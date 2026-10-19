@@ -1,0 +1,128 @@
+---
+import { siteConfig } from '../config/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+---
+
+<header class="sticky top-0 z-40 bg-[#FFF9F4]/95 backdrop-blur-md border-b border-[#F6DCCD] transition-all">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
+      <!-- Logo Brand -->
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#C2552B] rounded-lg p-1">
+        <div class="w-11 h-11 rounded-2xl bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center font-brand font-bold text-2xl shadow-sm border border-[#F6DCCD] group-hover:scale-105 transition-transform">
+          K
+        </div>
+        <div class="flex flex-col">
+          <span class="font-brand font-bold text-2xl tracking-tight text-[#4B2E22] leading-none">Kala</span>
+          <span class="text-[11px] font-semibold text-[#C2552B] tracking-wider uppercase mt-0.5">Moms & Baby Spa</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-7" aria-label="Menu Utama">
+        <a href="/#layanan" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Layanan Unggulan
+        </a>
+        <a href="/#pembeda" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Tentang Bidan
+        </a>
+        <a href="/#testimoni" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Cerita Bunda
+        </a>
+        <a href="/#area" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Area Layanan
+        </a>
+        <a href="/blog" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Blog Edukasi
+        </a>
+      </nav>
+
+      <!-- Desktop CTA Button -->
+      <div class="hidden md:flex items-center gap-3">
+        <WhatsAppButton
+          refCode="KALA-NAV"
+          message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-NAV]"
+          text="Reservasi Bidan"
+          variant="nav"
+        />
+      </div>
+
+      <!-- Mobile Menu Toggle Button -->
+      <div class="flex md:hidden items-center gap-2">
+        <WhatsAppButton
+          refCode="KALA-NAV-MOB"
+          message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-NAV-MOB]"
+          text="Chat"
+          variant="nav"
+          className="text-xs py-1.5 px-3"
+        />
+        <button
+          type="button"
+          id="mobileMenuToggle"
+          class="p-2 rounded-xl text-[#4B2E22] hover:bg-[#FFEFE5] focus:outline-none focus:ring-2 focus:ring-[#C2552B]"
+          aria-label="Buka menu navigasi"
+          aria-expanded="false"
+        >
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Navigation -->
+  <div id="mobileMenu" class="hidden md:hidden border-t border-[#F6DCCD] bg-[#FFF9F4] px-4 pt-3 pb-6 shadow-xl">
+    <div class="flex flex-col gap-3">
+      <a href="/#layanan" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
+        Layanan Unggulan
+      </a>
+      <a href="/#pembeda" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
+        Tentang Bidan Kala
+      </a>
+      <a href="/#testimoni" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
+        Cerita & Ulasan Bunda
+      </a>
+      <a href="/#area" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
+        Area Layanan Surabaya & Sidoarjo
+      </a>
+      <a href="/blog" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2">
+        Blog Edukasi Kesehatan
+      </a>
+      <div class="pt-2">
+        <WhatsAppButton
+          refCode="KALA-NAV-DROPDOWN"
+          message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-NAV-DROPDOWN]"
+          text="Reservasi Homecare via WhatsApp"
+          variant="primary"
+          className="w-full text-center"
+        />
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('mobileMenuToggle');
+  const menu = document.getElementById('mobileMenu');
+  const links = document.querySelectorAll('.mobile-nav-link');
+
+  if (toggle && menu) {
+    toggle.addEventListener('click', () => {
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+      } else {
+        menu.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    links.forEach((l) => {
+      l.addEventListener('click', () => {
+        menu.classList.add('hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+</script>

@@ -1,0 +1,75 @@
+---
+import { siteConfig } from '../config/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+
+const districts = [
+  {
+    region: 'Surabaya Barat',
+    areas: 'Wiyung, Sambikerep, Lakarsantri, Tandes, Sukomanunggal, Benowo, Pakal',
+  },
+  {
+    region: 'Surabaya Timur',
+    areas: 'Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, Gubeng, Tenggilis Mejoyo',
+  },
+  {
+    region: 'Surabaya Selatan',
+    areas: 'Wonokromo, Wonocolo, Jambangan, Gayungan, Karang Pilang, Sawahan',
+  },
+  {
+    region: 'Surabaya Pusat',
+    areas: 'Tegalsari, Genteng, Bubutan, Simokerto',
+  },
+  {
+    region: 'Surabaya Utara',
+    areas: 'Kenjeran, Bulak, Pabean Cantian, Semampir, Krembangan',
+  },
+  {
+    region: 'Kabupaten Sidoarjo',
+    areas: 'Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian',
+  },
+];
+---
+
+<section id="area" class="py-16 md:py-24 bg-[#FFF9F4]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+        Jangkauan Homecare Langsung ke Rumah
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+        Area Layanan Surabaya & Sidoarjo
+      </h2>
+      <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
+        Kala beroperasi murni sebagai layanan homecare tanpa antrean outlet fisik. Bidan profesional kami siap berkunjung langsung ke kediaman Anda di seluruh wilayah berikut:
+      </p>
+    </div>
+
+    <!-- Area Grid (Plain Text for Search Engine Crawlers) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      {districts.map((item) => (
+        <div class="bg-white p-6 rounded-2xl border border-[#F6DCCD] shadow-sm hover:border-[#C2552B] transition-colors">
+          <div class="flex items-center gap-2 mb-2 text-[#C2552B]">
+            <span class="text-lg">📍</span>
+            <h3 class="font-brand font-bold text-lg text-[#4B2E22]">{item.region}</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">
+            {item.areas}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <!-- CTA Check Location -->
+    <div class="text-center">
+      <p class="text-sm text-[#86675A] mb-4">
+        Lokasi rumah Anda belum tercantum di atas? Hubungi admin untuk konfirmasi jangkauan dan ketersediaan terapis bidan.
+      </p>
+      <WhatsAppButton
+        refCode="KALA-AREA-CHECK"
+        message="Halo Bidan Kala, saya mau tanya apakah lokasi saya dijangkau homecare Kala? [ref: KALA-AREA-CHECK]"
+        text="Cek Ketersediaan Bidan ke Rumah Saya"
+        variant="primary"
+      />
+    </div>
+  </div>
+</section>

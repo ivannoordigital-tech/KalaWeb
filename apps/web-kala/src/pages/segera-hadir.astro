@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../config/site';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+---
+
+<BaseLayout
+  title="Segera Hadir | Kala Moms and Baby Spa"
+  description="Situs resmi Kala Moms and Baby Spa sedang dalam persiapan peluncuran. Layanan homecare bidan profesional untuk ibu dan bayi di Surabaya & Sidoarjo tetap beroperasi normal via WhatsApp."
+  noindex={true}
+  showFloatingWa={false}
+>
+  <div class="min-h-[80vh] flex items-center justify-center py-16 px-4 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4]">
+    <div class="max-w-xl mx-auto text-center bg-white p-8 sm:p-12 rounded-3xl border-2 border-[#F6DCCD] shadow-kala">
+      
+      <!-- Brand Monogram -->
+      <div class="w-16 h-16 rounded-3xl bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center font-brand font-bold text-3xl mx-auto mb-6 shadow-sm border border-[#F6DCCD]">
+        K
+      </div>
+
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-4">
+        Website Sedang Disiapkan
+      </span>
+
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3 leading-snug">
+        Kala Moms and Baby Spa
+      </h1>
+
+      <p class="text-base font-semibold text-[#C2552B] font-brand mb-4">
+        {siteConfig.tagline}
+      </p>
+
+      <p class="text-sm sm:text-base text-[#86675A] leading-relaxed mb-8">
+        Platform resmi kami sedang dalam penyempurnaan fitur dan edukasi kesehatan. Seluruh layanan <span class="font-bold text-[#4B2E22]">homecare bidan resmi</span> untuk area Surabaya & Sidoarjo tetap beroperasi aktif setiap hari!
+      </p>
+
+      <!-- Trust Line -->
+      <div class="bg-[#FFF9F4] p-4 rounded-2xl border border-[#F6DCCD] mb-8 text-xs text-[#4B2E22] space-y-1.5 text-left">
+        <div class="flex items-center gap-2">
+          <span class="text-[#128C4A] font-bold">✓</span>
+          <span>Bidan Profesional Ber-STR Resmi</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[#128C4A] font-bold">✓</span>
+          <span>Protokol Higienitas Medis & Minyak Food-Grade</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[#128C4A] font-bold">✓</span>
+          <span>Melayani Homecare ke Seluruh Surabaya & Sidoarjo</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <WhatsAppButton
+          refCode="KALA-SEGERA-HADIR"
+          message="Halo Bidan Kala, saya mau reservasi homecare Kala [ref: KALA-SEGERA-HADIR]"
+          text="Reservasi Layanan via WhatsApp Resmi"
+          variant="primary"
+          className="w-full text-center py-4"
+        />
+
+        <div class="pt-2 text-xs text-[#86675A]">
+          <span>Ikuti kami di Instagram: </span>
+          <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer" class="font-bold text-[#C2552B] hover:underline">
+            {siteConfig.instagram}
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

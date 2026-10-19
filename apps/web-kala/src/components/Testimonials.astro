@@ -1,0 +1,51 @@
+---
+import { siteConfig } from '../config/site';
+---
+
+<section id="testimoni" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+        Cerita & Ulasan Nyata
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+        Kata Bunda yang Sudah Merasakan Sentuhan Kala
+      </h2>
+      <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
+        Ulasan terverifikasi dari Bunda di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {siteConfig.testimonials.map((item) => (
+        <div class="p-7 rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] flex flex-col justify-between hover:shadow-kala transition-all duration-300">
+          <div>
+            <div class="flex items-center gap-1 text-[#C2552B] mb-4 text-sm">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              <span class="text-xs font-bold text-[#128C4A] ml-2 bg-[#128C4A]/10 px-2 py-0.5 rounded-full">
+                Ulasan Terverifikasi
+              </span>
+            </div>
+            <p class="text-sm sm:text-base text-[#4B2E22] leading-relaxed italic mb-6">
+              "{item.quote}"
+            </p>
+          </div>
+
+          <div class="pt-5 border-t border-[#F6DCCD]/70 flex items-center justify-between">
+            <div>
+              <h3 class="font-brand font-bold text-sm text-[#4B2E22] leading-tight">
+                {item.author}
+              </h3>
+              <p class="text-xs text-[#86675A] mt-0.5">
+                📍 {item.location}
+              </p>
+            </div>
+            <span class="text-[11px] font-semibold text-[#C2552B] bg-[#FFEFE5] px-2.5 py-1 rounded-lg border border-[#F6DCCD]">
+              {item.service}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

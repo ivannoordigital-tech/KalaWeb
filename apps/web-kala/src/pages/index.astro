@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import ValueProps from '../components/ValueProps.astro';
+import FeaturedServices from '../components/FeaturedServices.astro';
+import Testimonials from '../components/Testimonials.astro';
+import CoverageArea from '../components/CoverageArea.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const latestPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+---
+
+<BaseLayout
+  title="Kala Moms and Baby Spa"
+  description="Layanan perawatan ibu dan bayi di rumah oleh bidan profesional ber-STR resmi di Surabaya dan Sidoarjo. Menghadirkan kenyamanan, higienitas steril, dan zero mom-shaming."
+  schemaType="home"
+>
+  <!-- Hero Section -->
+  <Hero />
+
+  <!-- 5 Pembeda Keunggulan Bidan Kala -->
+  <ValueProps />
+
+  <!-- 3 Layanan Unggulan + WhatsApp Catalog -->
+  <FeaturedServices />
+
+  <!-- 3 Cuplikan Cerita Nyata Bunda -->
+  <Testimonials />
+
+  <!-- Area Jangkauan Homecare Surabaya & Sidoarjo -->
+  <CoverageArea />
+
+  <!-- Section Blog Edukasi Pilar -->
+  <section class="py-16 md:py-24 bg-white border-t border-[#F6DCCD]/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <div>
+          <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+            Edukasi Kebidanan & Pediatrik
+          </span>
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4">
+            Artikel & Panduan Medis untuk Bunda
+          </h2>
+          <p class="text-sm sm:text-base text-[#86675A] mt-2 max-w-xl">
+            Materi berbasis panduan kebidanan resmi untuk mendampingi masa adaptasi Bunda dan si kecil dengan tenang.
+          </p>
+        </div>
+        <div class="mt-4 md:mt-0">
+          <a href="/blog" class="inline-flex items-center text-sm font-bold text-[#C2552B] hover:underline gap-1">
+            Lihat Semua Artikel →
+          </a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {latestPosts.map((post) => (
+          <article class="bg-[#FFF9F4] rounded-3xl border border-[#F6DCCD] overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300">
+            <div class="p-7">
+              <div class="flex items-center justify-between text-xs text-[#86675A] mb-3">
+                <span class="px-2.5 py-1 bg-[#FFEFE5] text-[#C2552B] font-semibold rounded-lg border border-[#F6DCCD] uppercase tracking-wider text-[10px]">
+                  {post.data.category}
+                </span>
+                <span>{new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(post.data.pubDate)}</span>
+              </div>
+              <h3 class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22] mb-3 leading-snug hover:text-[#C2552B] transition-colors">
+                <a href={`/blog/${post.slug}`}>
+                  {post.data.title}
+                </a>
+              </h3>
+              <p class="text-xs sm:text-sm text-[#86675A] line-clamp-3 leading-relaxed">
+                {post.data.description}
+              </p>
+            </div>
+
+            <div class="p-7 pt-0 border-t border-[#F6DCCD]/60 mt-4 flex items-center justify-between text-xs">
+              <span class="text-[#86675A]">Oleh <strong class="text-[#4B2E22]">{post.data.author}</strong></span>
+              <a href={`/blog/${post.slug}`} class="font-bold text-[#C2552B] hover:underline flex items-center gap-0.5">
+                Baca Selengkapnya →
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Call to Action -->
+  <section class="py-16 bg-gradient-to-r from-[#FFD9C4] via-[#FFEFE5] to-[#FFD9C4] border-t border-[#F6DCCD] text-center">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-4">
+        Siap Menyambut Bidan Kala ke Rumah Anda?
+      </h2>
+      <p class="text-sm sm:text-base text-[#86675A] max-w-xl mx-auto mb-8 leading-relaxed">
+        Pilih waktu terbaik Bunda. Bidan profesional kami siap hadir mendampingi pemulihan ibu dan relaksasi si kecil dengan higienitas terjamin.
+      </p>
+      <WhatsAppButton
+        refCode="KALA-HOME-BOTTOM"
+        message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-HOME-BOTTOM]"
+        text="Konsultasi & Reservasi Homecare Sekarang"
+        variant="primary"
+        className="text-base py-4 px-8"
+      />
+    </div>
+  </section>
+</BaseLayout>

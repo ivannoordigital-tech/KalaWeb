@@ -1,0 +1,109 @@
+---
+import SEO from '../components/SEO.astro';
+import JsonLd from '../components/JsonLd.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  type?: 'website' | 'article';
+  image?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  keywords?: string[];
+  noindex?: boolean;
+  schemaType?: 'home' | 'article' | 'page';
+  articleData?: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate: Date;
+    author: string;
+    authorTitle?: string;
+    url: string;
+    heroImage?: string;
+  };
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  showFloatingWa?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  type = 'website',
+  image,
+  publishedTime,
+  modifiedTime,
+  author,
+  keywords,
+  noindex = false,
+  schemaType = 'page',
+  articleData,
+  breadcrumbs,
+  showFloatingWa = true,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#FFBE9C" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- SEO Meta Tags & Open Graph -->
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonical}
+      image={image}
+      type={type}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+      keywords={keywords}
+      noindex={noindex}
+    />
+
+    <!-- JSON-LD Structured Data -->
+    <JsonLd
+      type={schemaType}
+      articleData={articleData}
+      breadcrumbs={breadcrumbs}
+    />
+  </head>
+  <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22]">
+    <Navbar />
+
+    <main class="flex-grow">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {showFloatingWa && (
+      <div class="fixed bottom-5 right-5 z-40">
+        <WhatsAppButton
+          refCode="KALA-FLOAT"
+          message="Halo Bidan Kala, saya mau tanya layanan homecare Kala [ref: KALA-FLOAT]"
+          text="Chat Bidan"
+          variant="floating"
+        />
+      </div>
+    )}
+
+    <!-- Attribution and WhatsApp Click Script -->
+    <script src="../scripts/tracker.js"></script>
+  </body>
+</html>

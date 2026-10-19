@@ -1,0 +1,138 @@
+---
+import { siteConfig } from '../config/site';
+
+interface Props {
+  type: 'home' | 'article' | 'page';
+  articleData?: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate: Date;
+    author: string;
+    authorTitle?: string;
+    url: string;
+    heroImage?: string;
+  };
+  breadcrumbs?: Array<{ name: string; url: string }>;
+}
+
+const { type, articleData, breadcrumbs } = Astro.props;
+
+// Schema LocalBusiness / MedicalBusiness for Homepage
+const homeSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['MedicalBusiness', 'HealthAndBeautyBusiness'],
+  '@id': `${siteConfig.url}/#business`,
+  name: siteConfig.name,
+  legalName: siteConfig.legalName,
+  url: siteConfig.url,
+  logo: `${siteConfig.url}/images/logo-kala.svg`,
+  image: `${siteConfig.url}/images/og-kala-homecare.svg`,
+  description: siteConfig.description,
+  telephone: `+${siteConfig.whatsappNumber}`,
+  priceRange: siteConfig.priceRange,
+  currenciesAccepted: 'IDR',
+  paymentAccepted: 'Tunai, Transfer Bank, QRIS',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '08:00',
+      closes: '17:00',
+    },
+  ],
+  areaServed: siteConfig.coverageAreas.map((area) => ({
+    '@type': 'AdministrativeArea',
+    name: area,
+  })),
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: siteConfig.geo.latitude,
+    longitude: siteConfig.geo.longitude,
+  },
+  sameAs: [
+    siteConfig.instagramUrl,
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Layanan Unggulan Kala Moms and Baby Spa',
+    itemListElement: siteConfig.featuredServices.map((srv, index) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: srv.name,
+        description: srv.description,
+        provider: {
+          '@type': 'MedicalBusiness',
+          name: siteConfig.name,
+        },
+      },
+      price: srv.numericPrice,
+      priceCurrency: 'IDR',
+      priceValidUntil: '2027-12-31',
+      position: index + 1,
+    })),
+  },
+};
+
+// Schema Article for Blog posts
+const articleSchema = articleData
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'MedicalWebPage',
+      headline: articleData.title,
+      description: articleData.description,
+      image: articleData.heroImage ? new URL(articleData.heroImage, siteConfig.url).href : `${siteConfig.url}/images/og-kala-homecare.svg`,
+      datePublished: articleData.pubDate.toISOString(),
+      dateModified: articleData.updatedDate.toISOString(),
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': articleData.url,
+      },
+      author: {
+        '@type': 'Person',
+        name: articleData.author,
+        jobTitle: articleData.authorTitle || 'Bidan Praktisi Kala',
+      },
+      reviewedBy: {
+        '@type': 'MedicalBusiness',
+        name: siteConfig.name,
+        telephone: `+${siteConfig.whatsappNumber}`,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: siteConfig.name,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${siteConfig.url}/images/logo-kala.svg`,
+        },
+      },
+    }
+  : null;
+
+// Breadcrumbs Schema
+const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((crumb, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: crumb.name,
+        item: new URL(crumb.url, siteConfig.url).href,
+      })),
+    }
+  : null;
+---
+
+{type === 'home' && (
+  <script type="application/ld+json" set:html={JSON.stringify(homeSchema)} />
+)}
+
+{type === 'article' && articleSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+)}
+
+{breadcrumbSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+)}

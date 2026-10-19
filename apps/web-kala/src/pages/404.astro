@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+---
+
+<BaseLayout
+  title="Halaman Tidak Ditemukan (404)"
+  description="Halaman yang Anda tuju tidak ditemukan atau telah dipindahkan."
+  noindex={true}
+>
+  <div class="min-h-[70vh] flex items-center justify-center py-16 px-4 bg-[#FFF9F4]">
+    <div class="max-w-md mx-auto text-center">
+      <div class="w-20 h-20 rounded-3xl bg-[#FFEFE5] text-[#C2552B] flex items-center justify-center font-brand font-bold text-4xl mx-auto mb-6 border border-[#F6DCCD]">
+        404
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mb-3">
+        Halaman Tidak Ditemukan
+      </h1>
+      <p class="text-sm text-[#86675A] mb-8 leading-relaxed">
+        Maaf Bunda, halaman yang dicari mungkin telah dipindahkan atau tautan yang dimasukkan kurang tepat. Yuk kembali ke beranda atau konsultasi langsung dengan Bidan Kala.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a
+          href="/"
+          class="w-full sm:w-auto inline-flex items-center justify-center font-bold text-[#4B2E22] bg-[#FFEFE5] hover:bg-[#FFD9C4] border border-[#F6DCCD] py-3 px-6 rounded-full text-sm transition-all"
+        >
+          Kembali ke Beranda
+        </a>
+        <WhatsAppButton
+          refCode="KALA-404"
+          message="Halo Bidan Kala, saya mau tanya soal layanan Kala [ref: KALA-404]"
+          text="Tanya Bidan via WA"
+          variant="primary"
+          className="w-full sm:w-auto text-sm py-3 px-6"
+        />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

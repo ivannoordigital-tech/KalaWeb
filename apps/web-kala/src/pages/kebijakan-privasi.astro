@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../config/site';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Kebijakan Privasi', url: '/kebijakan-privasi' },
+];
+---
+
+<BaseLayout
+  title="Kebijakan Privasi & Perlindungan Data"
+  description="Kebijakan privasi resmi Kala Moms and Baby Spa. Transparansi perlindungan data kesehatan keluarga, penggunaan analitik website, dan komunikasi aman via WhatsApp."
+  canonical="https://kalababyspa.com/kebijakan-privasi"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="py-14 md:py-20 bg-[#FFF9F4]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-xs text-[#86675A] mb-8" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#C2552B] transition-colors">Beranda</a>
+        <span>›</span>
+        <span class="text-[#4B2E22] font-semibold">Kebijakan Privasi</span>
+      </nav>
+
+      <header class="mb-10 pb-8 border-b border-[#F6DCCD]">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Privasi & Keamanan Pasien
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-3">
+          Kebijakan Privasi Kala Moms and Baby Spa
+        </h1>
+        <p class="text-xs sm:text-sm text-[#86675A]">
+          Terakhir diperbarui: 19 Oktober 2026 &bull; Berlaku untuk seluruh layanan di domain kalababyspa.com
+        </p>
+      </header>
+
+      <div class="prose-kala max-w-none bg-white p-8 sm:p-12 rounded-3xl border border-[#F6DCCD] shadow-sm">
+        <p>
+          Selamat datang di situs resmi <strong>{siteConfig.name}</strong> ("Kala", "kami"). Kami sangat menghargai dan menjunjung tinggi privasi Bunda, buah hati, dan keluarga tercinta. Dokumen Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, menyimpan, dan melindungi informasi pribadi Anda saat mengakses website maupun saat berkomunikasi melalui kanal reservasi kami.
+        </p>
+
+        <h2>1. Informasi yang Kami Kumpulkan</h2>
+        <p>
+          Kami membatasi pengumpulan data hanya pada hal-hal yang relevan untuk kebutuhan konsultasi kebidanan dan kenyamanan operasional homecare:
+        </p>
+        <ul>
+          <li><strong>Data Teknis & Analitik Anonim:</strong> Saat Anda mengunjungi website, kami mengumpulkan data analitik agregat yang tidak mengidentifikasi identitas pribadi, seperti jenis perangkat, peramban (browser), halaman yang diakses, serta parameter kampanye (UTM) untuk mengukur performa situs.</li>
+          <li><strong>Data Komunikasi & Reservasi (via WhatsApp):</strong> Saat Anda menghubungi kami melalui tautan WhatsApp resmi, nomor telepon Anda, nama sapaan Bunda, nama/usia si kecil, serta alamat kunjungan di area Surabaya atau Sidoarjo dicatat untuk keperluan penjadwalan terapis bidan.</li>
+          <li><strong>Informasi Riwayat Kesehatan Fisiologis:</strong> Riwayat singkat proses persalinan (normal/SC), keluhan bayi (seperti kolik/kembung), atau kondisi laktasi yang disampaikan saat sesi ngobrol hangat dicatat secara tertutup demi keselamatan tindakan kebidanan.</li>
+        </ul>
+
+        <h2>2. Penggunaan Kode Referensi dan Pelacakan Iklan</h2>
+        <p>
+          Untuk memahami efektivitas konten edukasi kami, tombol WhatsApp pada situs ini dilengkapi kode referensi (misalnya <code>[ref: KALA-HOME]</code> atau <code>[ref: KALA-ART-KOLIK]</code>). Sistem ini membantu tim admin kami mengetahui halaman atau artikel mana yang Anda baca sebelum memulai obrolan, sehingga bidan kami dapat menyapa Anda dengan konteks percakapan yang tepat dan ramah.
+        </p>
+        <p>
+          Kami tidak menempelkan pelacak pihak ketiga yang menjual data Anda ke jaringan iklan pihak luar.
+        </p>
+
+        <h2>3. Perlindungan & Kerahasiaan Data Medis</h2>
+        <p>
+          Kala mematuhi standar etika kebidanan dan kerahasiaan rekam medis:
+        </p>
+        <ul>
+          <li>Data riwayat kesehatan dan alamat rumah Anda <strong>tidak akan pernah dijual, disewakan, atau dibagikan</strong> kepada pihak ketiga untuk tujuan pemasaran komersial.</li>
+          <li>Foto atau video dokumentasi tindakan bayi <strong>hanya dapat diambil dan ditayangkan bila telah memperoleh persetujuan tertulis eksplisit dari orang tua</strong>. Secara default, seluruh dokumentasi internal dijaga privasi visualnya.</li>
+        </ul>
+
+        <h2>4. Hak Anda atas Data Pribadi</h2>
+        <p>
+          Bunda memiliki hak penuh untuk:
+        </p>
+        <ul>
+          <li>Mengetahui data kontak apa saja yang tersimpan di sistem administrasi kami.</li>
+          <li>Meminta pembaruan atau koreksi data riwayat kunjungan rumah.</li>
+          <li>Meminta penghapusan nomor telepon dan riwayat obrolan dari kontak reservasi kami setelah layanan selesai.</li>
+        </ul>
+
+        <h2>5. Kontak & Pertanyaan Privasi</h2>
+        <p>
+          Bila Bunda memiliki pertanyaan, masukan, atau permohonan terkait privasi data, silakan menghubungi tim privasi dan manajemen Kala melalui:
+        </p>
+        <ul>
+          <li><strong>WhatsApp Resmi:</strong> {siteConfig.whatsappNumberFormatted}</li>
+          <li><strong>Instagram:</strong> {siteConfig.instagram}</li>
+          <li><strong>Area Operasional:</strong> Surabaya & Sidoarjo, Jawa Timur, Indonesia</li>
+        </ul>
+      </div>
+
+      <div class="mt-10 text-center">
+        <WhatsAppButton
+          refCode="KALA-PRIVACY"
+          message="Halo Bidan Kala, saya mau tanya seputar kebijakan layanan Kala [ref: KALA-PRIVACY]"
+          text="Hubungi Tim Kala via WhatsApp"
+          variant="secondary"
+        />
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

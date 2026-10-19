@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#FFF9F4"/>
+  <!-- Decorative Background Curves -->
+  <circle cx="1050" cy="150" r="320" fill="#FFEFE5" opacity="0.8"/>
+  <circle cx="150" cy="550" r="280" fill="#FFD9C4" opacity="0.5"/>
+
+  <!-- Logo Monogram -->
+  <g transform="translate(100, 100)">
+    <rect width="90" height="90" rx="28" fill="#FFD9C4" stroke="#F6DCCD" stroke-width="3"/>
+    <path d="M36 28v42h11V52l18 18h16L58 46l20-18H62L47 38V28H36z" fill="#C2552B"/>
+    <text x="110" y="55" font-family="'Fredoka', 'Nunito', sans-serif" font-size="46" font-weight="700" fill="#4B2E22">Kala</text>
+    <text x="112" y="78" font-family="'Nunito', sans-serif" font-size="15" font-weight="800" fill="#C2552B" letter-spacing="2">MOMS &amp; BABY SPA</text>
+  </g>
+
+  <!-- Title & Tagline -->
+  <text x="100" y="270" font-family="'Fredoka', sans-serif" font-size="52" font-weight="700" fill="#4B2E22">Layanan Perawatan Ibu &amp; Bayi di Rumah</text>
+  <text x="100" y="335" font-family="'Fredoka', sans-serif" font-size="44" font-weight="700" fill="#C2552B">oleh Bidan Profesional di Surabaya &amp; Sidoarjo</text>
+
+  <text x="100" y="415" font-family="'Nunito', sans-serif" font-size="24" font-weight="600" fill="#86675A">Tumbuh Berkembang Bersama Kala — Bidan Sahabat Bunda</text>
+
+  <!-- Badges -->
+  <g transform="translate(100, 480)">
+    <rect width="260" height="54" rx="27" fill="#FFEFE5" stroke="#F6DCCD"/>
+    <text x="130" y="33" font-family="'Nunito', sans-serif" font-size="17" font-weight="700" fill="#C2552B" text-anchor="middle">✓ Bidan Ber-STR Resmi</text>
+  </g>
+
+  <g transform="translate(380, 480)">
+    <rect width="280" height="54" rx="27" fill="#FFEFE5" stroke="#F6DCCD"/>
+    <text x="140" y="33" font-family="'Nunito', sans-serif" font-size="17" font-weight="700" fill="#C2552B" text-anchor="middle">✓ Minyak Food-Grade Steril</text>
+  </g>
+
+  <g transform="translate(680, 480)">
+    <rect width="320" height="54" rx="27" fill="#FFEFE5" stroke="#F6DCCD"/>
+    <text x="160" y="33" font-family="'Nunito', sans-serif" font-size="17" font-weight="700" fill="#C2552B" text-anchor="middle">✓ 100% Homecare ke Rumah</text>
+  </g>
+</svg>

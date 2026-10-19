@@ -1,0 +1,128 @@
+---
+import { siteConfig } from '../config/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+---
+
+<footer class="bg-[#4B2E22] text-[#FFF9F4] pt-16 pb-12 border-t border-[#F6DCCD]/20">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[#FFF9F4]/10">
+      
+      <!-- Col 1: Brand & Tagline -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#FFBE9C] text-[#4B2E22] flex items-center justify-center font-brand font-bold text-2xl">
+            K
+          </div>
+          <div>
+            <span class="font-brand font-bold text-xl text-[#FFF9F4] block leading-none">Kala</span>
+            <span class="text-[10px] font-semibold text-[#FFBE9C] tracking-wider uppercase">Moms & Baby Spa</span>
+          </div>
+        </div>
+        <p class="text-xs text-[#FFF9F4]/80 leading-relaxed">
+          {siteConfig.tagline}. Layanan perawatan kesehatan ibu dan stimulasi tumbuh kembang bayi di rumah oleh bidan ber-STR resmi di Surabaya & Sidoarjo.
+        </p>
+        <div class="pt-2">
+          <span class="inline-block text-[11px] font-semibold bg-[#FFBE9C]/15 text-[#FFBE9C] px-3 py-1 rounded-full border border-[#FFBE9C]/30">
+            {siteConfig.socialProofText}
+          </span>
+        </div>
+      </div>
+
+      <!-- Col 2: Jam & Wilayah Layanan -->
+      <div class="space-y-3">
+        <h3 class="font-brand font-bold text-base text-[#FFBE9C]">
+          Operasional & Layanan
+        </h3>
+        <ul class="space-y-2 text-xs text-[#FFF9F4]/80">
+          <li class="flex items-start gap-2">
+            <span>🕒</span>
+            <span>{siteConfig.operationalHours}</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span>🏠</span>
+            <span>Murni Layanan Homecare (Terapis berkunjung ke rumah Bunda)</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span>📍</span>
+            <span>Area: Surabaya (Barat, Timur, Selatan, Pusat, Utara) & Sidoarjo</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Navigasi & Edukasi -->
+      <div class="space-y-3">
+        <h3 class="font-brand font-bold text-base text-[#FFBE9C]">
+          Artikel & Kebijakan
+        </h3>
+        <ul class="space-y-2 text-xs text-[#FFF9F4]/80">
+          <li>
+            <a href="/blog/bayi-kolik-malam-hari" class="hover:text-[#FFBE9C] transition-colors">
+              Mengatasi Bayi Kolik & Kembung
+            </a>
+          </li>
+          <li>
+            <a href="/blog/manfaat-pijat-oksitosin-ibu-menyusui" class="hover:text-[#FFBE9C] transition-colors">
+              Manfaat Pijat Oksitosin Laktasi
+            </a>
+          </li>
+          <li>
+            <a href="/blog/panduan-memilih-pijat-bayi-homecare-surabaya" class="hover:text-[#FFBE9C] transition-colors">
+              Panduan Memilih Bidan Homecare
+            </a>
+          </li>
+          <li>
+            <a href="/kebijakan-privasi" class="hover:text-[#FFBE9C] transition-colors font-medium underline">
+              Kebijakan Privasi & Data Pasien
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Kontak & WhatsApp -->
+      <div class="space-y-3">
+        <h3 class="font-brand font-bold text-base text-[#FFBE9C]">
+          Kontak Resmi
+        </h3>
+        <p class="text-xs text-[#FFF9F4]/80">
+          Konsultasi jadwal dan reservasi ditangani langsung oleh tim admin Bidan Kala:
+        </p>
+        <div class="space-y-2 text-xs text-[#FFF9F4]/80">
+          <p>
+            Instagram: <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer" class="text-[#FFBE9C] hover:underline font-semibold">{siteConfig.instagram}</a>
+          </p>
+          <p>
+            WhatsApp: <span class="font-semibold text-[#FFF9F4]">{siteConfig.whatsappNumberFormatted}</span>
+          </p>
+        </div>
+        <div class="pt-2">
+          <WhatsAppButton
+            refCode="KALA-FOOTER"
+            message="Halo Bidan Kala, saya mau tanya layanan homecare Kala [ref: KALA-FOOTER]"
+            text="Hubungi Bidan Kala"
+            variant="primary"
+            className="w-full text-center text-xs py-2.5"
+          />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Credits -->
+    <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FFF9F4]/60 gap-4">
+      <p>
+        &copy; {new Date().getFullYear()} {siteConfig.name}. Hak cipta dilindungi undang-undang.
+      </p>
+      <div class="flex items-center gap-6">
+        <a href="/kebijakan-privasi" class="hover:text-[#FFBE9C] transition-colors">
+          Kebijakan Privasi
+        </a>
+        <a href="/#area" class="hover:text-[#FFBE9C] transition-colors">
+          Area Surabaya & Sidoarjo
+        </a>
+        <a href="/#layanan" class="hover:text-[#FFBE9C] transition-colors">
+          Pricelist
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>

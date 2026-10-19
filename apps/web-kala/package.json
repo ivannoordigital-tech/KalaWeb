@@ -1,0 +1,22 @@
+{
+  "name": "web-kala",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Situs resmi Kala Moms and Baby Spa - Astro & Tailwind",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/tailwind": "^6.0.2",
+    "astro": "^5.4.0",
+    "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

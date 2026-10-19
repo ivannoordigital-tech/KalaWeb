@@ -1,0 +1,44 @@
+---
+import { siteConfig } from '../config/site';
+---
+
+<section id="pembeda" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+        Standar Kebidanan Medis
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+        5 Pembeda Layanan Homecare Kala
+      </h2>
+      <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
+        Mengapa ratusan Bunda di Surabaya dan Sidoarjo mempercayakan kenyamanan pemulihan ibu dan tumbuh kembang buah hati kepada Bidan Kala.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      {siteConfig.differentiators.map((item, index) => (
+        <div class={`p-7 rounded-3xl border border-[#F6DCCD] bg-[#FFF9F4] hover:shadow-kala transition-all duration-300 flex flex-col justify-between ${index === 4 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
+          <div>
+            <div class="flex items-center justify-between mb-5">
+              <span class="w-10 h-10 rounded-2xl bg-[#FFEFE5] text-[#C2552B] font-brand font-bold flex items-center justify-center text-sm border border-[#F6DCCD]">
+                {item.number}
+              </span>
+              <span class="text-xs font-semibold text-[#86675A]">Keunggulan #{index + 1}</span>
+            </div>
+            <h3 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug">
+              {item.title}
+            </h3>
+            <p class="text-sm text-[#86675A] leading-relaxed">
+              {item.description}
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-[#F6DCCD]/60 flex items-center text-xs font-bold text-[#C2552B]">
+            <span>Standar Klinis Kala</span>
+            <span class="ml-1">✓</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

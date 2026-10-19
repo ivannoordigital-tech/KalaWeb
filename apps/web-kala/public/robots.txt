@@ -1,0 +1,28 @@
+# Robots.txt for Kala Moms and Baby Spa (kalababyspa.com)
+# Generated: 2026-10-19
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# AI Search & Answer Engines (Authorized for Public Clinical & Citation Discovery)
+User-agent: GPTBot
+Allow: /
+Disallow: /segera-hadir
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /segera-hadir
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /segera-hadir
+
+User-agent: *
+Allow: /
+Disallow: /segera-hadir
+Disallow: /404
+
+Sitemap: https://kalababyspa.com/sitemap-index.xml

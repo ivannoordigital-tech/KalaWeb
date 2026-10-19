@@ -1,0 +1,126 @@
+---
+import { siteConfig } from '../config/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+---
+
+<section class="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Text Column (Left) -->
+      <div class="lg:col-span-7 flex flex-col items-start text-left">
+        <!-- Trust Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFEFE5] border border-[#F6DCCD] text-[#C2552B] font-semibold text-xs sm:text-sm mb-6 shadow-sm">
+          <span class="inline-block w-2 h-2 rounded-full bg-[#128C4A] animate-pulse"></span>
+          <span>{siteConfig.socialProofText}</span>
+        </div>
+
+        <!-- Single H1 Title -->
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] tracking-tight leading-[1.18] mb-5">
+          Layanan Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional di Surabaya & Sidoarjo
+        </h1>
+
+        <!-- Tagline / Subtitle -->
+        <p class="text-lg sm:text-xl font-medium text-[#C2552B] mb-4 font-brand">
+          {siteConfig.tagline}
+        </p>
+
+        <!-- Descriptive Paragraph -->
+        <p class="text-base sm:text-lg text-[#86675A] leading-relaxed mb-8 max-w-2xl">
+          Sentuhan medis yang hangat dan higienis langsung ke ruang keluarga Anda. Nikmati sesi pemulihan nifas, pijat laktasi, dan stimulasi tumbuh kembang si kecil tanpa lelah menembus kemacetan, tanpa rasa cemas, dan tanpa <span class="font-semibold text-[#4B2E22]">mom-shaming</span>.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+          <WhatsAppButton
+            refCode="KALA-HOME"
+            message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-HOME]"
+            text="Konsultasi Bidan via WhatsApp"
+            variant="primary"
+            className="text-base py-4 px-8"
+          />
+          <a
+            href="#layanan"
+            class="inline-flex items-center justify-center font-semibold text-[#4B2E22] bg-[#FFEFE5] hover:bg-[#FFD9C4] border border-[#F6DCCD] py-3.5 px-6 rounded-full transition-all text-center text-sm sm:text-base"
+          >
+            Lihat Menu Layanan
+          </a>
+        </div>
+
+        <!-- Trust Badges Under Hero -->
+        <div class="mt-10 pt-8 border-t border-[#F6DCCD]/80 grid grid-cols-3 gap-4 w-full text-left">
+          <div>
+            <div class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22]">100%</div>
+            <div class="text-xs text-[#86675A]">Bidan Ber-STR Resmi</div>
+          </div>
+          <div>
+            <div class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22]">Food-Grade</div>
+            <div class="text-xs text-[#86675A]">Minyak Alami Steril</div>
+          </div>
+          <div>
+            <div class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22]">Surabaya-SDA</div>
+            <div class="text-xs text-[#86675A]">Homecare ke Rumah</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual Card / Graphic Column (Right) -->
+      <div class="lg:col-span-5 relative">
+        <div class="relative mx-auto max-w-md lg:max-w-none">
+          <!-- Background Glow -->
+          <div class="absolute -top-6 -left-6 w-72 h-72 bg-[#FFD9C4] rounded-full filter blur-3xl opacity-60 pointer-events-none"></div>
+          <div class="absolute -bottom-6 -right-6 w-72 h-72 bg-[#FFEFE5] rounded-full filter blur-3xl opacity-70 pointer-events-none"></div>
+
+          <!-- Feature Card Illustration -->
+          <div class="relative bg-white border-2 border-[#F6DCCD] rounded-3xl p-6 sm:p-8 shadow-kala text-[#4B2E22]">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-[#F6DCCD]/60">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-[#FFEFE5] flex items-center justify-center text-[#C2552B] font-bold text-xl">
+                  👶
+                </div>
+                <div>
+                  <h2 class="font-brand font-bold text-base text-[#4B2E22] leading-tight">Protokol Bidan Kala</h2>
+                  <p class="text-xs text-[#86675A]">Kenyamanan Maksimal di Rumah</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold px-3 py-1 bg-[#128C4A]/10 text-[#128C4A] rounded-full">Terapis Nakes</span>
+            </div>
+
+            <ul class="space-y-4 text-sm text-[#4B2E22]">
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
+                <span><strong>Ngobrol Hangat 10-15 Menit:</strong> Bidan mendengarkan adaptasi Bunda tanpa penghakiman.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
+                <span><strong>Linen & Alat Bersih Steril:</strong> Peralatan higienis standar medis dibawa langsung.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
+                <span><strong>Stimulasi Anatomi Pediatrik:</strong> Teknik pijat aman untuk pernapasan, relaksasi & cerna.</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
+                <span><strong>Edukasi Mandiri Orang Tua:</strong> Panduan teknik pijat yang bisa dipraktikkan Ayah-Bunda.</span>
+              </li>
+            </ul>
+
+            <div class="mt-6 pt-5 border-t border-[#F6DCCD]/60 bg-[#FFF9F4] -mx-6 -mb-6 p-6 rounded-b-3xl">
+              <div class="flex items-center justify-between text-xs text-[#86675A] mb-3">
+                <span>Konsultasi awal & tanya jadwal:</span>
+                <span class="font-bold text-[#128C4A]">Respon Cepat</span>
+              </div>
+              <WhatsAppButton
+                refCode="KALA-HERO-CARD"
+                message="Halo Bidan Kala, saya mau tanya jadwal homecare [ref: KALA-HERO-CARD]"
+                text="Chat Tanya Jadwal"
+                variant="card"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

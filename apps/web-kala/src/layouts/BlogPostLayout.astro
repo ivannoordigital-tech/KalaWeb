@@ -1,0 +1,194 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+
+interface Props {
+  entry: {
+    slug: string;
+    data: {
+      title: string;
+      description: string;
+      pubDate: Date;
+      updatedDate: Date;
+      author: string;
+      authorTitle?: string;
+      category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
+      heroImage?: string;
+      heroImageAlt?: string;
+      keywords?: string[];
+      medicalReviewer?: string;
+      draft?: boolean;
+    };
+  };
+}
+
+const { entry } = Astro.props;
+const { data, slug } = entry;
+
+// Determine specific refCode and message per article
+let artRefCode = 'KALA-ART';
+let artWaMessage = `Halo Bidan Kala, saya membaca artikel ${data.title} dan mau konsultasi [ref: KALA-ART]`;
+
+if (slug.includes('kolik')) {
+  artRefCode = 'KALA-ART-KOLIK';
+  artWaMessage = 'Halo Bidan Kala, saya baca artikel kolik dan mau konsultasi [ref: KALA-ART-KOLIK]';
+} else if (slug.includes('oksitosin')) {
+  artRefCode = 'KALA-ART-OKSITOSIN';
+  artWaMessage = 'Halo Bidan Kala, saya mau tanya soal pijat oksitosin [ref: KALA-ART-OKSITOSIN]';
+} else if (slug.includes('homecare') || slug.includes('surabaya')) {
+  artRefCode = 'KALA-ART-HOMECARE';
+  artWaMessage = 'Halo Bidan Kala, saya mau reservasi pijat bayi homecare [ref: KALA-ART-HOMECARE]';
+}
+
+const formattedPubDate = new Intl.DateTimeFormat('id-ID', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(data.pubDate);
+
+const formattedUpdateDate = new Intl.DateTimeFormat('id-ID', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(data.updatedDate);
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Blog Edukasi', url: '/blog' },
+  { name: data.title, url: `/blog/${slug}` },
+];
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  canonical={`https://kalababyspa.com/blog/${slug}`}
+  type="article"
+  publishedTime={data.pubDate.toISOString()}
+  modifiedTime={data.updatedDate.toISOString()}
+  author={data.author}
+  keywords={data.keywords}
+  schemaType="article"
+  articleData={{
+    title: data.title,
+    description: data.description,
+    pubDate: data.pubDate,
+    updatedDate: data.updatedDate,
+    author: data.author,
+    authorTitle: data.authorTitle,
+    url: `https://kalababyspa.com/blog/${slug}`,
+    heroImage: data.heroImage,
+  }}
+  breadcrumbs={breadcrumbs}
+>
+  <article class="py-12 md:py-16 bg-[#FFF9F4]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Breadcrumb Navigation -->
+      <nav class="flex items-center gap-2 text-xs text-[#86675A] mb-8 overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#C2552B] transition-colors">Beranda</a>
+        <span>›</span>
+        <a href="/blog" class="hover:text-[#C2552B] transition-colors">Blog Edukasi</a>
+        <span>›</span>
+        <span class="text-[#4B2E22] font-semibold truncate max-w-xs">{data.title}</span>
+      </nav>
+
+      <!-- Article Header -->
+      <header class="mb-10 pb-8 border-b border-[#F6DCCD]">
+        <div class="flex flex-wrap items-center gap-2.5 mb-4">
+          <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3 py-1 rounded-full border border-[#F6DCCD]">
+            Pilar: {data.category}
+          </span>
+          <span class="inline-flex items-center gap-1.5 text-xs font-medium text-[#128C4A] bg-[#128C4A]/10 px-3 py-1 rounded-full border border-[#128C4A]/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#128C4A]"></span>
+            Ditinjau Bidan Ber-STR
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] tracking-tight leading-tight mb-5">
+          {data.title}
+        </h1>
+
+        <!-- Metadata Row -->
+        <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-[#86675A] pt-2">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center font-bold text-xs">
+              👩‍⚕️
+            </div>
+            <div>
+              <span class="font-bold text-[#4B2E22] block">{data.author}</span>
+              <span class="text-[11px] text-[#86675A]">{data.authorTitle || 'Bidan Kala'}</span>
+            </div>
+          </div>
+          <span class="text-[#F6DCCD]">|</span>
+          <div>
+            <span>Terbit: {formattedPubDate}</span>
+            {data.updatedDate > data.pubDate && (
+              <span class="block text-[11px] text-[#C2552B]">Diperbarui: {formattedUpdateDate}</span>
+            )}
+          </div>
+          <span class="text-[#F6DCCD]">|</span>
+          <div class="text-[11px] text-[#86675A]">
+            Reviewer Medis: <span class="font-semibold text-[#4B2E22]">{data.medicalReviewer || 'Tim Medis Kala'}</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Article Prose Content -->
+      <div class="prose-kala max-w-none text-base sm:text-lg">
+        <slot />
+      </div>
+
+      <!-- Midwife Author Bio Box -->
+      <div class="mt-14 p-6 sm:p-8 rounded-3xl bg-white border border-[#F6DCCD] shadow-sm">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+          <div class="w-16 h-16 rounded-2xl bg-[#FFEFE5] text-[#C2552B] flex items-center justify-center font-bold text-2xl flex-shrink-0 border border-[#F6DCCD]">
+            👩‍⚕️
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <h3 class="font-brand font-bold text-lg text-[#4B2E22]">{data.author}</h3>
+              <span class="text-xs px-2.5 py-0.5 bg-[#FFEFE5] text-[#C2552B] rounded-full font-semibold border border-[#F6DCCD]">
+                Bidan Resmi Ber-STR
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">
+              Praktisi kebidanan profesional di Kala Moms and Baby Spa dengan peminatan stimulasi taktil newborn, manajemen laktasi, dan pendampingan masa nifas tanpa mom-shaming di area Surabaya & Sidoarjo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article WhatsApp Consultation Banner -->
+      <div class="mt-10 p-8 rounded-3xl bg-gradient-to-br from-[#FFEFE5] via-[#FFF9F4] to-[#FFEFE5] border-2 border-[#F6DCCD] text-center shadow-kala">
+        <span class="text-xs font-bold text-[#C2552B] uppercase tracking-wider bg-white px-3 py-1 rounded-full border border-[#F6DCCD] inline-block mb-3">
+          Konsultasi Hangat Langsung
+        </span>
+        <h3 class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22] mb-3">
+          Punya Pertanyaan Seputar Keluhan Si Kecil atau Pemulihan Nifas?
+        </h3>
+        <p class="text-sm text-[#86675A] max-w-xl mx-auto mb-6">
+          Bicarakan kondisi Bunda dan si kecil dengan bidan Kala. Kami siap membantu reservasi kunjungan homecare steril ke rumah Anda di Surabaya & Sidoarjo.
+        </p>
+        <WhatsAppButton
+          refCode={artRefCode}
+          message={artWaMessage}
+          text="Konsultasikan dengan Bidan via WhatsApp"
+          variant="primary"
+          className="text-base py-3.5 px-8"
+        />
+      </div>
+
+      <!-- Back to Blog Navigation -->
+      <div class="mt-12 pt-6 border-t border-[#F6DCCD] flex items-center justify-between text-sm">
+        <a href="/blog" class="font-bold text-[#C2552B] hover:underline flex items-center gap-1">
+          ← Kembali ke Semua Artikel
+        </a>
+        <a href="/#layanan" class="font-bold text-[#4B2E22] hover:text-[#C2552B]">
+          Lihat Menu Layanan Homecare →
+        </a>
+      </div>
+
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,14 @@
+{
+  "name": "kala-web-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for Kala Moms and Baby Spa digital platform",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=web-kala",
+    "build": "npm run build --workspace=web-kala",
+    "preview": "npm run preview --workspace=web-kala"
+  }
+}

@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-kala-peach: #FFBE9C;
+  --color-kala-peach-2: #FFD9C4;
+  --color-kala-peach-3: #FFEFE5;
+  --color-kala-cream: #FFF9F4;
+  --color-kala-ink: #4B2E22;
+  --color-kala-muted: #86675A;
+  --color-kala-accent: #C2552B;
+  --color-kala-line: #F6DCCD;
+  --color-kala-wa: #128C4A;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #4B2E22;
+  background-color: #FFF9F4;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography styles for Fredoka Brand Headings */
+h1, h2, h3, .font-brand {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+}
+
+/* Prose customizations for articles */
+.prose-kala {
+  color: #4B2E22;
+  line-height: 1.8;
+}
+
+.prose-kala h2 {
+  font-family: 'Fredoka', sans-serif;
+  color: #4B2E22;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #FFEFE5;
+}
+
+.prose-kala h3 {
+  font-family: 'Fredoka', sans-serif;
+  color: #C2552B;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-kala p {
+  margin-bottom: 1.25rem;
+}
+
+.prose-kala ul, .prose-kala ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.prose-kala li {
+  margin-bottom: 0.5rem;
+}
+
+.prose-kala blockquote {
+  border-left: 4px solid #FFBE9C;
+  background-color: #FFEFE5;
+  padding: 1rem 1.25rem;
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  margin: 1.5rem 0;
+}
+
+.prose-kala table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.prose-kala th {
+  background-color: #FFEFE5;
+  color: #4B2E22;
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid #F6DCCD;
+}
+
+.prose-kala td {
+  padding: 10px 14px;
+  border: 1px solid #F6DCCD;
+}
+
+.prose-kala tr:nth-child(even) td {
+  background-color: #FFFDFB;
+}
+
+.prose-kala a {
+  color: #C2552B;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.prose-kala a:hover {
+  color: #4B2E22;
+}
+
+/* Safe area padding for mobile iOS bottom navigation */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

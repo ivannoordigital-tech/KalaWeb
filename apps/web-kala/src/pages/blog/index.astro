@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Blog Edukasi', url: '/blog' },
+];
+---
+
+<BaseLayout
+  title="Blog Edukasi Ibu & Bayi"
+  description="Kumpulan artikel ilmiah dan panduan praktis kebidanan: pijat bayi kolik, let-down reflex ASI oksitosin, stimulasi newborn, dan standar homecare medis di Surabaya & Sidoarjo."
+  canonical="https://kalababyspa.com/blog"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="py-14 md:py-20 bg-[#FFF9F4]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Page Header -->
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Klinik Edukasi Kala
+        </span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Pusat Edukasi Ibu & Bayi
+        </h1>
+        <p class="text-base text-[#86675A] leading-relaxed">
+          Semua artikel disusun dan ditinjau oleh tenaga bidan profesional ber-STR resmi untuk menemani perjalanan Bunda dengan rasa tenang dan berbasis ilmu medis yang benar.
+        </p>
+      </div>
+
+      <!-- Articles Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {sortedPosts.map((post) => (
+          <article class="bg-white rounded-3xl border border-[#F6DCCD] overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300">
+            <div class="p-8">
+              <div class="flex items-center justify-between text-xs text-[#86675A] mb-4">
+                <span class="px-3 py-1 bg-[#FFEFE5] text-[#C2552B] font-bold rounded-lg border border-[#F6DCCD] uppercase tracking-wider text-[10px]">
+                  {post.data.category}
+                </span>
+                <span>
+                  {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(post.data.pubDate)}
+                </span>
+              </div>
+
+              <h2 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug hover:text-[#C2552B] transition-colors">
+                <a href={`/blog/${post.slug}`}>
+                  {post.data.title}
+                </a>
+              </h2>
+
+              <p class="text-sm text-[#86675A] leading-relaxed line-clamp-3 mb-4">
+                {post.data.description}
+              </p>
+            </div>
+
+            <div class="p-8 pt-0 border-t border-[#F6DCCD]/60 mt-4 flex items-center justify-between text-xs">
+              <span class="text-[#86675A]">Penulis: <strong class="text-[#4B2E22]">{post.data.author}</strong></span>
+              <a href={`/blog/${post.slug}`} class="font-bold text-[#C2552B] hover:underline flex items-center gap-1">
+                Baca Artikel →
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
