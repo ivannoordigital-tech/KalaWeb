@@ -7,6 +7,7 @@ export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   label: 'Pengaturan Situs & Kontak',
   admin: {
+    group: '⚙️ Pengaturan Website',
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator' || role === 'seo';

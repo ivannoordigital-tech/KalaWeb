@@ -19,11 +19,27 @@ export interface DeployStatus {
   lastCompletedAt?: string;
   lastReason?: string;
   error?: string;
+  targetUrl?: string;
 }
 
 export const currentDeployStatus: DeployStatus = {
   status: 'idle',
 };
+
+export function getDeployStatus(): DeployStatus & { isBuilding: boolean; estimatedSecondsRemaining: number } {
+  const now = Date.now();
+  const timeSinceTrigger = now - lastTriggerTime;
+  const BUILD_DURATION_MS = 90000; // ~90 seconds typical Cloudflare Pages build duration
+
+  const isBuilding = currentDeployStatus.status === 'triggered' && timeSinceTrigger < BUILD_DURATION_MS;
+  const estimatedSecondsRemaining = isBuilding ? Math.max(0, Math.round((BUILD_DURATION_MS - timeSinceTrigger) / 1000)) : 0;
+
+  return {
+    ...currentDeployStatus,
+    isBuilding,
+    estimatedSecondsRemaining,
+  };
+}
 
 async function sendTelegramAlert(message: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -91,6 +107,8 @@ async function executeDeploy(hookUrl: string, options: TriggerOptions, reason: s
     : options.resource === 'Pages' && options.slug
       ? `https://kalababyspa.com/${options.slug}`
       : 'https://kalababyspa.com';
+
+  currentDeployStatus.targetUrl = targetUrl;
 
   await sendTelegramAlert(
     `🚀 <b>[KalaWeb Build Dimulai]</b>\n` +

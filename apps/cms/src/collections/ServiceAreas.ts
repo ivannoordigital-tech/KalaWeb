@@ -10,6 +10,7 @@ export const ServiceAreas: CollectionConfig = {
     plural: 'Wilayah Layanan',
   },
   admin: {
+    group: '🏥 Data Layanan & Klinik',
     useAsTitle: 'name',
     defaultColumns: ['name', 'city', 'estimatedArrivalMinutes', 'active'],
     hidden: ({ user }) => {

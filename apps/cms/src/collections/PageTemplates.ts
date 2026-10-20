@@ -9,6 +9,7 @@ export const PageTemplates: CollectionConfig = {
     plural: '📑 Pustaka Template Halaman',
   },
   admin: {
+    group: '📢 Pemasaran & Iklan',
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'updatedAt'],
     hidden: ({ user }) => {

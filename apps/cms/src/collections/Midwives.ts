@@ -10,6 +10,7 @@ export const Midwives: CollectionConfig = {
     plural: 'Bidan & Tenaga Medis',
   },
   admin: {
+    group: '🏥 Data Layanan & Klinik',
     useAsTitle: 'name',
     defaultColumns: ['name', 'title', 'strNumber', 'experienceYears', 'active'],
     hidden: ({ user }) => {

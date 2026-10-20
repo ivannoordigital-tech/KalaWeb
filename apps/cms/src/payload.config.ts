@@ -17,7 +17,9 @@ import { LandingPages } from './collections/LandingPages'
 import { Pages } from './collections/Pages'
 import { BlockTemplates } from './collections/BlockTemplates'
 import { PageTemplates } from './collections/PageTemplates'
+import { HelpCenter } from './collections/HelpCenter'
 import { SiteSettings } from './globals/SiteSettings'
+import { getDeployStatus } from './utilities/triggerDeployHook'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -29,20 +31,30 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
+  endpoints: [
+    {
+      path: '/deploy-status',
+      method: 'get',
+      handler: () => {
+        return Response.json(getDeployStatus())
+      },
+    },
+  ],
   collections: [
-    Users,
-    Media,
-    Articles,
+    HelpCenter,
+    LandingPages,
+    PageTemplates,
+    BlockTemplates,
+    Pages,
     Services,
+    Midwives,
+    ServiceAreas,
     Testimonials,
     FAQ,
-    ServiceAreas,
-    Midwives,
+    Articles,
+    Media,
     Redirects,
-    LandingPages,
-    Pages,
-    BlockTemplates,
-    PageTemplates,
+    Users,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor(),

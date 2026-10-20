@@ -9,6 +9,7 @@ export const FAQ: CollectionConfig = {
     plural: 'Tanya Jawab (FAQ)',
   },
   admin: {
+    group: '🏥 Data Layanan & Klinik',
     useAsTitle: 'question',
     defaultColumns: ['question', 'category', 'order', 'active'],
     hidden: ({ user }) => {

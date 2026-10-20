@@ -11,6 +11,7 @@ export const Services: CollectionConfig = {
     plural: 'Layanan & Paket Spa',
   },
   admin: {
+    group: '🏥 Data Layanan & Klinik',
     useAsTitle: 'name',
     defaultColumns: ['name', 'numericPrice', 'durationMinutes', 'recommended', 'active', 'order'],
     hidden: ({ user }) => {

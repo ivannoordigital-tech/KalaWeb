@@ -67,4 +67,31 @@ const hasBlocks = blocks.length > 0;
       </div>
     )}
   </main>
+
+  <!-- Payload CMS Side-by-Side Live Preview Message Listener -->
+  <script is:inline>
+    (function initPayloadLivePreview() {
+      if (typeof window === 'undefined') return;
+      const isInsideIframe = window.self !== window.top;
+      if (isInsideIframe) {
+        window.addEventListener('message', function(event) {
+          if (event.data && (event.data.type === 'payload-live-preview' || event.data.type === 'payload-live-preview-ready')) {
+            if (event.data.data) {
+              const updated = event.data.data;
+              if (updated.title) {
+                document.title = '[PRATINJAU DRAFT] ' + updated.title;
+              }
+              const mainH1 = document.querySelector('main h1');
+              if (mainH1 && updated.title) {
+                mainH1.textContent = updated.title;
+              }
+            }
+          }
+        });
+        try {
+          window.parent.postMessage({ type: 'payload-live-preview-ready' }, '*');
+        } catch (e) {}
+      }
+    })();
+  </script>
 </BaseLayout>

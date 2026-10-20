@@ -9,6 +9,7 @@ export const BlockTemplates: CollectionConfig = {
     plural: '📁 Pustaka Template Blok',
   },
   admin: {
+    group: '📢 Pemasaran & Iklan',
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'category', 'updatedAt'],
     hidden: ({ user }) => {

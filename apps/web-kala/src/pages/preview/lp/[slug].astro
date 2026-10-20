@@ -123,5 +123,37 @@ const hasBlocks = blocks.length > 0;
 
     <!-- Tracker Script -->
     <script src="../../../scripts/tracker.js"></script>
+
+    <!-- Payload CMS Side-by-Side Live Preview Message Listener -->
+    <script is:inline>
+      (function initPayloadLivePreview() {
+        if (typeof window === 'undefined') return;
+        const isInsideIframe = window.self !== window.top;
+        if (isInsideIframe) {
+          console.log('[KalaWeb Live Preview] Connected to Payload CMS Editor iframe.');
+          window.addEventListener('message', function(event) {
+            if (event.data && (event.data.type === 'payload-live-preview' || event.data.type === 'payload-live-preview-ready')) {
+              if (event.data.data) {
+                const updated = event.data.data;
+                if (updated.title) {
+                  document.title = '[PRATINJAU DRAFT] ' + updated.title;
+                }
+                const heroH1 = document.querySelector('section h1, main h1');
+                if (heroH1 && (updated.headline || updated.title)) {
+                  heroH1.textContent = updated.headline || updated.title;
+                }
+                const heroSub = document.querySelector('section p.text-base, main p.text-base');
+                if (heroSub && updated.subheadline) {
+                  heroSub.textContent = updated.subheadline;
+                }
+              }
+            }
+          });
+          try {
+            window.parent.postMessage({ type: 'payload-live-preview-ready' }, '*');
+          } catch (e) {}
+        }
+      })();
+    </script>
   </body>
 </html>

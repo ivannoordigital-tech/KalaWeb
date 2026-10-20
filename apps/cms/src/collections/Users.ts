@@ -8,6 +8,7 @@ export const Users: CollectionConfig = {
     plural: 'Pengguna & Tim',
   },
   admin: {
+    group: '⚙️ Pengaturan Website',
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'role'],
     hidden: ({ user }) => getUserRole(user) !== 'superadmin',

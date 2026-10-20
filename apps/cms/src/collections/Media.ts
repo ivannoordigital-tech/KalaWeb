@@ -13,6 +13,7 @@ export const Media: CollectionConfig = {
     plural: 'Galeri Foto & Media',
   },
   admin: {
+    group: '⚙️ Pengaturan Website',
     useAsTitle: 'alt',
     defaultColumns: ['alt', 'filename', 'filesize', 'createdAt'],
   },

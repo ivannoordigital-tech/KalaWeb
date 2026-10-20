@@ -9,6 +9,7 @@ export const Redirects: CollectionConfig = {
     plural: 'Manajemen Redirects',
   },
   admin: {
+    group: '⚙️ Pengaturan Website',
     useAsTitle: 'from',
     defaultColumns: ['from', 'to', 'type', 'active'],
     hidden: ({ user }) => {

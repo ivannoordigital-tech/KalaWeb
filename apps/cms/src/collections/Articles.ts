@@ -10,6 +10,7 @@ export const Articles: CollectionConfig = {
     plural: 'Artikel Edukasi & Blog',
   },
   admin: {
+    group: '✍️ Edukasi & Blog',
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'author', 'pubDate', 'status'],
     hidden: ({ user }) => {

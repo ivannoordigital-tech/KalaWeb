@@ -624,6 +624,122 @@ export async function seed() {
     }
   }
 
+  // 12. Seed Help Center & Admin SOP Guides
+  const initialGuides = [
+    {
+      title: 'Tutorial 3 Menit: Membuat Landing Page Baru dari Template',
+      category: 'panduan-lp',
+      order: 1,
+      summary: 'Cara tercepat membuat landing page iklan: pilih PageTemplate yang sudah ada, sesuaikan judul & harga, lalu terbitkan dalam 3 menit.',
+      steps: [
+        {
+          stepNumber: '1',
+          stepTitle: 'Pilih Template di Menu Page Templates',
+          stepDetail: 'Buka menu "📑 Pustaka Template Halaman", pilih blueprint yang sesuai (misal: "LP Standar Kolik"). Klik tombol Duplikat untuk menyalin seluruh susunan blok secara instan.',
+        },
+        {
+          stepNumber: '2',
+          stepTitle: 'Ganti Teks Headline & Harga Promo',
+          stepDetail: 'Pada panel Side-by-Side Live Preview, ganti judul Hero dan teks paket harga. Anda dapat langsung melihat hasil tampilannya di simulasi layar HP sebelah kanan secara real-time.',
+        },
+        {
+          stepNumber: '3',
+          stepTitle: 'Biarkan Ref Code Otomatis',
+          stepDetail: 'Kosongkan kolom Ref Code. Sistem akan otomatis membuat kode pelacak terstandar (misal: KALA-LP-KOLIK-A) dan menyematkannya di tombol WhatsApp.',
+        },
+        {
+          stepNumber: '4',
+          stepTitle: 'Periksa Checklist Pra-Publish & Terbitkan',
+          stepDetail: 'Pastikan checklist pra-publish berwarna hijau, lalu klik "Publish". Perhatikan widget status di atas editor: status akan berubah menjadi hijau saat website live di CDN.',
+        },
+      ],
+      dosAndDonts: {
+        dos: [
+          { item: 'Gunakan selalu Page Template agar struktur konversi tetap teratur' },
+          { item: 'Tulis kalimat empati bunda di baris pembuka hero' },
+          { item: 'Periksa tampilan live preview di ukuran Mobile (375px)' },
+        ],
+        donts: [
+          { item: 'Jangan menambahkan lebih dari satu blok Hero (H1 ganda)' },
+          { item: 'Jangan menghapus tombol WhatsApp CTA' },
+          { item: 'Jangan menjanjikan kesembuhan instan medis' },
+        ],
+      },
+    },
+    {
+      title: 'Pedoman Etika Bahasa Iklan Kesehatan & Regulasi Kemenkes',
+      category: 'etika-iklan-medis',
+      order: 2,
+      summary: 'Kamus kata terlarang dan aturan klaim etis kebidanan demi melindungi kredibilitas klinis dan legalitas izin operasional Kala.',
+      steps: [
+        {
+          stepNumber: '1',
+          stepTitle: 'Gunakan Kata Empati & Validasi Rasa Lelah',
+          stepDetail: 'Alih-alih menakut-nakuti, gunakan bahasa validasi kehangatan: "Bayi rewel wajar Bunda, kami hadir mendampingi di rumah tanpa mom-shaming."',
+        },
+        {
+          stepNumber: '2',
+          stepTitle: 'Hindari Klaim Kesembuhan Mutlak',
+          stepDetail: 'Layanan homecare kebidanan adalah stimulasi relaksasi dan kenyamanan tumbuh kembang, bukan terapi kuratif obat medis.',
+        },
+      ],
+      dosAndDonts: {
+        dos: [
+          { item: 'Sebutkan "100% Ditangani Bidan Ber-STR Resmi"' },
+          { item: 'Sebutkan "Minyak Alami Food-Grade Steril"' },
+          { item: 'Sebutkan "Edukasi & Pijat Stimulasi Ilmiah"' },
+        ],
+        donts: [
+          { item: 'DILARANG: "Menyembuhkan kolik seketika / pasti sembuh"' },
+          { item: 'DILARANG: "100% aman tanpa risiko apapun"' },
+          { item: 'DILARANG: Memberi diagnosis medis (misal: mendiagnosis infeksi)' },
+        ],
+      },
+    },
+    {
+      title: 'Standar Foto & Format Media Gambar',
+      category: 'standar-foto-media',
+      order: 3,
+      summary: 'Panduan upload foto langsung dari ponsel agar website tetap super cepat dimuat calon Bunda.',
+      steps: [
+        {
+          stepNumber: '1',
+          stepTitle: 'Foto Langsung dari Ponsel',
+          stepDetail: 'Admin bebas mengunggah foto langsung dari kamera HP. Sistem otomatis mengecilkan dan mengonversi menjadi WebP ringan (<200KB).',
+        },
+        {
+          stepNumber: '2',
+          stepTitle: 'Isi Teks Deskripsi (Alt Text)',
+          stepDetail: 'Tuliskan deskripsi singkat foto dalam 4-8 kata (misal: "Bidan Kala sedang melakukan pijat relaksasi bayi di rumah"). Ini penting untuk Google SEO dan aksesibilitas.',
+        },
+      ],
+      dosAndDonts: {
+        dos: [
+          { item: 'Pastikan pencahayaan foto bayi hangat dan jelas' },
+          { item: 'Pastikan linen dan seragam bidan tampak rapi dan bersih' },
+        ],
+        donts: [
+          { item: 'Jangan upload foto tanpa izin tertulis dari orang tua bayi' },
+          { item: 'Jangan biarkan kolom Alt Text kosong saat upload' },
+        ],
+      },
+    },
+  ]
+
+  for (const guide of initialGuides) {
+    const existing = await (payload.find as any)({
+      collection: 'help-center',
+      where: { title: { equals: guide.title } },
+    })
+    if (existing.totalDocs === 0) {
+      console.log(`Seeding help guide: ${guide.title}`)
+      await (payload.create as any)({
+        collection: 'help-center',
+        data: guide,
+      })
+    }
+  }
+
   console.log('Seeding completed successfully!')
   process.exit(0)
 }

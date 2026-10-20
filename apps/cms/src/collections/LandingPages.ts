@@ -11,8 +11,9 @@ export const LandingPages: CollectionConfig = {
     plural: 'Halaman Iklan (Landing Pages)',
   },
   admin: {
+    group: '📢 Pemasaran & Iklan',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'refCode', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'refCode', 'variant', '_status', 'updatedAt'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
@@ -22,6 +23,32 @@ export const LandingPages: CollectionConfig = {
         return `http://localhost:4321/preview/lp/${doc.slug}`;
       }
       return null;
+    },
+    livePreview: {
+      url: ({ data }) => {
+        const slug = data?.slug || 'bayi-kolik';
+        return `http://localhost:4321/preview/lp/${slug}`;
+      },
+      breakpoints: [
+        {
+          label: 'Mobile (375px)',
+          name: 'mobile',
+          width: 375,
+          height: 667,
+        },
+        {
+          label: 'Tablet (768px)',
+          name: 'tablet',
+          width: 768,
+          height: 1024,
+        },
+        {
+          label: 'Desktop (1280px)',
+          name: 'desktop',
+          width: 1280,
+          height: 800,
+        },
+      ],
     },
   },
   access: {
@@ -51,6 +78,13 @@ export const LandingPages: CollectionConfig = {
     ],
     beforeChange: [
       async ({ data }) => {
+        // Auto-generate standard refCode if empty
+        if (!data.refCode && data.slug) {
+          const cleanSlug = String(data.slug).toUpperCase().replace(/[^A-Z0-9]/g, '-');
+          const variant = data.variant || 'A';
+          data.refCode = `KALA-LP-${cleanSlug}-${variant}`;
+        }
+
         const { isValid, errors, warnings } = validatePageBuilderDoc(data, true);
         if (!isValid) {
           throw new Error(`[Validasi Publikasi Landing Page Gagal]:\n• ${errors.join('\n• ')}`);
@@ -109,12 +143,12 @@ export const LandingPages: CollectionConfig = {
     {
       name: 'refCode',
       type: 'text',
-      required: true,
+      required: false,
       label: 'Kode Pelacak WhatsApp (Ref Code)',
       admin: {
         position: 'sidebar',
-        description: 'Kode unik pelacak pesan WA agar tim CS/Admin tahu asal kampanye iklan. Contoh: LP-KOLIK-ADS',
-        placeholder: 'LP-KOLIK-ADS',
+        description: 'Kosongkan jika ingin dibuat otomatis: KALA-LP-[SLUG]-[VARIAN]. Pesan chat: "Halo Bidan Kala, saya mau reservasi... [ref: ...]"',
+        placeholder: 'Otomatis dibuat jika kosong',
       },
     },
     {

@@ -30,6 +30,7 @@ export const Pages: CollectionConfig = {
     plural: 'Halaman Kustom (Pages)',
   },
   admin: {
+    group: '📢 Pemasaran & Iklan',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt', '_status'],
     hidden: ({ user }) => {
@@ -41,6 +42,32 @@ export const Pages: CollectionConfig = {
         return `http://localhost:4321/preview/${doc.slug}`;
       }
       return null;
+    },
+    livePreview: {
+      url: ({ data }) => {
+        const slug = data?.slug || 'syarat-ketentuan';
+        return `http://localhost:4321/preview/${slug}`;
+      },
+      breakpoints: [
+        {
+          label: 'Mobile (375px)',
+          name: 'mobile',
+          width: 375,
+          height: 667,
+        },
+        {
+          label: 'Tablet (768px)',
+          name: 'tablet',
+          width: 768,
+          height: 1024,
+        },
+        {
+          label: 'Desktop (1280px)',
+          name: 'desktop',
+          width: 1280,
+          height: 800,
+        },
+      ],
     },
   },
   access: {
