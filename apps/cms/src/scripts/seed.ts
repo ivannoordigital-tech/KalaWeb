@@ -32,7 +32,7 @@ export async function seed() {
   // 2. Seed Services
   const initialServices = [
     {
-      serviceId: 'bundle-duo',
+      slug: 'bundle-duo',
       name: 'Kala Bundle Duo (Mom & Baby Ceria)',
       target: '1 Ibu + 1 Bayi',
       duration: '100 Menit',
@@ -46,7 +46,7 @@ export async function seed() {
       message: 'Halo Bidan Kala, saya mau reservasi Kala Bundle Duo (Mom & Baby Ceria) Rp150.000 [ref: KALA-SRV-DUO]',
     },
     {
-      serviceId: 'baby-newborn',
+      slug: 'baby-newborn',
       name: 'Kala Baby – Pijat Ceria Newborn',
       target: 'Bayi 0 - 6 Bulan',
       duration: '40 Menit',
@@ -60,7 +60,7 @@ export async function seed() {
       message: 'Halo Bidan Kala, saya mau reservasi Kala Baby Pijat Ceria Newborn Rp60.000 [ref: KALA-SRV-NEWBORN]',
     },
     {
-      serviceId: 'bundle-selapan',
+      slug: 'bundle-selapan',
       name: 'Kala Bundle Selapan Full',
       target: 'Bayi 0 - 12 Bulan',
       duration: '80 Menit',
@@ -78,7 +78,7 @@ export async function seed() {
   for (const srv of initialServices) {
     const existing = await payload.find({
       collection: 'services',
-      where: { serviceId: { equals: srv.serviceId } },
+      where: { slug: { equals: srv.slug } },
     })
     if (existing.totalDocs === 0) {
       console.log(`Seeding service: ${srv.name}`)
@@ -94,19 +94,19 @@ export async function seed() {
     {
       quote: 'Setelah melahirkan sesar rasanya badan remuk dan cemas banget pegang newborn. Begitu Bidan Kala datang, langsung diajak ngobrol santai tanpa disalah-salahin soal ASI. Pijatan lembutnya bikin anakku tidur tenang banget.',
       author: 'Bunda Sarah & Baby Arka (2 bulan)',
-      location: 'Rungkut, Surabaya Timur',
+      area: 'Rungkut, Surabaya Timur',
       service: 'Kala Bundle Duo',
     },
     {
       quote: 'Si kecil sempat sering nangis histeris tiap malam karena kembung. Bidan Kala sabar banget ngajarin gerakan ILU dan posisi sendawa yang benar. Sekarang jauh lebih tenang dan kami nggak panikan lagi.',
       author: 'Bunda Nadhira & Baby Zayn (3 minggu)',
-      location: 'Waru, Sidoarjo',
+      area: 'Waru, Sidoarjo',
       service: 'Pijat Ceria Newborn',
     },
     {
       quote: 'Cukur selapanan di rumah sama Bidan Kala higienis banget. Alatnya steril dan bidannya telaten ngalihin perhatian bayi sampai nggak nangis sama sekali. Praktis nggak perlu keluar rumah.',
       author: 'Bunda Clarissa & Baby Kenzo (1 bulan)',
-      location: 'Wiyung, Surabaya Barat',
+      area: 'Wiyung, Surabaya Barat',
       service: 'Kala Bundle Selapan Full',
     },
   ]
