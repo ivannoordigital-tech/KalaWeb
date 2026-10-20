@@ -1,91 +1,106 @@
-# Standar Operasional Prosedur (SOP) Operasional KalaWeb
+# Standar Operasional Prosedur (SOP) Operasional & SEO KalaWeb
 
-Panduan kerja praktis untuk tim **Bidan**, **Admin Operasional**, dan **Marketing** dalam mengoperasikan konten, layanan, serta atribusi reservasi di Kala Moms and Baby Spa.
-
----
-
-## 1. SOP untuk Tim Bidan & Penulis Edukasi
-
-### 1.1 Penulisan Artikel Baru di CMS
-1. Buka `https://admin.kalababyspa.com/admin/collections/articles`.
-2. Klik **Create New Article**.
-3. **Judul & Slug:**
-   - Gunakan judul ramah orang tua, contoh: *"Mengapa Bayi Sering Menangis di Jam Tertentu dan Cara Mengatasinya"*.
-   - Slug otomatis terbentuk dalam huruf kecil dan tanda hubung.
-4. **Validasi Gambar & Alt Text (Wajib):**
-   - Setiap gambar **wajib** memiliki *Alt Text* deskriptif (contoh: *"Bidan Kala sedang menenangkan bayi baru lahir dengan teknik sentuhan taktil"*).
-   - Format gambar: WebP/JPG/PNG (maksimal ukuran 2 MB).
-5. **Medical Reviewer & Kredibilitas:**
-   - Wajib memilih nama Bidan peninjau ber-STR aktif.
-   - Status artikel akan tetap `draft` sampai disetujui oleh Bidan Koordinator.
-6. **Penerbitan:**
-   - Ubah status menjadi `Published` dan klik **Save**.
-   - Sistem akan otomatis mendebounce (60 detik) dan memicu pembaruan website live tanpa bantuan developer.
+Panduan kerja resmi untuk tim **Bidan Penulis**, **Bidan Koordinator**, **Admin Operasional**, dan **SEO Specialist** dalam mengoperasikan konten, layanan, harga, serta optimasi pencarian di Kala Moms and Baby Spa.
 
 ---
 
-## 2. SOP untuk Admin Operasional
+## 1. SOP untuk Tim Bidan & Penulis Konten Edukasi
 
-### 2.1 Mengubah Harga Layanan & Banner Promo
-1. Buka menu **Services** di CMS:
-   - Pilih layanan yang akan diperbarui (misalnya: *Kala Bundle Duo*).
-   - Ubah kolom **Harga** (tampilan) dan **Numeric Price** (untuk sistem & schema).
-   - Jika ada promo, masukkan **Harga Coret** (`originalPrice`).
-   - Ubah flag `Recommended` jika ingin menampilkan badge *Paling Diminati Bunda*.
-2. Untuk banner pengumuman atas website:
-   - Buka menu **Site Settings** (Global).
-   - Masukkan pesan pada kolom `announcementBanner` (misalnya: *"Promo Bulan Ini: Free Minyak Telon Food-Grade untuk Reservasi Homecare Selapanan"*).
-   - Kosongkan kolom jika tidak ada banner aktif.
-3. Klik **Save**. Perubahan otomatis terdeploy dalam 1-2 menit.
+### 1.1 Struktur Standar Penulisan Artikel (Template Topic Cluster)
+Setiap artikel edukasi yang ditulis di CMS (`/admin/collections/articles`) wajib mengikuti 6 pilar struktur:
+1. **Pengantar Penuh Empati (Empathy Hook):** Menenangkan kecemasan Bunda tanpa nada menghakimi (*zero mom-shaming*).
+2. **Penjelasan Medis Sederhana:** Menjelaskan fisiologi atau penyebab keluhan dengan bahasa awam yang mudah dipahami.
+3. **Kapan Perlu ke Dokter / Red Flags (Tanda Bahaya Medis):** Poin tegas tanda bahaya bayi/ibu yang memerlukan penanganan IGD/dokter spesialis segera.
+4. **Tindakan Mandiri yang Aman di Rumah:** Tips stimulasi, kompres, atau pijat lembut yang aman dilakukan orang tua.
+5. **Rekomendasi Layanan Homecare Terkait (Internal Link CTA):** Menautkan ke minimal 1 layanan resmi Kala (misal: *Pijat Bayi Kolik*, *Pijat Laktasi*).
+6. **FAQ Singkat (2-3 Pertanyaan):** Menjawab keraguan umum orang tua seputar topik tersebut.
 
-### 2.2 Menangani Chat Reservasi & Kode Ref WhatsApp
-Setiap pesan yang masuk dari website memiliki kode pelacak unik di dalam kurung siku `[ref: ...]`.
+### 1.2 Checklist Pra-Publish Artikel (Wajib Centang Mandiri)
+Sebelum mengubah status artikel menjadi **Published**, pastikan checklist berikut terpenuhi:
+- [ ] **Judul Artikel:** 30–60 karakter, memuat kata kunci utama di awal atau tengah judul.
+- [ ] **Ringkasan Deskripsi:** 120–155 karakter, menjelaskan manfaat membaca artikel bagi Bunda.
+- [ ] **Alt Text Foto Sampul:** Wajib diisi dengan deskripsi visual yang jelas (aksesibilitas & Google Image).
+- [ ] **Penulis & Peninjau Medis:** Pilih nama Bidan ber-STR aktif yang bertanggung jawab atas validitas klinis.
+- [ ] **Internal Linking (Hubungan Konten):**
+  - Minimal 1 Layanan Terkait (`relatedServices`).
+  - Minimal 2 Artikel Edukasi Terkait (`relatedArticles`).
+  - Pilih apakah artikel ini **Artikel Pilar** atau artikel pendukung yang menunjuk ke **Pilar Induk**.
+- [ ] **Status:** Simpan sebagai `Draft` terlebih dahulu untuk ditinjau. Ubah ke `Published` hanya jika telah siap tayang.
 
-**Contoh Format Pesan:**
+---
+
+## 2. SOP untuk Admin Operasional & Koordinator Layanan
+
+### 2.1 Mengubah Harga Layanan & Proteksi Keamanan
+1. Buka menu **Services** di CMS (`/admin/collections/services`).
+2. Pilih layanan yang akan diperbarui (misal: *Pijat Bayi Homecare Surabaya*).
+3. Isi kolom **Harga Angka (Numeric Price)**:
+   - Masukkan nominal murni berupa angka (misal: `125000`). Sistem otomatis memformat teks tampilan menjadi `Rp125.000` dan mengupdate Schema.org Google tanpa perlu diketik ulang.
+4. **Harga Coret Promo (Original Price):**
+   - Jika ada diskon, masukkan nominal asli sebelum diskon pada `Harga Coret`. Sistem memvalidasi harga coret harus selalu lebih besar dari harga jual.
+5. **Proteksi Perubahan Harga Ekstrim (>30%):**
+   - Jika harga berubah drastis lebih dari 30% (baik kenaikan maupun penurunan), sistem otomatis memblokir penyimpanan untuk mencegah salah ketik nol (misal Rp150.000 menjadi Rp15.000).
+   - Untuk melanjutkan perubahan resmi, centang kotak **"Konfirmasi Perubahan Harga >30%"** di bagian bawah formulir.
+6. Klik **Save**. Perubahan akan memicu build otomatis Cloudflare Pages.
+
+### 2.2 Memasang & Menghentikan Banner Pengumuman / Promo
+1. Buka menu **Pengaturan Situs (Site Settings)** di CMS.
+2. Buka grup **Banner Promo Pengumuman**:
+   - **Teks Pengumuman:** Tulis teks promo singkat dan menarik (misal: *"Promo Bulan Ini: Free Minyak Telon Alami untuk Paket Selapanan"*).
+   - **Tanggal Mulai Tayang (Opsional):** Jadwalkan kapan banner mulai aktif.
+   - **Tanggal Berakhir Tayang (Opsional):** Tentukan batas akhir promo. Sistem otomatis menyembunyikan banner setelah tanggal ini berakhir, sehingga promo kedaluwarsa tidak tertinggal di website.
+3. Untuk mematikan banner sewaktu-waktu: kosongkan kolom teks pengumuman lalu klik **Save**.
+
+### 2.3 Nomor WhatsApp Resmi
+- Kolom WhatsApp nomor diisi dengan format angka baku diawali `628` (contoh: `6281234567890`).
+- Sistem otomatis menghapus karakter spasi, tanda plus `+`, tanda hubung `-`, atau angka `0` di depan.
+
+### 2.4 Berapa Lama Perubahan Tampil di Website? (Status Build)
+- Setelah menekan tombol **Save** / **Publish**, sistem akan mengirim sinyal build ke Cloudflare Pages.
+- Perubahan biasanya aktif di website `https://kalababyspa.com` dalam waktu **1 hingga 2 menit**.
+- **Jika situs belum berubah setelah 10 menit:**
+  1. Bersihkan cache browser Bunda / buka via mode Incognito / Private Window.
+  2. Periksa bot Telegram Notifikasi Deployment Kala (akan ada laporan apakah build berhasil atau gagal).
+  3. Hubungi Lead Developer / Super Admin jika terdapat notifikasi error build.
+
+---
+
+## 3. SOP untuk SEO Specialist
+
+### 3.1 Paket SEO Reusable (Articles, Services, Areas, Midwives)
+Setiap halaman publik memiliki panel **Optimasi Mesin Pencari (SEO)** standar:
+- **Meta Title:** Panjang ideal 30–60 karakter. Jika dikosongkan, sistem otomatis mengambil dari Judul Halaman.
+- **Meta Description:** Panjang ideal 120–155 karakter. Jika dikosongkan, mengambil dari ringkasan halaman.
+- **Kata Kunci Fokus (Primary Keyword):** Masukkan 1 frasa kata kunci utama (contoh: `pijat bayi surabaya homecare`).
+- **Canonical URL:** Kosongkan untuk menggunakan URL default halaman sendiri. Hanya isi jika halaman merupakan duplikasi dari halaman lain.
+- **Noindex:** Centang HANYA untuk halaman privat, draft khusus, atau halaman pengujian yang dilarang muncul di Google.
+- **Revisi Substantif:** Centang kotak ini jika melakukan pembaruan konten besar agar Google memperbarui timestamp `dateModified` di schema.
+
+### 3.2 Manajemen Redirects (Peralihan URL 301/302)
+1. Buka menu **Manajemen Redirects** di CMS (`/admin/collections/redirects`).
+2. Masukkan **URL Asal** (misal: `/promo-lama`). Wajib diawali garis miring `/`.
+3. Masukkan **URL Tujuan** (misal: `/layanan/bundle-selapan`).
+4. Pilih tipe:
+   - **301 (Permanen):** Pilihan standar agar ranking Google dari URL lama dialihkan sepenuhnya ke URL baru.
+   - **302 (Sementara):** Hanya untuk pengalihan sementara promo bulanan.
+5. Sistem memiliki proteksi anti-loop: Anda tidak dapat mengarahkan URL ke dirinya sendiri (`from !== to`).
+6. Saat build dijalankan, seluruh daftar redirect aktif akan diinjeksikan otomatis ke file Cloudflare `_redirects`.
+
+---
+
+## 4. Alur Penanganan Lead WhatsApp & Kode Atribusi
+
+Setiap Bunda yang menekan tombol konsultasi di website akan mengirim pesan dengan format unik:
 ```
-Halo Bidan Kala, saya mau reservasi Kala Bundle Duo (Mom & Baby Ceria) Rp150.000 [ref: KALA-SRV-DUO&f=google_cpc&l=ig_bio&gclid=Cj0K...]
+Halo Bidan Kala, saya mau reservasi Pijat Bayi Homecare Rp125.000 [ref: KALA-SRV-BAYI&f=google_cpc&l=ig_bio&gclid=Cj0K...]
 ```
 
-**Langkah Penanganan CS/Admin:**
-1. **Sapaan Hangat & Validasi:**
-   - *"Halo Bunda! Selamat datang di Kala Moms and Baby Spa. Terima kasih sudah menghubungi kami..."*
-2. **Pencatatan ke Spreadsheet / CRM Leads:**
-   Catat lead masuk ke Google Sheet operasional:
-   - **Tanggal & Jam:** Waktu pesan masuk.
-   - **Nama Bunda & Area:** (Misal: Bunda Ratna - Surabaya Timur).
-   - **Layanan:** (Misal: Kala Bundle Duo).
-   - **Kode Ref Utama:** `KALA-SRV-DUO`
-   - **Sumber Pertama (f):** `google_cpc` atau `direct`
-   - **Sumber Terakhir (l):** `ig_bio`
-   - **Status:** *Chatting -> Deal -> Jadwal Terkonfirmasi -> Selesai Layanan -> Repeat Order*.
-   - **Nilai Transaksi (IDR):** Nilai nominal yang dibayarkan.
-3. **Kepatuhan Privasi (UU PDP):**
-   - Jangan menyebarkan nomor kontak atau riwayat kesehatan bayi di luar tim medis resmi Kala.
-
----
-
-## 3. SOP untuk Tim Marketing & Ads
-
-### 3.1 Menjalankan Iklan Meta / Google Ads
-1. **Gunakan Halaman Kampanye Khusus (`/lp/[slug]`):**
-   - Jangan arahkan trafik berbayar ke halaman beranda jika kampanye memiliki target spesifik.
-   - Contoh URL kampanye:
-     - `https://kalababyspa.com/lp/bayi-kolik?utm_source=meta_ads&utm_campaign=kolik_surabaya`
-     - `https://kalababyspa.com/lp/pijat-newborn?utm_source=google_ads&utm_campaign=newborn_sidoarjo`
-2. **Pelacakan Otomatis (30 Hari):**
-   - Skrip tracker KalaWeb secara otomatis menyimpan `fbclid`, `gclid`, `utm_source`, dan `utm_campaign` ke dalam cookie 30 hari.
-   - Parameter tersebut akan otomatis disertakan saat Bunda menekan tombol WhatsApp.
-3. **Meta Pixel & Google Tag Manager:**
-   - Semua tag iklan diinjeksikan lewat GTM Container ID.
-   - Event tombol WhatsApp mengirim event `whatsapp_lead` dan `whatsapp_contact`.
-
----
-
-## 4. Alur Evaluasi Kuartalan
-
-1. **Audit SEO & Search Console:**
-   - Cek impresi kata kunci di Google Search Console setiap akhir bulan.
-   - Evaluasi halaman `/area/[slug]` dan `/layanan/[slug]` yang menghasilkan impresi tertinggi.
-2. **Review Atribusi & Closing Rate:**
-   - Bandingkan biaya iklan di Meta/Google dengan total nilai transaksi yang dicatat admin di Google Sheet (berdasarkan kode `[ref: ...]`).
-   - Hentikan iklan dengan rasio klik tinggi tetapi closing rendah; tingkatkan anggaran pada kampanye dengan tingkat deal tertinggi.
+**Langkah Penanganan Admin/CS:**
+1. Balas dengan hangat dalam maksimal 5 menit:
+   *"Halo Bunda! Selamat datang di Kala Moms and Baby Spa. Terima kasih sudah menghubungi kami. Bidan kami siap hadir ke rumah Bunda di Surabaya / Sidoarjo..."*
+2. Catat lead ke Google Sheet Operasional:
+   - Tanggal & Waktu
+   - Nama Bunda & Wilayah / Kecamatan
+   - Layanan & Ref Code (`KALA-SRV-BAYI`)
+   - First Touch (`f=google_cpc`) dan Last Touch (`l=ig_bio`)
+   - Status Reservasi (*Tanya Jawab -> Terjadwal -> Selesai -> Repeat Order*)

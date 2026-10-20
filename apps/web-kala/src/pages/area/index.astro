@@ -1,0 +1,163 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../config/site';
+import { fetchPayloadServiceAreas, type PayloadServiceArea } from '../../lib/payload';
+
+const cmsAreas = await fetchPayloadServiceAreas();
+
+const fallbackAreas: PayloadServiceArea[] = [
+  {
+    id: 'surabaya-timur',
+    name: 'Surabaya Timur',
+    slug: 'surabaya-timur',
+    city: 'Surabaya',
+    uniqueDescription: 'Area padat residensial keluarga muda Surabaya Timur meliputi Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, dan sekitarnya. Terhubung cepat via jalur MERR dan OERR.',
+    landmarks: [{ name: 'Galaxy Mall & MERR' }, { name: 'Rungkut Asri & Pandugo' }, { name: 'Klampis & Manyar' }, { name: 'Pakuwon City Laguna' }],
+    estimatedArrivalMinutes: '20-35 menit',
+    availableServices: [{ serviceName: 'Kala Bundle Duo (Mom & Baby)' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Pijat Laktasi & Oksitosin' }],
+  },
+  {
+    id: 'surabaya-barat',
+    name: 'Surabaya Barat',
+    slug: 'surabaya-barat',
+    city: 'Surabaya',
+    uniqueDescription: 'Kawasan pemukiman modern Surabaya Barat mencakup Wiyung, CitraLand, Graha Family, Sambikerep, HR Muhammad, hingga Pakuwon Mall.',
+    landmarks: [{ name: 'Pakuwon Mall & Supermall' }, { name: 'CitraLand Fresh Market' }, { name: 'Graha Family & Dian Istana' }, { name: 'Wiyung Royal Residence' }],
+    estimatedArrivalMinutes: '25-45 menit',
+    availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Pijat Kolik & Kembung' }],
+  },
+  {
+    id: 'surabaya-selatan',
+    name: 'Surabaya Selatan',
+    slug: 'surabaya-selatan',
+    city: 'Surabaya',
+    uniqueDescription: 'Mencakup area Wonokromo, Ketintang, Gayungan, Pagesangan, Jemursari, hingga Kutisari. Akses cepat dekat jalur frontage Ahmad Yani.',
+    landmarks: [{ name: 'Royal Plaza & Ahmad Yani' }, { name: 'Jemursari & Margorejo' }, { name: 'Ketintang & Gayungan' }, { name: 'Kutisari & Prapen' }],
+    estimatedArrivalMinutes: '25-40 menit',
+    availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Pijat Nifas & Laktasi' }],
+  },
+  {
+    id: 'surabaya-pusat',
+    name: 'Surabaya Pusat',
+    slug: 'surabaya-pusat',
+    city: 'Surabaya',
+    uniqueDescription: 'Menjangkau kawasan jantung kota: Tegalsari, Gubeng, Genteng, Bubutan, dan sekitarnya bagi keluarga urban yang mengutamakan privasi.',
+    landmarks: [{ name: 'Tunjungan Plaza' }, { name: 'Stasiun Gubeng & Kertajaya' }, { name: 'Embong Malang & Basuki Rahmat' }],
+    estimatedArrivalMinutes: '25-40 menit',
+    availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Bayi Stimulasi' }, { serviceName: 'Pijat Laktasi' }],
+  },
+  {
+    id: 'surabaya-utara',
+    name: 'Surabaya Utara',
+    slug: 'surabaya-utara',
+    city: 'Surabaya',
+    uniqueDescription: 'Melayani area Kenjeran, Bulak, Pabean Cantian, Semampir, hingga perbatasan Jembatan Suramadu dengan protokol higienis steril.',
+    landmarks: [{ name: 'Kenjeran Park & Pantai Ria' }, { name: 'Kembang Jepun' }, { name: 'Jalan Jakarta & Perak Barat' }],
+    estimatedArrivalMinutes: '30-50 menit',
+    availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Mandi Bayi & Tali Pusat' }],
+  },
+  {
+    id: 'sidoarjo',
+    name: 'Kabupaten Sidoarjo',
+    slug: 'sidoarjo',
+    city: 'Sidoarjo',
+    uniqueDescription: 'Wilayah tetangga Waru, Sedati (Bandara Juanda), Gedangan, Buduran, Sukodono, hingga Sidoarjo Kota yang terhubung langsung dengan markas tim Bidan Kala.',
+    landmarks: [{ name: 'Waru & Bundaran Aloha' }, { name: 'Sedati & Bandara Juanda' }, { name: 'Gedangan & Pondok Tjandra' }, { name: 'Sidoarjo Kota & Alun-alun' }],
+    estimatedArrivalMinutes: '15-30 menit',
+    availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Cukur Rambut Selapanan' }],
+  },
+];
+
+const areasList = cmsAreas.length > 0 ? cmsAreas : fallbackAreas;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Area Jangkauan Homecare', url: '/area' },
+];
+
+const title = 'Wilayah Layanan Bidan Homecare Surabaya & Sidoarjo | Kala Moms & Baby';
+const description = 'Cakupan lengkap layanan pijat bayi dan perawatan ibu di rumah oleh Bidan ber-STR di seluruh kecamatan Kota Surabaya dan Kabupaten Sidoarjo. Tiba tepat waktu, nyaman tanpa macet.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="https://kalababyspa.com/area"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="py-14 md:py-20 bg-[#FFF9F4]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Service Area Business
+        </span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Wilayah Layanan Homecare Bidan
+        </h1>
+        <p class="text-base text-[#86675A] leading-relaxed">
+          Bunda dan si kecil tidak perlu repot menembus kemacetan Surabaya atau Sidoarjo. Bidan profesional kami berkunjung langsung ke kediaman Anda dengan membawa perlengkapan steril dan minyak alami food-grade.
+        </p>
+      </div>
+
+      <!-- Area Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {areasList.map((area) => (
+          <div class="bg-white rounded-3xl border border-[#F6DCCD] p-8 flex flex-col justify-between hover:shadow-kala transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between text-xs mb-4">
+                <span class="px-3 py-1 bg-[#FFEFE5] text-[#C2552B] font-bold rounded-full border border-[#F6DCCD]">
+                  📍 {area.city}
+                </span>
+                <span class="text-[#86675A] font-medium bg-[#FBF5F0] px-2.5 py-1 rounded-md">
+                  ⏱️ {area.estimatedArrivalMinutes || '20-40 mnt'}
+                </span>
+              </div>
+
+              <h2 class="font-brand font-bold text-2xl text-[#4B2E22] mb-3">
+                <a href={`/area/${area.slug}`} class="hover:text-[#C2552B] transition-colors">
+                  {area.name}
+                </a>
+              </h2>
+
+              <p class="text-sm text-[#86675A] leading-relaxed mb-6 line-clamp-3">
+                {area.uniqueDescription}
+              </p>
+
+              {area.landmarks && area.landmarks.length > 0 && (
+                <div class="mb-6">
+                  <span class="text-xs font-bold text-[#4B2E22] block mb-2">Area Landmark / Kecamatan:</span>
+                  <div class="flex flex-wrap gap-1.5">
+                    {area.landmarks.slice(0, 4).map((lm: any) => (
+                      <span class="text-[11px] bg-[#FBF5F0] text-[#86675A] px-2 py-0.5 rounded border border-[#F6DCCD]/40">
+                        {typeof lm === 'string' ? lm : lm.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div class="pt-6 border-t border-[#F6DCCD]/60 flex flex-col gap-3">
+              <a
+                href={`/area/${area.slug}`}
+                class="text-center py-2.5 text-xs font-bold text-[#4B2E22] hover:text-[#C2552B] border border-[#F6DCCD] rounded-xl transition-colors hover:bg-[#FBF5F0]"
+              >
+                Cek Layanan di {area.name} →
+              </a>
+              <WhatsAppButton
+                refCode={`KALA-AREA-${area.slug.toUpperCase()}`}
+                text={`Panggil Bidan ke ${area.name}`}
+                customMessage={`Halo Bidan Kala, saya mau tanya jadwal kunjungan homecare ke area ${area.name}`}
+                classes="w-full justify-center text-xs py-2.5"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,185 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../config/site';
+import { fetchPayloadMidwives, type PayloadMidwife } from '../../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsMidwives = await fetchPayloadMidwives();
+
+  const fallbackMidwives: PayloadMidwife[] = [
+    {
+      id: 'bidan-ayu-lestari',
+      name: 'Bidan Ayu Lestari, A.Md.Keb',
+      slug: 'bidan-ayu-lestari',
+      title: 'Lead Midwife & Certified Infant Massage Practitioner',
+      strNumber: 'STR-KEMENKES-3578-2022-08912',
+      experienceYears: 6,
+      specialties: [
+        { specialty: 'Pijat Taktil Stimulasi Bayi & Kolik' },
+        { specialty: 'Konseling Fisiologi Laktasi & Pijat Oksitosin' },
+        { specialty: 'Perawatan Tali Pusat & Neonatal' },
+      ],
+      bio: 'Bidan Ayu berpengalaman mendampingi ratusan ibu nifas dan bayi baru lahir di Surabaya. Memiliki sertifikasi resmi Pediatric Touch Therapy dan pendekatan komunikatif yang penuh kehangatan tanpa menghakimi.',
+    },
+    {
+      id: 'bidan-dwi-rahmawati',
+      name: 'Bidan Dwi Rahmawati, S.Tr.Keb',
+      slug: 'bidan-dwi-rahmawati',
+      title: 'Senior Clinical Midwife & Postnatal Care Specialist',
+      strNumber: 'STR-KEMENKES-3515-2021-04561',
+      experienceYears: 5,
+      specialties: [
+        { specialty: 'Pijat Tradisi Selapanan & Cukur Bersih Steril' },
+        { specialty: 'Pemulihan Pasca-Sesar (Post-Sectio Caesarea)' },
+        { specialty: 'Edukasi Manajemen Kolik & Sendawa Bayi' },
+      ],
+      bio: 'Fokus pada kenyamanan ibu pasca persalinan normal maupun sesar di wilayah Sidoarjo dan Surabaya Selatan. Dikenal sangat sabar dan teliti dalam menerapkan teknik aseptik higienis pada bayi sensitif.',
+    },
+    {
+      id: 'bidan-nurul-hidayah',
+      name: 'Bidan Nurul Hidayah, A.Md.Keb',
+      slug: 'bidan-nurul-hidayah',
+      title: 'Homecare Midwife & Baby Wellness Therapist',
+      strNumber: 'STR-KEMENKES-3578-2023-11203',
+      experienceYears: 4,
+      specialties: [
+        { specialty: 'Stimulasi Motorik Kasar & Halus Bayi' },
+        { specialty: 'Relaksasi Tidur Bayi Gelisah (Fussy Baby)' },
+        { specialty: 'Pijat Payudara & Bendungan ASI' },
+      ],
+      bio: 'Berpengalaman menangani bayi dengan adaptasi tidur gelisah dan kembung. Mengutamakan kenyamanan emosional Bunda agar proses menyusui berjalan lancar dan bebas stres.',
+    },
+  ];
+
+  const midwivesList = cmsMidwives.length > 0 ? cmsMidwives : fallbackMidwives;
+
+  return midwivesList.map((midwife) => ({
+    params: { slug: midwife.slug || midwife.id },
+    props: { midwife },
+  }));
+}
+
+interface Props {
+  midwife: PayloadMidwife;
+}
+
+const { midwife } = Astro.props;
+
+const canonicalUrl = `${siteConfig.url}/bidan/${midwife.slug || midwife.id}`;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Tim Bidan Ber-STR', url: '/tim-bidan' },
+  { name: midwife.name, url: `/bidan/${midwife.slug || midwife.id}` },
+];
+
+const title = `${midwife.name} | Bidan Homecare Surabaya & Sidoarjo`;
+const description = `Profil profesional ${midwife.name} (${midwife.title}) dengan nomor izin STR Kemenkes ${midwife.strNumber}. Pendampingan homecare steril tanpa mom-shaming.`;
+
+// Schema.org Person with Medical Credential
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: midwife.name,
+  jobTitle: midwife.title,
+  identifier: midwife.strNumber,
+  description: midwife.bio,
+  worksFor: {
+    '@type': 'MedicalBusiness',
+    name: siteConfig.name,
+    url: siteConfig.url,
+  },
+  knowsAbout: (midwife.specialties || []).map((s: any) => typeof s === 'string' ? s : s.specialty),
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonicalUrl}
+  breadcrumbs={breadcrumbs}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+
+  <div class="py-14 md:py-20 bg-[#FFF9F4]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Profile Card -->
+      <div class="bg-white rounded-3xl border border-[#F6DCCD] p-8 md:p-12 shadow-sm mb-12">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+          
+          <!-- Avatar Icon -->
+          <div class="w-32 h-32 rounded-2xl bg-[#FFEFE5] border-2 border-[#C2552B]/30 flex items-center justify-center text-5xl flex-shrink-0 shadow-inner">
+            👩‍⚕️
+          </div>
+
+          <!-- Bio Information -->
+          <div class="flex-grow text-center md:text-left">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-full border border-emerald-200 mb-3">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Nakes Berizin & Terdaftar Kemenkes RI
+            </span>
+
+            <h1 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mb-1">
+              {midwife.name}
+            </h1>
+            
+            <p class="text-sm font-semibold text-[#C2552B] mb-3">
+              {midwife.title}
+            </p>
+
+            <!-- Verified STR Card -->
+            <div class="inline-block bg-[#FBF5F0] border border-[#F6DCCD] rounded-xl px-4 py-2 text-xs text-[#86675A] mb-6">
+              <span class="font-bold text-[#4B2E22]">Nomor Registrasi Medis (STR):</span>{' '}
+              <span class="font-mono text-[#C2552B] font-bold">{midwife.strNumber}</span>
+              {midwife.experienceYears && (
+                <span class="ml-2 pl-2 border-l border-[#F6DCCD]">
+                  Pengalaman: <strong>{midwife.experienceYears} Tahun</strong>
+                </span>
+              )}
+            </div>
+
+            <p class="text-sm text-[#86675A] leading-relaxed mb-8">
+              {midwife.bio}
+            </p>
+
+            <!-- Specialties -->
+            {midwife.specialties && midwife.specialties.length > 0 && (
+              <div class="mb-8">
+                <span class="text-xs font-bold text-[#4B2E22] block mb-3 uppercase tracking-wider">
+                  Keahlian Klinis & Sertifikasi Khusus:
+                </span>
+                <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                  {midwife.specialties.map((s: any) => (
+                    <span class="text-xs bg-[#FFEFE5] text-[#C2552B] font-bold px-3 py-1.5 rounded-lg border border-[#F6DCCD]">
+                      ✓ {typeof s === 'string' ? s : s.specialty}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <!-- CTA Button -->
+            <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-[#F6DCCD]/60">
+              <WhatsAppButton
+                refCode={`KALA-MIDWIFE-${(midwife.slug || midwife.id).toUpperCase()}`}
+                text={`Reservasi Homecare bersama ${midwife.name.split(',')[0]}`}
+                customMessage={`Halo Bidan Kala, saya membaca profil ${midwife.name} dan mau konsultasi reservasi homecare.`}
+                classes="w-full sm:w-auto text-xs py-3"
+              />
+              <a
+                href="/tim-bidan"
+                class="px-6 py-3 rounded-full border border-[#F6DCCD] text-xs font-bold text-[#4B2E22] hover:bg-[#FBF5F0] transition-colors text-center"
+              >
+                ← Kembali ke Seluruh Tim Bidan
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

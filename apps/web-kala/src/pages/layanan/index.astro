@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../config/site';
+import { fetchPayloadServices, type PayloadService } from '../../lib/payload';
+
+const cmsServices = await fetchPayloadServices();
+
+const servicesList: PayloadService[] = cmsServices.length > 0
+  ? cmsServices
+  : siteConfig.featuredServices.map(s => ({
+      id: s.id,
+      slug: s.id,
+      name: s.name,
+      target: s.target,
+      duration: s.duration,
+      originalPrice: s.originalPrice,
+      price: s.price,
+      numericPrice: s.numericPrice,
+      description: s.description,
+      badge: s.badge,
+      popular: s.popular,
+      refCode: s.refCode,
+      message: s.message,
+    }));
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Katalog Layanan Homecare', url: '/layanan' },
+];
+
+const title = 'Katalog Layanan & Tarif Spa Bayi Homecare Surabaya & Sidoarjo | Kala';
+const description = 'Daftar lengkap paket perawatan ibu & bayi di rumah oleh bidan profesional ber-STR resmi di Surabaya dan Sidoarjo. Tarif transparan, higienis medis steril, bebas mom-shaming.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="https://kalababyspa.com/layanan"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="py-14 md:py-20 bg-[#FFF9F4]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Header Katalog -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Katalog Lengkap Resmi
+        </span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Layanan Perawatan Ibu & Bayi di Rumah
+        </h1>
+        <p class="text-base text-[#86675A] leading-relaxed">
+          Semua tindakan ditangani langsung oleh tenaga bidan profesional berijazah, ber-STR aktif, dan bersertifikasi kebidanan klinis. Nyaman di rumah sendiri tanpa repot keluar dan tanpa mom-shaming.
+        </p>
+      </div>
+
+      <!-- Services Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {servicesList.map((service) => (
+          <div class={`bg-white rounded-3xl border ${service.popular || service.recommended ? 'border-[#C2552B] ring-2 ring-[#C2552B]/20' : 'border-[#F6DCCD]'} overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300`}>
+            <div class="p-8">
+              {service.badge && (
+                <span class="inline-block px-3 py-1 bg-[#FFEFE5] text-[#C2552B] text-xs font-bold rounded-full border border-[#F6DCCD] mb-4">
+                  {service.badge}
+                </span>
+              )}
+              
+              <h2 class="font-brand font-bold text-2xl text-[#4B2E22] mb-2 leading-tight">
+                <a href={`/layanan/${service.slug || service.id}`} class="hover:text-[#C2552B] transition-colors">
+                  {service.name}
+                </a>
+              </h2>
+
+              <div class="flex items-center gap-3 text-xs text-[#86675A] font-medium mb-6">
+                <span class="flex items-center gap-1 bg-[#FBF5F0] px-2.5 py-1 rounded-md">
+                  👶 {service.target}
+                </span>
+                <span class="flex items-center gap-1 bg-[#FBF5F0] px-2.5 py-1 rounded-md">
+                  ⏱️ {service.duration}
+                </span>
+              </div>
+
+              <div class="mb-6">
+                {service.originalPrice && (
+                  <span class="text-xs text-[#86675A] line-through block">
+                    {service.originalPrice}
+                  </span>
+                )}
+                <div class="flex items-baseline gap-1">
+                  <span class="text-3xl font-brand font-bold text-[#C2552B]">
+                    {service.price}
+                  </span>
+                  <span class="text-xs text-[#86675A]">/ kunjungan</span>
+                </div>
+              </div>
+
+              <p class="text-sm text-[#86675A] leading-relaxed mb-6">
+                {service.shortDescription || service.description}
+              </p>
+            </div>
+
+            <div class="p-8 pt-0 border-t border-[#F6DCCD]/60 mt-4 flex flex-col gap-3">
+              <a
+                href={`/layanan/${service.slug || service.id}`}
+                class="text-center py-2.5 text-xs font-bold text-[#4B2E22] hover:text-[#C2552B] border border-[#F6DCCD] rounded-xl transition-colors hover:bg-[#FBF5F0]"
+              >
+                Lihat Rincian & Manfaat Medis →
+              </a>
+              <WhatsAppButton
+                refCode={service.refCode}
+                text="Reservasi via WhatsApp"
+                customMessage={service.message}
+                classes="w-full justify-center text-xs py-3"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Footer Info -->
+      <div class="mt-16 bg-[#FFEFE5]/50 border border-[#F6DCCD] rounded-2xl p-6 text-center max-w-2xl mx-auto">
+        <p class="text-xs text-[#86675A] leading-relaxed">
+          ✨ Butuh layanan kombinasi atau konsultasi khusus (pascabersalin caesar, mastitis, atau bayi kembung)? Bidan kami siap berdiskusi hangat untuk memilih tindakan yang paling tepat bagi Bunda dan si kecil.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

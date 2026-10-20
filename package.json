@@ -11,6 +11,7 @@
     "dev:cms": "npm run dev --workspace=cms-kala",
     "build": "npm run build --workspace=web-kala",
     "build:cms": "npm run build --workspace=cms-kala",
+    "audit:seo": "node scripts/audit-seo.mjs",
     "preview": "npm run preview --workspace=web-kala"
   }
 }

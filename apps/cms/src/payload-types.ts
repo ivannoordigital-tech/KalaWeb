@@ -75,6 +75,7 @@ export interface Config {
     faq: Faq;
     'service-areas': ServiceArea;
     midwives: Midwife;
+    redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +91,7 @@ export interface Config {
     faq: FaqSelect<false> | FaqSelect<true>;
     'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
     midwives: MidwivesSelect<false> | MidwivesSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -140,7 +142,10 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name: string;
-  role: 'superadmin' | 'admin' | 'author';
+  /**
+   * Menentukan menu apa saja yang dapat dilihat dan diedit oleh pengguna ini di dashboard.
+   */
+  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -167,7 +172,13 @@ export interface User {
  */
 export interface Media {
   id: number;
+  /**
+   * Jelaskan isi visual gambar kepada pengguna tunanetra dan perayap Google. Contoh: Bidan mengoleskan minyak pijat food-grade pada punggung bayi.
+   */
   alt: string;
+  /**
+   * Keterangan singkat yang tampil di bawah foto jika ditampilkan di artikel.
+   */
   caption?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -205,24 +216,41 @@ export interface Media {
  */
 export interface Article {
   id: number;
+  /**
+   * Judul artikel yang edukatif dan menenangkan Bunda. Contoh: Cara Mengatasi Bayi Kolik Malam Hari
+   */
   title: string;
-  slug: string;
   category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
   pubDate: string;
   updatedDate: string;
+  /**
+   * Nama tenaga kesehatan resmi yang menyusun artikel.
+   */
   author: string;
   authorTitle: string;
+  /**
+   * Otoritas medis yang memvalidasi kebenaran klinis isi artikel.
+   */
   medicalReviewer: string;
   /**
-   * Ideal 130–155 karakter. Muncul di bawah judul artikel di hasil pencarian Google.
+   * Ringkasan isi artikel (1–2 paragraf) untuk pembuka dan cuplikan kartu blog.
    */
   description: string;
+  /**
+   * Unggah foto resmi bidan / perawatan bayi (format WebP/JPG/PNG).
+   */
   heroImage?: (number | null) | Media;
+  /**
+   * URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).
+   */
   heroImageUrlFallback?: string | null;
   /**
-   * Deskripsikan isi gambar secara ringkas dan informatif (wajib)
+   * Deskripsikan isi visual gambar secara jelas. Contoh: Bidan sedang mengedukasi teknik pijat ILU pada bayi.
    */
   heroImageAlt: string;
+  /**
+   * Daftar kata kunci pencarian Google yang relevan dengan artikel ini.
+   */
   keywords?:
     | {
         keyword: string;
@@ -244,20 +272,67 @@ export interface Article {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Alamat URL artikel (huruf kecil dan tanda hubung). Contoh: bayi-kolik-malam-hari
+   */
+  slug: string;
+  /**
+   * Hubungkan artikel ini dengan layanan komersial dan artikel lain untuk memperkuat SEO & konversi.
+   */
+  internalLinking?: {
+    /**
+     * Centang jika artikel ini adalah panduan komprehensif utama (pillar of content) untuk satu topik besar.
+     */
+    isPillarArticle?: boolean | null;
+    /**
+     * Pilih artikel pilar yang menjadi induk dari artikel pendukung (cluster content) ini.
+     */
+    parentPillar?: (number | null) | Article;
+    /**
+     * Sangat disarankan: hubungkan minimal 1 layanan relevan agar Bunda bisa langsung reservasi homecare.
+     */
+    relatedServices?: (number | Service)[] | null;
+    /**
+     * Pilih 2-4 artikel edukasi relevan untuk direkomendasikan kepada pembaca.
+     */
+    relatedArticles?: (number | Article)[] | null;
+    /**
+     * Hubungkan dengan area jangkauan (misal: Surabaya Timur, Sidoarjo) jika artikel menyinggung lokasi.
+     */
+    relatedAreas?: (number | ServiceArea)[] | null;
+  };
+  /**
+   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   */
   seo?: {
     /**
-     * Kosongkan = pakai judul artikel otomatis
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
      */
     metaTitle?: string | null;
     /**
-     * Ideal: 1200×630px. Kosongkan = pakai hero image
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "description".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
      */
     ogImage?: (number | null) | Media;
     /**
-     * Centang HANYA untuk halaman promo iklan khusus
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
      */
     noIndex?: boolean | null;
-    canonicalUrl?: string | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -269,63 +344,120 @@ export interface Article {
  */
 export interface Service {
   id: number;
+  /**
+   * Nama paket perawatan homecare. Contoh: Kala Bundle Duo (Mom & Baby Ceria)
+   */
   name: string;
-  slug: string;
+  /**
+   * Kelompok usia atau target tindakan. Contoh: 1 Ibu + 1 Bayi, Bayi 0 - 6 Bulan
+   */
   target: string;
-  duration: string;
-  price: string;
+  /**
+   * Masukkan angka saja tanpa titik/koma. Contoh: 150000
+   */
   numericPrice: number;
+  /**
+   * Kosongkan untuk auto-format dari angka di samping. Contoh: Rp150.000
+   */
+  price?: string | null;
+  /**
+   * Jika ada promo diskon. Wajib lebih besar dari harga promo. Contoh: Rp190.000
+   */
   originalPrice?: string | null;
+  /**
+   * Contoh: 100, 80, 40
+   */
+  durationMinutes?: number | null;
+  /**
+   * Otomatis dari menit jika dikosongkan. Contoh: 100 Menit
+   */
+  duration?: string | null;
+  /**
+   * Centang kotak ini jika Anda memang berniat mengubah harga lebih dari 30% dari harga sebelumnya.
+   */
+  confirmLargePriceChange?: boolean | null;
+  /**
+   * Teks ringkas 1-2 kalimat untuk kartu di beranda. Contoh: Perawatan komplit relaksasi pasca-persalinan untuk Bunda dan stimulasi si kecil.
+   */
   shortDescription?: string | null;
+  /**
+   * Jelaskan manfaat klinis dan keunggulan tindakan ini secara mendalam untuk calon Bunda.
+   */
   description: string;
+  /**
+   * Daftar rincian tindakan (misal: Pijat oksitosin, Pijat relaksasi bayi, Totok wajah ibu).
+   */
   includedItems?:
     | {
         item: string;
         id?: string | null;
       }[]
     | null;
-  image?: (number | null) | Media;
-  badge?: string | null;
-  recommended?: boolean | null;
-  active?: boolean | null;
-  order?: number | null;
-  refCode: string;
-  message?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials".
- */
-export interface Testimonial {
-  id: number;
-  author: string;
-  area: string;
-  service: string;
-  quote: string;
-  photo?: (number | null) | Media;
-  date?: string | null;
   /**
-   * Wajib dicentang sesuai standar etika medis & kerahasiaan pasien
+   * Unggah foto resmi tindakan bidan (format WebP/JPG/PNG).
    */
-  permissionGranted: boolean;
+  image?: (number | null) | Media;
+  /**
+   * Teks pemikat di atas kartu. Contoh: Paling Diminati Bunda, Tradisi Praktis Steril
+   */
+  badge?: string | null;
+  /**
+   * Jika dicentang, paket ini akan diberi bingkai warna aksen dan diprioritaskan di beranda.
+   */
+  recommended?: boolean | null;
+  /**
+   * Alamat URL ramah SEO. Huruf kecil dan strip. Contoh: bundle-duo, baby-newborn
+   */
+  slug: string;
+  /**
+   * Hapus centang untuk menyembunyikan layanan ini sementara tanpa menghapus datanya.
+   */
   active?: boolean | null;
+  /**
+   * Angka lebih kecil akan tampil lebih awal di katalog (1, 2, 3...).
+   */
   order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faq".
- */
-export interface Faq {
-  id: number;
-  question: string;
-  answer: string;
-  category: 'layanan' | 'keamanan-medis' | 'reservasi-homecare' | 'biaya-wilayah';
-  order?: number | null;
-  active?: boolean | null;
+  /**
+   * Kode identifikasi unik untuk melacak konversi di bot WA. Contoh: KALA-SRV-DUO
+   */
+  refCode: string;
+  /**
+   * Draft pesan yang terisi otomatis di aplikasi WhatsApp pasien. Contoh: Halo Bidan Kala, saya mau reservasi...
+   */
+  message?: string | null;
+  /**
+   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "shortDescription".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -335,26 +467,146 @@ export interface Faq {
  */
 export interface ServiceArea {
   id: number;
+  /**
+   * Contoh: Surabaya Barat, Waru Sidoarjo, Rungkut & Surabaya Timur
+   */
   name: string;
-  slug: string;
   city: 'Surabaya' | 'Sidoarjo';
   /**
-   * Tuliskan deskripsi otentik unik per wilayah untuk mendongkrak local SEO Google
+   * Tuliskan ulasan spesifik mengenai karakter wilayah, perumahan, dan aksesibilitas bidan. Hindari teks generik agar tidak dianggap thin-content oleh Google.
    */
   uniqueDescription: string;
+  /**
+   * Daftar perumahan besar, jalan protokol, atau kecamatan yang tercakup.
+   */
   landmarks?:
     | {
         name: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Perkiraan durasi perjalanan tim bidan tiba di kediaman pasien. Contoh: 20–35 Menit
+   */
   estimatedArrivalMinutes?: string | null;
+  /**
+   * Paket perawatan yang dapat dipanggil ke wilayah ini.
+   */
   availableServices?:
     | {
         serviceName: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Huruf kecil dan strip. Contoh: surabaya-barat
+   */
+  slug: string;
+  active?: boolean | null;
+  /**
+   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "uniqueDescription".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: number;
+  /**
+   * Contoh: Bunda Sarah & Baby Arka (2 bulan)
+   */
+  author: string;
+  /**
+   * Wilayah tempat tinggal pasien. Contoh: Rungkut, Surabaya Timur
+   */
+  area: string;
+  /**
+   * Nama paket perawatan. Contoh: Kala Bundle Duo
+   */
+  service: string;
+  /**
+   * Jika ditautkan, testimoni ini akan otomatis tampil di halaman detail layanan tersebut.
+   */
+  relatedService?: (number | null) | Service;
+  /**
+   * Jika ditautkan, testimoni ini akan otomatis tampil di halaman area wilayah tersebut.
+   */
+  relatedArea?: (number | null) | ServiceArea;
+  /**
+   * Cerita nyata pengalaman mendapatkan pelayanan homecare dari Bidan Kala.
+   */
+  quote: string;
+  /**
+   * Pastikan telah mendapatkan izin tayang tertulis dari orang tua sebelum mengunggah foto bayi.
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Wajib dicentang demi mematuhi UU Perlindungan Data Pribadi (UU PDP) dan etika kerahasiaan medis.
+   */
+  permissionGranted: boolean;
+  date?: string | null;
+  order?: number | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq".
+ */
+export interface Faq {
+  id: number;
+  /**
+   * Pertanyaan yang kerap ditanyakan orang tua seputar perawatan bayi dan ibu.
+   */
+  question: string;
+  /**
+   * Jawaban berbasis ilmu kebidanan yang menenangkan dan mudah dipahami.
+   */
+  answer: string;
+  category: 'layanan' | 'keamanan-medis' | 'reservasi-homecare' | 'biaya-wilayah';
+  /**
+   * Jika dipilih, FAQ ini akan otomatis tampil di halaman detail layanan tersebut.
+   */
+  relatedServices?: (number | Service)[] | null;
+  /**
+   * Jika dipilih, FAQ ini akan otomatis tampil di halaman wilayah tersebut.
+   */
+  relatedAreas?: (number | ServiceArea)[] | null;
+  order?: number | null;
   active?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -365,23 +617,103 @@ export interface ServiceArea {
  */
 export interface Midwife {
   id: number;
+  /**
+   * Contoh: Bidan Annisa Rahmawati
+   */
   name: string;
-  slug: string;
+  /**
+   * Contoh: S.Tr.Keb, Bdn
+   */
   title: string;
   /**
-   * Bukti legalitas tenaga kesehatan resmi Kemenkes untuk membangun E-E-A-T Google
+   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google.
    */
   strNumber: string;
+  /**
+   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
+   */
   photo?: (number | null) | Media;
+  /**
+   * Lama pengalaman menangani ibu dan anak. Contoh: 5
+   */
   experienceYears?: number | null;
+  /**
+   * Daftar kompetensi khusus yang dimiliki bidan.
+   */
   specialties?:
     | {
         specialty: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
+   */
   bio: string;
+  /**
+   * Huruf kecil dan strip. Contoh: bidan-annisa
+   */
+  slug: string;
+  /**
+   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
+   */
   active?: boolean | null;
+  /**
+   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * URL lama yang ingin dialihkan. Contoh: /promo-selapan atau /layanan-lama
+   */
+  from: string;
+  /**
+   * URL halaman baru tujuan pengalihan. Contoh: /layanan/bundle-selapan
+   */
+  to: string;
+  /**
+   * Pilih 301 agar Google mentransfer otoritas ranking lama ke URL baru.
+   */
+  type: '301' | '302';
+  active?: boolean | null;
+  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -440,6 +772,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'midwives';
         value: number | Midwife;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -557,7 +893,6 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ArticlesSelect<T extends boolean = true> {
   title?: T;
-  slug?: T;
   category?: T;
   pubDate?: T;
   updatedDate?: T;
@@ -575,13 +910,26 @@ export interface ArticlesSelect<T extends boolean = true> {
         id?: T;
       };
   content?: T;
+  slug?: T;
+  internalLinking?:
+    | T
+    | {
+        isPillarArticle?: T;
+        parentPillar?: T;
+        relatedServices?: T;
+        relatedArticles?: T;
+        relatedAreas?: T;
+      };
   seo?:
     | T
     | {
         metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
         ogImage?: T;
-        noIndex?: T;
         canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -593,12 +941,13 @@ export interface ArticlesSelect<T extends boolean = true> {
  */
 export interface ServicesSelect<T extends boolean = true> {
   name?: T;
-  slug?: T;
   target?: T;
-  duration?: T;
-  price?: T;
   numericPrice?: T;
+  price?: T;
   originalPrice?: T;
+  durationMinutes?: T;
+  duration?: T;
+  confirmLargePriceChange?: T;
   shortDescription?: T;
   description?: T;
   includedItems?:
@@ -610,10 +959,22 @@ export interface ServicesSelect<T extends boolean = true> {
   image?: T;
   badge?: T;
   recommended?: T;
+  slug?: T;
   active?: T;
   order?: T;
   refCode?: T;
   message?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -625,12 +986,14 @@ export interface TestimonialsSelect<T extends boolean = true> {
   author?: T;
   area?: T;
   service?: T;
+  relatedService?: T;
+  relatedArea?: T;
   quote?: T;
   photo?: T;
-  date?: T;
   permissionGranted?: T;
-  active?: T;
+  date?: T;
   order?: T;
+  active?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -642,6 +1005,8 @@ export interface FaqSelect<T extends boolean = true> {
   question?: T;
   answer?: T;
   category?: T;
+  relatedServices?: T;
+  relatedAreas?: T;
   order?: T;
   active?: T;
   updatedAt?: T;
@@ -653,7 +1018,6 @@ export interface FaqSelect<T extends boolean = true> {
  */
 export interface ServiceAreasSelect<T extends boolean = true> {
   name?: T;
-  slug?: T;
   city?: T;
   uniqueDescription?: T;
   landmarks?:
@@ -669,7 +1033,19 @@ export interface ServiceAreasSelect<T extends boolean = true> {
         serviceName?: T;
         id?: T;
       };
+  slug?: T;
   active?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -679,7 +1055,6 @@ export interface ServiceAreasSelect<T extends boolean = true> {
  */
 export interface MidwivesSelect<T extends boolean = true> {
   name?: T;
-  slug?: T;
   title?: T;
   strNumber?: T;
   photo?: T;
@@ -691,7 +1066,32 @@ export interface MidwivesSelect<T extends boolean = true> {
         id?: T;
       };
   bio?: T;
+  slug?: T;
   active?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  type?: T;
+  active?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -742,27 +1142,46 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   /**
-   * Format baku tanpa spasi, tanda + atau 0 di depan. Contoh: 6281234567890
+   * Format baku nomor WA. Contoh: 6281234567890. Sistem otomatis membersihkan spasi, tanda +, atau angka 0. (Setelah Simpan, situs live Cloudflare ter-update ~2 menit).
    */
   whatsappNumber: string;
   /**
-   * Tampilan ramah pengguna untuk teks footer dan kontak. Contoh: +62 812-3456-7890
+   * Tampilan ramah pengguna untuk teks footer dan tombol kontak. Contoh: +62 812-3456-7890
    */
   whatsappNumberFormatted?: string | null;
+  /**
+   * Username akun Instagram resmi Kala. Contoh: @kala.babyspa
+   */
   instagram?: string | null;
+  /**
+   * Jadwal pelayanan homecare yang tampil di footer web. Contoh: Senin - Minggu: 08.00 - 17.00 WIB
+   */
   operationalHours?: string | null;
   /**
-   * Badge keunggulan di bagian atas beranda (contoh: ✨ 100% Bidan Resmi Ber-STR)
+   * Badge penanda di atas judul beranda (contoh: ✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes)
    */
   heroBadgeText?: string | null;
   /**
-   * Contoh: Dipercaya 500+ Bunda di Surabaya & Sidoarjo
+   * Statistik kepercayaan Bunda (contoh: Dipercaya 500+ Bunda di Surabaya & Sidoarjo)
    */
   socialProofText?: string | null;
+  bannerGroup?: {
+    /**
+     * Kosongkan jika tidak ada promo aktif. Jika diisi, akan tampil di bar paling atas website.
+     */
+    announcementBanner?: string | null;
+    /**
+     * Banner hanya akan mulai tampil setelah tanggal ini.
+     */
+    bannerStartDate?: string | null;
+    /**
+     * Banner otomatis hilang dari website setelah tanggal ini (mencegah banner kedaluwarsa tertinggal).
+     */
+    bannerEndDate?: string | null;
+  };
   /**
-   * Kosongkan jika tidak ada pengumuman aktif. Jika diisi, akan tampil di bar paling atas website.
+   * Kecamatan / wilayah kota yang dilayani di Surabaya dan Sidoarjo.
    */
-  announcementBanner?: string | null;
   coverageAreas?:
     | {
         area: string;
@@ -783,7 +1202,13 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   operationalHours?: T;
   heroBadgeText?: T;
   socialProofText?: T;
-  announcementBanner?: T;
+  bannerGroup?:
+    | T
+    | {
+        announcementBanner?: T;
+        bannerStartDate?: T;
+        bannerEndDate?: T;
+      };
   coverageAreas?:
     | T
     | {

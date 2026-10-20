@@ -1,32 +1,44 @@
 import type { CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
+import { buildSeoFields } from '../fields/seoFields'
+import { canManageArticles, getUserRole } from '../access/roles'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
+  labels: {
+    singular: 'Artikel Edukasi & Blog',
+    plural: 'Artikel Edukasi & Blog',
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'author', 'pubDate', 'status'],
+    hidden: ({ user }) => {
+      const role = getUserRole(user);
+      return role === 'midwife_coordinator';
+    },
+  },
+  access: {
+    read: () => true,
+    create: canManageArticles,
+    update: canManageArticles,
+    delete: canManageArticles,
   },
   versions: {
     drafts: true,
   },
   hooks: {
     afterChange: [
-      async ({ doc, previousDoc, operation }) => {
+      async ({ doc, previousDoc }) => {
         const isNowPublished = doc._status === 'published' || doc.status === 'published';
         const wasPublished = previousDoc?._status === 'published' || previousDoc?.status === 'published';
 
         if (isNowPublished && !wasPublished) {
-          // 1. Dokumen baru diterbitkan (Draft -> Published)
           triggerCloudflareDeploy({ resource: 'Articles', action: 'publish', slug: doc.slug });
         } else if (!isNowPublished && wasPublished) {
-          // 2. Dokumen ditarik / unpublish (Published -> Draft)
           triggerCloudflareDeploy({ resource: 'Articles', action: 'unpublish', slug: doc.slug });
         } else if (isNowPublished && wasPublished) {
-          // 3. Pembaruan konten pada dokumen yang sudah published
           triggerCloudflareDeploy({ resource: 'Articles', action: 'publish', slug: doc.slug });
         }
-        // Abaikan perubahan antar draft / autosave
       },
     ],
     afterDelete: [
@@ -44,15 +56,9 @@ export const Articles: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Judul Artikel',
-    },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      label: 'Slug URL (contoh: cara-mengatasi-bayi-kolik)',
       admin: {
-        position: 'sidebar',
+        description: 'Judul artikel yang edukatif dan menenangkan Bunda. Contoh: Cara Mengatasi Bayi Kolik Malam Hari',
+        placeholder: 'Cara Mengatasi Bayi Kolik Malam Hari: Panduan Bidan Tenangkan Tangisan Si Kecil',
       },
     },
     {
@@ -86,7 +92,7 @@ export const Articles: CollectionConfig = {
       type: 'date',
       required: true,
       defaultValue: () => new Date().toISOString(),
-      label: 'Tanggal Pembaruan',
+      label: 'Tanggal Pembaruan Terakhir',
       admin: {
         position: 'sidebar',
       },
@@ -96,9 +102,10 @@ export const Articles: CollectionConfig = {
       type: 'text',
       defaultValue: 'Bidan Annisa, S.Tr.Keb',
       required: true,
-      label: 'Nama Penulis (Bidan)',
+      label: 'Nama Penulis (Bidan Ber-STR)',
       admin: {
         position: 'sidebar',
+        description: 'Nama tenaga kesehatan resmi yang menyusun artikel.',
       },
     },
     {
@@ -116,18 +123,19 @@ export const Articles: CollectionConfig = {
       type: 'text',
       defaultValue: 'Tim Medis & Kebidanan Kala Moms and Baby Spa',
       required: true,
-      label: 'Reviewer Medis (Otoritas Kesehatan)',
+      label: 'Peninjau Medis (Medical Reviewer)',
       admin: {
         position: 'sidebar',
+        description: 'Otoritas medis yang memvalidasi kebenaran klinis isi artikel.',
       },
     },
     {
       name: 'description',
       type: 'textarea',
       required: true,
-      label: 'Ringkasan Deskripsi (Meta Description untuk Google & Snippet)',
+      label: 'Ringkasan Deskripsi Artikel',
       admin: {
-        description: 'Ideal 130–155 karakter. Muncul di bawah judul artikel di hasil pencarian Google.',
+        description: 'Ringkasan isi artikel (1–2 paragraf) untuk pembuka dan cuplikan kartu blog.',
       },
     },
     {
@@ -135,70 +143,122 @@ export const Articles: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       label: 'Foto Sampul Utama (Hero Image)',
+      admin: {
+        description: 'Unggah foto resmi bidan / perawatan bayi (format WebP/JPG/PNG).',
+      },
     },
     {
       name: 'heroImageUrlFallback',
       type: 'text',
-      label: 'URL Gambar Sampul Fallback (opsional jika foto lokal svg)',
+      label: 'URL Gambar Sampul Fallback (Opsional)',
+      admin: {
+        description: 'URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).',
+      },
     },
     {
       name: 'heroImageAlt',
       type: 'text',
       required: true,
-      label: 'Alt Text Foto Sampul (Wajib untuk Aksesibilitas & SEO)',
+      label: 'Alt Text Foto Sampul (Wajib untuk Aksesibilitas & Google)',
       admin: {
-        description: 'Deskripsikan isi gambar secara ringkas dan informatif (wajib)',
+        description: 'Deskripsikan isi visual gambar secara jelas. Contoh: Bidan sedang mengedukasi teknik pijat ILU pada bayi.',
       },
     },
     {
       name: 'keywords',
       type: 'array',
       label: 'Target Kata Kunci SEO',
+      admin: {
+        description: 'Daftar kata kunci pencarian Google yang relevan dengan artikel ini.',
+      },
       fields: [
         {
           name: 'keyword',
           type: 'text',
           required: true,
+          label: 'Kata Kunci',
         },
       ],
     },
     {
       name: 'content',
       type: 'richText',
-      label: 'Isi Konten Artikel',
+      label: 'Isi Konten Artikel Lengkap',
     },
+    // Pengaturan Lanjutan (Sidebar)
     {
-      name: 'seo',
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      label: 'Slug URL (/blog/[slug])',
+      admin: {
+        position: 'sidebar',
+        description: 'Alamat URL artikel (huruf kecil dan tanda hubung). Contoh: bayi-kolik-malam-hari',
+      },
+    },
+    // Internal Linking & Topic Cluster (Track B5)
+    {
+      name: 'internalLinking',
       type: 'group',
-      label: '🔍 SEO & Open Graph (Pengaturan Mesin Pencari)',
-      admin: { position: 'sidebar' },
+      label: 'Struktur Internal Linking & Topic Cluster',
+      admin: {
+        description: 'Hubungkan artikel ini dengan layanan komersial dan artikel lain untuk memperkuat SEO & konversi.',
+      },
       fields: [
         {
-          name: 'metaTitle',
-          type: 'text',
-          label: 'Meta Title (Judul di Google, maks 60 karakter)',
-          admin: { description: 'Kosongkan = pakai judul artikel otomatis' },
-        },
-        {
-          name: 'ogImage',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'OG Image (Thumbnail saat dibagikan ke WA/FB/IG)',
-          admin: { description: 'Ideal: 1200×630px. Kosongkan = pakai hero image' },
-        },
-        {
-          name: 'noIndex',
+          name: 'isPillarArticle',
           type: 'checkbox',
           defaultValue: false,
-          label: 'Sembunyikan dari Google (no-index)',
-          admin: { description: 'Centang HANYA untuk halaman promo iklan khusus' },
+          label: 'Jadikan Sebagai "Artikel Pilar" (Pillar Post)',
+          admin: {
+            description: 'Centang jika artikel ini adalah panduan komprehensif utama (pillar of content) untuk satu topik besar.',
+          },
         },
         {
-          name: 'canonicalUrl',
-          type: 'text',
-          label: 'Canonical URL (opsional — jika konten ada di tempat lain juga)',
+          name: 'parentPillar',
+          type: 'relationship',
+          relationTo: 'articles',
+          hasMany: false,
+          label: 'Artikel Pilar Induk',
+          admin: {
+            condition: (data, siblingData) => !siblingData?.isPillarArticle,
+            description: 'Pilih artikel pilar yang menjadi induk dari artikel pendukung (cluster content) ini.',
+          },
+        },
+        {
+          name: 'relatedServices',
+          type: 'relationship',
+          relationTo: 'services',
+          hasMany: true,
+          label: 'Layanan Terkait (Konversi CTA)',
+          admin: {
+            description: 'Sangat disarankan: hubungkan minimal 1 layanan relevan agar Bunda bisa langsung reservasi homecare.',
+          },
+        },
+        {
+          name: 'relatedArticles',
+          type: 'relationship',
+          relationTo: 'articles',
+          hasMany: true,
+          label: 'Artikel Terkait ("Baca Juga")',
+          admin: {
+            description: 'Pilih 2-4 artikel edukasi relevan untuk direkomendasikan kepada pembaca.',
+          },
+        },
+        {
+          name: 'relatedAreas',
+          type: 'relationship',
+          relationTo: 'service-areas',
+          hasMany: true,
+          label: 'Wilayah Layanan Terkait',
+          admin: {
+            description: 'Hubungkan dengan area jangkauan (misal: Surabaya Timur, Sidoarjo) jika artikel menyinggung lokasi.',
+          },
         },
       ],
     },
+    // Reusable SEO Fields
+    buildSeoFields({ titleSourceField: 'title', descriptionSourceField: 'description' }),
   ],
 }

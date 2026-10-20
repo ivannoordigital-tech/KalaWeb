@@ -82,7 +82,7 @@ export async function seed() {
     })
     if (existing.totalDocs === 0) {
       console.log(`Seeding service: ${srv.name}`)
-      await payload.create({
+      await (payload.create as any)({
         collection: 'services',
         data: srv,
       })
@@ -118,7 +118,7 @@ export async function seed() {
     })
     if (existing.totalDocs === 0) {
       console.log(`Seeding testimonial from: ${test.author}`)
-      await payload.create({
+      await (payload.create as any)({
         collection: 'testimonials',
         data: test,
       })
@@ -188,7 +188,7 @@ export async function seed() {
     })
     if (existing.totalDocs === 0) {
       console.log(`Seeding article: ${art.title}`)
-      await payload.create({
+      await (payload.create as any)({
         collection: 'articles',
         data: {
           ...art,

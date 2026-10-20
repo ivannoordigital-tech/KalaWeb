@@ -1,6 +1,6 @@
 /**
- * Cloudflare Pages Deploy Hook Trigger with Debounce and Status Check
- * Prevents build storms, race conditions, and unnecessary builds during drafts/autosaves.
+ * Cloudflare Pages Deploy Hook Trigger with Debounce, Status Tracking, and Admin Alerts
+ * Prevents build storms, race conditions, and informs operational admins via Telegram/Console.
  */
 
 let lastTriggerTime = 0;
@@ -11,6 +11,40 @@ export interface TriggerOptions {
   resource: string;
   action: 'publish' | 'unpublish' | 'delete' | 'update_settings';
   slug?: string;
+}
+
+export interface DeployStatus {
+  status: 'idle' | 'triggered' | 'success' | 'failed';
+  lastTriggeredAt?: string;
+  lastCompletedAt?: string;
+  lastReason?: string;
+  error?: string;
+}
+
+export const currentDeployStatus: DeployStatus = {
+  status: 'idle',
+};
+
+async function sendTelegramAlert(message: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) return;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+    });
+  } catch (err) {
+    console.warn('[Deploy Hook] Failed to dispatch Telegram alert:', (err as Error).message);
+  }
 }
 
 export function triggerCloudflareDeploy(options: TriggerOptions): void {
@@ -39,7 +73,7 @@ export function triggerCloudflareDeploy(options: TriggerOptions): void {
     return;
   }
 
-  // Add 2.5s safe delay to ensure database transaction is fully committed before Cloudflare starts pulling data
+  // 2.5s safe delay to ensure database transaction is fully committed before Cloudflare starts pulling data
   console.log(`[Deploy Hook] Triggering build in 2.5s for: ${reason}`);
   setTimeout(() => {
     executeDeploy(hookUrl, reason);
@@ -48,6 +82,16 @@ export function triggerCloudflareDeploy(options: TriggerOptions): void {
 
 async function executeDeploy(hookUrl: string, reason: string): Promise<void> {
   lastTriggerTime = Date.now();
+  currentDeployStatus.status = 'triggered';
+  currentDeployStatus.lastTriggeredAt = new Date().toISOString();
+  currentDeployStatus.lastReason = reason;
+
+  await sendTelegramAlert(
+    `🚀 <b>[KalaWeb Build Dimulai]</b>\n` +
+    `Perubahan konten sedang diproses: <code>${reason}</code>\n` +
+    `Situs akan ter-update di https://kalababyspa.com dalam ~1–2 menit.`
+  );
+
   try {
     const response = await fetch(hookUrl, {
       method: 'POST',
@@ -56,11 +100,35 @@ async function executeDeploy(hookUrl: string, reason: string): Promise<void> {
     });
 
     if (response.ok) {
+      currentDeployStatus.status = 'success';
+      currentDeployStatus.lastCompletedAt = new Date().toISOString();
       console.log(`[Deploy Hook] Cloudflare Pages build triggered successfully! Reason: ${reason} (Status ${response.status})`);
+
+      await sendTelegramAlert(
+        `✅ <b>[KalaWeb Sudah Live]</b>\n` +
+        `Perubahan <code>${reason}</code> berhasil diproses oleh Cloudflare Pages!\n` +
+        `🌐 Kunjungi: https://kalababyspa.com`
+      );
     } else {
+      currentDeployStatus.status = 'failed';
+      currentDeployStatus.error = `HTTP ${response.status}: ${response.statusText}`;
       console.error(`[Deploy Hook] Cloudflare returned error: ${response.status} ${response.statusText}`);
+
+      await sendTelegramAlert(
+        `❌ <b>[KalaWeb Build GAGAL]</b>\n` +
+        `Cloudflare merespons status error: <code>${response.status} ${response.statusText}</code>\n` +
+        `Situs live tetap aman (Cloudflare mempertahankan deployment sebelumnya). Hubungi tim developer bila masalah berlanjut.`
+      );
     }
   } catch (error) {
-    console.error(`[Deploy Hook] Failed to send deploy webhook:`, (error as Error).message);
+    const msg = (error as Error).message;
+    currentDeployStatus.status = 'failed';
+    currentDeployStatus.error = msg;
+    console.error(`[Deploy Hook] Failed to send deploy webhook:`, msg);
+
+    await sendTelegramAlert(
+      `❌ <b>[KalaWeb Build Network Error]</b>\n` +
+      `Gagal menghubungi webhook Cloudflare: <code>${msg}</code>`
+    );
   }
 }

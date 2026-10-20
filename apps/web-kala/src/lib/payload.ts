@@ -4,12 +4,12 @@
  * with strict production protection (build failure on Cloudflare Pages) and graceful local dev fallback.
  */
 
-const PAYLOAD_URL = import.meta.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
+const PAYLOAD_URL = (typeof import.meta !== 'undefined' && import.meta.env?.PAYLOAD_URL) || process.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
 
-const isDev = Boolean(import.meta.env.DEV);
+const isDev = typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV);
 // Fallback is allowed in local development OR when explicitly permitted via ALLOW_FALLBACK=true.
 // In production builds (Cloudflare Pages), if CMS is unreachable, the build fails to keep previous deployment live.
-const allowFallback = isDev || import.meta.env.ALLOW_FALLBACK === 'true' || process.env.ALLOW_FALLBACK === 'true';
+const allowFallback = isDev || (typeof import.meta !== 'undefined' && import.meta.env?.ALLOW_FALLBACK === 'true') || process.env.ALLOW_FALLBACK === 'true';
 
 function handleFetchError(resource: string, err: Error): void {
   if (!allowFallback) {
@@ -112,6 +112,15 @@ export interface PayloadMidwife {
     url?: string;
     alt?: string;
   };
+}
+
+export interface PayloadRedirect {
+  id: string;
+  from: string;
+  to: string;
+  type: '301' | '302';
+  active: boolean;
+  notes?: string;
 }
 
 export interface SiteSettingsData {
@@ -247,5 +256,23 @@ export async function fetchSiteSettings(): Promise<SiteSettingsData | null> {
   } catch (err) {
     handleFetchError('site-settings', err as Error);
     return null;
+  }
+}
+
+/**
+ * Fetch dynamic SEO redirects from Payload CMS
+ */
+export async function fetchPayloadRedirects(): Promise<PayloadRedirect[]> {
+  try {
+    const res = await fetch(`${PAYLOAD_URL}/api/redirects?where[active][equals]=true&limit=500`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
+    const data = await res.json();
+    return data.docs || [];
+  } catch (err) {
+    handleFetchError('redirects', err as Error);
+    return [];
   }
 }

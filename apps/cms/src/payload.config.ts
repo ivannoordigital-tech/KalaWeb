@@ -12,6 +12,7 @@ import { Testimonials } from './collections/Testimonials'
 import { FAQ } from './collections/FAQ'
 import { ServiceAreas } from './collections/ServiceAreas'
 import { Midwives } from './collections/Midwives'
+import { Redirects } from './collections/Redirects'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -24,7 +25,17 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Articles, Services, Testimonials, FAQ, ServiceAreas, Midwives],
+  collections: [
+    Users,
+    Media,
+    Articles,
+    Services,
+    Testimonials,
+    FAQ,
+    ServiceAreas,
+    Midwives,
+    Redirects,
+  ],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || 'KALA_BABY_SPA_SECRET_KEY_PROD_2026',
