@@ -72,6 +72,9 @@ export interface Config {
     articles: Article;
     services: Service;
     testimonials: Testimonial;
+    faq: Faq;
+    'service-areas': ServiceArea;
+    midwives: Midwife;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +87,9 @@ export interface Config {
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    faq: FaqSelect<false> | FaqSelect<true>;
+    'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
+    midwives: MidwivesSelect<false> | MidwivesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -93,8 +99,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -203,10 +213,16 @@ export interface Article {
   author: string;
   authorTitle: string;
   medicalReviewer: string;
+  /**
+   * Ideal 130–155 karakter. Muncul di bawah judul artikel di hasil pencarian Google.
+   */
   description: string;
   heroImage?: (number | null) | Media;
   heroImageUrlFallback?: string | null;
-  heroImageAlt?: string | null;
+  /**
+   * Deskripsikan isi gambar secara ringkas dan informatif (wajib)
+   */
+  heroImageAlt: string;
   keywords?:
     | {
         keyword: string;
@@ -228,6 +244,21 @@ export interface Article {
     };
     [k: string]: unknown;
   } | null;
+  seo?: {
+    /**
+     * Kosongkan = pakai judul artikel otomatis
+     */
+    metaTitle?: string | null;
+    /**
+     * Ideal: 1200×630px. Kosongkan = pakai hero image
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Centang HANYA untuk halaman promo iklan khusus
+     */
+    noIndex?: boolean | null;
+    canonicalUrl?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -239,15 +270,25 @@ export interface Article {
 export interface Service {
   id: number;
   name: string;
-  serviceId: string;
+  slug: string;
   target: string;
   duration: string;
-  originalPrice?: string | null;
   price: string;
   numericPrice: number;
+  originalPrice?: string | null;
+  shortDescription?: string | null;
   description: string;
+  includedItems?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  image?: (number | null) | Media;
   badge?: string | null;
-  popular?: boolean | null;
+  recommended?: boolean | null;
+  active?: boolean | null;
+  order?: number | null;
   refCode: string;
   message?: string | null;
   updatedAt: string;
@@ -259,10 +300,88 @@ export interface Service {
  */
 export interface Testimonial {
   id: number;
-  quote: string;
   author: string;
-  location: string;
+  area: string;
   service: string;
+  quote: string;
+  photo?: (number | null) | Media;
+  date?: string | null;
+  /**
+   * Wajib dicentang sesuai standar etika medis & kerahasiaan pasien
+   */
+  permissionGranted: boolean;
+  active?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  category: 'layanan' | 'keamanan-medis' | 'reservasi-homecare' | 'biaya-wilayah';
+  order?: number | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-areas".
+ */
+export interface ServiceArea {
+  id: number;
+  name: string;
+  slug: string;
+  city: 'Surabaya' | 'Sidoarjo';
+  /**
+   * Tuliskan deskripsi otentik unik per wilayah untuk mendongkrak local SEO Google
+   */
+  uniqueDescription: string;
+  landmarks?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  estimatedArrivalMinutes?: string | null;
+  availableServices?:
+    | {
+        serviceName: string;
+        id?: string | null;
+      }[]
+    | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "midwives".
+ */
+export interface Midwife {
+  id: number;
+  name: string;
+  slug: string;
+  title: string;
+  /**
+   * Bukti legalitas tenaga kesehatan resmi Kemenkes untuk membangun E-E-A-T Google
+   */
+  strNumber: string;
+  photo?: (number | null) | Media;
+  experienceYears?: number | null;
+  specialties?:
+    | {
+        specialty: string;
+        id?: string | null;
+      }[]
+    | null;
+  bio: string;
+  active?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -309,6 +428,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'faq';
+        value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'service-areas';
+        value: number | ServiceArea;
+      } | null)
+    | ({
+        relationTo: 'midwives';
+        value: number | Midwife;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -444,6 +575,14 @@ export interface ArticlesSelect<T extends boolean = true> {
         id?: T;
       };
   content?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        ogImage?: T;
+        noIndex?: T;
+        canonicalUrl?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -454,15 +593,25 @@ export interface ArticlesSelect<T extends boolean = true> {
  */
 export interface ServicesSelect<T extends boolean = true> {
   name?: T;
-  serviceId?: T;
+  slug?: T;
   target?: T;
   duration?: T;
-  originalPrice?: T;
   price?: T;
   numericPrice?: T;
+  originalPrice?: T;
+  shortDescription?: T;
   description?: T;
+  includedItems?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  image?: T;
   badge?: T;
-  popular?: T;
+  recommended?: T;
+  active?: T;
+  order?: T;
   refCode?: T;
   message?: T;
   updatedAt?: T;
@@ -473,10 +622,76 @@ export interface ServicesSelect<T extends boolean = true> {
  * via the `definition` "testimonials_select".
  */
 export interface TestimonialsSelect<T extends boolean = true> {
-  quote?: T;
   author?: T;
-  location?: T;
+  area?: T;
   service?: T;
+  quote?: T;
+  photo?: T;
+  date?: T;
+  permissionGranted?: T;
+  active?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faq_select".
+ */
+export interface FaqSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  category?: T;
+  order?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-areas_select".
+ */
+export interface ServiceAreasSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  city?: T;
+  uniqueDescription?: T;
+  landmarks?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  estimatedArrivalMinutes?: T;
+  availableServices?:
+    | T
+    | {
+        serviceName?: T;
+        id?: T;
+      };
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "midwives_select".
+ */
+export interface MidwivesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  title?: T;
+  strNumber?: T;
+  photo?: T;
+  experienceYears?: T;
+  specialties?:
+    | T
+    | {
+        specialty?: T;
+        id?: T;
+      };
+  bio?: T;
+  active?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -519,6 +734,65 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Format baku tanpa spasi, tanda + atau 0 di depan. Contoh: 6281234567890
+   */
+  whatsappNumber: string;
+  /**
+   * Tampilan ramah pengguna untuk teks footer dan kontak. Contoh: +62 812-3456-7890
+   */
+  whatsappNumberFormatted?: string | null;
+  instagram?: string | null;
+  operationalHours?: string | null;
+  /**
+   * Badge keunggulan di bagian atas beranda (contoh: ✨ 100% Bidan Resmi Ber-STR)
+   */
+  heroBadgeText?: string | null;
+  /**
+   * Contoh: Dipercaya 500+ Bunda di Surabaya & Sidoarjo
+   */
+  socialProofText?: string | null;
+  /**
+   * Kosongkan jika tidak ada pengumuman aktif. Jika diisi, akan tampil di bar paling atas website.
+   */
+  announcementBanner?: string | null;
+  coverageAreas?:
+    | {
+        area: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  whatsappNumber?: T;
+  whatsappNumberFormatted?: T;
+  instagram?: T;
+  operationalHours?: T;
+  heroBadgeText?: T;
+  socialProofText?: T;
+  announcementBanner?: T;
+  coverageAreas?:
+    | T
+    | {
+        area?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
