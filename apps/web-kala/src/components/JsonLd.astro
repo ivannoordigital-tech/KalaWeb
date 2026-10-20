@@ -2,7 +2,7 @@
 import { siteConfig } from '../config/site';
 
 interface Props {
-  type: 'home' | 'article' | 'page';
+  type: 'home' | 'article' | 'page' | 'service' | 'person';
   articleData?: {
     title: string;
     description: string;
@@ -13,10 +13,25 @@ interface Props {
     url: string;
     heroImage?: string;
   };
+  serviceData?: {
+    name: string;
+    description: string;
+    price: number;
+    duration?: string;
+    url: string;
+  };
+  personData?: {
+    name: string;
+    title: string;
+    strNumber?: string;
+    bio?: string;
+    image?: string;
+    url?: string;
+  };
   breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
-const { type, articleData, breadcrumbs } = Astro.props;
+const { type, articleData, serviceData, personData, breadcrumbs } = Astro.props;
 
 // Schema LocalBusiness / MedicalBusiness for Homepage
 const homeSchema = {
@@ -27,7 +42,7 @@ const homeSchema = {
   legalName: siteConfig.legalName,
   url: siteConfig.url,
   logo: `${siteConfig.url}/images/logo-kala.svg`,
-  image: `${siteConfig.url}/images/og-kala-homecare.svg`,
+  image: `${siteConfig.url}/images/og-kala-homecare.png`,
   description: siteConfig.description,
   telephone: `+${siteConfig.whatsappNumber}`,
   priceRange: siteConfig.priceRange,
@@ -82,7 +97,7 @@ const articleSchema = articleData
       '@type': 'MedicalWebPage',
       headline: articleData.title,
       description: articleData.description,
-      image: articleData.heroImage ? new URL(articleData.heroImage, siteConfig.url).href : `${siteConfig.url}/images/og-kala-homecare.svg`,
+      image: articleData.heroImage ? new URL(articleData.heroImage, siteConfig.url).href : `${siteConfig.url}/images/og-kala-homecare.png`,
       datePublished: articleData.pubDate.toISOString(),
       dateModified: articleData.updatedDate.toISOString(),
       mainEntityOfPage: {
@@ -110,6 +125,54 @@ const articleSchema = articleData
     }
   : null;
 
+// Service & Offer Schema
+const serviceSchema = serviceData
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: serviceData.name,
+      description: serviceData.description,
+      provider: {
+        '@type': 'MedicalBusiness',
+        name: siteConfig.name,
+        url: siteConfig.url,
+        telephone: `+${siteConfig.whatsappNumber}`,
+      },
+      offers: {
+        '@type': 'Offer',
+        price: serviceData.price,
+        priceCurrency: 'IDR',
+        priceValidUntil: '2027-12-31',
+        url: serviceData.url,
+        availability: 'https://schema.org/InStock',
+      },
+    }
+  : null;
+
+// Person Schema for Midwives
+const personSchema = personData
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: personData.name,
+      jobTitle: personData.title,
+      description: personData.bio,
+      image: personData.image,
+      worksFor: {
+        '@type': 'MedicalBusiness',
+        name: siteConfig.name,
+        url: siteConfig.url,
+      },
+      identifier: personData.strNumber
+        ? {
+            '@type': 'PropertyValue',
+            name: 'Nomor Surat Tanda Registrasi (STR) Bidan',
+            value: personData.strNumber,
+          }
+        : undefined,
+    }
+  : null;
+
 // Breadcrumbs Schema
 const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0
   ? {
@@ -131,6 +194,14 @@ const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0
 
 {type === 'article' && articleSchema && (
   <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+)}
+
+{type === 'service' && serviceSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+)}
+
+{type === 'person' && personSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 )}
 
 {breadcrumbSchema && (

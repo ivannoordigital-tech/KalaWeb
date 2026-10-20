@@ -8,6 +8,7 @@ interface Props {
   variant?: 'primary' | 'secondary' | 'accent' | 'nav' | 'floating' | 'card';
   className?: string;
   showIcon?: boolean;
+  phone?: string;
 }
 
 const {
@@ -17,10 +18,11 @@ const {
   variant = 'primary',
   className = '',
   showIcon = true,
+  phone = siteConfig.whatsappNumber,
 } = Astro.props;
 
 const defaultMessage = message || `Halo Bidan Kala, saya mau reservasi homecare [ref: ${refCode}]`;
-const baseWaUrl = `https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(defaultMessage)}`;
+const baseWaUrl = `https://wa.me/${phone}?text=${encodeURIComponent(defaultMessage)}`;
 
 const variantStyles = {
   primary: 'bg-[#128C4A] hover:bg-[#0E6C38] text-white font-bold py-3.5 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2.5 text-base',
@@ -39,7 +41,7 @@ const variantStyles = {
   class={`kala-wa-btn ${variantStyles[variant]} ${className}`}
   data-ref-code={refCode}
   data-base-msg={defaultMessage}
-  data-phone={siteConfig.whatsappNumber}
+  data-phone={phone}
   aria-label={text}
 >
   {showIcon && (

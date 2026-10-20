@@ -65,64 +65,130 @@ Skrip `tracker.js` otomatis:
 2. Menambahkan ringkasan atribusi ke dalam pesan WhatsApp secara dinamis saat tombol diklik:
    `[ref: KALA-HOME | src:meta cmp:spring fb:xxxx]`
 3. Mengirimkan event analitik `lead_whatsapp_click` ke Microsoft Clarity / Cloudflare Web Analytics.
+4. Mendorong event konversi `whatsapp_lead` ke `window.dataLayer` Google Tag Manager (GTM) untuk pelacakan serentak di GA4, Meta Pixel, dan Google Ads.
+
+### F. Pembaruan Dokumen Revisi KalaWeb (Fase 0 – Fase 5)
+1. **Fase 0 — Pengamanan & Keandalan Arsitektur:**
+   - **Fail-Safe Build Fallback:** Pada production build Cloudflare Pages (`ALLOW_FALLBACK=false`), kegagalan komunikasi ke CMS akan sengaja menggagalkan proses build agar Cloudflare Pages mempertahankan deployment live sebelumnya (zero downtime). Mode fallback hanya aktif di dev lokal.
+   - **Deploy Hook Cerdas:** Debounce 60 detik, jeda keselamatan transaksi PostgreSQL (2.5 detik), pemicu spesifik status draft/publish/unpublish, serta cron rebuild harian via GitHub Actions.
+   - **Backup Otomatis VPS:** Script dump PostgreSQL harian (`backup-postgres.sh`) dengan kompresi gzip, retensi 30 hari, sinkronisasi R2, dan script pemulihan teruji (`restore-postgres.sh`).
+   - **Pipeline Gambar Teroptimasi:** Dukungan remote domain Cloudflare/Payload di Astro Image dan OG default 1200×630 PNG.
+2. **Fase 1 — Konten Komersial Mandiri di CMS:**
+   - Koleksi Payload CMS lengkap: `Services`, `Testimonials`, `FAQ`, `ServiceAreas`, `Midwives`, dan `SiteSettings`.
+   - Validasi regex nomor WhatsApp Indonesia (`628xxxxxxxxxx`) dan penegakan *alt text* wajib.
+   - Runbook teknis (`docs/runbook-teknis.md`) dan SOP operasional (`docs/sop-operasional.md`).
+3. **Fase 2 — Struktur Halaman & Penguatan SEO:**
+   - **Halaman Layanan Individual:** `/layanan/[slug]` lengkap dengan Schema `Service` & `Offer`, transparansi biaya, dan alur prosedur 4 langkah.
+   - **Halaman Area Spesifik:** `/area/[slug]` (Surabaya Timur, Barat, Selatan, Pusat, Utara, Sidoarjo) dengan landmark lokal dan estimasi waktu tempuh.
+   - **Halaman Otoritas Klinis:** `/tentang-kami` dan `/tim-bidan` dengan nomor STR terverifikasi dan Schema `Person`.
+   - **Landing Page Kampanye Ads:** `/lp/[slug]` (`/lp/bayi-kolik`, `/lp/pijat-newborn`) bebas distraksi navigasi, single CTA, dan `noindex: true`.
+   - **RSS Feed & Breadcrumbs:** `/rss.xml` terintegrasi `@astrojs/rss`.
+4. **Fase 3 & 4 — Atribusi Multi-Touch 30 Hari, Kepatuhan & Performa:**
+   - **Atribusi Tahan Lama:** Pelacakan First-Touch & Last-Touch (`utm_source`, `utm_campaign`, `fbclid`, `gclid`) bertahan 30 hari via Cookie & localStorage.
+   - **Debounce Double-Click & Event GTM:** Pencegahan double-fire klik WhatsApp dan pelacakan event scroll depth (25%, 50%, 75%, 90%).
+   - **Kepatuhan Privasi UU PDP:** Komponen `ConsentBanner.astro` dengan penyimpanan persetujuan lokal.
+   - **Mobile Sticky CTA Bar:** Tombol mengambang bawah ramah *tap target* (>44px) dan aman iPhone home bar.
+   - **Header Keamanan Web:** HSTS, X-Content-Type-Options, Referrer-Policy, dan Content Security Policy di `_headers`.
 
 ---
 
-## 2. Struktur Direktori Proyek
+## 2. Struktur Direktori Proyek Monorepo
 
 ```
 KalaWeb/
+├── .github/
+│   └── workflows/
+│       └── scheduled-build.yml # Cron rebuild harian Cloudflare Pages
 ├── .gitignore
 ├── package.json               # Root monorepo workspace
-├── README.md                  # Dokumentasi proyek & SOP Go-Live
+├── README.md                  # Dokumentasi proyek & panduan arsitektur
+├── docs/
+│   ├── runbook-teknis.md      # Panduan disaster recovery, restore DB, rotasi secret
+│   └── sop-operasional.md     # SOP bidan, admin reservasi WA, & marketing ads
 └── apps/
-    └── web-kala/              # Aplikasi Astro marketing & SEO
+    ├── cms/                   # Payload CMS v3 (Next.js + Postgres)
+    │   ├── package.json
+    │   ├── .env.example       # Database URI & CLOUDFLARE_DEPLOY_HOOK_URL
+    │   ├── scripts/
+    │   │   ├── backup-postgres.sh  # Backup harian terkompresi & R2 sync
+    │   │   └── restore-postgres.sh # Script restore DB teruji
+    │   └── src/
+    │       ├── payload.config.ts   # Konfigurasi koleksi & global
+    │       ├── utilities/
+    │       │   └── triggerDeployHook.ts # Debounced deploy trigger
+    │       ├── globals/
+    │       │   └── SiteSettings.ts # Nomor WA (regex), jam kerja, banner
+    │       └── collections/
+    │           ├── Articles.ts     # Artikel edukasi + SEO + deploy hook
+    │           ├── FAQ.ts          # Tanya jawab seputar homecare
+    │           ├── Media.ts        # Storage media
+    │           ├── Midwives.ts     # Profil bidan + STR
+    │           ├── ServiceAreas.ts # Wilayah Surabaya & Sidoarjo + estimasi waktu
+    │           ├── Services.ts     # Katalog layanan + harga + durasi
+    │           ├── Testimonials.ts # Ulasan Bunda terverifikasi
+    │           └── Users.ts        # Role admin & penulis
+    │
+    └── web-kala/              # Aplikasi Astro marketing & SEO (Cloudflare Pages)
         ├── package.json
-        ├── astro.config.mjs   # Konfigurasi Astro, Tailwind, & Sitemap
-        ├── tailwind.config.mjs# Brand color palette Kala & typography
+        ├── .env.example       # PAYLOAD_URL, PUBLIC_GTM_ID, ALLOW_FALLBACK
+        ├── astro.config.mjs   # Astro, Tailwind, Image Remote, Sitemap filter
+        ├── tailwind.config.mjs# Color palette & typography
         ├── tsconfig.json
         ├── public/
-        │   ├── _headers       # Header keamanan & caching Cloudflare Pages
-        │   ├── _redirects     # 301 Redirect canonical (www & .online -> .com)
-        │   ├── favicon.svg    # Monogram logo Kala
-        │   ├── llms.txt       # Profil entitas untuk AI search
-        │   ├── robots.txt     # Crawler rules
+        │   ├── _headers       # HSTS, CSP, & security headers
+        │   ├── _redirects     # 301 Redirects
+        │   ├── favicon.svg    # Brand monogram
+        │   ├── llms.txt       # Profil entitas untuk AI crawler
+        │   ├── robots.txt     # Rules crawler
         │   └── images/
         │       ├── logo-kala.svg
-        │       ├── og-kala-homecare.svg
-        │       └── blog/      # Hero SVG untuk tiap artikel pilar
+        │       ├── og-kala-homecare.png # 1200x630 OG image standar WA/FB
+        │       └── blog/      # Hero SVG artikel pilar
         └── src/
-            ├── config/
-            │   └── site.ts    # Single source of truth info bisnis & nomor WA
-            ├── content/
-            │   ├── config.ts  # Zod schema Content Collections
-            │   └── blog/      # 3 artikel pilar Markdown
             ├── components/
-            │   ├── CoverageArea.astro
-            │   ├── FeaturedServices.astro
+            │   ├── ConsentBanner.astro   # Banner persetujuan UU PDP
+            │   ├── CoverageArea.astro    # Grid wilayah dengan link ke /area/
+            │   ├── FeaturedServices.astro# Menu layanan dengan link ke /layanan/
             │   ├── Footer.astro
             │   ├── Hero.astro
-            │   ├── JsonLd.astro
+            │   ├── JsonLd.astro          # Schema MedicalBusiness, Service, Person, Article
+            │   ├── MobileStickyBar.astro # Sticky bottom CTA bar mobile
             │   ├── Navbar.astro
             │   ├── SEO.astro
             │   ├── Testimonials.astro
             │   ├── ValueProps.astro
             │   └── WhatsAppButton.astro
+            ├── config/
+            │   └── site.ts    # Fallback data lokal
+            ├── content/
+            │   ├── config.ts  # Zod schema artikel
+            │   └── blog/      # Markdown artikel awal
             ├── layouts/
-            │   ├── BaseLayout.astro
-            │   └── BlogPostLayout.astro
+            │   ├── BaseLayout.astro     # Deferred GTM, consent, mobile bar
+            │   └── BlogPostLayout.astro # Layout artikel medis
+            ├── lib/
+            │   └── payload.ts # Client API CMS + proteksi build production
             ├── pages/
             │   ├── 404.astro
             │   ├── index.astro
             │   ├── kebijakan-privasi.astro
             │   ├── segera-hadir.astro
-            │   └── blog/
-            │       ├── index.astro
-            │       └── [...slug].astro
+            │   ├── tentang-kami.astro    # Profil & standar klinis Kala
+            │   ├── tim-bidan.astro       # Profil bidan + STR (Schema Person)
+            │   ├── rss.xml.ts            # RSS feed blog
+            │   ├── area/
+            │   │   └── [slug].astro      # Landing page area lokal
+            │   ├── blog/
+            │   │   ├── index.astro
+            │   │   └── [...slug].astro
+            │   ├── layanan/
+            │   │   └── [slug].astro      # Halaman per layanan (Schema Service)
+            │   └── lp/
+            │       └── [slug].astro      # Landing page kampanye iklan (noindex)
             ├── scripts/
-            │   └── tracker.js # Script penangkap UTM & pelacakan klik WA
+            │   └── tracker.js # Multi-touch 30-day attribution & GTM pushes
             └── styles/
-                └── global.css # Custom brand styling & prose
+                └── global.css
 ```
 
 ---
@@ -133,13 +199,16 @@ KalaWeb/
 # Pindah ke direktori proyek
 cd c:\Users\User\Documents\KalaWeb
 
-# Jalankan server pengembangan lokal (Astro)
+# Jalankan server frontend web (Astro: http://localhost:4321)
 npm run dev
 
-# Bangun aset produksi (Static HTML)
+# Jalankan server CMS Payload (Next.js: http://localhost:3005)
+npm run dev:cms
+
+# Bangun aset produksi frontend (Static HTML di apps/web-kala/dist)
 npm run build
 
-# Uji hasil build lokal
+# Uji hasil build frontend lokal
 npm run preview
 ```
 
@@ -197,3 +266,31 @@ npm run preview
    - Buka [Google PageSpeed Insights](https://pagespeed.web.dev/).
    - Masukkan `https://kalababyspa.com/`.
    - Pastikan metrik LCP (Largest Contentful Paint), CLS (Cumulative Layout Shift), dan INP berada di **Zona Hijau**.
+
+---
+
+## 5. Panduan Operasional Fitur Sprint 2
+
+### A. Cloudflare Pages Deploy Hook (Auto-Build CMS)
+1. Buka Cloudflare Dashboard -> **Workers & Pages** -> Pilih project `web-kala` -> **Settings** -> **Builds & deployments**.
+2. Di bagian **Deploy Hooks**, klik **Create deploy hook**.
+   - Nama: `Payload CMS Publish`
+   - Branch: `main`
+3. Salin URL webhook dan masukkan ke `apps/cms/.env` pada server VPS:
+   ```env
+   CLOUDFLARE_DEPLOY_HOOK_URL=https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/YOUR_HOOK_ID
+   ```
+4. Setiap kali Bidan menerbitkan artikel atau memperbarui Pengaturan Situs di CMS, Cloudflare otomatis melakukan build dan deploy tanpa perlu intervensi developer.
+
+### B. Google Tag Manager (GTM)
+1. Container ID GTM dikonfigurasi melalui variabel lingkungan `PUBLIC_GTM_ID` di `apps/web-kala/.env` (default: `'GTM-XXXXXXX'`).
+2. Setiap tombol WhatsApp yang diklik pengunjung memicu event konversi otomatis ke `window.dataLayer`:
+   ```javascript
+   {
+     event: 'whatsapp_lead',
+     event_category: 'Lead',
+     event_label: refCode,
+     whatsapp_ref_code: refCode
+   }
+   ```
+3. Di dashboard [Google Tag Manager](https://tagmanager.google.com/), tim marketing dapat membuat trigger **Custom Event** dengan event name `whatsapp_lead` untuk menghubungkan GA4, Meta Pixel (Facebook & Instagram Ads), serta Google Ads Conversion tanpa perlu mengubah kode sumber website.

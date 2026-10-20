@@ -7,9 +7,24 @@ import Testimonials from '../components/Testimonials.astro';
 import CoverageArea from '../components/CoverageArea.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import { getCollection } from 'astro:content';
+import { fetchSiteSettings } from '../lib/payload';
+import { siteConfig } from '../config/site';
 
 const allPosts = await getCollection('blog', ({ data }) => !data.draft);
 const latestPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+
+const cmsSettings = await fetchSiteSettings();
+const siteSettings = {
+  ...siteConfig,
+  whatsappNumber: cmsSettings?.whatsappNumber || siteConfig.whatsappNumber,
+  whatsappNumberFormatted: cmsSettings?.whatsappNumberFormatted || siteConfig.whatsappNumberFormatted,
+  instagram: cmsSettings?.instagram || siteConfig.instagram,
+  operationalHours: cmsSettings?.operationalHours || siteConfig.operationalHours,
+  socialProofText: cmsSettings?.socialProofText || siteConfig.socialProofText,
+  heroBadgeText: cmsSettings?.heroBadgeText || '✨ Bidan Resmi Ber-STR',
+  announcementBanner: cmsSettings?.announcementBanner || '',
+  coverageAreas: cmsSettings?.coverageAreas?.length ? cmsSettings.coverageAreas.map((c) => c.area) : siteConfig.coverageAreas,
+};
 ---
 
 <BaseLayout
@@ -18,7 +33,7 @@ const latestPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pu
   schemaType="home"
 >
   <!-- Hero Section -->
-  <Hero />
+  <Hero siteSettings={siteSettings} />
 
   <!-- 5 Pembeda Keunggulan Bidan Kala -->
   <ValueProps />
@@ -101,6 +116,7 @@ const latestPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pu
         text="Konsultasi & Reservasi Homecare Sekarang"
         variant="primary"
         className="text-base py-4 px-8"
+        phone={siteSettings.whatsappNumber}
       />
     </div>
   </section>

@@ -18,6 +18,12 @@ interface Props {
       keywords?: string[];
       medicalReviewer?: string;
       draft?: boolean;
+      seo?: {
+        metaTitle?: string;
+        ogImage?: { url?: string; alt?: string } | string;
+        noIndex?: boolean;
+        canonicalUrl?: string;
+      };
     };
   };
 }
@@ -57,27 +63,37 @@ const breadcrumbs = [
   { name: 'Blog Edukasi', url: '/blog' },
   { name: data.title, url: `/blog/${slug}` },
 ];
+
+const resolvedOgImage = typeof data.seo?.ogImage === 'object' && data.seo?.ogImage !== null
+  ? (data.seo.ogImage.url || data.heroImage)
+  : typeof data.seo?.ogImage === 'string' && data.seo.ogImage
+    ? data.seo.ogImage
+    : data.heroImage;
+
+const resolvedCanonical = data.seo?.canonicalUrl || `https://kalababyspa.com/blog/${slug}`;
 ---
 
 <BaseLayout
-  title={data.title}
+  title={data.seo?.metaTitle || data.title}
   description={data.description}
-  canonical={`https://kalababyspa.com/blog/${slug}`}
+  canonical={resolvedCanonical}
   type="article"
+  image={resolvedOgImage}
   publishedTime={data.pubDate.toISOString()}
   modifiedTime={data.updatedDate.toISOString()}
   author={data.author}
   keywords={data.keywords}
+  noindex={data.seo?.noIndex || false}
   schemaType="article"
   articleData={{
-    title: data.title,
+    title: data.seo?.metaTitle || data.title,
     description: data.description,
     pubDate: data.pubDate,
     updatedDate: data.updatedDate,
     author: data.author,
     authorTitle: data.authorTitle,
-    url: `https://kalababyspa.com/blog/${slug}`,
-    heroImage: data.heroImage,
+    url: resolvedCanonical,
+    heroImage: resolvedOgImage || data.heroImage,
   }}
   breadcrumbs={breadcrumbs}
 >

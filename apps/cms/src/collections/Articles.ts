@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -8,6 +9,34 @@ export const Articles: CollectionConfig = {
   },
   versions: {
     drafts: true,
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc, previousDoc, operation }) => {
+        const isNowPublished = doc._status === 'published' || doc.status === 'published';
+        const wasPublished = previousDoc?._status === 'published' || previousDoc?.status === 'published';
+
+        if (isNowPublished && !wasPublished) {
+          // 1. Dokumen baru diterbitkan (Draft -> Published)
+          triggerCloudflareDeploy({ resource: 'Articles', action: 'publish', slug: doc.slug });
+        } else if (!isNowPublished && wasPublished) {
+          // 2. Dokumen ditarik / unpublish (Published -> Draft)
+          triggerCloudflareDeploy({ resource: 'Articles', action: 'unpublish', slug: doc.slug });
+        } else if (isNowPublished && wasPublished) {
+          // 3. Pembaruan konten pada dokumen yang sudah published
+          triggerCloudflareDeploy({ resource: 'Articles', action: 'publish', slug: doc.slug });
+        }
+        // Abaikan perubahan antar draft / autosave
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        const wasPublished = doc._status === 'published' || doc.status === 'published';
+        if (wasPublished) {
+          triggerCloudflareDeploy({ resource: 'Articles', action: 'delete', slug: doc.slug });
+        }
+      },
+    ],
   },
   fields: [
     {
@@ -97,6 +126,9 @@ export const Articles: CollectionConfig = {
       type: 'textarea',
       required: true,
       label: 'Ringkasan Deskripsi (Meta Description untuk Google & Snippet)',
+      admin: {
+        description: 'Ideal 130–155 karakter. Muncul di bawah judul artikel di hasil pencarian Google.',
+      },
     },
     {
       name: 'heroImage',
@@ -112,7 +144,11 @@ export const Articles: CollectionConfig = {
     {
       name: 'heroImageAlt',
       type: 'text',
-      label: 'Alt Text Foto Sampul',
+      required: true,
+      label: 'Alt Text Foto Sampul (Wajib untuk Aksesibilitas & SEO)',
+      admin: {
+        description: 'Deskripsikan isi gambar secara ringkas dan informatif (wajib)',
+      },
     },
     {
       name: 'keywords',
@@ -130,6 +166,39 @@ export const Articles: CollectionConfig = {
       name: 'content',
       type: 'richText',
       label: 'Isi Konten Artikel',
+    },
+    {
+      name: 'seo',
+      type: 'group',
+      label: '🔍 SEO & Open Graph (Pengaturan Mesin Pencari)',
+      admin: { position: 'sidebar' },
+      fields: [
+        {
+          name: 'metaTitle',
+          type: 'text',
+          label: 'Meta Title (Judul di Google, maks 60 karakter)',
+          admin: { description: 'Kosongkan = pakai judul artikel otomatis' },
+        },
+        {
+          name: 'ogImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'OG Image (Thumbnail saat dibagikan ke WA/FB/IG)',
+          admin: { description: 'Ideal: 1200×630px. Kosongkan = pakai hero image' },
+        },
+        {
+          name: 'noIndex',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Sembunyikan dari Google (no-index)',
+          admin: { description: 'Centang HANYA untuk halaman promo iklan khusus' },
+        },
+        {
+          name: 'canonicalUrl',
+          type: 'text',
+          label: 'Canonical URL (opsional — jika konten ada di tempat lain juga)',
+        },
+      ],
     },
   ],
 }

@@ -4,6 +4,10 @@ import JsonLd from '../components/JsonLd.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
+import MobileStickyBar from '../components/MobileStickyBar.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
+import { fetchSiteSettings } from '../lib/payload';
+import { siteConfig } from '../config/site';
 import '../styles/global.css';
 
 interface Props {
@@ -17,7 +21,7 @@ interface Props {
   author?: string;
   keywords?: string[];
   noindex?: boolean;
-  schemaType?: 'home' | 'article' | 'page';
+  schemaType?: 'home' | 'article' | 'page' | 'service' | 'person';
   articleData?: {
     title: string;
     description: string;
@@ -27,6 +31,21 @@ interface Props {
     authorTitle?: string;
     url: string;
     heroImage?: string;
+  };
+  serviceData?: {
+    name: string;
+    description: string;
+    price: number;
+    duration?: string;
+    url: string;
+  };
+  personData?: {
+    name: string;
+    title: string;
+    strNumber?: string;
+    bio?: string;
+    image?: string;
+    url?: string;
   };
   breadcrumbs?: Array<{ name: string; url: string }>;
   showFloatingWa?: boolean;
@@ -45,9 +64,27 @@ const {
   noindex = false,
   schemaType = 'page',
   articleData,
+  serviceData,
+  personData,
   breadcrumbs,
   showFloatingWa = true,
 } = Astro.props;
+
+// Fetch dynamic global site settings at build time (falls back gracefully to siteConfig)
+const cmsSettings = await fetchSiteSettings();
+const siteSettings = {
+  ...siteConfig,
+  whatsappNumber: cmsSettings?.whatsappNumber || siteConfig.whatsappNumber,
+  whatsappNumberFormatted: cmsSettings?.whatsappNumberFormatted || siteConfig.whatsappNumberFormatted,
+  instagram: cmsSettings?.instagram || siteConfig.instagram,
+  operationalHours: cmsSettings?.operationalHours || siteConfig.operationalHours,
+  socialProofText: cmsSettings?.socialProofText || siteConfig.socialProofText,
+  heroBadgeText: cmsSettings?.heroBadgeText || '✨ Bidan Resmi Ber-STR',
+  announcementBanner: cmsSettings?.announcementBanner || '',
+  coverageAreas: cmsSettings?.coverageAreas?.length ? cmsSettings.coverageAreas.map((c) => c.area) : siteConfig.coverageAreas,
+};
+
+const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
 ---
 
 <!DOCTYPE html>
@@ -61,6 +98,34 @@ const {
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Google Tag Manager (Deferred until idle or interaction to protect LCP & INP) -->
+    <script is:inline define:vars={{ gtmId }}>
+      (function() {
+        var gtmLoaded = false;
+        function loadGTM() {
+          if (gtmLoaded) return;
+          gtmLoaded = true;
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+          f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer',gtmId);
+        }
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(function() { setTimeout(loadGTM, 1800); }, { timeout: 3500 });
+        } else {
+          setTimeout(loadGTM, 2200);
+        }
+
+        ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(evt) {
+          window.addEventListener(evt, loadGTM, { once: true, passive: true });
+        });
+      })();
+    </script>
+    <!-- End Google Tag Manager -->
 
     <!-- SEO Meta Tags & Open Graph -->
     <SEO
@@ -80,28 +145,50 @@ const {
     <JsonLd
       type={schemaType}
       articleData={articleData}
+      serviceData={serviceData}
+      personData={personData}
       breadcrumbs={breadcrumbs}
     />
   </head>
-  <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22]">
-    <Navbar />
+  <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22] pb-16 md:pb-0">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    {siteSettings.announcementBanner && (
+      <aside class="bg-[#C2552B] text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center">
+        {siteSettings.announcementBanner}
+      </aside>
+    )}
+
+    <Navbar siteSettings={siteSettings} />
 
     <main class="flex-grow">
       <slot />
     </main>
 
-    <Footer />
+    <Footer siteSettings={siteSettings} />
 
     {showFloatingWa && (
-      <div class="fixed bottom-5 right-5 z-40">
+      <div class="hidden md:block fixed bottom-5 right-5 z-40">
         <WhatsAppButton
           refCode="KALA-FLOAT"
           message="Halo Bidan Kala, saya mau tanya layanan homecare Kala [ref: KALA-FLOAT]"
           text="Chat Bidan"
           variant="floating"
+          phone={siteSettings.whatsappNumber}
         />
       </div>
     )}
+
+    <!-- Mobile Sticky Bottom CTA Bar -->
+    <MobileStickyBar phone={siteSettings.whatsappNumber} />
+
+    <!-- Privacy Consent Banner (UU PDP Compliance) -->
+    <ConsentBanner />
 
     <!-- Attribution and WhatsApp Click Script -->
     <script src="../scripts/tracker.js"></script>

@@ -1,0 +1,360 @@
+---
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import MobileStickyBar from '../../components/MobileStickyBar.astro';
+import ConsentBanner from '../../components/ConsentBanner.astro';
+import { siteConfig } from '../../config/site';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const campaigns = [
+    {
+      slug: 'bayi-kolik',
+      title: 'Solusi Tangis Kolik & Perut Kembung Bayi di Surabaya & Sidoarjo',
+      headline: 'Atasi Tangis Bayi Akibat Kolik & Kembung Tanpa Panik',
+      subheadline: 'Bidan ber-STR resmi hadir langsung ke rumah Bunda. Terapi pijat ILU anatomi medis + evaluasi perlekatan menyusui untuk meredakan tangisan si kecil.',
+      refCode: 'LP-KOLIK-ADS',
+      price: 'Rp60.000',
+      duration: '40 Menit',
+      painPoints: [
+        'Bayi menangis histeris di sore atau malam hari dengan kaki menekuk ke dada',
+        'Perut si kecil terasa kencang, begah, atau berbunyi keras saat disentuh',
+        'Bunda dan Ayah kelelahan, kurang tidur, dan merasa cemas bingung harus berbuat apa',
+        'Takut mencoba obat sembarangan atau pijat urut tradisional yang terlalu keras',
+      ],
+      solutions: [
+        {
+          title: 'Teknik Pijat ILU Klinis & Gerakan Kayuh Sepeda',
+          desc: 'Stimulasi gerak peristaltik usus yang terbukti ilmiah membantu mengeluarkan gas terjebak secara alami dan tanpa rasa sakit.',
+        },
+        {
+          title: 'Evaluasi Sendawa & Pelekatan Menyusui',
+          desc: 'Bidan memeriksa posisi menyusui Bunda untuk mencegah udara tertelan (aerofagia) saat bayi minum ASI atau susu botol.',
+        },
+        {
+          title: 'Zero Mom-Shaming Guarantee',
+          desc: 'Rasa lelah dan cemas Bunda kami validasi dengan penuh kehangatan. Tidak ada nada menghakimi.',
+        },
+      ],
+      steps: [
+        { num: '1', title: 'Chat WhatsApp', desc: 'Sampaikan keluhan tangis bayi Bunda dan tentukan jam kedatangan bidan.' },
+        { num: '2', title: 'Bidan Tiba di Rumah', desc: 'Bidan memeriksa tanda vital, membawa perlak steril & minyak food-grade.' },
+        { num: '3', title: 'Bayi Rileks & Tenang', desc: 'Gas keluar, perut si kecil lebih nyaman, dan Bunda bisa beristirahat lega.' },
+      ],
+      testimonial: {
+        quote: 'Baby Zayn sempat nangis 3 jam tiap malam. Bidan Kala datang dan sabar banget ngeluarin gas di perutnya pakai pijatan lembut. Malam itu Zayn bisa tidur nyenyak 4 jam berturut-turut. Terima kasih banyak!',
+        author: 'Bunda Nadhira & Baby Zayn (3 minggu)',
+        area: 'Waru, Sidoarjo',
+      },
+      faqs: [
+        {
+          q: 'Kapan waktu terbaik untuk pijat kolik?',
+          a: 'Paling baik dilakukan saat bayi dalam kondisi tenang atau di antara jadwal minum (sekitar 45 menit setelah menyusui), bukan saat bayi sedang kelaparan atau tepat setelah minum kenyang.',
+        },
+        {
+          q: 'Apakah bidannya aman dan terpercaya?',
+          a: 'Seluruh tim Kala adalah bidan berijazah kebidanan dengan Surat Tanda Registrasi (STR) aktif dari Kemenkes RI serta sertifikasi pijat bayi.',
+        },
+        {
+          q: 'Bagaimana jika bayi menangis saat dipijat?',
+          a: 'Bidan tidak akan pernah memaksa tindakan. Jika bayi butuh jeda, bidan akan menenangkan si kecil atau membiarkan Bunda menyusui terlebih dahulu.',
+        },
+      ],
+    },
+    {
+      slug: 'pijat-newborn',
+      title: 'Pijat Ceria Newborn Homecare Surabaya & Sidoarjo | Bidan Ber-STR',
+      headline: 'Sentuhan Lembut Pertama untuk Kenyamanan Tumbuh Kembang Si Kecil',
+      subheadline: 'Perawatan homecare khusus bayi baru lahir (0-6 bulan) langsung di kamar Bunda. Higienis steril, minyak food-grade, dan ditangani 100% oleh bidan resmi.',
+      refCode: 'LP-NEWBORN-ADS',
+      price: 'Rp60.000',
+      duration: '40 Menit',
+      painPoints: [
+        'Kekhawatiran memegang dan merawat tubuh newborn yang masih sangat mungil dan rentan',
+        'Bayi sering kaget, rewel saat tidur, atau sulit beradaptasi dengan lingkungan luar rahim',
+        'Bunda masih dalam masa pemulihan nifas atau sesar, sulit keluar rumah menembus macet',
+        'Ragu dengan kebersihan terapis pijat umum yang belum memahami anatomi bayi baru lahir',
+      ],
+      solutions: [
+        {
+          title: 'Stimulasi Taktil & Sensori Berstandar Medis',
+          desc: 'Membantu menurunkan hormon stres kortisol bayi dan meningkatkan hormon relaksasi untuk kualitas tidur yang jauh lebih lelap.',
+        },
+        {
+          title: 'Higienitas Medis & Minyak Food-Grade Steril',
+          desc: 'Menggunakan perlak steril dan minyak alami tanpa pewangi sintetis yang 100% aman bagi kulit sensitif bayi baru lahir.',
+        },
+        {
+          title: 'Praktis di Rumah Tanpa Macet',
+          desc: 'Bunda cukup beristirahat di rumah dengan tenang. Bidan datang tepat waktu membawa seluruh perlengkapan bersih.',
+        },
+      ],
+      steps: [
+        { num: '1', title: 'Pilih Jadwal Kunjungan', desc: 'Hubungi WhatsApp Bidan Kala dan infokan usia si kecil serta alamat rumah Bunda.' },
+        { num: '2', title: 'Kunjungan Bidan Bersih', desc: 'Bidan mencuci tangan aseptik, cek suhu tubuh bayi, dan menyiapkan perlak higienis.' },
+        { num: '3', title: 'Tumbuh Ceria & Tidur Lelap', desc: 'Si kecil rileks, tidur lebih pulas, dan Bunda mendapatkan panduan stimulasi mandiri.' },
+      ],
+      testimonial: {
+        quote: 'Setelah melahirkan sesar badan rasanya nyeri semua dan takut mandiin atau megang bayi. Bidan Kala telaten banget, ngajarin posisi gendong dan pijat stimulasi lembut. Rasanya tenang banget!',
+        author: 'Bunda Clarissa & Baby Kenzo (1 bulan)',
+        area: 'Wiyung, Surabaya Barat',
+      },
+      faqs: [
+        {
+          q: 'Usia berapa bayi sudah boleh dipijat oleh bidan?',
+          a: 'Sejak usia beberapa hari setelah lahir (newborn) sudah sangat aman dilakukan pijatan stimulasi lembut, asalkan kondisi tanda vital stabil dan tali pusat dirawat secara benar.',
+        },
+        {
+          q: 'Apakah Bunda perlu menyiapkan minyak sendiri?',
+          a: 'Tidak perlu. Bidan Kala membawa minyak pijat food-grade alami steril yang telah disetujui standar medis untuk kulit bayi.',
+        },
+        {
+          q: 'Apakah melayani seluruh area Surabaya dan Sidoarjo?',
+          a: 'Ya, kami melayani seluruh kawasan Surabaya (Barat, Timur, Selatan, Pusat, Utara) serta Sidoarjo Kota dan sekitarnya.',
+        },
+      ],
+    },
+  ];
+
+  return campaigns.map((campaign) => ({
+    params: { slug: campaign.slug },
+    props: { campaign },
+  }));
+}
+
+interface Props {
+  campaign: {
+    slug: string;
+    title: string;
+    headline: string;
+    subheadline: string;
+    refCode: string;
+    price: string;
+    duration: string;
+    painPoints: string[];
+    solutions: Array<{ title: string; desc: string }>;
+    steps: Array<{ num: string; title: string; desc: string }>;
+    testimonial: { quote: string; author: string; area: string };
+    faqs: Array<{ q: string; a: string }>;
+  };
+}
+
+const { campaign } = Astro.props;
+const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{campaign.title}</title>
+    <meta name="description" content={campaign.subheadline} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Google Tag Manager (Deferred until idle or interaction) -->
+    <script is:inline define:vars={{ gtmId }}>
+      (function() {
+        var gtmLoaded = false;
+        function loadGTM() {
+          if (gtmLoaded) return;
+          gtmLoaded = true;
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+          f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer',gtmId);
+        }
+
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(function() { setTimeout(loadGTM, 1800); }, { timeout: 3500 });
+        } else {
+          setTimeout(loadGTM, 2200);
+        }
+
+        ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(evt) {
+          window.addEventListener(evt, loadGTM, { once: true, passive: true });
+        });
+      })();
+    </script>
+  </head>
+  <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] pb-20 md:pb-0">
+    
+    <!-- Minimalist Header -->
+    <header class="py-4 px-4 bg-white/90 backdrop-blur-md border-b border-[#F6DCCD] sticky top-0 z-30">
+      <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-[#FFEFE5] text-[#C2552B] flex items-center justify-center font-brand font-bold text-lg border border-[#F6DCCD]">
+            K
+          </span>
+          <span class="font-brand font-bold text-lg text-[#4B2E22]">Kala Homecare</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <span class="hidden sm:inline-block text-xs font-semibold text-[#128C4A] bg-[#E8F8EE] px-2.5 py-1 rounded-full border border-[#C5ECD2]">
+            ✓ Bidan Ber-STR Resmi
+          </span>
+          <span class="text-xs text-[#86675A] font-semibold">Surabaya & Sidoarjo</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. HERO SECTION -->
+    <section class="py-12 md:py-16 bg-gradient-to-b from-[#FFEFE5]/60 to-[#FFF9F4] border-b border-[#F6DCCD]">
+      <div class="max-w-3xl mx-auto px-4 text-center">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-4">
+          Layanan Bidan Homecare
+        </span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mb-4 leading-tight">
+          {campaign.headline}
+        </h1>
+        <p class="text-base sm:text-lg text-[#86675A] leading-relaxed mb-8">
+          {campaign.subheadline}
+        </p>
+
+        <!-- CTA Box -->
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-[#F6DCCD] shadow-kala inline-block w-full max-w-lg mx-auto">
+          <div class="flex items-center justify-center gap-4 mb-4">
+            <span class="text-3xl font-brand font-bold text-[#C2552B]">{campaign.price}</span>
+            <span class="text-xs text-[#86675A] bg-[#FFF9F4] px-3 py-1 rounded-full border border-[#F6DCCD]">
+              ⏱ {campaign.duration}
+            </span>
+          </div>
+          <WhatsAppButton
+            refCode={campaign.refCode}
+            message={`Halo Bidan Kala, saya mau pesan sesi ${campaign.headline} [ref: ${campaign.refCode}]`}
+            text="Hubungi Bidan Kala Sekarang"
+            variant="hero"
+          />
+          <p class="text-xs text-[#86675A] mt-3">
+            *Respon cepat setiap hari 08.00 - 17.00 WIB
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PAIN POINTS SECTION -->
+    <section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+      <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] text-center mb-8">
+          Apakah Bunda Mengalami Hal Ini?
+        </h2>
+        <div class="space-y-4">
+          {campaign.painPoints.map((point) => (
+            <div class="flex items-start gap-3 p-4 rounded-2xl bg-[#FFF9F4] border border-[#F6DCCD]">
+              <span class="text-red-500 font-bold text-lg flex-shrink-0">✕</span>
+              <p class="text-sm sm:text-base text-[#4B2E22] font-medium leading-relaxed">
+                {point}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SOLUTIONS & WHY KALA -->
+    <section class="py-12 md:py-16 bg-[#FFF9F4] border-b border-[#F6DCCD]">
+      <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] text-center mb-8">
+          Solusi Medis & Penuh Kehangatan dari Kala
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {campaign.solutions.map((sol) => (
+            <div class="p-6 rounded-2xl bg-white border border-[#F6DCCD] shadow-sm">
+              <span class="text-2xl mb-3 block">🌿</span>
+              <h3 class="font-brand font-bold text-base text-[#4B2E22] mb-2">{sol.title}</h3>
+              <p class="text-xs text-[#86675A] leading-relaxed">{sol.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 3-STEP EASY FLOW -->
+    <section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+      <div class="max-w-3xl mx-auto px-4 text-center">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mb-8">
+          Cara Kerja Praktis 3 Langkah
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {campaign.steps.map((step) => (
+            <div class="p-6 rounded-2xl bg-[#FFF9F4] border border-[#F6DCCD]">
+              <div class="w-10 h-10 rounded-full bg-[#FFEFE5] text-[#C2552B] font-bold text-base flex items-center justify-center mx-auto mb-4 border border-[#F6DCCD]">
+                {step.num}
+              </div>
+              <h3 class="font-brand font-bold text-base text-[#4B2E22] mb-2">{step.title}</h3>
+              <p class="text-xs text-[#86675A] leading-relaxed">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SOCIAL PROOF & TESTIMONIAL -->
+    <section class="py-12 md:py-16 bg-[#FFF9F4] border-b border-[#F6DCCD]">
+      <div class="max-w-3xl mx-auto px-4">
+        <div class="bg-white p-8 rounded-3xl border-2 border-[#F6DCCD] shadow-kala">
+          <div class="flex items-center gap-1 text-[#C2552B] mb-4 text-lg">
+            ★★★★★
+          </div>
+          <p class="text-base text-[#4B2E22] italic leading-relaxed mb-6 font-medium">
+            "{campaign.testimonial.quote}"
+          </p>
+          <div class="flex items-center justify-between border-t border-[#F6DCCD]/60 pt-4 text-xs">
+            <span class="font-bold text-[#4B2E22]">{campaign.testimonial.author}</span>
+            <span class="text-[#86675A]">📍 {campaign.testimonial.area}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. FAQS -->
+    <section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+      <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] text-center mb-8">
+          Pertanyaan yang Sering Diajukan Bunda
+        </h2>
+        <div class="space-y-4">
+          {campaign.faqs.map((faq) => (
+            <details class="group p-5 bg-[#FFF9F4] rounded-2xl border border-[#F6DCCD] cursor-pointer">
+              <summary class="font-brand font-bold text-sm sm:text-base text-[#4B2E22] flex items-center justify-between list-none">
+                <span>{faq.q}</span>
+                <span class="text-[#C2552B] font-bold text-lg group-open:rotate-45 transition-transform">+</span>
+              </summary>
+              <p class="mt-3 text-xs sm:text-sm text-[#86675A] leading-relaxed border-t border-[#F6DCCD]/60 pt-3">
+                {faq.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. CLOSING CTA -->
+    <section class="py-14 md:py-20 bg-gradient-to-b from-[#FFF9F4] to-[#FFEFE5] text-center">
+      <div class="max-w-xl mx-auto px-4">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mb-4">
+          Si kecil berhak merasa nyaman, Bunda berhak beristirahat tenang.
+        </h2>
+        <p class="text-sm text-[#86675A] mb-8 leading-relaxed">
+          Slot kunjungan terbatas setiap hari demi menjaga kualitas dan higienitas setiap tindakan medis.
+        </p>
+        <WhatsAppButton
+          refCode={campaign.refCode}
+          message={`Halo Bidan Kala, saya mau reservasi kunjungan ${campaign.headline} [ref: ${campaign.refCode}]`}
+          text="Jadwalkan Kunjungan Sekarang"
+          variant="hero"
+        />
+      </div>
+    </section>
+
+    <!-- Sticky Mobile CTA Bar -->
+    <MobileStickyBar phone={siteConfig.whatsappNumber} />
+
+    <!-- Privacy Consent Banner -->
+    <ConsentBanner />
+
+    <!-- Tracker Script -->
+    <script src="../../scripts/tracker.js"></script>
+  </body>
+</html>

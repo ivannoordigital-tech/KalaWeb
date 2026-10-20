@@ -1,0 +1,38 @@
+---
+import { siteConfig } from '../config/site';
+import WhatsAppButton from './WhatsAppButton.astro';
+
+interface Props {
+  phone?: string;
+  refCode?: string;
+  priceNote?: string;
+}
+
+const {
+  phone = siteConfig.whatsappNumber,
+  refCode = 'KALA-MOB-BAR',
+  priceNote = 'Mulai Rp60.000',
+} = Astro.props;
+---
+
+<div
+  class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F6DCCD] px-4 py-2.5 shadow-[0_-4px_20px_rgba(75,46,34,0.08)] transition-all"
+  style="padding-bottom: max(0.6rem, env(safe-area-inset-bottom));"
+>
+  <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+    <div class="flex flex-col">
+      <span class="text-[11px] font-bold uppercase tracking-wider text-[#C2552B]">Bidan ke Rumah</span>
+      <span class="font-brand font-bold text-sm text-[#4B2E22] leading-tight">{priceNote}</span>
+    </div>
+
+    <div class="flex-grow max-w-[210px]">
+      <WhatsAppButton
+        refCode={refCode}
+        phone={phone}
+        text="Chat Reservasi"
+        variant="primary"
+        className="w-full text-sm py-2.5 px-4 min-h-[44px] shadow-none"
+      />
+    </div>
+  </div>
+</div>

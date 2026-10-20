@@ -1,6 +1,18 @@
 ---
 import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
+
+interface Props {
+  siteSettings?: {
+    whatsappNumber?: string;
+    whatsappNumberFormatted?: string;
+    instagram?: string;
+    [key: string]: any;
+  };
+}
+
+const { siteSettings } = Astro.props;
+const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 ---
 
 <header class="sticky top-0 z-40 bg-[#FFF9F4]/95 backdrop-blur-md border-b border-[#F6DCCD] transition-all">
@@ -18,21 +30,24 @@ import WhatsAppButton from './WhatsAppButton.astro';
       </a>
 
       <!-- Desktop Navigation Links -->
-      <nav class="hidden md:flex items-center gap-7" aria-label="Menu Utama">
+      <nav class="hidden md:flex items-center gap-6" aria-label="Menu Utama">
         <a href="/#layanan" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
-          Layanan Unggulan
+          Layanan
         </a>
-        <a href="/#pembeda" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
-          Tentang Bidan
+        <a href="/tentang-kami" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Tentang Kami
+        </a>
+        <a href="/tim-bidan" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
+          Tim Bidan
         </a>
         <a href="/#testimoni" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
-          Cerita Bunda
+          Ulasan
         </a>
         <a href="/#area" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
-          Area Layanan
+          Area
         </a>
         <a href="/blog" class="text-sm font-semibold text-[#4B2E22] hover:text-[#C2552B] transition-colors py-1">
-          Blog Edukasi
+          Blog
         </a>
       </nav>
 
@@ -43,6 +58,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
           message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-NAV]"
           text="Reservasi Bidan"
           variant="nav"
+          phone={phone}
         />
       </div>
 
@@ -54,6 +70,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
           text="Chat"
           variant="nav"
           className="text-xs py-1.5 px-3"
+          phone={phone}
         />
         <button
           type="button"
@@ -76,8 +93,11 @@ import WhatsAppButton from './WhatsAppButton.astro';
       <a href="/#layanan" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
         Layanan Unggulan
       </a>
-      <a href="/#pembeda" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
-        Tentang Bidan Kala
+      <a href="/tentang-kami" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
+        Tentang Kami & Standar Medis
+      </a>
+      <a href="/tim-bidan" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
+        Profil Tim Bidan Ber-STR
       </a>
       <a href="/#testimoni" class="mobile-nav-link text-base font-semibold text-[#4B2E22] hover:text-[#C2552B] py-2 border-b border-[#F6DCCD]/40">
         Cerita & Ulasan Bunda
@@ -95,6 +115,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
           text="Reservasi Homecare via WhatsApp"
           variant="primary"
           className="w-full text-center"
+          phone={phone}
         />
       </div>
     </div>

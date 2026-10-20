@@ -1,0 +1,237 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../config/site';
+import { fetchPayloadServices, type PayloadService } from '../../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsServices = await fetchPayloadServices();
+  
+  // Use CMS services if available, otherwise fallback to siteConfig
+  const servicesList: PayloadService[] = cmsServices.length > 0 
+    ? cmsServices 
+    : siteConfig.featuredServices.map(s => ({
+        id: s.id,
+        slug: s.id,
+        name: s.name,
+        target: s.target,
+        duration: s.duration,
+        originalPrice: s.originalPrice,
+        price: s.price,
+        numericPrice: s.numericPrice,
+        description: s.description,
+        badge: s.badge,
+        popular: s.popular,
+        refCode: s.refCode,
+        message: s.message,
+        includedItems: [
+          'Tindakan 100% oleh Bidan bersertifikat & STR aktif',
+          'Alat dan linen medis bersih sekali pakai',
+          'Minyak pijat food-grade steril (aman tertelan bayi)',
+          'Konsultasi tumbuh kembang & bebas mom-shaming',
+          'Edukasi stimulasi mandiri untuk orang tua di rumah',
+        ],
+      }));
+
+  return servicesList.map((service) => ({
+    params: { slug: service.slug || service.id },
+    props: { service },
+  }));
+}
+
+interface Props {
+  service: PayloadService;
+}
+
+const { service } = Astro.props;
+
+const canonicalUrl = `${siteConfig.url}/layanan/${service.slug || service.id}`;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Layanan Homecare', url: '/#layanan' },
+  { name: service.name, url: `/layanan/${service.slug || service.id}` },
+];
+
+const includedList: string[] = Array.isArray(service.includedItems)
+  ? service.includedItems.map((item: any) => (typeof item === 'string' ? item : item.item))
+  : [
+      'Tindakan 100% oleh Bidan bersertifikat & STR aktif',
+      'Alat dan linen medis bersih sekali pakai',
+      'Minyak pijat food-grade steril (aman tertelan bayi)',
+      'Konsultasi tumbuh kembang & bebas mom-shaming',
+      'Edukasi stimulasi mandiri untuk orang tua di rumah',
+    ];
+
+const procedureSteps = [
+  {
+    step: '01',
+    title: 'Pemeriksaan Awal & Suhu',
+    desc: 'Bidan tiba tepat waktu, mencuci tangan secara aseptik, serta mengukur suhu dan memeriksa kondisi umum si kecil atau Bunda sebelum tindakan.',
+  },
+  {
+    step: '02',
+    title: 'Persiapan Steril & Suasana Nyaman',
+    desc: 'Menyiapkan alas perlak higienis, linen bersih sekali pakai, serta minyak alami steril food-grade dalam suhu hangat optimal.',
+  },
+  {
+    step: '03',
+    title: 'Tindakan Pijat & Terapi Lembut',
+    desc: 'Pijatan stimulasi taktil berbasis anatomi medis yang disesuaikan dengan respons kenyamanan bayi, tanpa paksaan saat si kecil lelah.',
+  },
+  {
+    step: '04',
+    title: 'Edukasi & Pendampingan Bunda',
+    desc: 'Evaluasi hasil relaksasi, tips stimulasi mandiri di rumah, dan sesi tanya jawab seputar adaptasi menyusui maupun nifas.',
+  },
+];
+---
+
+<BaseLayout
+  title={`${service.name} | Kala Moms and Baby Spa Homecare`}
+  description={`${service.name} oleh bidan ber-STR resmi di Surabaya & Sidoarjo. ${service.description} Durasi ${service.duration}, tarif transparan ${service.price}.`}
+  canonical={canonicalUrl}
+  breadcrumbs={breadcrumbs}
+  schemaType="service"
+  serviceData={{
+    name: service.name,
+    description: service.description,
+    price: service.numericPrice || 100000,
+    duration: service.duration,
+    url: canonicalUrl,
+  }}
+>
+  <!-- Service Hero Section -->
+  <section class="py-12 md:py-16 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Badges -->
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        {service.badge && (
+          <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+            {service.badge}
+          </span>
+        )}
+        <span class="text-xs font-semibold text-[#128C4A] bg-[#E8F8EE] px-3 py-1 rounded-full border border-[#C5ECD2] flex items-center gap-1">
+          ✓ Bidan Ber-STR Resmi
+        </span>
+        <span class="text-xs font-semibold text-[#86675A] bg-white px-3 py-1 rounded-full border border-[#F6DCCD]">
+          ⏱ {service.duration}
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mb-4 leading-tight">
+        {service.name}
+      </h1>
+
+      <p class="text-lg text-[#86675A] leading-relaxed mb-6 max-w-3xl">
+        {service.description}
+      </p>
+
+      <!-- Price Box & Primary CTA -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-[#F6DCCD] shadow-kala flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div>
+          <span class="text-xs uppercase font-bold text-[#86675A] tracking-wider block mb-1">
+            Tarif Layanan Homecare (Surabaya & Sidoarjo)
+          </span>
+          <div class="flex items-baseline gap-3">
+            <span class="text-3xl sm:text-4xl font-brand font-bold text-[#C2552B]">
+              {service.price}
+            </span>
+            {service.originalPrice && (
+              <span class="text-lg text-[#86675A]/60 line-through">
+                {service.originalPrice}
+              </span>
+            )}
+          </div>
+          <p class="text-xs text-[#86675A] mt-1">
+            *Sudah termasuk seluruh perlengkapan medis, linen steril, dan minyak food-grade.
+          </p>
+        </div>
+
+        <div class="flex-shrink-0">
+          <WhatsAppButton
+            refCode={service.refCode || 'KALA-SRV'}
+            message={service.message || `Halo Bidan Kala, saya mau reservasi ${service.name} [ref: ${service.refCode || 'KALA-SRV'}]`}
+            text="Jadwalkan Kunjungan Bidan"
+            variant="hero"
+          />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Included Items & Clinical Protocol -->
+  <section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mb-3">
+          Apa Saja yang Bunda Dapatkan?
+        </h2>
+        <p class="text-sm sm:text-base text-[#86675A]">
+          Setiap sesi dirancang komprehensif demi relaksasi bayi dan ketenangan hati Bunda.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-12">
+        {includedList.map((item) => (
+          <div class="flex items-start gap-3 p-4 rounded-2xl bg-[#FFF9F4] border border-[#F6DCCD]">
+            <div class="w-6 h-6 rounded-full bg-[#FFEFE5] text-[#C2552B] flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5 border border-[#F6DCCD]">
+              ✓
+            </div>
+            <p class="text-sm text-[#4B2E22] font-medium leading-relaxed">
+              {item}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Protocol Flow -->
+      <div class="mt-14">
+        <h3 class="text-xl font-brand font-bold text-[#4B2E22] mb-6 text-center">
+          Alur 4 Langkah Kunjungan Homecare
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {procedureSteps.map((step) => (
+            <div class="p-5 rounded-2xl bg-[#FFF9F4] border border-[#F6DCCD] relative">
+              <span class="text-xs font-bold text-[#C2552B] bg-[#FFEFE5] px-2.5 py-1 rounded-md border border-[#F6DCCD] inline-block mb-3">
+                Langkah {step.step}
+              </span>
+              <h4 class="font-brand font-bold text-base text-[#4B2E22] mb-2">
+                {step.title}
+              </h4>
+              <p class="text-xs text-[#86675A] leading-relaxed">
+                {step.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Guarantee & Trust -->
+  <section class="py-12 bg-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-gradient-to-r from-[#FFEFE5] to-[#FFD9C4]/50 rounded-3xl p-6 sm:p-8 border border-[#F6DCCD] flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h3 class="text-xl font-brand font-bold text-[#4B2E22] mb-2">
+            Garansi Higienis & Bidan Terverifikasi
+          </h3>
+          <p class="text-sm text-[#86675A] max-w-xl leading-relaxed">
+            Tenaga medis kami tidak merangkap sales produk. Fokus kami murni pada kesehatan, stimulasi tumbuh kembang si kecil, dan kesehatan mental Bunda.
+          </p>
+        </div>
+        <div class="flex-shrink-0">
+          <WhatsAppButton
+            refCode={`KALA-ASK-${service.refCode || 'SRV'}`}
+            message={`Halo Bidan Kala, saya mau tanya-tanya dulu tentang ${service.name} [ref: KALA-ASK]`}
+            text="Tanya Bidan Dulu"
+            variant="outline"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

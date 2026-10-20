@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../config/site';
+import { fetchPayloadServiceAreas, type PayloadServiceArea } from '../../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsAreas = await fetchPayloadServiceAreas();
+
+  const fallbackAreas: PayloadServiceArea[] = [
+    {
+      id: 'surabaya-timur',
+      name: 'Surabaya Timur',
+      slug: 'surabaya-timur',
+      city: 'Surabaya',
+      uniqueDescription: 'Area padat residensial keluarga muda Surabaya Timur meliputi Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, dan sekitarnya. Terhubung cepat via jalur MERR (Middle East Ring Road) dan OERR.',
+      landmarks: [{ name: 'Galaxy Mall & MERR' }, { name: 'Rungkut Asri & Pandugo' }, { name: 'Klampis & Manyar' }, { name: 'Pakuwon City Laguna' }],
+      estimatedArrivalMinutes: '20-35 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo (Mom & Baby)' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Pijat Laktasi & Oksitosin' }, { serviceName: 'Cukur Rambut & Pijat Selapanan' }],
+    },
+    {
+      id: 'surabaya-barat',
+      name: 'Surabaya Barat',
+      slug: 'surabaya-barat',
+      city: 'Surabaya',
+      uniqueDescription: 'Kawasan pemukiman modern Surabaya Barat mencakup Wiyung, CitraLand, Graha Family, Sambikerep, HR Muhammad, hingga Pakuwon Mall. Tim bidan kami siap berkunjung tanpa Bunda perlu terjebak kemacetan Mayjen Sungkono.',
+      landmarks: [{ name: 'Pakuwon Mall & Supermall' }, { name: 'CitraLand Fresh Market' }, { name: 'Graha Family & Dian Istana' }, { name: 'Wiyung Royal Residence' }],
+      estimatedArrivalMinutes: '25-45 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Pijat Kolik & Kembung' }, { serviceName: 'Perawatan Tali Pusat & Mandi Bayi' }],
+    },
+    {
+      id: 'surabaya-selatan',
+      name: 'Surabaya Selatan',
+      slug: 'surabaya-selatan',
+      city: 'Surabaya',
+      uniqueDescription: 'Mencakup area Wonokromo, Ketintang, Gayungan, Pagesangan, Jemursari, hingga Kutisari. Akses cepat dekat jalur frontage Ahmad Yani memudahkan jadwal kunjungan homecare tepat waktu.',
+      landmarks: [{ name: 'Royal Plaza & Ahmad Yani' }, { name: 'Jemursari & Margorejo' }, { name: 'Ketintang & Gayungan' }, { name: 'Kutisari & Prapen' }],
+      estimatedArrivalMinutes: '25-40 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Pijat Nifas & Laktasi' }, { serviceName: 'Kala Bundle Selapan Full' }],
+    },
+    {
+      id: 'surabaya-pusat',
+      name: 'Surabaya Pusat',
+      slug: 'surabaya-pusat',
+      city: 'Surabaya',
+      uniqueDescription: 'Menjangkau kawasan jantung kota: Tegalsari, Gubeng, Genteng, Bubutan, dan sekitarnya. Cocok bagi Bunda bekerja maupun keluarga urban yang mengutamakan privasi dan kenyamanan homecare profesional.',
+      landmarks: [{ name: 'Tunjungan Plaza' }, { name: 'Stasiun Gubeng & Kertajaya' }, { name: 'Embong Malang & Basuki Rahmat' }, { name: 'Kusuma Bangsa' }],
+      estimatedArrivalMinutes: '25-40 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Bayi Stimulasi' }, { serviceName: 'Pijat Laktasi' }, { serviceName: 'Paket Newborn Care' }],
+    },
+    {
+      id: 'surabaya-utara',
+      name: 'Surabaya Utara',
+      slug: 'surabaya-utara',
+      city: 'Surabaya',
+      uniqueDescription: 'Layanan homecare bidan menjangkau Tambaksari, Kenjeran, Semampir, Pabean Cantian, hingga kawasan perbatasan Jembatan Suramadu dengan protokol higienis tinggi.',
+      landmarks: [{ name: 'Kapas Krampung' }, { name: 'Kenjeran Park' }, { name: 'Perak Barat & Timur' }, { name: 'Plaza Marina / Kertajaya Indah' }],
+      estimatedArrivalMinutes: '30-50 menit',
+      availableServices: [{ serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Kala Bundle Duo' }, { serviceName: 'Cukur Rambut Bayi Steril' }, { serviceName: 'Perawatan Payudara Bengkak' }],
+    },
+    {
+      id: 'sidoarjo',
+      name: 'Sidoarjo Kota & Sekitarnya',
+      slug: 'sidoarjo',
+      city: 'Sidoarjo',
+      uniqueDescription: 'Menjangkau area Waru, Sedati, Aloha, Buduran, Gedangan, Candi, Sukodono, hingga Sidoarjo Kota. Akses mudah dari perbatasan Surabaya Selatan dengan waktu tempuh terukur dan bebas ribet keluar rumah.',
+      landmarks: [{ name: 'Bundaran Waru & Aloha' }, { name: 'Taman Pinang Indah' }, { name: 'Kahuripan Nirwana' }, { name: 'Juanda & Sedati' }],
+      estimatedArrivalMinutes: '25-45 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Kala Bundle Selapan Full' }, { serviceName: 'Pijat Terapi Kolik' }],
+    },
+  ];
+
+  const areaList = cmsAreas.length > 0 ? cmsAreas : fallbackAreas;
+
+  return areaList.map((area) => ({
+    params: { slug: area.slug || area.id },
+    props: { area },
+  }));
+}
+
+interface Props {
+  area: PayloadServiceArea;
+}
+
+const { area } = Astro.props;
+
+const canonicalUrl = `${siteConfig.url}/area/${area.slug || area.id}`;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Area Layanan', url: '/#area' },
+  { name: area.name, url: `/area/${area.slug || area.id}` },
+];
+
+const landmarksList = area.landmarks && area.landmarks.length > 0
+  ? area.landmarks.map((l: any) => (typeof l === 'string' ? l : l.name))
+  : ['Pusat Pemukiman Residensial', 'Jalur Akses Utama', 'Kawasan Keluarga Muda'];
+
+const availableServicesList = area.availableServices && area.availableServices.length > 0
+  ? area.availableServices.map((s: any) => (typeof s === 'string' ? s : s.serviceName))
+  : ['Kala Bundle Duo (Mom & Baby)', 'Pijat Ceria Newborn', 'Pijat Laktasi & Oksitosin', 'Cukur Rambut & Selapanan'];
+---
+
+<BaseLayout
+  title={`Layanan Homecare Bidan di ${area.name} (${area.city}) | Kala Baby Spa`}
+  description={`Layanan homecare ibu dan bayi langsung ke rumah di ${area.name}, ${area.city}. Ditangani bidan profesional ber-STR resmi. Estimasi kedatangan ${area.estimatedArrivalMinutes || '25-40 menit'}.`}
+  canonical={canonicalUrl}
+  breadcrumbs={breadcrumbs}
+>
+  <!-- Area Hero Section -->
+  <section class="py-12 md:py-16 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Area Badge -->
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          📍 Area Layanan: {area.city}
+        </span>
+        <span class="text-xs font-semibold text-[#128C4A] bg-[#E8F8EE] px-3 py-1 rounded-full border border-[#C5ECD2]">
+          ⏱ Estimasi Kedatangan {area.estimatedArrivalMinutes || '25-40 menit'}
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mb-4 leading-tight">
+        Layanan Homecare Bidan di {area.name}
+      </h1>
+
+      <p class="text-lg text-[#86675A] leading-relaxed mb-8 max-w-3xl">
+        {area.uniqueDescription}
+      </p>
+
+      <!-- Quick Action Card -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-[#F6DCCD] shadow-kala flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div>
+          <h3 class="text-base font-brand font-bold text-[#4B2E22] mb-1">
+            Bunda Tinggal di Sekitar {area.name}?
+          </h3>
+          <p class="text-xs sm:text-sm text-[#86675A]">
+            Bidan kami siap datang membawa seluruh perlengkapan medis steril dan linen higienis langsung ke rumah Bunda.
+          </p>
+        </div>
+        <div class="flex-shrink-0">
+          <WhatsAppButton
+            refCode={`KALA-AREA-${(area.slug || area.id).toUpperCase()}`}
+            message={`Halo Bidan Kala, saya tinggal di ${area.name} dan mau reservasi homecare [ref: KALA-AREA-${(area.slug || area.id).toUpperCase()}]`}
+            text="Pesan Kunjungan Bidan"
+            variant="hero"
+          />
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Local Landmarks & Neighborhood Coverage -->
+  <section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        
+        <div>
+          <h2 class="text-2xl font-brand font-bold text-[#4B2E22] mb-4">
+            Cakupan Wilayah & Landmark Utama di {area.name}
+          </h2>
+          <p class="text-sm text-[#86675A] leading-relaxed mb-6">
+            Tim bidan Kala beroperasi aktif di rute-rute berikut untuk memastikan ketepatan waktu kunjungan homecare:
+          </p>
+
+          <ul class="space-y-3">
+            {landmarksList.map((landmark) => (
+              <li class="flex items-center gap-3 p-3 rounded-xl bg-[#FFF9F4] border border-[#F6DCCD] text-sm text-[#4B2E22] font-medium">
+                <span class="w-5 h-5 rounded-full bg-[#FFEFE5] text-[#C2552B] flex items-center justify-center font-bold text-xs">
+                  ✓
+                </span>
+                {landmark}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Available Services in this Area -->
+        <div class="bg-[#FFF9F4] p-6 sm:p-8 rounded-3xl border border-[#F6DCCD]">
+          <h3 class="text-xl font-brand font-bold text-[#4B2E22] mb-4">
+            Layanan Populer di {area.name}
+          </h3>
+          <p class="text-xs sm:text-sm text-[#86675A] mb-6">
+            Seluruh paket perawatan dapat dipesan untuk kunjungan homecare tanpa biaya transportasi tersembunyi:
+          </p>
+
+          <div class="space-y-3 mb-6">
+            {availableServicesList.map((service) => (
+              <div class="p-3 bg-white rounded-xl border border-[#F6DCCD] text-xs sm:text-sm font-semibold text-[#4B2E22] flex items-center justify-between">
+                <span>{service}</span>
+                <span class="text-[#C2552B] font-bold text-xs">Homecare Tersedia →</span>
+              </div>
+            ))}
+          </div>
+
+          <WhatsAppButton
+            refCode={`KALA-AREA-${(area.slug || area.id).toUpperCase()}`}
+            message={`Halo Bidan Kala, saya mau tanya ketersediaan jadwal bidan di ${area.name} [ref: KALA-AREA]`}
+            text="Cek Jadwal Bidan Hari Ini"
+            variant="outline"
+          />
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Transport & Booking Clarity Notice -->
+  <section class="py-12 bg-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-[#FFEFE5]/70 rounded-2xl p-6 border border-[#F6DCCD] text-xs sm:text-sm text-[#4B2E22] space-y-2">
+        <h4 class="font-bold text-sm text-[#C2552B] uppercase tracking-wider">
+          Ketentuan Kunjungan Homecare di {area.name}
+        </h4>
+        <p class="text-[#86675A] leading-relaxed">
+          • <strong>Biaya Transportasi:</strong> Tarif transport disesuaikan dengan jarak aktual dari titik bidan terdekat dan selalu diinfokan secara transparan sebelum konfirmasi jadwal (tanpa biaya tersembunyi).
+        </p>
+        <p class="text-[#86675A] leading-relaxed">
+          • <strong>Higienitas:</strong> Bidan membawa seluruh perlengkapan steril (alas perlak medis, handuk steril cadangan, minyak food-grade, dan termometer digital). Bunda cukup menyiapkan ruangan yang nyaman dan tenang.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -5,26 +5,32 @@ import WhatsAppButton from './WhatsAppButton.astro';
 const districts = [
   {
     region: 'Surabaya Barat',
+    slug: 'surabaya-barat',
     areas: 'Wiyung, Sambikerep, Lakarsantri, Tandes, Sukomanunggal, Benowo, Pakal',
   },
   {
     region: 'Surabaya Timur',
+    slug: 'surabaya-timur',
     areas: 'Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, Gubeng, Tenggilis Mejoyo',
   },
   {
     region: 'Surabaya Selatan',
+    slug: 'surabaya-selatan',
     areas: 'Wonokromo, Wonocolo, Jambangan, Gayungan, Karang Pilang, Sawahan',
   },
   {
     region: 'Surabaya Pusat',
+    slug: 'surabaya-pusat',
     areas: 'Tegalsari, Genteng, Bubutan, Simokerto',
   },
   {
     region: 'Surabaya Utara',
+    slug: 'surabaya-utara',
     areas: 'Kenjeran, Bulak, Pabean Cantian, Semampir, Krembangan',
   },
   {
     region: 'Kabupaten Sidoarjo',
+    slug: 'sidoarjo',
     areas: 'Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian',
   },
 ];
@@ -47,14 +53,28 @@ const districts = [
     <!-- Area Grid (Plain Text for Search Engine Crawlers) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
       {districts.map((item) => (
-        <div class="bg-white p-6 rounded-2xl border border-[#F6DCCD] shadow-sm hover:border-[#C2552B] transition-colors">
-          <div class="flex items-center gap-2 mb-2 text-[#C2552B]">
-            <span class="text-lg">📍</span>
-            <h3 class="font-brand font-bold text-lg text-[#4B2E22]">{item.region}</h3>
+        <div class="bg-white p-6 rounded-2xl border border-[#F6DCCD] shadow-sm hover:border-[#C2552B] transition-colors flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2 text-[#C2552B]">
+              <span class="text-lg">📍</span>
+              <h3 class="font-brand font-bold text-lg text-[#4B2E22]">
+                <a href={`/area/${item.slug}`} class="hover:text-[#C2552B] transition-colors">
+                  {item.region}
+                </a>
+              </h3>
+            </div>
+            <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">
+              {item.areas}
+            </p>
           </div>
-          <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">
-            {item.areas}
-          </p>
+          <div class="pt-4 mt-2 border-t border-[#F6DCCD]/50">
+            <a
+              href={`/area/${item.slug}`}
+              class="text-xs font-bold text-[#C2552B] hover:underline flex items-center gap-1"
+            >
+              Info & Estimasi Waktu Kedatangan →
+            </a>
+          </div>
         </div>
       ))}
     </div>

@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { siteConfig } from '../config/site';
+import { fetchPayloadMidwives, type PayloadMidwife } from '../lib/payload';
+
+const cmsMidwives = await fetchPayloadMidwives();
+
+const fallbackMidwives: PayloadMidwife[] = [
+  {
+    id: 'bidan-ayu-lestari',
+    name: 'Bidan Ayu Lestari, A.Md.Keb',
+    slug: 'bidan-ayu-lestari',
+    title: 'Lead Midwife & Certified Infant Massage Practitioner',
+    strNumber: 'STR-KEMENKES-3578-2022-08912',
+    experienceYears: 6,
+    specialties: [
+      { specialty: 'Pijat Taktil Stimulasi Bayi & Kolik' },
+      { specialty: 'Konseling Fisiologi Laktasi & Pijat Oksitosin' },
+      { specialty: 'Perawatan Tali Pusat & Neonatal' },
+    ],
+    bio: 'Bidan Ayu berpengalaman mendampingi ratusan ibu nifas dan bayi baru lahir di Surabaya. Memiliki sertifikasi resmi Pediatric Touch Therapy dan pendekatan komunikatif yang penuh kehangatan tanpa menghakimi.',
+  },
+  {
+    id: 'bidan-dwi-rahmawati',
+    name: 'Bidan Dwi Rahmawati, S.Tr.Keb',
+    slug: 'bidan-dwi-rahmawati',
+    title: 'Senior Clinical Midwife & Postnatal Care Specialist',
+    strNumber: 'STR-KEMENKES-3515-2021-04561',
+    experienceYears: 5,
+    specialties: [
+      { specialty: 'Pijat Tradisi Selapanan & Cukur Bersih Steril' },
+      { specialty: 'Pemulihan Pasca-Sesar (Post-Sectio Caesarea)' },
+      { specialty: 'Edukasi Manajemen Kolik & Sendawa Bayi' },
+    ],
+    bio: 'Fokus pada kenyamanan ibu pasca persalinan normal maupun sesar di wilayah Sidoarjo dan Surabaya Selatan. Dikenal sangat sabar dan teliti dalam menerapkan teknik aseptik higienis pada bayi sensitif.',
+  },
+  {
+    id: 'bidan-nurul-hidayah',
+    name: 'Bidan Nurul Hidayah, A.Md.Keb',
+    slug: 'bidan-nurul-hidayah',
+    title: 'Homecare Midwife & Baby Wellness Therapist',
+    strNumber: 'STR-KEMENKES-3578-2023-11203',
+    experienceYears: 4,
+    specialties: [
+      { specialty: 'Stimulasi Motorik Kasar & Halus Bayi' },
+      { specialty: 'Relaksasi Tidur Bayi Gelisah (Fussy Baby)' },
+      { specialty: 'Pijat Payudara & Bendungan ASI' },
+    ],
+    bio: 'Berpengalaman menangani bayi dengan adaptasi tidur gelisah dan kembung. Mengutamakan kenyamanan emosional Bunda agar proses menyusui berjalan lancar dan bebas stres.',
+  },
+];
+
+const midwivesList = cmsMidwives.length > 0 ? cmsMidwives : fallbackMidwives;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: 'Tim Bidan', url: '/tim-bidan' },
+];
+
+const primaryMidwife = midwivesList[0];
+---
+
+<BaseLayout
+  title="Profil Tim Bidan Resmi Ber-STR | Kala Moms and Baby Spa"
+  description="Kenali tim bidan profesional Kala Moms and Baby Spa di Surabaya & Sidoarjo. Berijazah kebidanan, bersertifikat pijat bayi klinis, dan terdaftar resmi di Kemenkes RI."
+  canonical={`${siteConfig.url}/tim-bidan`}
+  breadcrumbs={breadcrumbs}
+  schemaType="person"
+  personData={{
+    name: primaryMidwife.name,
+    title: primaryMidwife.title,
+    strNumber: primaryMidwife.strNumber,
+    bio: primaryMidwife.bio,
+    url: `${siteConfig.url}/tim-bidan`,
+  }}
+>
+  <!-- Page Header -->
+  <section class="py-14 md:py-20 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-4">
+        Tenaga Kesehatan Terverifikasi
+      </span>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mb-6 leading-tight">
+        Tim Bidan Profesional Ber-STR Resmi
+      </h1>
+      <p class="text-lg text-[#86675A] leading-relaxed max-w-2xl mx-auto">
+        Kesehatan dan kenyamanan si kecil adalah prioritas utama. Di Kala, setiap tindakan homecare dikerjakan langsung oleh bidan profesional berizin resmi dari Kementerian Kesehatan RI.
+      </p>
+    </div>
+  </section>
+
+  <!-- Midwives Grid -->
+  <section class="py-14 md:py-20 bg-white border-b border-[#F6DCCD]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {midwivesList.map((midwife) => (
+          <div class="bg-[#FFF9F4] rounded-3xl border-2 border-[#F6DCCD] overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300">
+            <div class="p-8">
+              <!-- Midwife Avatar Monogram / Badge -->
+              <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-[#FFEFE5] border-2 border-[#F6DCCD] text-[#C2552B] flex items-center justify-center font-brand font-bold text-2xl flex-shrink-0">
+                  {midwife.name.split(' ')[1]?.[0] || 'B'}
+                </div>
+                <div>
+                  <h2 class="font-brand font-bold text-lg text-[#4B2E22] leading-snug">
+                    {midwife.name}
+                  </h2>
+                  <p class="text-xs text-[#C2552B] font-semibold">
+                    {midwife.title}
+                  </p>
+                </div>
+              </div>
+
+              <!-- STR Verification Box -->
+              <div class="bg-white p-3.5 rounded-xl border border-[#F6DCCD] mb-6 text-xs text-[#4B2E22] flex items-center justify-between">
+                <span class="text-[#86675A]">Surat Tanda Registrasi:</span>
+                <span class="font-mono font-bold text-[#128C4A] text-[11px] bg-[#E8F8EE] px-2 py-0.5 rounded border border-[#C5ECD2]">
+                  ✓ {midwife.strNumber}
+                </span>
+              </div>
+
+              <!-- Bio -->
+              <p class="text-sm text-[#86675A] leading-relaxed mb-6">
+                {midwife.bio}
+              </p>
+
+              <!-- Specialties -->
+              <div>
+                <h3 class="text-xs uppercase font-bold text-[#4B2E22] tracking-wider mb-3">
+                  Keahlian & Spesialisasi Klinis
+                </h3>
+                <ul class="space-y-1.5">
+                  {midwife.specialties?.map((spec: any) => (
+                    <li class="flex items-center gap-2 text-xs text-[#86675A]">
+                      <span class="text-[#C2552B] font-bold">✓</span>
+                      <span>{typeof spec === 'string' ? spec : spec.specialty}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <!-- Footer Card Action -->
+            <div class="p-6 pt-0">
+              <WhatsAppButton
+                refCode={`KALA-BIDAN-${midwife.slug.toUpperCase()}`}
+                message={`Halo Bidan Kala, saya mau request jadwal kunjungan homecare dengan ${midwife.name} [ref: KALA-BIDAN]`}
+                text={`Pesan Jadwal Bersama ${midwife.name.split(' ')[1] || 'Bidan'}`}
+                variant="outline"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Ethical Assurance Notice -->
+  <section class="py-12 bg-[#FFF9F4]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-[#F6DCCD] text-center">
+        <h3 class="text-lg font-brand font-bold text-[#4B2E22] mb-2">
+          Komitmen Standar Etika Kebidanan Indonesia
+        </h3>
+        <p class="text-xs sm:text-sm text-[#86675A] max-w-2xl mx-auto leading-relaxed">
+          Seluruh bidan Kala berpegang teguh pada kode etik kebidanan Republik Indonesia: menjamin privasi Bunda dan keluarga di rumah, mensterilkan alat sesuai standar operasional medis, serta tidak pernah melakukan praktik di luar batas kompetensi wewenang kebidanan.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

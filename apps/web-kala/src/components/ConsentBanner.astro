@@ -1,0 +1,60 @@
+---
+---
+
+<div
+  id="kalaConsentBanner"
+  class="fixed bottom-0 left-0 right-0 z-50 bg-[#4B2E22] text-[#FFF9F4] px-4 py-3 sm:py-4 shadow-2xl border-t border-[#FFBE9C]/30 transform translate-y-full transition-transform duration-300 ease-out hidden"
+  style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));"
+  role="region"
+  aria-label="Persetujuan Privasi Data"
+>
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+    <p class="leading-relaxed text-[#FFF9F4]/90 text-center sm:text-left">
+      Kami menggunakan cookie dan atribusi teknis untuk menghadirkan pengalaman terbaik serta kenyamanan reservasi. Kami menjamin <span class="font-bold text-[#FFBE9C]">tidak ada rekam medis atau data sensitif kesehatan</span> yang dibagikan. Pelajari di <a href="/kebijakan-privasi" class="underline hover:text-[#FFBE9C] transition-colors">Kebijakan Privasi</a>.
+    </p>
+    <div class="flex items-center gap-2 flex-shrink-0">
+      <button
+        type="button"
+        id="acceptConsentBtn"
+        class="bg-[#128C4A] hover:bg-[#0E6C38] text-white font-bold py-2 px-5 rounded-full text-xs sm:text-sm shadow-md transition-all active:scale-95"
+      >
+        Saya Mengerti & Setuju
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function initConsent() {
+    const banner = document.getElementById('kalaConsentBanner');
+    const btn = document.getElementById('acceptConsentBtn');
+    if (!banner || !btn) return;
+
+    try {
+      const consented = localStorage.getItem('kala_privacy_consent');
+      if (!consented) {
+        banner.classList.remove('hidden');
+        setTimeout(() => {
+          banner.classList.remove('translate-y-full');
+        }, 100);
+      }
+    } catch (e) {}
+
+    btn.addEventListener('click', () => {
+      try {
+        localStorage.setItem('kala_privacy_consent', 'granted');
+      } catch (e) {}
+
+      banner.classList.add('translate-y-full');
+      setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 350);
+
+      // Trigger GTM consent update if enabled
+      if (typeof window !== 'undefined') {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'consent_granted' });
+      }
+    });
+  })();
+</script>

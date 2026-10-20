@@ -118,7 +118,8 @@ export const siteConfig = {
   ],
 };
 
-export function buildWhatsAppUrl(refCode: string, customMessage?: string): string {
+export function buildWhatsAppUrl(refCode: string, customMessage?: string, phoneNumber?: string): string {
   const baseMessage = customMessage || `Halo Bidan Kala, saya mau reservasi homecare [ref: ${refCode}]`;
-  return `https://wa.me/${siteConfig.whatsappNumber}?text=${encodeURIComponent(baseMessage)}`;
+  const phone = phoneNumber || siteConfig.whatsappNumber;
+  return `https://wa.me/${phone}?text=${encodeURIComponent(baseMessage)}`;
 }

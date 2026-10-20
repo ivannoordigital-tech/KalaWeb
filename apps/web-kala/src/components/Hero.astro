@@ -1,6 +1,19 @@
 ---
 import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
+
+interface Props {
+  siteSettings?: {
+    socialProofText?: string;
+    heroBadgeText?: string;
+    whatsappNumber?: string;
+    [key: string]: any;
+  };
+}
+
+const { siteSettings } = Astro.props;
+const socialProof = siteSettings?.socialProofText || siteConfig.socialProofText;
+const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 ---
 
 <section class="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4]">
@@ -12,7 +25,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
         <!-- Trust Badge -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFEFE5] border border-[#F6DCCD] text-[#C2552B] font-semibold text-xs sm:text-sm mb-6 shadow-sm">
           <span class="inline-block w-2 h-2 rounded-full bg-[#128C4A] animate-pulse"></span>
-          <span>{siteConfig.socialProofText}</span>
+          <span>{socialProof}</span>
         </div>
 
         <!-- Single H1 Title -->
@@ -38,6 +51,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
             text="Konsultasi Bidan via WhatsApp"
             variant="primary"
             className="text-base py-4 px-8"
+            phone={phone}
           />
           <a
             href="#layanan"
@@ -115,6 +129,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
                 message="Halo Bidan Kala, saya mau tanya jadwal homecare [ref: KALA-HERO-CARD]"
                 text="Chat Tanya Jadwal"
                 variant="card"
+                phone={phone}
               />
             </div>
           </div>

@@ -1,6 +1,23 @@
 ---
 import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
+
+interface Props {
+  siteSettings?: {
+    whatsappNumber?: string;
+    whatsappNumberFormatted?: string;
+    instagram?: string;
+    operationalHours?: string;
+    socialProofText?: string;
+    [key: string]: any;
+  };
+}
+
+const { siteSettings } = Astro.props;
+const config = {
+  ...siteConfig,
+  ...(siteSettings || {}),
+};
 ---
 
 <footer class="bg-[#4B2E22] text-[#FFF9F4] pt-16 pb-12 border-t border-[#F6DCCD]/20">
@@ -19,11 +36,11 @@ import WhatsAppButton from './WhatsAppButton.astro';
           </div>
         </div>
         <p class="text-xs text-[#FFF9F4]/80 leading-relaxed">
-          {siteConfig.tagline}. Layanan perawatan kesehatan ibu dan stimulasi tumbuh kembang bayi di rumah oleh bidan ber-STR resmi di Surabaya & Sidoarjo.
+          {config.tagline}. Layanan perawatan kesehatan ibu dan stimulasi tumbuh kembang bayi di rumah oleh bidan ber-STR resmi di Surabaya & Sidoarjo.
         </p>
         <div class="pt-2">
           <span class="inline-block text-[11px] font-semibold bg-[#FFBE9C]/15 text-[#FFBE9C] px-3 py-1 rounded-full border border-[#FFBE9C]/30">
-            {siteConfig.socialProofText}
+            {config.socialProofText}
           </span>
         </div>
       </div>
@@ -36,7 +53,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
         <ul class="space-y-2 text-xs text-[#FFF9F4]/80">
           <li class="flex items-start gap-2">
             <span>🕒</span>
-            <span>{siteConfig.operationalHours}</span>
+            <span>{config.operationalHours}</span>
           </li>
           <li class="flex items-start gap-2">
             <span>🏠</span>
@@ -52,22 +69,22 @@ import WhatsAppButton from './WhatsAppButton.astro';
       <!-- Col 3: Navigasi & Edukasi -->
       <div class="space-y-3">
         <h3 class="font-brand font-bold text-base text-[#FFBE9C]">
-          Artikel & Kebijakan
+          Kala & Kebijakan
         </h3>
         <ul class="space-y-2 text-xs text-[#FFF9F4]/80">
           <li>
-            <a href="/blog/bayi-kolik-malam-hari" class="hover:text-[#FFBE9C] transition-colors">
-              Mengatasi Bayi Kolik & Kembung
+            <a href="/tentang-kami" class="hover:text-[#FFBE9C] transition-colors">
+              Tentang Kami & Standar Medis
             </a>
           </li>
           <li>
-            <a href="/blog/manfaat-pijat-oksitosin-ibu-menyusui" class="hover:text-[#FFBE9C] transition-colors">
-              Manfaat Pijat Oksitosin Laktasi
+            <a href="/tim-bidan" class="hover:text-[#FFBE9C] transition-colors">
+              Profil Tim Bidan Ber-STR
             </a>
           </li>
           <li>
-            <a href="/blog/panduan-memilih-pijat-bayi-homecare-surabaya" class="hover:text-[#FFBE9C] transition-colors">
-              Panduan Memilih Bidan Homecare
+            <a href="/blog" class="hover:text-[#FFBE9C] transition-colors">
+              Blog Edukasi Kesehatan
             </a>
           </li>
           <li>
@@ -88,10 +105,10 @@ import WhatsAppButton from './WhatsAppButton.astro';
         </p>
         <div class="space-y-2 text-xs text-[#FFF9F4]/80">
           <p>
-            Instagram: <a href={siteConfig.instagramUrl} target="_blank" rel="noopener noreferrer" class="text-[#FFBE9C] hover:underline font-semibold">{siteConfig.instagram}</a>
+            Instagram: <a href={config.instagramUrl} target="_blank" rel="noopener noreferrer" class="text-[#FFBE9C] hover:underline font-semibold">{config.instagram}</a>
           </p>
           <p>
-            WhatsApp: <span class="font-semibold text-[#FFF9F4]">{siteConfig.whatsappNumberFormatted}</span>
+            WhatsApp: <span class="font-semibold text-[#FFF9F4]">{config.whatsappNumberFormatted}</span>
           </p>
         </div>
         <div class="pt-2">
@@ -101,6 +118,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
             text="Hubungi Bidan Kala"
             variant="primary"
             className="w-full text-center text-xs py-2.5"
+            phone={config.whatsappNumber}
           />
         </div>
       </div>

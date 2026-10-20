@@ -15,6 +15,12 @@ const blog = defineCollection({
     keywords: z.array(z.string()).optional(),
     medicalReviewer: z.string().default('Tim Medis & Bidan Kala'),
     draft: z.boolean().default(false),
+    seo: z.object({
+      metaTitle: z.string().optional(),
+      ogImage: z.string().optional(),
+      noIndex: z.boolean().default(false).optional(),
+      canonicalUrl: z.string().optional(),
+    }).optional(),
   }),
 });
 

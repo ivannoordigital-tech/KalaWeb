@@ -42,7 +42,9 @@ import WhatsAppButton from './WhatsAppButton.astro';
             </div>
 
             <h3 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug">
-              {service.name}
+              <a href={`/layanan/${service.id}`} class="hover:text-[#C2552B] transition-colors">
+                {service.name}
+              </a>
             </h3>
 
             <p class="text-sm text-[#86675A] leading-relaxed mb-6">
@@ -62,7 +64,13 @@ import WhatsAppButton from './WhatsAppButton.astro';
             </div>
           </div>
 
-          <div class="p-7 pt-0">
+          <div class="p-7 pt-0 space-y-3">
+            <a
+              href={`/layanan/${service.id}`}
+              class="block text-center text-xs font-bold text-[#C2552B] hover:underline py-1"
+            >
+              Detail Prosedur & Manfaat Medis →
+            </a>
             <WhatsAppButton
               refCode={service.refCode}
               message={service.message}
