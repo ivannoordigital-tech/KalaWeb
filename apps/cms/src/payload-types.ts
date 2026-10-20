@@ -740,16 +740,205 @@ export interface LandingPage {
    */
   refCode: string;
   active?: boolean | null;
-  price: string;
-  duration: string;
   /**
-   * Kalimat pemikat utama di bagian atas. Contoh: Atasi Tangis Bayi Akibat Kolik & Kembung Tanpa Panik
+   * Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.
    */
-  headline: string;
+  layout?:
+    | (
+        | {
+            badge?: string | null;
+            /**
+             * Pemicu minat pertama pengunjung.
+             */
+            headline: string;
+            /**
+             * Penjelasan 1-2 kalimat menenangkan orang tua.
+             */
+            subheadline: string;
+            price?: string | null;
+            originalPrice?: string | null;
+            duration?: string | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            image?: (number | null) | Media;
+            bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            points: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'painPoints';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            highlightQuote?: {
+              quote?: string | null;
+              author?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'solutions';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            packages: {
+              name: string;
+              target?: string | null;
+              price: string;
+              originalPrice?: string | null;
+              duration?: string | null;
+              description?: string | null;
+              isPopular?: boolean | null;
+              popularBadge?: string | null;
+              features?:
+                | {
+                    feature: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              ctaText?: string | null;
+              refCode?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricing';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            kalaLabel?: string | null;
+            otherLabel?: string | null;
+            rows: {
+              feature: string;
+              kalaValue: string;
+              otherValue: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'comparison';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            steps: {
+              num?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'steps';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              quote: string;
+              author: string;
+              role?: string | null;
+              area?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            description: string;
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'guarantee';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            faqs: {
+              q: string;
+              a: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+        | {
+            /**
+             * Tulis paragraf, judul, kutipan, dan link secara bebas.
+             */
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            badge?: string | null;
+            headline: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonMessage?: string | null;
+            footnote?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+      )[]
+    | null;
   /**
-   * Penjelasan pembuka 1-2 kalimat yang menenangkan kecemasan Bunda.
+   * Diabaikan jika Anda menggunakan Susunan Blok di atas.
    */
-  subheadline: string;
+  price?: string | null;
+  /**
+   * Diabaikan jika Anda menggunakan Susunan Blok di atas.
+   */
+  duration?: string | null;
+  /**
+   * Kalimat pemikat utama di bagian atas (diabaikan jika menggunakan Blok Hero di Page Builder).
+   */
+  headline?: string | null;
+  /**
+   * Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).
+   */
+  subheadline?: string | null;
   /**
    * Daftar keluhan yang dialami calon pasien (tampil dengan tanda silang merah).
    */
@@ -777,10 +966,13 @@ export interface LandingPage {
         id?: string | null;
       }[]
     | null;
-  testimonial: {
-    quote: string;
-    author: string;
-    area: string;
+  /**
+   * Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.
+   */
+  testimonial?: {
+    quote?: string | null;
+    author?: string | null;
+    area?: string | null;
   };
   faqs?:
     | {
@@ -817,7 +1009,7 @@ export interface Page {
   /**
    * Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.
    */
-  content: {
+  content?: {
     root: {
       type: string;
       children: {
@@ -831,7 +1023,190 @@ export interface Page {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
+  /**
+   * Gunakan blok ini untuk menyusun seksi halaman secara visual (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.
+   */
+  layout?:
+    | (
+        | {
+            badge?: string | null;
+            /**
+             * Pemicu minat pertama pengunjung.
+             */
+            headline: string;
+            /**
+             * Penjelasan 1-2 kalimat menenangkan orang tua.
+             */
+            subheadline: string;
+            price?: string | null;
+            originalPrice?: string | null;
+            duration?: string | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            image?: (number | null) | Media;
+            bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            points: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'painPoints';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            highlightQuote?: {
+              quote?: string | null;
+              author?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'solutions';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            packages: {
+              name: string;
+              target?: string | null;
+              price: string;
+              originalPrice?: string | null;
+              duration?: string | null;
+              description?: string | null;
+              isPopular?: boolean | null;
+              popularBadge?: string | null;
+              features?:
+                | {
+                    feature: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              ctaText?: string | null;
+              refCode?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricing';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            kalaLabel?: string | null;
+            otherLabel?: string | null;
+            rows: {
+              feature: string;
+              kalaValue: string;
+              otherValue: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'comparison';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            steps: {
+              num?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'steps';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              quote: string;
+              author: string;
+              role?: string | null;
+              area?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            description: string;
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'guarantee';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            faqs: {
+              q: string;
+              a: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+        | {
+            /**
+             * Tulis paragraf, judul, kutipan, dan link secara bebas.
+             */
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            badge?: string | null;
+            headline: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonMessage?: string | null;
+            footnote?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+      )[]
+    | null;
   /**
    * Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.
    */
@@ -1272,6 +1647,190 @@ export interface LandingPagesSelect<T extends boolean = true> {
   slug?: T;
   refCode?: T;
   active?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   price?: T;
   duration?: T;
   headline?: T;
@@ -1324,6 +1883,190 @@ export interface PagesSelect<T extends boolean = true> {
   description?: T;
   heroImage?: T;
   content?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   showWhatsAppCta?: T;
   whatsappCustomMessage?: T;
   seo?:

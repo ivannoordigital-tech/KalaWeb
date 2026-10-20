@@ -1,0 +1,34 @@
+---
+import HeroBlock from './HeroBlock.astro';
+import PainPointsBlock from './PainPointsBlock.astro';
+import SolutionsBlock from './SolutionsBlock.astro';
+import PricingPackagesBlock from './PricingPackagesBlock.astro';
+import ComparisonTableBlock from './ComparisonTableBlock.astro';
+import StepsFlowBlock from './StepsFlowBlock.astro';
+import TestimonialsBlock from './TestimonialsBlock.astro';
+import GuaranteeBlock from './GuaranteeBlock.astro';
+import FaqAccordionBlock from './FaqAccordionBlock.astro';
+import RichTextBlock from './RichTextBlock.astro';
+import CallToActionBlock from './CallToActionBlock.astro';
+
+interface Props {
+  block: {
+    blockType: string;
+    [key: string]: any;
+  };
+}
+
+const { block } = Astro.props;
+---
+
+{block.blockType === 'hero' && <HeroBlock block={block as any} />}
+{block.blockType === 'painPoints' && <PainPointsBlock block={block as any} />}
+{block.blockType === 'solutions' && <SolutionsBlock block={block as any} />}
+{block.blockType === 'pricing' && <PricingPackagesBlock block={block as any} />}
+{block.blockType === 'comparison' && <ComparisonTableBlock block={block as any} />}
+{block.blockType === 'steps' && <StepsFlowBlock block={block as any} />}
+{block.blockType === 'testimonials' && <TestimonialsBlock block={block as any} />}
+{block.blockType === 'guarantee' && <GuaranteeBlock block={block as any} />}
+{block.blockType === 'faq' && <FaqAccordionBlock block={block as any} />}
+{block.blockType === 'richText' && <RichTextBlock block={block as any} />}
+{block.blockType === 'cta' && <CallToActionBlock block={block as any} />}

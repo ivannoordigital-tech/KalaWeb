@@ -1,0 +1,83 @@
+---
+interface ComparisonRow {
+  feature: string;
+  kalaValue: string;
+  otherValue: string;
+}
+
+interface Props {
+  block: {
+    title: string;
+    subtitle?: string;
+    kalaLabel?: string;
+    otherLabel?: string;
+    rows: ComparisonRow[];
+  };
+}
+
+const { block } = Astro.props;
+const rows = block.rows || [];
+const kalaLabel = block.kalaLabel || 'Kala Moms & Baby Spa';
+const otherLabel = block.otherLabel || 'Pijat Keliling / Terapis Umum';
+---
+
+<section class="py-14 md:py-20 bg-[#FFF9F4] border-b border-[#F6DCCD]">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+        Standar Kualitas
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block.title}
+      </h2>
+      {block.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] max-w-xl mx-auto">
+          {block.subtitle}
+        </p>
+      )}
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="overflow-x-auto rounded-3xl border border-[#F6DCCD] bg-white shadow-sm">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-[#F6DCCD] bg-[#FFEFE5]/50">
+            <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#86675A] w-1/3">
+              Aspek Perawatan
+            </th>
+            <th class="py-4 px-4 sm:px-6 text-sm sm:text-base font-brand font-bold text-[#128C4A] bg-[#E8F8EE]/60 w-1/3 border-x border-[#C5ECD2]">
+              ✨ {kalaLabel}
+            </th>
+            <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-[#86675A] w-1/3">
+              {otherLabel}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#F6DCCD]">
+          {rows.map((row, idx) => (
+            <tr class="hover:bg-[#FFF9F4]/40 transition-colors">
+              <td class="py-4 px-4 sm:px-6 font-semibold text-xs sm:text-sm text-[#4B2E22]">
+                {row.feature}
+              </td>
+              <td class="py-4 px-4 sm:px-6 text-xs sm:text-sm text-[#4B2E22] font-medium bg-[#E8F8EE]/20 border-x border-[#C5ECD2]/40">
+                <div class="flex items-start gap-2">
+                  <span class="text-[#128C4A] font-bold text-base flex-shrink-0">✓</span>
+                  <span>{row.kalaValue}</span>
+                </div>
+              </td>
+              <td class="py-4 px-4 sm:px-6 text-xs sm:text-sm text-[#86675A]">
+                <div class="flex items-start gap-2">
+                  <span class="text-[#DC2626] font-bold text-base flex-shrink-0">✕</span>
+                  <span>{row.otherValue}</span>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,41 @@
+---
+interface Props {
+  block: {
+    badge?: string;
+    title: string;
+    description: string;
+    note?: string;
+  };
+}
+
+const { block } = Astro.props;
+---
+
+<section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#FFEFE5] via-white to-[#FFEFE5] border-2 border-[#F6DCCD] text-center shadow-kala relative overflow-hidden">
+      
+      <!-- Badge -->
+      <div class="inline-block mb-3">
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-white px-3.5 py-1.5 rounded-full border border-[#F6DCCD] shadow-xs">
+          {block.badge || '🛡️ Komitmen Kualitas Kala'}
+        </span>
+      </div>
+
+      <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mb-4">
+        {block.title}
+      </h2>
+
+      <p class="text-sm sm:text-base text-[#86675A] leading-relaxed max-w-xl mx-auto mb-4">
+        {block.description}
+      </p>
+
+      {block.note && (
+        <p class="text-xs text-[#86675A]/80 italic">
+          {block.note}
+        </p>
+      )}
+
+    </div>
+  </div>
+</section>

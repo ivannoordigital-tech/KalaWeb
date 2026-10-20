@@ -1,0 +1,144 @@
+---
+import WhatsAppButton from '../WhatsAppButton.astro';
+
+interface PackageItem {
+  name: string;
+  target?: string;
+  price: string;
+  originalPrice?: string;
+  duration?: string;
+  description?: string;
+  isPopular?: boolean;
+  popularBadge?: string;
+  features?: Array<{ feature: string }>;
+  ctaText?: string;
+  refCode?: string;
+}
+
+interface Props {
+  block: {
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    packages: PackageItem[];
+  };
+}
+
+const { block } = Astro.props;
+const packages = block.packages || [];
+---
+
+<section class="py-14 md:py-20 bg-white border-b border-[#F6DCCD]">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12 sm:mb-16">
+      {block.badge && (
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+          {block.badge}
+        </span>
+      )}
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block.title}
+      </h2>
+      {block.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] max-w-2xl mx-auto">
+          {block.subtitle}
+        </p>
+      )}
+    </div>
+
+    <!-- Packages Grid -->
+    <div class={`grid gap-8 items-stretch ${packages.length === 1 ? 'max-w-md mx-auto grid-cols-1' : packages.length === 2 ? 'max-w-3xl mx-auto grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+      {packages.map((pkg) => {
+        const isPop = Boolean(pkg.isPopular);
+        return (
+          <div class={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${isPop ? 'bg-[#FFF9F4] border-2 border-[#C2552B] shadow-xl scale-[1.02]' : 'bg-white border border-[#F6DCCD] shadow-sm hover:shadow-md'}`}>
+            
+            {isPop && (
+              <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                <span class="bg-[#C2552B] text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-md">
+                  {pkg.popularBadge || 'Pilihan Terpopuler ⭐'}
+                </span>
+              </div>
+            )}
+
+            <div>
+              <!-- Package Top -->
+              <div class="mb-5">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <h3 class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22]">
+                    {pkg.name}
+                  </h3>
+                </div>
+                {pkg.target && (
+                  <span class="text-xs font-semibold text-[#86675A] bg-[#FFEFE5] px-2.5 py-0.5 rounded-full border border-[#F6DCCD] inline-block">
+                    {pkg.target}
+                  </span>
+                )}
+              </div>
+
+              <!-- Price Box -->
+              <div class="mb-5 pb-5 border-b border-[#F6DCCD]">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-3xl sm:text-4xl font-brand font-bold text-[#C2552B]">
+                    {pkg.price}
+                  </span>
+                  {pkg.originalPrice && (
+                    <span class="text-sm text-[#86675A]/60 line-through">
+                      {pkg.originalPrice}
+                    </span>
+                  )}
+                </div>
+                {pkg.duration && (
+                  <span class="text-xs text-[#86675A] font-medium block mt-1">
+                    ⏱️ Durasi per sesi: {pkg.duration}
+                  </span>
+                )}
+              </div>
+
+              <!-- Description -->
+              {pkg.description && (
+                <p class="text-xs sm:text-sm text-[#86675A] mb-6 leading-relaxed">
+                  {pkg.description}
+                </p>
+              )}
+
+              <!-- Features List -->
+              {pkg.features && pkg.features.length > 0 && (
+                <div class="mb-8">
+                  <span class="text-xs font-bold uppercase tracking-wider text-[#4B2E22] block mb-3">
+                    Termasuk di Paket Ini:
+                  </span>
+                  <ul class="space-y-2.5">
+                    {pkg.features.map((feat) => (
+                      <li class="flex items-start gap-2.5 text-xs sm:text-sm text-[#4B2E22]">
+                        <span class="w-4 h-4 rounded-full bg-[#E8F8EE] text-[#128C4A] flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                          ✓
+                        </span>
+                        <span>{feat.feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <!-- CTA Button -->
+            <div class="pt-4 border-t border-[#F6DCCD]/60 mt-auto">
+              <WhatsAppButton
+                refCode={pkg.refCode || `PKG-${pkg.name.replace(/\s+/g, '-').toUpperCase()}`}
+                message={`Halo Bidan Kala, saya tertarik dengan paket ${pkg.name} (${pkg.price})`}
+                text={pkg.ctaText || 'Reservasi Paket Ini'}
+                variant={isPop ? 'secondary' : 'primary'}
+                className="w-full text-center"
+              />
+            </div>
+
+          </div>
+        );
+      })}
+    </div>
+
+  </div>
+</section>

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { buildSeoFields } from '../fields/seoFields'
 import { canManageSiteSettings, getUserRole } from '../access/roles'
+import { allBlocks } from '../blocks'
 
 const RESERVED_SLUGS = [
   'admin',
@@ -125,6 +126,16 @@ export const Pages: CollectionConfig = {
       admin: {
         description: 'Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.',
       },
+    },
+    // 🧱 Flexible Block-Based Page Builder
+    {
+      name: 'layout',
+      type: 'blocks',
+      label: '🧱 Susunan Blok Halaman (Drag & Drop Page Builder)',
+      admin: {
+        description: 'Gunakan blok ini untuk menyusun seksi halaman secara visual (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.',
+      },
+      blocks: allBlocks,
     },
     // Pengaturan CTA WhatsApp
     {

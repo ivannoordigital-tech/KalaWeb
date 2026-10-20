@@ -128,15 +128,16 @@ export interface PayloadLandingPage {
   title: string;
   slug: string;
   refCode: string;
-  price: string;
-  duration: string;
-  headline: string;
-  subheadline: string;
-  painPoints: Array<{ point: string }> | string[];
-  solutions: Array<{ title: string; desc: string }>;
-  steps: Array<{ num: string; title: string; desc: string }>;
-  testimonial: { quote: string; author: string; area: string };
-  faqs: Array<{ q: string; a: string }>;
+  price?: string;
+  duration?: string;
+  headline?: string;
+  subheadline?: string;
+  painPoints?: Array<{ point: string }> | string[];
+  solutions?: Array<{ title: string; desc: string }>;
+  steps?: Array<{ num: string; title: string; desc: string }>;
+  testimonial?: { quote: string; author: string; area: string };
+  faqs?: Array<{ q: string; a: string }>;
+  layout?: any[];
   active?: boolean;
 }
 
@@ -147,6 +148,7 @@ export interface PayloadPage {
   description?: string;
   heroImage?: { url?: string; alt?: string };
   content?: any;
+  layout?: any[];
   showWhatsAppCta?: boolean;
   whatsappCustomMessage?: string;
   seo?: {
@@ -316,7 +318,7 @@ export async function fetchPayloadRedirects(): Promise<PayloadRedirect[]> {
  */
 export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&limit=100`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&depth=2&limit=100`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });
@@ -334,7 +336,7 @@ export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> 
  */
 export async function fetchPayloadPages(): Promise<PayloadPage[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/pages?where[_status][equals]=published&limit=100`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/pages?where[_status][equals]=published&depth=2&limit=100`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });

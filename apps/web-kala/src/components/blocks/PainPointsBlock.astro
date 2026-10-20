@@ -1,0 +1,56 @@
+---
+interface Props {
+  block: {
+    title: string;
+    subtitle?: string;
+    points: Array<{
+      icon?: string;
+      title: string;
+      description: string;
+    }>;
+  };
+}
+
+const { block } = Astro.props;
+const points = block.points || [];
+---
+
+<section class="py-14 md:py-20 bg-white border-b border-[#F6DCCD]">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <span class="text-xs font-bold tracking-wider text-[#DC2626] uppercase bg-[#FEE2E2] px-3.5 py-1.5 rounded-full border border-[#FCA5A5] inline-block mb-3">
+        Kekhawatiran Orang Tua
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block.title}
+      </h2>
+      {block.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] max-w-xl mx-auto">
+          {block.subtitle}
+        </p>
+      )}
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      {points.map((pt, idx) => (
+        <div class="p-5 sm:p-6 rounded-2xl bg-[#FFF9F4] border border-[#F6DCCD] hover:border-[#FCA5A5] transition-colors relative flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-[#FEE2E2] text-[#DC2626] flex items-center justify-center flex-shrink-0 text-xl font-bold border border-[#FCA5A5]">
+            {pt.icon || '✕'}
+          </div>
+          <div>
+            <h3 class="font-bold text-[#4B2E22] text-base mb-1.5">
+              {pt.title}
+            </h3>
+            <p class="text-sm text-[#86675A] leading-relaxed">
+              {pt.description}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>

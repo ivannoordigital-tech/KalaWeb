@@ -1,0 +1,74 @@
+---
+interface Props {
+  block: {
+    title: string;
+    subtitle?: string;
+    items: Array<{
+      icon?: string;
+      title: string;
+      description: string;
+    }>;
+    highlightQuote?: {
+      quote?: string;
+      author?: string;
+    };
+  };
+}
+
+const { block } = Astro.props;
+const items = block.items || [];
+---
+
+<section class="py-14 md:py-20 bg-[#FFF9F4] border-b border-[#F6DCCD]">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <span class="text-xs font-bold tracking-wider text-[#128C4A] uppercase bg-[#E8F8EE] px-3.5 py-1.5 rounded-full border border-[#C5ECD2] inline-block mb-3">
+        Solusi & Keunggulan Kala
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block.title}
+      </h2>
+      {block.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] max-w-xl mx-auto">
+          {block.subtitle}
+        </p>
+      )}
+    </div>
+
+    <!-- Items Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      {items.map((item, idx) => (
+        <div class="p-6 rounded-2xl bg-white border border-[#F6DCCD] shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-[#E8F8EE] text-[#128C4A] flex items-center justify-center text-2xl mb-4 border border-[#C5ECD2]">
+              {item.icon || '✓'}
+            </div>
+            <h3 class="font-bold text-[#4B2E22] text-lg mb-2">
+              {item.title}
+            </h3>
+            <p class="text-sm text-[#86675A] leading-relaxed">
+              {item.description}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Highlight Quote (if present) -->
+    {block.highlightQuote?.quote && (
+      <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#FFEFE5] to-white border-2 border-[#F6DCCD] text-center shadow-xs">
+        <p class="text-base sm:text-lg font-serif italic text-[#4B2E22] mb-3">
+          “{block.highlightQuote.quote}”
+        </p>
+        {block.highlightQuote.author && (
+          <span class="text-xs sm:text-sm font-bold text-[#C2552B] tracking-wide">
+            — {block.highlightQuote.author}
+          </span>
+        )}
+      </div>
+    )}
+
+  </div>
+</section>

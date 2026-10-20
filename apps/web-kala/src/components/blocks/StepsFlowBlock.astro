@@ -1,0 +1,58 @@
+---
+interface StepItem {
+  num: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  block: {
+    title: string;
+    subtitle?: string;
+    steps: StepItem[];
+  };
+}
+
+const { block } = Astro.props;
+const steps = block.steps || [];
+---
+
+<section class="py-14 md:py-20 bg-white border-b border-[#F6DCCD]">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+        Alur Praktis
+      </span>
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block.title}
+      </h2>
+      {block.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] max-w-xl mx-auto">
+          {block.subtitle}
+        </p>
+      )}
+    </div>
+
+    <!-- Steps Flow Grid -->
+    <div class={`grid gap-6 ${steps.length === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-3'}`}>
+      {steps.map((st) => (
+        <div class="p-6 rounded-2xl bg-[#FFF9F4] border border-[#F6DCCD] flex flex-col justify-between relative hover:shadow-md transition-shadow">
+          <div>
+            <div class="w-10 h-10 rounded-full bg-[#FFEFE5] text-[#C2552B] font-brand font-bold text-lg flex items-center justify-center mb-4 border border-[#F6DCCD]">
+              {st.num}
+            </div>
+            <h3 class="font-bold text-[#4B2E22] text-base mb-2">
+              {st.title}
+            </h3>
+            <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">
+              {st.description}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>

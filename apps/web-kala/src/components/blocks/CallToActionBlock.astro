@@ -1,0 +1,54 @@
+---
+import WhatsAppButton from '../WhatsAppButton.astro';
+
+interface Props {
+  block: {
+    badge?: string;
+    headline: string;
+    description?: string;
+    buttonText?: string;
+    buttonMessage?: string;
+    footnote?: string;
+  };
+}
+
+const { block } = Astro.props;
+---
+
+<section class="py-16 md:py-24 bg-gradient-to-b from-white via-[#FFEFE5]/40 to-[#FFEFE5]">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+    
+    {block.badge && (
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-4 shadow-xs">
+        {block.badge}
+      </span>
+    )}
+
+    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-4 leading-tight">
+      {block.headline}
+    </h2>
+
+    {block.description && (
+      <p class="text-base sm:text-lg text-[#86675A] mb-8 leading-relaxed max-w-xl mx-auto">
+        {block.description}
+      </p>
+    )}
+
+    <div class="flex flex-col items-center gap-3">
+      <WhatsAppButton
+        refCode="FINAL-CTA-BLOCK"
+        message={block.buttonMessage || `Halo Bidan Kala, saya mau tanya konsultasi & booking`}
+        text={block.buttonText || '💬 Chat WhatsApp Sekarang'}
+        variant="primary"
+        className="w-full sm:w-auto text-lg py-4 px-8 shadow-xl hover:shadow-2xl"
+      />
+      
+      {block.footnote && (
+        <span class="text-xs text-[#86675A] mt-2">
+          {block.footnote}
+        </span>
+      )}
+    </div>
+
+  </div>
+</section>

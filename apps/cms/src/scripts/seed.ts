@@ -309,6 +309,171 @@ export async function seed() {
         },
       ],
     },
+    {
+      title: 'Reservasi Online Homecare Bidan Kala | Surabaya & Sidoarjo',
+      slug: 'reservasi-online',
+      headline: 'Si Kecil Lebih Tenang, Tidur Lebih Nyenyak, Tumbuh Lebih Optimal',
+      subheadline: 'Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda oleh bidan ber-STR resmi Kemenkes.',
+      refCode: 'LP-RESERVASI-ONLINE',
+      price: 'Mulai Rp60.000',
+      duration: '40 - 100 Menit',
+      active: true,
+      layout: [
+        {
+          blockType: 'hero',
+          badge: '✨ Pilihan #1 Orang Tua di Surabaya & Sidoarjo',
+          headline: 'Si Kecil Lebih Tenang, Tidur Lebih Nyenyak, Tumbuh Lebih Optimal',
+          subheadline: 'Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda oleh bidan ber-STR resmi Kemenkes RI.',
+          price: 'Mulai Rp60.000',
+          duration: '40 - 100 Menit',
+          ctaText: 'Konsultasi Gratis via WhatsApp',
+          ctaMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
+          bgStyle: 'gradient',
+        },
+        {
+          blockType: 'painPoints',
+          title: 'Apakah Bunda Kerap Khawatir dengan Kondisi Ini?',
+          subtitle: 'Bunda tidak sendiri. Ratusan orang tua baru di Surabaya & Sidoarjo merasakan hal yang sama:',
+          points: [
+            { icon: '😭', title: 'Bayi Sering Rewel & Sulit Tidur', description: 'Si kecil terus menangis di malam hari akibat perut kembung atau kolik yang tak kunjung reda.' },
+            { icon: '🚗', title: 'Mager Keluar Rumah & Macet', description: 'Membawa newborn ke luar rumah menembus kemacetan dan antrean klinik sangat melelahkan bagi Bunda pasca-persalinan.' },
+            { icon: '⚠️', title: 'Khawatir Pijat Tradisional Sembarangan', description: 'Ragu dengan terapis pijat urut umum yang tidak memahami anatomi dan fisiologi bayi yang masih rentan.' },
+            { icon: '🥺', title: 'Kelelahan & Cemas Tanpa Arahan', description: 'Butuh teman konsultasi seputar menyusui, tali pusat, dan tumbuh kembang anak yang ramah tanpa menghakimi.' },
+          ],
+        },
+        {
+          blockType: 'solutions',
+          title: 'Mengapa Memilih Layanan Homecare Bidan Kala?',
+          subtitle: 'Bukan sekadar pijat relaksasi biasa, melainkan perawatan holistik berbasis kebidanan profesional.',
+          items: [
+            { icon: '👩‍⚕️', title: '100% Bidan Resmi Ber-STR', description: 'Ditangani langsung oleh bidan berijazah kebidanan dengan STR aktif Kemenkes RI dan bersertifikat baby massage.' },
+            { icon: '🏡', title: 'Nyaman di Kamar Bunda', description: 'Bidan hadir tepat waktu ke rumah membawa seluruh perlengkapan steril (perlak, handuk bersih, dan minyak food-grade).' },
+            { icon: '🌿', title: 'Minyak Organik Food-Grade', description: 'Tanpa minyak mineral sintetis atau pewangi keras. 100% aman untuk kulit sensitif bayi baru lahir.' },
+          ],
+          highlightQuote: {
+            quote: 'Bidan Kala sangat telaten dan sabar. Bayiku yang tadinya rewel karena kembung langsung rileks dan tidur pulas 4 jam berturut-turut.',
+            author: 'Bunda Nadhira & Baby Zayn (Surabaya)',
+          },
+        },
+        {
+          blockType: 'pricing',
+          badge: 'Paket Favorit Bunda',
+          title: 'Pilihan Paket Perawatan Terbaik Buah Hati & Bunda',
+          subtitle: 'Semua paket sudah termasuk konsultasi kebidanan gratis dan peralatan steril lengkap.',
+          packages: [
+            {
+              name: 'Pijat Ceria Newborn',
+              target: 'Bayi 0 - 6 Bulan',
+              price: 'Rp60.000',
+              originalPrice: 'Rp80.000',
+              duration: '40 Menit',
+              description: 'Pijat stimulasi taktil lembut oleh bidan untuk meredakan kolik dan membantu si kecil tidur lelap.',
+              isPopular: false,
+              features: [
+                { feature: 'Minyak food-grade steril' },
+                { feature: 'Pijat perut ILU pereda kolik' },
+                { feature: 'Evaluasi tumbuh kembang dasar' },
+              ],
+              ctaText: 'Pilih Paket Newborn',
+              refCode: 'PKG-NEWBORN',
+            },
+            {
+              name: 'Kala Bundle Duo (Mom & Baby)',
+              target: '1 Ibu + 1 Bayi',
+              price: 'Rp150.000',
+              originalPrice: 'Rp190.000',
+              duration: '100 Menit',
+              description: 'Paket komplit relaksasi pasca-persalinan untuk Bunda dan pijat ceria untuk buah hati.',
+              isPopular: true,
+              popularBadge: 'Paling Diminati Bunda ⭐',
+              features: [
+                { feature: 'Pijat rileksasi nifas / laktasi Bunda' },
+                { feature: 'Pijat ceria stimulasi bayi' },
+                { feature: 'Konsultasi menyusui & pelekatan' },
+                { feature: 'Peralatan higienis steril lengkap' },
+              ],
+              ctaText: 'Reservasi Paket Duo',
+              refCode: 'PKG-DUO',
+            },
+            {
+              name: 'Kala Bundle Selapan Full',
+              target: 'Bayi 0 - 12 Bulan',
+              price: 'Rp100.000',
+              originalPrice: 'Rp155.000',
+              duration: '80 Menit',
+              description: 'Tradisi selapanan praktis dan higienis: cukur bersih dengan silet steril sekali pakai, pijat relaksasi, dan mandi air hangat.',
+              isPopular: false,
+              features: [
+                { feature: 'Cukur gundul steril silet baru' },
+                { feature: 'Pijat relaksasi bayi lembut' },
+                { feature: 'Mandi air hangat aromaterapi' },
+              ],
+              ctaText: 'Pilih Paket Selapan',
+              refCode: 'PKG-SELAPAN',
+            },
+          ],
+        },
+        {
+          blockType: 'comparison',
+          title: 'Beda Layanan Bidan Kala dengan Pijat Urut Biasa',
+          subtitle: 'Keamanan dan ketenangan buah hati Bunda adalah prioritas utama kami.',
+          kalaLabel: 'Kala Moms & Baby Spa',
+          otherLabel: 'Pijat Urut Umum / Keliling',
+          rows: [
+            { feature: 'Kualifikasi Praktisi', kalaValue: '100% Bidan Lulusan Kebidanan & Ber-STR Kemenkes', otherValue: 'Terapis otodidak tanpa legalitas medis resmi' },
+            { feature: 'Higienitas & Alat', kalaValue: 'Perlak steril, alat sekali pakai, cuci tangan aseptik', otherValue: 'Alat seadanya dan risiko kontaminasi silang' },
+            { feature: 'Teknik Pemijatan', kalaValue: 'Sentuhan anatomis lembut berbasis stimulasi sensori', otherValue: 'Pijatan keras yang berisiko cedera otot/sendi bayi' },
+            { feature: 'Konseling Bunda', kalaValue: 'Pendampingan ramah, empati, tanpa mom-shaming', otherValue: 'Kerap memberi komentar menghakimi seputar ASI/pola asuh' },
+          ],
+        },
+        {
+          blockType: 'steps',
+          title: 'Cara Reservasi Mudah & Cepat',
+          subtitle: 'Hanya perlu 3 langkah praktis dari ponsel Bunda:',
+          steps: [
+            { num: '1', title: 'Hubungi WhatsApp Bidan', description: 'Ceritakan usia si kecil, keluhan (bila ada), dan alamat rumah Bunda di Surabaya / Sidoarjo.' },
+            { num: '2', title: 'Pilih Hari & Jam', description: 'Tentukan jadwal kunjungan yang paling nyaman sesuai waktu bangun dan tidur si kecil.' },
+            { num: '3', title: 'Bidan Tiba di Rumah', description: 'Bidan kami hadir tepat waktu dengan seragam rapi dan perlengkapan higienis steril.' },
+          ],
+        },
+        {
+          blockType: 'testimonials',
+          title: 'Apa Kata Bunda yang Telah Menggunakan Kala?',
+          subtitle: 'Kepuasan dan kebahagiaan keluarga Anda adalah energi kami.',
+          items: [
+            { quote: 'Setelah sesi pertama baby massage, Zayn langsung tidur nyenyak 4 jam berturut-turut. Bidan sangat ramah dan telaten!', author: 'Bunda Nadhira', role: 'Mama dari Baby Zayn (3 minggu)', area: 'Waru, Sidoarjo' },
+            { quote: 'Pasca operasi caesar gerak serba nyeri. Bidan Kala datang bantu pijat laktasi dan baby massage. ASI langsung lancar dan badan enteng!', author: 'Bunda Clarissa', role: 'Mama dari Baby Kenzo (1 bulan)', area: 'Wiyung, Surabaya Barat' },
+            { quote: 'Pijatannya lembut banget, beda sama dukun urut zaman dulu. Bidan jelasin fungsi tiap gerakan dengan jelas. Sangat recommended!', author: 'Bunda Sarah', role: 'Mama dari Baby Arka (2 bulan)', area: 'Rungkut, Surabaya Timur' },
+          ],
+        },
+        {
+          blockType: 'guarantee',
+          badge: '🛡️ Komitmen Kepuasan 100%',
+          title: 'Garansi Kenyamanan Buah Hati Bunda',
+          description: 'Jika si kecil rewel atau Bunda merasa pelayanan bidan kami tidak sesuai standar kebidanan ramah yang kami janjikan, kami sediakan sesi evaluasi ulang gratis tanpa ribet.',
+          note: '*Kenyamanan dan ketenangan Bunda serta si kecil adalah kehormatan bagi kami.',
+        },
+        {
+          blockType: 'faq',
+          title: 'Pertanyaan yang Sering Diajukan',
+          subtitle: 'Informasi lengkap seputar kunjungan homecare Bidan Kala.',
+          faqs: [
+            { q: 'Kapan waktu terbaik untuk memijat bayi?', a: 'Waktu terbaik adalah saat bayi dalam kondisi tenang dan tidak mengantuk berat, sekitar 45 menit setelah menyusui agar tidak muntah.' },
+            { q: 'Apakah Bunda perlu menyiapkan peralatan khusus?', a: 'Tidak perlu repot. Bidan Kala membawa perlak steril, minyak food-grade, serta perlengkapan pendukung bersih. Bunda cukup sediakan pakaian ganti si kecil.' },
+            { q: 'Bagaimana jika si kecil menangis saat treatment?', a: 'Bidan kami tidak pernah memaksakan tindakan. Kami akan memberi jeda, menenangkan si kecil, atau mempersilakan Bunda menyusui terlebih dahulu.' },
+          ],
+        },
+        {
+          blockType: 'cta',
+          badge: 'Slot Terbatas Setiap Hari',
+          headline: 'Berikan Sentuhan Terbaik untuk Tumbuh Kembang Buah Hati',
+          description: 'Konsultasikan kebutuhan perawatan si kecil bersama Bidan Kala sekarang juga via WhatsApp.',
+          buttonText: 'Chat Bidan Kala via WhatsApp',
+          buttonMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
+          footnote: '⚡ Balas cepat dalam 5 menit · Bebas mom-shaming',
+        },
+      ],
+    },
   ]
 
   for (const lp of initialLandingPages) {
@@ -321,6 +486,15 @@ export async function seed() {
       await (payload.create as any)({
         collection: 'landing-pages',
         data: lp,
+      })
+    } else if ((lp as any).layout && existing.docs[0]) {
+      console.log(`Updating landing page with layout: ${lp.title}`)
+      await (payload.update as any)({
+        collection: 'landing-pages',
+        id: existing.docs[0].id,
+        data: {
+          layout: (lp as any).layout,
+        },
       })
     }
   }

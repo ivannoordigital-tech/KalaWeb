@@ -1,0 +1,93 @@
+---
+interface Props {
+  block: {
+    content: any;
+    containerWidth?: 'narrow' | 'normal' | 'wide';
+  };
+}
+
+const { block } = Astro.props;
+
+function renderLexicalNode(node: any): string {
+  if (!node) return '';
+  if (typeof node === 'string') return node;
+
+  if (node.type === 'text') {
+    let text = node.text || '';
+    // Format bits: 1 = bold, 2 = italic, 4 = strikethrough, 8 = underline, 16 = code
+    if (node.format & 1) text = `<strong>${text}</strong>`;
+    if (node.format & 2) text = `<em>${text}</em>`;
+    if (node.format & 8) text = `<u>${text}</u>`;
+    return text;
+  }
+
+  if (node.type === 'link') {
+    const url = node.fields?.url || '#';
+    const newTab = node.fields?.newTab ? ' target="_blank" rel="noopener noreferrer"' : '';
+    const inner = (node.children || []).map(renderLexicalNode).join('');
+    return `<a href="${url}" class="text-[#C2552B] underline font-semibold hover:text-[#A3431F]"${newTab}>${inner}</a>`;
+  }
+
+  const inner = (node.children || []).map(renderLexicalNode).join('');
+
+  if (node.type === 'paragraph') {
+    return inner ? `<p class="mb-5 leading-relaxed text-[#4B2E22]">${inner}</p>` : '<br/>';
+  }
+
+  if (node.type === 'heading') {
+    const tag = node.tag || 'h2';
+    const headingStyles: Record<string, string> = {
+      h1: 'text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mt-8 mb-4',
+      h2: 'text-xl sm:text-2xl font-brand font-bold text-[#4B2E22] mt-8 mb-4',
+      h3: 'text-lg sm:text-xl font-brand font-bold text-[#4B2E22] mt-6 mb-3',
+      h4: 'text-base sm:text-lg font-brand font-bold text-[#4B2E22] mt-4 mb-2',
+    };
+    const cls = headingStyles[tag] || headingStyles.h2;
+    return `<${tag} class="${cls}">${inner}</${tag}>`;
+  }
+
+  if (node.type === 'list') {
+    const isOrdered = node.listType === 'number';
+    const tag = isOrdered ? 'ol' : 'ul';
+    const listCls = isOrdered ? 'list-decimal ml-6 mb-5 space-y-2' : 'list-disc ml-6 mb-5 space-y-2';
+    return `<${tag} class="${listCls}">${inner}</${tag}>`;
+  }
+
+  if (node.type === 'listitem') {
+    return `<li class="text-[#4B2E22] leading-relaxed">${inner}</li>`;
+  }
+
+  if (node.type === 'quote') {
+    return `<blockquote class="border-l-4 border-[#C2552B] pl-4 py-2 italic text-[#86675A] bg-[#FFEFE5]/40 rounded-r-xl my-6">${inner}</blockquote>`;
+  }
+
+  return inner;
+}
+
+function renderContent(content: any): string {
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  if (content.root && Array.isArray(content.root.children)) {
+    return content.root.children.map(renderLexicalNode).join('');
+  }
+  return '';
+}
+
+const renderedHtml = renderContent(block.content);
+
+const widthClasses = {
+  narrow: 'max-w-2xl',
+  normal: 'max-w-4xl',
+  wide: 'max-w-6xl',
+};
+
+const currentWidth = widthClasses[block.containerWidth || 'normal'] || widthClasses.normal;
+---
+
+<section class="py-12 md:py-16 bg-white border-b border-[#F6DCCD]">
+  <div class={`${currentWidth} mx-auto px-4 sm:px-6`}>
+    <article class="prose prose-kala max-w-none text-base sm:text-lg">
+      <div set:html={renderedHtml} />
+    </article>
+  </div>
+</section>

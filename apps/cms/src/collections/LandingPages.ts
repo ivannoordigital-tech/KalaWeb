@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { canManageSiteSettings, getUserRole } from '../access/roles'
+import { allBlocks } from '../blocks'
 
 export const LandingPages: CollectionConfig = {
   slug: 'landing-pages',
@@ -79,28 +80,38 @@ export const LandingPages: CollectionConfig = {
         position: 'sidebar',
       },
     },
-    // Hero Box
+    // 🧱 Flexible Block-Based Page Builder
+    {
+      name: 'layout',
+      type: 'blocks',
+      label: '🧱 Susunan Blok Halaman (Drag & Drop Page Builder)',
+      admin: {
+        description: 'Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.',
+      },
+      blocks: allBlocks,
+    },
+    // Hero Box (Opsional bila menggunakan Block Builder)
     {
       type: 'row',
       fields: [
         {
           name: 'price',
           type: 'text',
-          required: true,
-          label: 'Teks Harga Promo Tampilan',
+          label: 'Teks Harga Promo Tampilan (Mode Klasik)',
           admin: {
             width: '50%',
             placeholder: 'Rp60.000',
+            description: 'Diabaikan jika Anda menggunakan Susunan Blok di atas.',
           },
         },
         {
           name: 'duration',
           type: 'text',
-          required: true,
-          label: 'Durasi Layanan',
+          label: 'Durasi Layanan (Mode Klasik)',
           admin: {
             width: '50%',
             placeholder: '40 Menit',
+            description: 'Diabaikan jika Anda menggunakan Susunan Blok di atas.',
           },
         },
       ],
@@ -108,19 +119,17 @@ export const LandingPages: CollectionConfig = {
     {
       name: 'headline',
       type: 'text',
-      required: true,
-      label: 'Judul Headline Utama (Hero H1)',
+      label: 'Judul Headline Utama (Hero H1 - Mode Klasik)',
       admin: {
-        description: 'Kalimat pemikat utama di bagian atas. Contoh: Atasi Tangis Bayi Akibat Kolik & Kembung Tanpa Panik',
+        description: 'Kalimat pemikat utama di bagian atas (diabaikan jika menggunakan Blok Hero di Page Builder).',
       },
     },
     {
       name: 'subheadline',
       type: 'textarea',
-      required: true,
-      label: 'Subheadline / Kalimat Empati',
+      label: 'Subheadline / Kalimat Empati (Mode Klasik)',
       admin: {
-        description: 'Penjelasan pembuka 1-2 kalimat yang menenangkan kecemasan Bunda.',
+        description: 'Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).',
       },
     },
     // Pain Points
@@ -198,18 +207,19 @@ export const LandingPages: CollectionConfig = {
     {
       name: 'testimonial',
       type: 'group',
-      label: 'Testimoni Pasien Khusus Iklan Ini',
+      label: 'Testimoni Pasien Khusus Iklan Ini (Mode Klasik)',
+      admin: {
+        description: 'Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.',
+      },
       fields: [
         {
           name: 'quote',
           type: 'textarea',
-          required: true,
           label: 'Kutipan Testimoni',
         },
         {
           name: 'author',
           type: 'text',
-          required: true,
           label: 'Nama Bunda & Anak',
           admin: {
             placeholder: 'Bunda Nadhira & Baby Zayn (3 minggu)',
@@ -218,7 +228,6 @@ export const LandingPages: CollectionConfig = {
         {
           name: 'area',
           type: 'text',
-          required: true,
           label: 'Wilayah Pasien',
           admin: {
             placeholder: 'Waru, Sidoarjo',
