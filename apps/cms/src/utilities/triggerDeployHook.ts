@@ -67,7 +67,7 @@ export function triggerCloudflareDeploy(options: TriggerOptions): void {
 
     debounceTimer = setTimeout(() => {
       debounceTimer = null;
-      executeDeploy(hookUrl, `Deferred (Debounced): ${reason}`);
+      executeDeploy(hookUrl, options, `Deferred (Debounced): ${reason}`);
     }, DEBOUNCE_DELAY_MS - timeSinceLast);
 
     return;
@@ -76,20 +76,26 @@ export function triggerCloudflareDeploy(options: TriggerOptions): void {
   // 2.5s safe delay to ensure database transaction is fully committed before Cloudflare starts pulling data
   console.log(`[Deploy Hook] Triggering build in 2.5s for: ${reason}`);
   setTimeout(() => {
-    executeDeploy(hookUrl, reason);
+    executeDeploy(hookUrl, options, reason);
   }, 2500);
 }
 
-async function executeDeploy(hookUrl: string, reason: string): Promise<void> {
+async function executeDeploy(hookUrl: string, options: TriggerOptions, reason: string): Promise<void> {
   lastTriggerTime = Date.now();
   currentDeployStatus.status = 'triggered';
   currentDeployStatus.lastTriggeredAt = new Date().toISOString();
   currentDeployStatus.lastReason = reason;
 
+  const targetUrl = options.resource === 'LandingPages' && options.slug
+    ? `https://kalababyspa.com/lp/${options.slug}`
+    : options.resource === 'Pages' && options.slug
+      ? `https://kalababyspa.com/${options.slug}`
+      : 'https://kalababyspa.com';
+
   await sendTelegramAlert(
     `🚀 <b>[KalaWeb Build Dimulai]</b>\n` +
     `Perubahan konten sedang diproses: <code>${reason}</code>\n` +
-    `Situs akan ter-update di https://kalababyspa.com dalam ~1–2 menit.`
+    `Situs akan ter-update di ${targetUrl} dalam ~1–2 menit.`
   );
 
   try {
@@ -104,11 +110,11 @@ async function executeDeploy(hookUrl: string, reason: string): Promise<void> {
       currentDeployStatus.lastCompletedAt = new Date().toISOString();
       console.log(`[Deploy Hook] Cloudflare Pages build triggered successfully! Reason: ${reason} (Status ${response.status})`);
 
-      await sendTelegramAlert(
-        `✅ <b>[KalaWeb Sudah Live]</b>\n` +
-        `Perubahan <code>${reason}</code> berhasil diproses oleh Cloudflare Pages!\n` +
-        `🌐 Kunjungi: https://kalababyspa.com`
-      );
+      const liveMessage = options.resource === 'LandingPages' && options.slug
+        ? `✅ <b>[KalaWeb Sudah Live]</b>\nLP <code>/lp/${options.slug}</code> sudah live!\n🌐 Kunjungi: ${targetUrl}`
+        : `✅ <b>[KalaWeb Sudah Live]</b>\nPerubahan <code>${reason}</code> berhasil diproses oleh Cloudflare Pages!\n🌐 Kunjungi: ${targetUrl}`;
+
+      await sendTelegramAlert(liveMessage);
     } else {
       currentDeployStatus.status = 'failed';
       currentDeployStatus.error = `HTTP ${response.status}: ${response.statusText}`;

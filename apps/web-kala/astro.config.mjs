@@ -44,7 +44,7 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     sitemap({
-      filter: (page) => !page.includes('/segera-hadir') && !page.includes('/404') && !page.includes('/lp/'),
+      filter: (page) => !page.includes('/segera-hadir') && !page.includes('/404') && !page.includes('/lp/') && !page.includes('/preview/') && !page.includes('/_blocks'),
       changefreq: 'weekly',
       priority: 0.8,
       lastmod: new Date('2026-10-20'),

@@ -109,6 +109,24 @@ for (const filePath of htmlFiles) {
     pageReport.hasOgImage = true;
   }
 
+  // 4b. Dedicated Landing Page (/lp/) checks (P10)
+  if (relativePath.startsWith('lp/')) {
+    const hasNoindex = /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex[^"']*["']/i.test(html);
+    if (!hasNoindex) {
+      pageReport.warnings.push('Halaman kampanye /lp/ wajib memiliki meta robots "noindex" untuk mencegah duplikasi konten.');
+      totalErrors++;
+    }
+    if (pageReport.h1Count !== 1) {
+      pageReport.warnings.push(`Halaman kampanye /lp/ wajib memiliki tepat satu <h1> (terdeteksi: ${pageReport.h1Count}).`);
+      totalErrors++;
+    }
+    const hasWaCta = /https:\/\/wa\.me\//i.test(html) || /wa\.me/i.test(html);
+    if (!hasWaCta) {
+      pageReport.warnings.push('Halaman kampanye /lp/ wajib memiliki minimal satu tautan CTA WhatsApp.');
+      totalErrors++;
+    }
+  }
+
   // 5. Check Internal Links for 404
   const linkMatches = [...html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi)];
   for (const match of linkMatches) {

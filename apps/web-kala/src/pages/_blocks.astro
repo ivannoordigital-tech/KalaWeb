@@ -1,0 +1,178 @@
+---
+import BlockRenderer from '../components/blocks/BlockRenderer.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Mock sample data for all 14 blocks
+const sampleBlocks = [
+  {
+    blockType: 'hero',
+    badge: '✨ Rekomendasi Terfavorit Bunda di Surabaya & Sidoarjo',
+    headline: 'Kala Homecare: Bidan Sahabat Bunda & Si Kecil',
+    subheadline: 'Perawatan kebidanan komprehensif, pijat bayi stimulasi klinis, dan terapi laktasi langsung di rumah Anda tanpa antrean.',
+    price: 'Rp150.000',
+    originalPrice: 'Rp190.000',
+    duration: '100 Menit',
+    ctaText: 'Reservasi Kunjungan Bidan',
+    bgStyle: 'gradient',
+  },
+  {
+    blockType: 'painPoints',
+    title: 'Kekhawatiran yang Sering Menghampiri Bunda',
+    subtitle: 'Masa adaptasi pasca-persalinan penuh tantangan fisik dan emosional.',
+    columns: '3',
+    background: 'cream',
+    points: [
+      { icon: '😢', title: 'Bayi Kerap Menangis Kolik', description: 'Si kecil menangis kencang tiap sore/malam hari dengan perut begah.' },
+      { icon: '⚡', title: 'Ibu Nifas Kelelahan', description: 'Tubuh terasa pegal dan cemas merawat si kecil yang masih sangat rentan.' },
+      { icon: '🤱', title: 'Bendungan ASI', description: 'Payudara bengkak dan ASI belum keluar lancar pada hari-hari pertama.' },
+    ],
+  },
+  {
+    blockType: 'solutions',
+    title: 'Solusi Sentuhan Medis & Penuh Kehangatan',
+    subtitle: 'Tindakan berbasis anatomi pediatri yang terbukti aman dan menenangkan.',
+    items: [
+      { title: 'Pijat Taktil Stimulasi', desc: 'Gerakan lembut berirama untuk melancarkan sirkulasi darah dan menurunkan hormon stres kortisol.' },
+      { title: 'Teknik Pijat ILU Peristaltik', desc: 'Membantu pengeluaran gas saluran cerna bayi secara alami dan tanpa rasa sakit.' },
+      { title: 'Pijat Laktasi & Oksitosin', desc: 'Stimulasi let-down reflex untuk meredakan nyeri payudara dan meningkatkan suplai ASI.' },
+    ],
+  },
+  {
+    blockType: 'pricing',
+    badge: 'Katalog Paket Layanan',
+    title: 'Pilihan Perawatan Terpopuler',
+    subtitle: 'Biaya transparan sudah termasuk seluruh linen steril dan minyak food-grade.',
+    packages: [
+      {
+        name: 'Kala Baby – Pijat Ceria Newborn',
+        target: 'Bayi 0 - 6 Bulan',
+        price: 'Rp60.000',
+        originalPrice: 'Rp80.000',
+        duration: '40 Menit',
+        description: 'Pijat stimulasi taktil lembut oleh bidan ber-STR resmi.',
+        features: [{ feature: 'Linen bersih steril' }, { feature: 'Minyak alami food-grade' }, { feature: 'Edukasi pijat mandiri' }],
+        isPopular: false,
+      },
+      {
+        name: 'Kala Bundle Duo (Mom & Baby Ceria)',
+        target: '1 Ibu + 1 Bayi',
+        price: 'Rp150.000',
+        originalPrice: 'Rp190.000',
+        duration: '100 Menit',
+        description: 'Relaksasi nifas untuk Bunda + stimulasi ceria si kecil.',
+        features: [{ feature: 'Pijat nifas & laktasi' }, { feature: 'Pijat ceria si kecil' }, { feature: 'Bebas mom-shaming' }],
+        isPopular: true,
+        popularBadge: 'Paling Diminati Bunda ⭐',
+      },
+    ],
+  },
+  {
+    blockType: 'comparison',
+    title: 'Mengapa Bunda Memilih Bidan Homecare Kala?',
+    subtitle: 'Perbandingan nyata antara standar medis Kala dengan spa tradisional umum.',
+    criteria: [
+      { label: 'Tenaga Pelaksana', kalaValue: '100% Bidan berijazah resmi & STR Kemenkes', otherValue: 'Terapis umum tanpa latar belakang kebidanan' },
+      { label: 'Higienitas Alat & Linen', kalaValue: 'Linen steril sekali pakai & minyak food-grade', otherValue: 'Handuk cuci ulang & minyak berpewangi sintetis' },
+      { label: 'Konsultasi Emosional', kalaValue: 'Zero Mom-Shaming & sesi ngobrol hangat', otherValue: 'Hanya tindakan fisik tanpa validasi psikologis' },
+    ],
+  },
+  {
+    blockType: 'steps',
+    title: 'Alur 3 Langkah Praktis Layanan Homecare',
+    subtitle: 'Bunda cukup beristirahat di rumah, bidan kami tiba tepat waktu.',
+    steps: [
+      { num: '1', title: 'Pilih Jadwal & Konsultasi', desc: 'Hubungi WhatsApp Bidan Kala dan tentukan hari serta jam kunjungan.' },
+      { num: '2', title: 'Bidan Tiba di Rumah', desc: 'Bidan memeriksa tanda vital dan menyiapkan seluruh perlengkapan higienis.' },
+      { num: '3', title: 'Bayi Rileks & Nyenyak', desc: 'Si kecil tidur lelap dan Bunda mendapatkan tips stimulasi mandiri.' },
+    ],
+  },
+  {
+    blockType: 'testimonials',
+    title: 'Cerita & Bukti Nyata Bunda',
+    testimonials: [
+      {
+        quote: 'Setelah melahirkan sesar badan remuk dan cemas banget. Bidan Kala datang dan sabar banget, pijatannya bikin rileks.',
+        author: 'Bunda Sarah & Baby Arka (2 bulan)',
+        area: 'Rungkut, Surabaya Timur',
+      },
+    ],
+  },
+  {
+    blockType: 'midwifeSpotlight',
+    heading: 'Ditangani Langsung oleh Bidan Profesional Ber-STR Resmi',
+    subheading: 'Kenali tenaga kesehatan resmi yang akan berkunjung ke rumah Bunda.',
+    background: 'cream',
+  },
+  {
+    blockType: 'guarantee',
+    title: 'Komitmen & Garansi Keamanan Medis Kala',
+    description: 'Kami tidak pernah berkompromi terhadap higienitas alat, kualifikasi tenaga kesehatan, dan etika privasi pasien di rumah.',
+  },
+  {
+    blockType: 'faq',
+    title: 'Pertanyaan Seputar Layanan Homecare',
+    items: [
+      { q: 'Usia berapa bayi sudah boleh dipijat?', a: 'Sejak usia beberapa hari (newborn) sudah sangat aman dilakukan stimulasi taktil oleh bidan ber-STR.' },
+      { q: 'Apakah melayani seluruh Surabaya & Sidoarjo?', a: 'Ya, seluruh area Surabaya (Barat, Timur, Selatan, Pusat, Utara) dan Kabupaten Sidoarjo dijangkau.' },
+    ],
+  },
+  {
+    blockType: 'cta',
+    headline: 'Si Kecil Berhak Nyaman, Bunda Berhak Tenang',
+    subheadline: 'Slot kunjungan homecare harian terbatas. Jadwalkan sesi perawatan bersama Bidan Kala sekarang.',
+    ctaText: 'Pesan Jadwal Kunjungan via WhatsApp',
+  },
+];
+---
+
+<BaseLayout
+  title="Katalog & Galeri Blok Modular (/_blocks)"
+  description="Katalog visual seluruh 14 blok modular KalaWeb Page Builder untuk pengujian developer dan referensi marketing."
+  noindex={true}
+>
+  <!-- Dev Gallery Header -->
+  <div class="bg-slate-900 text-white py-8 px-4 border-b border-slate-800">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs uppercase font-mono font-bold tracking-wider text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded border border-amber-400/20">
+            INTERNAL DEVELOPER & MARKETING CATALOG
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-brand font-bold mt-2">
+            Pustaka Galeri Blok Modular KalaWeb
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+            Semua blok di bawah ini dirender menggunakan komponen <code>BlockRenderer.astro</code> dengan data contoh nyata. Halaman ini memiliki meta tag <code>noindex</code> dan difilter dari sitemap publik.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <span class="bg-emerald-900/60 text-emerald-400 px-3 py-1.5 rounded-lg border border-emerald-500/30 font-semibold">
+            ✓ 14 Blok Siap Pakai
+          </span>
+          <a
+            href="/docs/pedoman-landing-page.md"
+            class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-colors font-medium"
+          >
+            Buka Pedoman Blok →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Render all sample blocks sequentially with debug labels -->
+  <div>
+    {sampleBlocks.map((block, idx) => (
+      <div class="relative group">
+        <div class="bg-slate-100 border-y border-slate-300 py-1.5 px-4 text-[11px] font-mono text-slate-600 flex items-center justify-between">
+          <span class="font-bold text-[#C2552B]">
+            #{idx + 1} — Blok: <code>{block.blockType}</code>
+          </span>
+          <span>Status: Aktif di BlockRenderer</span>
+        </div>
+        <BlockRenderer block={block as any} />
+      </div>
+    ))}
+  </div>
+</BaseLayout>

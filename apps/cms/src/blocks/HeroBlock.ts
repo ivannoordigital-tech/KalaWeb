@@ -79,6 +79,35 @@ export const HeroBlock: Block = {
       label: 'Foto Hero Utama (Opsional)',
     },
     {
+      name: 'imageAlt',
+      type: 'text',
+      label: 'Alt Text Foto Hero (Wajib jika ada foto)',
+      admin: {
+        description: 'Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.',
+      },
+    },
+    {
+      name: 'align',
+      type: 'select',
+      defaultValue: 'center',
+      options: [
+        { label: 'Teks Tengah (Rekomendasi Mobile)', value: 'center' },
+        { label: 'Teks Kiri (2 Kolom Desktop)', value: 'left' },
+      ],
+      label: 'Tata Letak / Posisi Teks Hero',
+    },
+    {
+      name: 'btnColor',
+      type: 'select',
+      defaultValue: 'terracotta',
+      options: [
+        { label: 'Terracotta Brand (#C2552B - Bawaan)', value: 'terracotta' },
+        { label: 'Hijau WhatsApp (#128C4A)', value: 'whatsapp' },
+        { label: 'Cokelat Hangat (#4B2E22)', value: 'chocolate' },
+      ],
+      label: 'Warna Tombol CTA',
+    },
+    {
       name: 'bgStyle',
       type: 'select',
       defaultValue: 'gradient',

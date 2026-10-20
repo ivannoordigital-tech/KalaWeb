@@ -323,6 +323,12 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
     <link rel="canonical" href={`https://kalababyspa.com/lp/${campaign.slug}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
+    <!-- A/B Testing & Conversion Attribution Meta -->
+    <meta name="kala:lp-slug" content={campaign.slug} />
+    <meta name="kala:variant" content={campaign.variant || (campaign.slug.endsWith('-b') ? 'B' : campaign.slug.endsWith('-c') ? 'C' : 'A')} />
+    <meta name="kala:ref-code" content={campaign.refCode} />
+    {campaign.campaignBaseRef && <meta name="kala:campaign-base-ref" content={campaign.campaignBaseRef} />}
+
     <!-- Google Tag Manager (Deferred until idle or interaction) -->
     <script is:inline define:vars={{ gtmId }}>
       (function() {

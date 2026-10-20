@@ -11,6 +11,7 @@ import FaqAccordionBlock from './FaqAccordionBlock.astro';
 import RichTextBlock from './RichTextBlock.astro';
 import CallToActionBlock from './CallToActionBlock.astro';
 import GalleryBlock from './GalleryBlock.astro';
+import MidwifeSpotlightBlock from './MidwifeSpotlightBlock.astro';
 
 interface Props {
   block: {
@@ -20,6 +21,35 @@ interface Props {
 }
 
 const { block } = Astro.props;
+
+const KNOWN_BLOCK_TYPES = [
+  'hero',
+  'painPoints',
+  'solutions',
+  'pricing',
+  'comparison',
+  'steps',
+  'testimonials',
+  'guarantee',
+  'faq',
+  'richText',
+  'cta',
+  'gallery',
+  'templateRef',
+  'midwifeSpotlight',
+];
+
+if (!block || !block.blockType) {
+  if (import.meta.env.PROD) {
+    throw new Error('[BlockRenderer] Fatal: Ditemukan blok tanpa tipe (blockType) yang valid pada build produksi.');
+  }
+} else if (!KNOWN_BLOCK_TYPES.includes(block.blockType)) {
+  if (import.meta.env.PROD) {
+    throw new Error(`[BlockRenderer] Fatal: Blok tidak dikenal "${block.blockType}". Halaman berisiko kehilangan bagian penting.`);
+  } else {
+    console.warn(`[BlockRenderer] Peringatan: Blok tidak dikenal "${block.blockType}".`);
+  }
+}
 
 // Ekstrak layout jika blok ini adalah TemplateRef
 const templateLayout = block.blockType === 'templateRef' && typeof block.template === 'object' && Array.isArray(block.template?.layout)
@@ -39,6 +69,7 @@ const templateLayout = block.blockType === 'templateRef' && typeof block.templat
 {block.blockType === 'richText' && <RichTextBlock block={block as any} />}
 {block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
 {block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
+{block.blockType === 'midwifeSpotlight' && <MidwifeSpotlightBlock block={block as any} />}
 
 <!-- Render template tersimpan secara modular -->
 {block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (

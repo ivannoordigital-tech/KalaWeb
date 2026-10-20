@@ -96,6 +96,48 @@
     console.debug('[KalaTracker] Attribution capture error:', err);
   }
 
+  // 1b. Landing Page & A/B Variant Detection (Sprint 5 - P9)
+  let lpContext = null;
+  try {
+    const path = window.location.pathname;
+    const isLP = path.startsWith('/lp/') || path.startsWith('/preview/lp/');
+    if (isLP) {
+      const metaSlug = document.querySelector('meta[name="kala:lp-slug"]');
+      const metaVariant = document.querySelector('meta[name="kala:variant"]');
+      const metaRef = document.querySelector('meta[name="kala:ref-code"]');
+
+      let lpSlug = metaSlug ? metaSlug.getAttribute('content') : '';
+      if (!lpSlug) {
+        const parts = path.replace(/\/$/, '').split('/');
+        lpSlug = parts[parts.length - 1];
+      }
+
+      let variant = metaVariant ? metaVariant.getAttribute('content') : '';
+      if (!variant) {
+        const urlParams = new URLSearchParams(window.location.search);
+        variant = urlParams.get('v') || urlParams.get('variant') || (lpSlug.endsWith('-b') ? 'B' : lpSlug.endsWith('-c') ? 'C' : 'A');
+      }
+
+      const refCode = metaRef ? metaRef.getAttribute('content') : '';
+
+      lpContext = { lpSlug, variant, refCode };
+      window.__KALA_LP_CONTEXT__ = lpContext;
+
+      // Google Tag Manager Event: landing_page_view
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'landing_page_view',
+        lp_slug: lpSlug,
+        variant: variant,
+        ref_code: refCode,
+        page_location: window.location.href,
+        page_path: window.location.pathname,
+      });
+    }
+  } catch (err) {
+    console.debug('[KalaTracker] LP view tracking error:', err);
+  }
+
   // 2. Delegate WhatsApp button clicks with debounce and conversion tracking
   let isClickProcessing = false;
 
@@ -112,27 +154,31 @@
     isClickProcessing = true;
     setTimeout(() => { isClickProcessing = false; }, 1500);
 
-    const refCode = btn.getAttribute('data-ref-code') || 'KALA-GEN';
+    const refCode = btn.getAttribute('data-ref-code') || (lpContext?.refCode) || 'KALA-GEN';
     let baseMsg = btn.getAttribute('data-base-msg') || 'Halo Bidan Kala, saya mau reservasi homecare';
     const phone = btn.getAttribute('data-phone') || '6281234567890';
 
     try {
       const stored = loadStoredAttribution();
       const activeAttr = stored ? (stored.lastTouch || stored.firstTouch) : null;
+      const attributionTags = [];
 
       if (activeAttr) {
-        const attributionTags = [];
         if (activeAttr.utm_source) attributionTags.push(`src:${activeAttr.utm_source}`);
         if (activeAttr.utm_campaign) attributionTags.push(`cmp:${activeAttr.utm_campaign}`);
         if (activeAttr.fbclid) attributionTags.push(`fb:${activeAttr.fbclid.substring(0, 8)}`);
         if (activeAttr.gclid) attributionTags.push(`g:${activeAttr.gclid.substring(0, 8)}`);
+      }
 
-        if (attributionTags.length > 0 && !baseMsg.includes('|')) {
-          baseMsg = baseMsg.replace(
-            new RegExp(`\\[ref:\\s*${refCode}\\]`, 'g'),
-            `[ref: ${refCode} | ${attributionTags.join(' ')}]`
-          );
-        }
+      if (lpContext?.variant) {
+        attributionTags.push(`var:${lpContext.variant}`);
+      }
+
+      if (attributionTags.length > 0 && !baseMsg.includes('|')) {
+        baseMsg = baseMsg.replace(
+          new RegExp(`\\[ref:\\s*${refCode}\\]`, 'g'),
+          `[ref: ${refCode} | ${attributionTags.join(' ')}]`
+        );
       }
 
       // Microsoft Clarity Event
@@ -143,19 +189,26 @@
       // Custom window event for general observers
       window.dispatchEvent(
         new CustomEvent('kala_lead_whatsapp', {
-          detail: { refCode, message: baseMsg },
+          detail: {
+            refCode,
+            message: baseMsg,
+            lpSlug: lpContext?.lpSlug,
+            variant: lpContext?.variant,
+          },
         })
       );
 
       // Google Tag Manager dataLayer push
       window.dataLayer = window.dataLayer || [];
 
-      // Event 1: whatsapp_lead (standard GA4 lead event)
+      // Event 1: whatsapp_lead (standard GA4 lead event with A/B variant breakdown)
       window.dataLayer.push({
         event: 'whatsapp_lead',
         event_category: 'Conversion',
         event_label: refCode,
         whatsapp_ref_code: refCode,
+        lp_slug: lpContext?.lpSlug || undefined,
+        variant: lpContext?.variant || undefined,
         page_location: window.location.href,
       });
 
@@ -164,6 +217,8 @@
         event: 'whatsapp_contact',
         event_category: 'Contact',
         event_label: refCode,
+        lp_slug: lpContext?.lpSlug || undefined,
+        variant: lpContext?.variant || undefined,
       });
 
       // Dynamically attach final wa.me url
@@ -191,6 +246,8 @@
           event: 'scroll_depth',
           scroll_depth_threshold: milestone,
           page_path: window.location.pathname,
+          lp_slug: lpContext?.lpSlug || undefined,
+          variant: lpContext?.variant || undefined,
         });
       }
     });
@@ -205,6 +262,8 @@
       window.dataLayer.push({
         event: 'faq_open',
         faq_question: qText.substring(0, 100),
+        lp_slug: lpContext?.lpSlug || undefined,
+        variant: lpContext?.variant || undefined,
       });
     }
   });

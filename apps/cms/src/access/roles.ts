@@ -1,6 +1,6 @@
 import type { Access, AccessArgs } from 'payload'
 
-export type UserRole = 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator';
+export type UserRole = 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing';
 
 export interface UserDoc {
   id: string;
@@ -16,6 +16,11 @@ export function getUserRole(user?: any): UserRole | null {
 
 export const isSuperAdmin: Access = ({ req: { user } }: AccessArgs) => {
   return getUserRole(user) === 'superadmin';
+};
+
+export const canManagePagesAndLPs: Access = ({ req: { user } }: AccessArgs) => {
+  const role = getUserRole(user);
+  return role === 'superadmin' || role === 'operator' || role === 'marketing' || role === 'seo';
 };
 
 export const canManageArticles: Access = ({ req: { user } }: AccessArgs) => {

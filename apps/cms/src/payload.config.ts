@@ -16,6 +16,7 @@ import { Redirects } from './collections/Redirects'
 import { LandingPages } from './collections/LandingPages'
 import { Pages } from './collections/Pages'
 import { BlockTemplates } from './collections/BlockTemplates'
+import { PageTemplates } from './collections/PageTemplates'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -41,6 +42,7 @@ export default buildConfig({
     LandingPages,
     Pages,
     BlockTemplates,
+    PageTemplates,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor(),

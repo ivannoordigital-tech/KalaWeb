@@ -21,6 +21,46 @@ export const PainPointsBlock: Block = {
       label: 'Sub-judul Penjelas',
     },
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'columns',
+          type: 'select',
+          defaultValue: '2',
+          options: [
+            { label: '2 Kolom (Rekomendasi 2-4 Masalah)', value: '2' },
+            { label: '3 Kolom (3 atau 6 Masalah)', value: '3' },
+          ],
+          label: 'Jumlah Kolom Grid',
+          admin: { width: '33%' },
+        },
+        {
+          name: 'background',
+          type: 'select',
+          defaultValue: 'cream',
+          options: [
+            { label: 'Krem Hangat (#FFF9F4)', value: 'cream' },
+            { label: 'Putih Bersih', value: 'white' },
+            { label: 'Peach Lembut (#FFEFE5)', value: 'peach' },
+          ],
+          label: 'Warna Latar',
+          admin: { width: '33%' },
+        },
+        {
+          name: 'spacing',
+          type: 'select',
+          defaultValue: 'normal',
+          options: [
+            { label: 'Rapat (Compact)', value: 'compact' },
+            { label: 'Normal', value: 'normal' },
+            { label: 'Longgar (Spacious)', value: 'spacious' },
+          ],
+          label: 'Jarak Seksi',
+          admin: { width: '33%' },
+        },
+      ],
+    },
+    {
       name: 'points',
       type: 'array',
       required: true,

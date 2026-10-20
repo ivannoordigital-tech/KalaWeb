@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
+import { fetchPayloadPages } from '../../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsPages = await fetchPayloadPages();
+
+  const fallbackPages = [
+    { slug: 'syarat-ketentuan', title: 'Syarat & Ketentuan Layanan' },
+  ];
+
+  const allSlugs = new Set([
+    ...cmsPages.map((p) => p.slug),
+    ...fallbackPages.map((f) => f.slug),
+  ]);
+
+  return Array.from(allSlugs).map((slug) => {
+    const pageData = cmsPages.find((p) => p.slug === slug);
+    return {
+      params: { slug },
+      props: { pageData },
+    };
+  });
+}
+
+const { slug } = Astro.params;
+const { pageData } = Astro.props;
+
+const title = pageData?.title || `Pratinjau Draft: ${slug}`;
+const blocks = Array.isArray(pageData?.layout) ? pageData.layout : [];
+const hasBlocks = blocks.length > 0;
+---
+
+<BaseLayout
+  title={`[PRATINJAU DRAFT] ${title}`}
+  description="Mode pratinjau halaman kustom draft editor CMS."
+  noindex={true}
+>
+  <!-- Prominent Draft Preview Banner (Sticky) -->
+  <aside class="bg-amber-500 text-slate-950 font-bold px-4 py-3 text-center text-xs sm:text-sm sticky top-20 z-50 flex flex-wrap items-center justify-center gap-2 shadow-md">
+    <span class="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[11px] font-mono tracking-wider uppercase">
+      PRATINJAU DRAFT HALAMAN
+    </span>
+    <span>Perubahan teks & blok di bawah ini belum dipublikasikan ke live.</span>
+    <a
+      href="https://admin.kalababyspa.com/admin/collections/pages"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="underline hover:text-white transition-colors ml-2"
+    >
+      Kembali ke Editor CMS →
+    </a>
+  </aside>
+
+  <main class="flex-grow">
+    {hasBlocks ? (
+      blocks.map((block: any) => (
+        <BlockRenderer block={block} />
+      ))
+    ) : (
+      <div class="py-16 px-4 text-center max-w-2xl mx-auto">
+        <h1 class="text-3xl font-brand font-bold text-[#4B2E22] mb-3">{title}</h1>
+        <p class="text-sm text-[#86675A]">
+          Belum ada blok yang ditambahkan ke halaman ini. Silakan tambahkan minimal satu blok di CMS.
+        </p>
+      </div>
+    )}
+  </main>
+</BaseLayout>

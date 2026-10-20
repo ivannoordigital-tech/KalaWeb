@@ -11,6 +11,7 @@ import { RichTextBlock } from './RichTextBlock'
 import { CallToActionBlock } from './CallToActionBlock'
 import { GalleryBlock } from './GalleryBlock'
 import { TemplateRefBlock } from './TemplateRefBlock'
+import { MidwifeSpotlightBlock } from './MidwifeSpotlightBlock'
 
 export const baseBlocks = [
   HeroBlock,
@@ -25,6 +26,7 @@ export const baseBlocks = [
   RichTextBlock,
   CallToActionBlock,
   GalleryBlock,
+  MidwifeSpotlightBlock,
 ]
 
 export const allBlocks = [
@@ -46,4 +48,5 @@ export {
   CallToActionBlock,
   GalleryBlock,
   TemplateRefBlock,
+  MidwifeSpotlightBlock,
 }

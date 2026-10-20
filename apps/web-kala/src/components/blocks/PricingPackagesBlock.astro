@@ -21,14 +21,32 @@ interface Props {
     title: string;
     subtitle?: string;
     packages: PackageItem[];
+    layoutStyle?: 'cards' | 'list';
+    background?: 'white' | 'cream' | 'peach';
+    spacing?: 'compact' | 'normal' | 'spacious';
   };
 }
 
 const { block } = Astro.props;
 const packages = block.packages || [];
+
+const bgClasses = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+
+const pyClasses = {
+  compact: 'py-8 md:py-12',
+  normal: 'py-14 md:py-20',
+  spacious: 'py-16 md:py-24',
+};
+
+const bg = bgClasses[block.background || 'white'] || 'bg-white';
+const py = pyClasses[block.spacing || 'normal'] || 'py-14 md:py-20';
 ---
 
-<section class="py-14 md:py-20 bg-white border-b border-[#F6DCCD]">
+<section class={`${py} ${bg} border-b border-[#F6DCCD]`}>
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     
     <!-- Header -->

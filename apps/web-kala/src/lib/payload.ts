@@ -128,6 +128,9 @@ export interface PayloadLandingPage {
   title: string;
   slug: string;
   refCode: string;
+  activePixels?: string[];
+  campaignBaseRef?: string;
+  variant?: 'A' | 'B' | 'C' | string;
   price?: string;
   duration?: string;
   headline?: string;

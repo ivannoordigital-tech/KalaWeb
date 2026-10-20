@@ -1,0 +1,117 @@
+---
+interface MidwifeItem {
+  id?: string;
+  name: string;
+  slug: string;
+  title?: string;
+  strNumber?: string;
+  experienceYears?: number;
+  bio?: string;
+}
+
+interface Props {
+  block: {
+    heading: string;
+    subheading?: string;
+    midwives?: MidwifeItem[];
+    background?: 'white' | 'cream' | 'peach';
+    spacing?: 'compact' | 'normal' | 'spacious';
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+
+const pyClasses = {
+  compact: 'py-8 md:py-12',
+  normal: 'py-12 md:py-16',
+  spacious: 'py-16 md:py-24',
+};
+
+const bg = bgClasses[block.background || 'cream'];
+const py = pyClasses[block.spacing || 'normal'];
+
+// Fallback jika belum memilih bidan relasi
+const midwives = block.midwives && block.midwives.length > 0
+  ? block.midwives
+  : [
+      {
+        name: 'Bidan Ayu Lestari, A.Md.Keb',
+        slug: 'bidan-ayu-lestari',
+        title: 'Lead Midwife & Certified Infant Massage Practitioner',
+        strNumber: 'STR-KEMENKES-3578-2022-08912',
+        experienceYears: 6,
+      },
+      {
+        name: 'Bidan Dwi Rahmawati, S.Tr.Keb',
+        slug: 'bidan-dwi-rahmawati',
+        title: 'Senior Clinical Midwife & Postnatal Specialist',
+        strNumber: 'STR-KEMENKES-3515-2021-04561',
+        experienceYears: 5,
+      },
+    ];
+---
+
+<section class={`${bg} ${py} border-b border-[#F6DCCD]/80`}>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+        Tenaga Kesehatan Terdaftar
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] leading-tight">
+        {block.heading || 'Ditangani Langsung oleh Bidan Profesional Ber-STR Resmi'}
+      </h2>
+      {block.subheading && (
+        <p class="text-sm sm:text-base text-[#86675A] mt-3 leading-relaxed">
+          {block.subheading}
+        </p>
+      )}
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {midwives.map((m) => (
+        <div class="bg-white rounded-2xl border-2 border-[#F6DCCD] p-6 shadow-sm hover:shadow-kala transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-xl bg-[#FFEFE5] border border-[#F6DCCD] text-[#C2552B] font-brand font-bold text-xl flex items-center justify-center flex-shrink-0">
+                {m.name.split(' ')[1]?.[0] || 'B'}
+              </div>
+              <div>
+                <h3 class="font-brand font-bold text-base text-[#4B2E22] leading-snug">
+                  {m.name}
+                </h3>
+                {m.title && (
+                  <p class="text-xs text-[#C2552B] font-semibold line-clamp-1">
+                    {m.title}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {m.strNumber && (
+              <div class="bg-[#E8F8EE] px-3 py-1.5 rounded-lg border border-[#C5ECD2] text-[11px] font-mono text-[#128C4A] font-bold mb-4 flex items-center gap-1.5">
+                <span>✓</span>
+                <span>STR: {m.strNumber}</span>
+              </div>
+            )}
+          </div>
+
+          <div class="pt-4 border-t border-[#F6DCCD]/60">
+            <a
+              href={`/bidan/${m.slug || 'tim-bidan'}`}
+              class="text-xs font-bold text-[#C2552B] hover:underline flex items-center justify-between min-h-[44px] py-2"
+            >
+              <span>Lihat Profil Lengkap Bidan</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

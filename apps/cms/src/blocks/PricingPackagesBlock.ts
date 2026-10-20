@@ -27,6 +27,46 @@ export const PricingPackagesBlock: Block = {
       label: 'Sub-judul Penjelas',
     },
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'layoutStyle',
+          type: 'select',
+          defaultValue: 'cards',
+          options: [
+            { label: 'Grid Kartu (Rekomendasi 2-3 Paket)', value: 'cards' },
+            { label: 'Daftar Ringkas (List View)', value: 'list' },
+          ],
+          label: 'Tata Letak Tampilan Paket',
+          admin: { width: '33%' },
+        },
+        {
+          name: 'background',
+          type: 'select',
+          defaultValue: 'cream',
+          options: [
+            { label: 'Krem Hangat (#FFF9F4)', value: 'cream' },
+            { label: 'Putih Bersih', value: 'white' },
+            { label: 'Peach Lembut (#FFEFE5)', value: 'peach' },
+          ],
+          label: 'Warna Latar Belakang',
+          admin: { width: '33%' },
+        },
+        {
+          name: 'spacing',
+          type: 'select',
+          defaultValue: 'normal',
+          options: [
+            { label: 'Rapat (Compact)', value: 'compact' },
+            { label: 'Normal', value: 'normal' },
+            { label: 'Longgar (Spacious)', value: 'spacious' },
+          ],
+          label: 'Jarak Antar Seksi (Spacing)',
+          admin: { width: '33%' },
+        },
+      ],
+    },
+    {
       name: 'packages',
       type: 'array',
       required: true,

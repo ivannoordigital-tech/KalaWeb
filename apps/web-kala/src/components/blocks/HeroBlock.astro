@@ -12,6 +12,9 @@ interface Props {
     ctaText?: string;
     ctaMessage?: string;
     image?: { url?: string; alt?: string } | string;
+    imageAlt?: string;
+    align?: 'center' | 'left';
+    btnColor?: 'terracotta' | 'whatsapp' | 'chocolate';
     bgStyle?: 'gradient' | 'plain' | 'white';
   };
 }
@@ -26,12 +29,15 @@ const bgStyles = {
 
 const currentBg = bgStyles[block.bgStyle || 'gradient'] || bgStyles.gradient;
 const imageUrl = typeof block.image === 'string' ? block.image : block.image?.url;
-const imageAlt = typeof block.image === 'object' ? block.image?.alt : block.headline;
+const imageAlt = block.imageAlt || (typeof block.image === 'object' ? block.image?.alt : null) || block.headline;
+
+const isLeft = block.align === 'left' || Boolean(imageUrl);
+const btnVariant = block.btnColor === 'whatsapp' ? 'secondary' : 'primary';
 ---
 
 <section class={`py-12 md:py-20 border-b border-[#F6DCCD] relative overflow-hidden ${currentBg}`}>
   <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class={`flex flex-col ${imageUrl ? 'lg:flex-row items-center gap-10 lg:gap-14 text-left' : 'items-center text-center max-w-3xl mx-auto'}`}>
+    <div class={`flex flex-col ${isLeft ? 'lg:flex-row items-center gap-10 lg:gap-14 text-left' : 'items-center text-center max-w-3xl mx-auto'}`}>
       
       <!-- Text Column -->
       <div class="flex-1">

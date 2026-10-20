@@ -1,8 +1,9 @@
 import type { CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { buildSeoFields } from '../fields/seoFields'
-import { canManageSiteSettings, getUserRole } from '../access/roles'
+import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
+import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
 
 const RESERVED_SLUGS = [
   'admin',
@@ -35,17 +36,49 @@ export const Pages: CollectionConfig = {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
     },
+    preview: (doc) => {
+      if (doc?.slug) {
+        return `http://localhost:4321/preview/${doc.slug}`;
+      }
+      return null;
+    },
   },
   access: {
     read: () => true,
-    create: canManageSiteSettings,
-    update: canManageSiteSettings,
-    delete: canManageSiteSettings,
+    create: canManagePagesAndLPs,
+    update: canManagePagesAndLPs,
+    delete: canManagePagesAndLPs,
   },
   versions: {
     drafts: true,
   },
   hooks: {
+    beforeOperation: [
+      ({ args, operation }) => {
+        if (operation === 'create' && (args as any)?.duplicateFromID) {
+          if (args.data) {
+            if (args.data.title) {
+              args.data.title = `${args.data.title} (Salinan Duplikat)`;
+            }
+            args.data.slug = '';
+            args.data._status = 'draft';
+          }
+        }
+        return args;
+      },
+    ],
+    beforeChange: [
+      async ({ data }) => {
+        const { isValid, errors, warnings } = validatePageBuilderDoc(data, false);
+        if (!isValid) {
+          throw new Error(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`);
+        }
+        if (warnings.length > 0) {
+          console.warn('[Pages Validation Warnings]:', warnings);
+        }
+        return data;
+      },
+    ],
     afterChange: [
       async ({ doc, previousDoc }) => {
         const isNowPublished = doc._status === 'published';

@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
-import { canManageSiteSettings, getUserRole } from '../access/roles'
+import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
+import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
 
 export const LandingPages: CollectionConfig = {
   slug: 'landing-pages',
@@ -11,29 +12,74 @@ export const LandingPages: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'refCode', 'price', 'active'],
+    defaultColumns: ['title', 'slug', 'refCode', '_status', 'updatedAt'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
     },
+    preview: (doc) => {
+      if (doc?.slug) {
+        return `http://localhost:4321/preview/lp/${doc.slug}`;
+      }
+      return null;
+    },
   },
   access: {
     read: () => true,
-    create: canManageSiteSettings,
-    update: canManageSiteSettings,
-    delete: canManageSiteSettings,
+    create: canManagePagesAndLPs,
+    update: canManagePagesAndLPs,
+    delete: canManagePagesAndLPs,
+  },
+  versions: {
+    drafts: true,
   },
   hooks: {
+    beforeOperation: [
+      ({ args, operation }) => {
+        if (operation === 'create' && (args as any)?.duplicateFromID) {
+          if (args.data) {
+            if (args.data.title) {
+              args.data.title = `${args.data.title} (Salinan Duplikat)`;
+            }
+            args.data.slug = '';
+            args.data.refCode = '';
+            args.data._status = 'draft';
+          }
+        }
+        return args;
+      },
+    ],
+    beforeChange: [
+      async ({ data }) => {
+        const { isValid, errors, warnings } = validatePageBuilderDoc(data, true);
+        if (!isValid) {
+          throw new Error(`[Validasi Publikasi Landing Page Gagal]:\n• ${errors.join('\n• ')}`);
+        }
+        if (warnings.length > 0) {
+          console.warn('[LandingPages Validation Warnings]:', warnings);
+        }
+        return data;
+      },
+    ],
     afterChange: [
-      async ({ doc }) => {
-        if (doc.active) {
+      async ({ doc, previousDoc }) => {
+        const isNowPublished = doc._status === 'published';
+        const wasPublished = previousDoc?._status === 'published';
+
+        if (isNowPublished && !wasPublished) {
+          triggerCloudflareDeploy({ resource: 'LandingPages', action: 'publish', slug: doc.slug });
+        } else if (!isNowPublished && wasPublished) {
+          triggerCloudflareDeploy({ resource: 'LandingPages', action: 'unpublish', slug: doc.slug });
+        } else if (isNowPublished && wasPublished) {
           triggerCloudflareDeploy({ resource: 'LandingPages', action: 'publish', slug: doc.slug });
         }
       },
     ],
     afterDelete: [
       async ({ doc }) => {
-        triggerCloudflareDeploy({ resource: 'LandingPages', action: 'delete', slug: doc.slug });
+        if (doc._status === 'published') {
+          triggerCloudflareDeploy({ resource: 'LandingPages', action: 'delete', slug: doc.slug });
+        }
       },
     ],
   },
@@ -78,6 +124,47 @@ export const LandingPages: CollectionConfig = {
       label: 'Status Aktif (Tampilkan di Website)',
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'activePixels',
+      type: 'select',
+      hasMany: true,
+      label: 'Pixel Iklan Aktif',
+      defaultValue: ['meta', 'google'],
+      options: [
+        { label: 'Meta Pixel (Facebook/Instagram Ads)', value: 'meta' },
+        { label: 'Google Ads Tag (GTM/AdWords)', value: 'google' },
+        { label: 'TikTok Pixel', value: 'tiktok' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Pilih pixel pelacakan konversi yang aktif. ID pixel dikonfigurasi terpusat di Site Settings.',
+      },
+    },
+    {
+      name: 'campaignBaseRef',
+      type: 'text',
+      label: 'Ref Induk Kampanye (A/B Test)',
+      admin: {
+        position: 'sidebar',
+        description: 'Contoh: KALA-LP-KOLIK. Digunakan untuk mengelompokkan laporan perbandingan varian.',
+        placeholder: 'KALA-LP-KOLIK',
+      },
+    },
+    {
+      name: 'variant',
+      type: 'select',
+      label: 'Varian Kampanye',
+      defaultValue: 'A',
+      options: [
+        { label: 'Varian A (Kontrol)', value: 'A' },
+        { label: 'Varian B (Uji)', value: 'B' },
+        { label: 'Varian C (Eksperimen)', value: 'C' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Identifikasi varian untuk evaluasi conversion rate iklan.',
       },
     },
     // 🧱 Flexible Block-Based Page Builder

@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { canManageSiteSettings, getUserRole } from '../access/roles'
+import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { baseBlocks } from '../blocks'
 
 export const BlockTemplates: CollectionConfig = {
@@ -19,9 +19,12 @@ export const BlockTemplates: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: canManageSiteSettings,
-    update: canManageSiteSettings,
-    delete: canManageSiteSettings,
+    create: canManagePagesAndLPs,
+    update: canManagePagesAndLPs,
+    delete: canManagePagesAndLPs,
+  },
+  versions: {
+    drafts: true,
   },
   fields: [
     {

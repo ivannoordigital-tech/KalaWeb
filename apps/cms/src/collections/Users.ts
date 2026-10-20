@@ -45,6 +45,7 @@ export const Users: CollectionConfig = {
         { label: 'Penulis Konten (Artikel Edukasi & Media)', value: 'author' },
         { label: 'SEO Specialist (Optimasi Metadata & Redirects)', value: 'seo' },
         { label: 'Koordinator Bidan (Data Tim Bidan & Ulasan)', value: 'midwife_coordinator' },
+        { label: 'Marketing Specialist (Landing Pages, Pages & Templates)', value: 'marketing' },
       ],
       required: true,
       label: 'Peran & Hak Akses (Role)',
