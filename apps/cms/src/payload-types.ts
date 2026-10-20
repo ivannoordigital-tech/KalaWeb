@@ -76,6 +76,7 @@ export interface Config {
     'service-areas': ServiceArea;
     midwives: Midwife;
     redirects: Redirect;
+    'landing-pages': LandingPage;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +93,7 @@ export interface Config {
     'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
     midwives: MidwivesSelect<false> | MidwivesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'landing-pages': LandingPagesSelect<false> | LandingPagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -719,6 +721,77 @@ export interface Redirect {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landing-pages".
+ */
+export interface LandingPage {
+  id: number;
+  /**
+   * Nama kampanye iklan untuk referensi internal. Contoh: Iklan Meta - Solusi Bayi Kolik Surabaya
+   */
+  title: string;
+  /**
+   * Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/lp/bayi-kolik)
+   */
+  slug: string;
+  /**
+   * Kode unik pelacak pesan WA agar tim CS/Admin tahu asal kampanye iklan. Contoh: LP-KOLIK-ADS
+   */
+  refCode: string;
+  active?: boolean | null;
+  price: string;
+  duration: string;
+  /**
+   * Kalimat pemikat utama di bagian atas. Contoh: Atasi Tangis Bayi Akibat Kolik & Kembung Tanpa Panik
+   */
+  headline: string;
+  /**
+   * Penjelasan pembuka 1-2 kalimat yang menenangkan kecemasan Bunda.
+   */
+  subheadline: string;
+  /**
+   * Daftar keluhan yang dialami calon pasien (tampil dengan tanda silang merah).
+   */
+  painPoints?:
+    | {
+        point: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 3 poin solusi klinis yang ditawarkan Bidan Kala.
+   */
+  solutions?:
+    | {
+        title: string;
+        desc: string;
+        id?: string | null;
+      }[]
+    | null;
+  steps?:
+    | {
+        num: string;
+        title: string;
+        desc: string;
+        id?: string | null;
+      }[]
+    | null;
+  testimonial: {
+    quote: string;
+    author: string;
+    area: string;
+  };
+  faqs?:
+    | {
+        q: string;
+        a: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -776,6 +849,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'landing-pages';
+        value: number | LandingPage;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1092,6 +1169,57 @@ export interface RedirectsSelect<T extends boolean = true> {
   type?: T;
   active?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landing-pages_select".
+ */
+export interface LandingPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  refCode?: T;
+  active?: T;
+  price?: T;
+  duration?: T;
+  headline?: T;
+  subheadline?: T;
+  painPoints?:
+    | T
+    | {
+        point?: T;
+        id?: T;
+      };
+  solutions?:
+    | T
+    | {
+        title?: T;
+        desc?: T;
+        id?: T;
+      };
+  steps?:
+    | T
+    | {
+        num?: T;
+        title?: T;
+        desc?: T;
+        id?: T;
+      };
+  testimonial?:
+    | T
+    | {
+        quote?: T;
+        author?: T;
+        area?: T;
+      };
+  faqs?:
+    | T
+    | {
+        q?: T;
+        a?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

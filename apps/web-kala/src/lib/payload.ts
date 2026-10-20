@@ -123,6 +123,23 @@ export interface PayloadRedirect {
   notes?: string;
 }
 
+export interface PayloadLandingPage {
+  id?: string;
+  title: string;
+  slug: string;
+  refCode: string;
+  price: string;
+  duration: string;
+  headline: string;
+  subheadline: string;
+  painPoints: Array<{ point: string }> | string[];
+  solutions: Array<{ title: string; desc: string }>;
+  steps: Array<{ num: string; title: string; desc: string }>;
+  testimonial: { quote: string; author: string; area: string };
+  faqs: Array<{ q: string; a: string }>;
+  active?: boolean;
+}
+
 export interface SiteSettingsData {
   whatsappNumber?: string;
   whatsappNumberFormatted?: string;
@@ -273,6 +290,24 @@ export async function fetchPayloadRedirects(): Promise<PayloadRedirect[]> {
     return data.docs || [];
   } catch (err) {
     handleFetchError('redirects', err as Error);
+    return [];
+  }
+}
+
+/**
+ * Fetch active ads landing pages from Payload CMS
+ */
+export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> {
+  try {
+    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&limit=100`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
+    const data = await res.json();
+    return data.docs || [];
+  } catch (err) {
+    handleFetchError('landing-pages', err as Error);
     return [];
   }
 }

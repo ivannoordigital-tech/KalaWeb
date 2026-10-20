@@ -3,10 +3,13 @@ import WhatsAppButton from '../../components/WhatsAppButton.astro';
 import MobileStickyBar from '../../components/MobileStickyBar.astro';
 import ConsentBanner from '../../components/ConsentBanner.astro';
 import { siteConfig } from '../../config/site';
+import { fetchPayloadLandingPages, type PayloadLandingPage } from '../../lib/payload';
 import '../../styles/global.css';
 
 export async function getStaticPaths() {
-  const campaigns = [
+  const cmsCampaigns = await fetchPayloadLandingPages();
+
+  const fallbackCampaigns: PayloadLandingPage[] = [
     {
       slug: 'bayi-kolik',
       title: 'Solusi Tangis Kolik & Perut Kembung Bayi di Surabaya & Sidoarjo',
@@ -114,6 +117,13 @@ export async function getStaticPaths() {
       ],
     },
   ];
+
+  const rawList = cmsCampaigns.length > 0 ? cmsCampaigns : fallbackCampaigns;
+
+  const campaigns = rawList.map((c) => ({
+    ...c,
+    painPoints: (c.painPoints || []).map((p: any) => typeof p === 'string' ? p : p.point),
+  }));
 
   return campaigns.map((campaign) => ({
     params: { slug: campaign.slug },
