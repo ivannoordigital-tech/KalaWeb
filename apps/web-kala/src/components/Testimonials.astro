@@ -1,5 +1,16 @@
 ---
 import { siteConfig } from '../config/site';
+import { fetchPayloadTestimonials } from '../lib/payload';
+
+const cmsTestimonials = await fetchPayloadTestimonials();
+const testimonialsList = cmsTestimonials.length > 0
+  ? cmsTestimonials.slice(0, 3).map((t) => ({
+      quote: t.quote,
+      author: t.author,
+      location: t.area || t.location,
+      service: t.service,
+    }))
+  : siteConfig.testimonials;
 ---
 
 <section id="testimoni" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
@@ -17,7 +28,7 @@ import { siteConfig } from '../config/site';
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {siteConfig.testimonials.map((item) => (
+      {testimonialsList.map((item) => (
         <div class="p-7 rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] flex flex-col justify-between hover:shadow-kala transition-all duration-300">
           <div>
             <div class="flex items-center gap-1 text-[#C2552B] mb-4 text-sm">

@@ -1,6 +1,24 @@
 ---
 import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
+import { fetchPayloadServices } from '../lib/payload';
+
+const cmsServices = await fetchPayloadServices();
+const servicesList = cmsServices.length > 0
+  ? cmsServices.slice(0, 3).map((s) => ({
+      id: s.slug || s.id,
+      name: s.name,
+      target: s.target,
+      duration: s.duration,
+      originalPrice: s.originalPrice,
+      price: s.price,
+      description: s.shortDescription || s.description,
+      badge: s.badge,
+      popular: s.recommended || s.popular,
+      refCode: s.refCode,
+      message: s.message || `Halo Bidan Kala, saya mau reservasi ${s.name} ${s.price} [ref: ${s.refCode}]`,
+    }))
+  : siteConfig.featuredServices;
 ---
 
 <section id="layanan" class="py-16 md:py-24 bg-[#FFF9F4]">
@@ -19,7 +37,7 @@ import WhatsAppButton from './WhatsAppButton.astro';
 
     <!-- Service Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
-      {siteConfig.featuredServices.map((service) => (
+      {servicesList.map((service) => (
         <div class={`relative rounded-3xl border-2 transition-all duration-300 flex flex-col justify-between overflow-hidden bg-white ${
           service.popular 
             ? 'border-[#C2552B] shadow-kala-hover md:-translate-y-2' 
