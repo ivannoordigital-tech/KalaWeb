@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { fetchPayloadPages, type PayloadPage } from '../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsPages = await fetchPayloadPages();
+
+  const reservedSlugs = new Set([
+    '',
+    'index',
+    '404',
+    'segera-hadir',
+    'tentang-kami',
+    'kebijakan-privasi',
+    'tim-bidan',
+    'layanan',
+    'area',
+    'bidan',
+    'blog',
+    'lp',
+  ]);
+
+  const fallbackPages: PayloadPage[] = [
+    {
+      title: 'Syarat dan Ketentuan Layanan',
+      slug: 'syarat-ketentuan',
+      description: 'Ketentuan pemesanan, reservasi homecare, higienitas medis, dan pembatalan kunjungan bidan Kala Moms and Baby Spa di Surabaya & Sidoarjo.',
+      showWhatsAppCta: true,
+      whatsappCustomMessage: 'Halo Bidan Kala, saya ingin berkonsultasi mengenai ketentuan layanan',
+    },
+  ];
+
+  const rawList = cmsPages.length > 0 ? cmsPages : fallbackPages;
+  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug));
+
+  return validPages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+interface Props {
+  page: PayloadPage;
+}
+
+const { page } = Astro.props;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: '/' },
+  { name: page.title, url: `/${page.slug}` },
+];
+
+const resolvedTitle = page.seo?.metaTitle || `${page.title} | Kala Moms and Baby Spa`;
+const resolvedDesc = page.description || 'Layanan perawatan ibu dan anak profesional langsung ke rumah oleh bidan ber-STR resmi di Surabaya dan Sidoarjo.';
+const resolvedCanonical = page.seo?.canonicalUrl || `https://kalababyspa.com/${page.slug}`;
+const resolvedOgImage = page.seo?.ogImage?.url || page.heroImage?.url || '/images/hero-baby.jpg';
+
+function renderRichText(content: any): string {
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  if (content.root && Array.isArray(content.root.children)) {
+    return content.root.children
+      .map((node: any) => {
+        if (node.type === 'paragraph') {
+          const text = (node.children || []).map((c: any) => c.text || '').join('');
+          return text ? `<p class="mb-5 leading-relaxed text-[#4B2E22]">${text}</p>` : '';
+        }
+        if (node.type === 'heading') {
+          const tag = node.tag || 'h2';
+          const text = (node.children || []).map((c: any) => c.text || '').join('');
+          return `<${tag} class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22] mt-8 mb-4">${text}</${tag}>`;
+        }
+        return '';
+      })
+      .join('');
+  }
+  return '';
+}
+
+const renderedHtml = renderRichText(page.content);
+---
+
+<BaseLayout
+  title={resolvedTitle}
+  description={resolvedDesc}
+  canonical={resolvedCanonical}
+  image={resolvedOgImage}
+  noindex={page.seo?.noIndex || false}
+  breadcrumbs={breadcrumbs}
+>
+  <div class="py-12 md:py-20 bg-[#FFF9F4] min-h-[70vh]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Breadcrumbs -->
+      <nav class="flex items-center gap-2 text-xs text-[#86675A] mb-8 overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
+        <a href="/" class="hover:text-[#C2552B] transition-colors">Beranda</a>
+        <span>›</span>
+        <span class="text-[#4B2E22] font-semibold">{page.title}</span>
+      </nav>
+
+      <!-- Page Header -->
+      <header class="mb-10 pb-8 border-b border-[#F6DCCD]">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mb-4 leading-tight">
+          {page.title}
+        </h1>
+        {page.description && (
+          <p class="text-base sm:text-lg text-[#86675A] leading-relaxed">
+            {page.description}
+          </p>
+        )}
+      </header>
+
+      <!-- Optional Hero Image -->
+      {page.heroImage?.url && (
+        <div class="mb-10 rounded-3xl overflow-hidden border border-[#F6DCCD] shadow-sm max-h-96">
+          <img
+            src={page.heroImage.url}
+            alt={page.heroImage.alt || page.title}
+            class="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
+      <!-- Main Rich Content -->
+      <article class="prose-kala max-w-none text-base sm:text-lg bg-white p-8 sm:p-12 rounded-3xl border border-[#F6DCCD] shadow-sm mb-12">
+        {renderedHtml ? (
+          <div set:html={renderedHtml} />
+        ) : (
+          <p class="text-base text-[#86675A] leading-relaxed">
+            Halaman ini sedang dalam proses pembaruan konten oleh tim operasional Kala Moms and Baby Spa. Untuk informasi selengkapnya atau konsultasi langsung, silakan hubungi tim bidan kami melalui tombol di bawah.
+          </p>
+        )}
+      </article>
+
+      <!-- Optional WhatsApp Call to Action -->
+      {page.showWhatsAppCta !== false && (
+        <div class="p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-[#FFEFE5] via-[#FFF9F4] to-[#FFEFE5] border-2 border-[#F6DCCD] text-center shadow-kala">
+          <span class="text-xs font-bold text-[#C2552B] uppercase tracking-wider bg-white px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+            Konsultasi Hangat & Ramah
+          </span>
+          <h2 class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22] mb-3">
+            Punya Pertanyaan Lebih Lanjut Seputar Kala?
+          </h2>
+          <p class="text-sm text-[#86675A] max-w-xl mx-auto mb-6">
+            Tim bidan profesional kami siap menjawab segala pertanyaan Bunda dengan penuh kehangatan dan tanpa mom-shaming.
+          </p>
+          <WhatsAppButton
+            refCode={`PAGE-${page.slug.toUpperCase()}`}
+            message={page.whatsappCustomMessage || `Halo Bidan Kala, saya membaca halaman ${page.title} dan ingin bertanya [ref: PAGE-${page.slug.toUpperCase()}]`}
+            text="Hubungi Bidan via WhatsApp"
+            variant="hero"
+          />
+        </div>
+      )}
+
+      <!-- Back to Home Link -->
+      <div class="mt-10 text-center">
+        <a href="/" class="text-sm font-semibold text-[#86675A] hover:text-[#C2552B] transition-colors">
+          ← Kembali ke Beranda Utama
+        </a>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>

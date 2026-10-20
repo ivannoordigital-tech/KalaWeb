@@ -14,6 +14,7 @@ import { ServiceAreas } from './collections/ServiceAreas'
 import { Midwives } from './collections/Midwives'
 import { Redirects } from './collections/Redirects'
 import { LandingPages } from './collections/LandingPages'
+import { Pages } from './collections/Pages'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -37,6 +38,7 @@ export default buildConfig({
     Midwives,
     Redirects,
     LandingPages,
+    Pages,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor(),

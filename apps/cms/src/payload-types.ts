@@ -77,6 +77,7 @@ export interface Config {
     midwives: Midwife;
     redirects: Redirect;
     'landing-pages': LandingPage;
+    pages: Page;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,6 +95,7 @@ export interface Config {
     midwives: MidwivesSelect<false> | MidwivesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'landing-pages': LandingPagesSelect<false> | LandingPagesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -792,6 +794,91 @@ export interface LandingPage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * Judul utama halaman yang tampil di bagian atas. Contoh: Syarat dan Ketentuan Layanan
+   */
+  title: string;
+  /**
+   * Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: syarat-ketentuan
+   */
+  slug: string;
+  /**
+   * Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.
+   */
+  description?: string | null;
+  /**
+   * Unggah foto banner atas halaman (format WebP/JPG/PNG).
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.
+   */
+  showWhatsAppCta?: boolean | null;
+  /**
+   * Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya soal kemitraan
+   */
+  whatsappCustomMessage?: string | null;
+  /**
+   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "description".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -853,6 +940,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'landing-pages';
         value: number | LandingPage;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1222,6 +1313,33 @@ export interface LandingPagesSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  heroImage?: T;
+  content?: T;
+  showWhatsAppCta?: T;
+  whatsappCustomMessage?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

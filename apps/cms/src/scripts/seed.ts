@@ -325,6 +325,33 @@ export async function seed() {
     }
   }
 
+  // 6. Seed Custom Pages
+  const initialPages = [
+    {
+      title: 'Syarat dan Ketentuan Layanan',
+      slug: 'syarat-ketentuan',
+      description: 'Ketentuan pemesanan, reservasi homecare, higienitas medis, dan pembatalan kunjungan bidan Kala Moms and Baby Spa.',
+      showWhatsAppCta: true,
+      whatsappCustomMessage: 'Halo Bidan Kala, saya mau tanya mengenai syarat dan ketentuan pemesanan',
+      _status: 'published',
+    },
+  ]
+
+  for (const pg of initialPages) {
+    const existing = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: pg.slug } },
+    })
+    if (existing.totalDocs === 0) {
+      console.log(`Seeding custom page: ${pg.title}`)
+      await (payload.create as any)({
+        collection: 'pages',
+        data: pg,
+        draft: false,
+      })
+    }
+  }
+
   console.log('Seeding completed successfully!')
   process.exit(0)
 }

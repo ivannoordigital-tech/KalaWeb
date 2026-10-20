@@ -140,6 +140,23 @@ export interface PayloadLandingPage {
   active?: boolean;
 }
 
+export interface PayloadPage {
+  id?: string;
+  title: string;
+  slug: string;
+  description?: string;
+  heroImage?: { url?: string; alt?: string };
+  content?: any;
+  showWhatsAppCta?: boolean;
+  whatsappCustomMessage?: string;
+  seo?: {
+    metaTitle?: string;
+    ogImage?: { url?: string; alt?: string };
+    noIndex?: boolean;
+    canonicalUrl?: string;
+  };
+}
+
 export interface SiteSettingsData {
   whatsappNumber?: string;
   whatsappNumberFormatted?: string;
@@ -308,6 +325,24 @@ export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> 
     return data.docs || [];
   } catch (err) {
     handleFetchError('landing-pages', err as Error);
+    return [];
+  }
+}
+
+/**
+ * Fetch published custom pages from Payload CMS
+ */
+export async function fetchPayloadPages(): Promise<PayloadPage[]> {
+  try {
+    const res = await fetch(`${PAYLOAD_URL}/api/pages?where[_status][equals]=published&limit=100`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
+    const data = await res.json();
+    return data.docs || [];
+  } catch (err) {
+    handleFetchError('pages', err as Error);
     return [];
   }
 }
