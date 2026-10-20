@@ -78,6 +78,7 @@ export interface Config {
     redirects: Redirect;
     'landing-pages': LandingPage;
     pages: Page;
+    'block-templates': BlockTemplate;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,6 +97,7 @@ export interface Config {
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'landing-pages': LandingPagesSelect<false> | LandingPagesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    'block-templates': BlockTemplatesSelect<false> | BlockTemplatesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -921,6 +923,32 @@ export interface LandingPage {
             blockName?: string | null;
             blockType: 'cta';
           }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            bgStyle?: ('white' | 'warm') | null;
+            images: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              caption?: string | null;
+              tag?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            /**
+             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
+             */
+            template: number | BlockTemplate;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'templateRef';
+          }
       )[]
     | null;
   /**
@@ -981,6 +1009,225 @@ export interface LandingPage {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Pustaka template susunan blok yang dapat disimpan dan dipakai berulang kali di halaman mana pun tanpa perlu menyusun dari nol.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "block-templates".
+ */
+export interface BlockTemplate {
+  id: number;
+  /**
+   * Beri nama template yang mudah dikenali oleh tim admin Anda.
+   */
+  name: string;
+  /**
+   * Huruf kecil dan tanda hubung (-).
+   */
+  slug: string;
+  category?: ('promo' | 'galeri' | 'edukasi' | 'review' | 'umum') | null;
+  description?: string | null;
+  /**
+   * Susun blok-blok yang ingin Anda jadikan template master (misal: Galeri + Testimoni + CTA). Blok yang Anda simpan di sini akan bisa disisipkan ke halaman mana pun.
+   */
+  layout: (
+    | {
+        badge?: string | null;
+        /**
+         * Pemicu minat pertama pengunjung.
+         */
+        headline: string;
+        /**
+         * Penjelasan 1-2 kalimat menenangkan orang tua.
+         */
+        subheadline: string;
+        price?: string | null;
+        originalPrice?: string | null;
+        duration?: string | null;
+        ctaText?: string | null;
+        ctaMessage?: string | null;
+        image?: (number | null) | Media;
+        bgStyle?: ('gradient' | 'plain' | 'white') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'hero';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        points: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'painPoints';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        highlightQuote?: {
+          quote?: string | null;
+          author?: string | null;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'solutions';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        packages: {
+          name: string;
+          target?: string | null;
+          price: string;
+          originalPrice?: string | null;
+          duration?: string | null;
+          description?: string | null;
+          isPopular?: boolean | null;
+          popularBadge?: string | null;
+          features?:
+            | {
+                feature: string;
+                id?: string | null;
+              }[]
+            | null;
+          ctaText?: string | null;
+          refCode?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pricing';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        kalaLabel?: string | null;
+        otherLabel?: string | null;
+        rows: {
+          feature: string;
+          kalaValue: string;
+          otherValue: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'comparison';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        steps: {
+          num?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'steps';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          quote: string;
+          author: string;
+          role?: string | null;
+          area?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'testimonials';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        description: string;
+        note?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'guarantee';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        faqs: {
+          q: string;
+          a: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'faq';
+      }
+    | {
+        /**
+         * Tulis paragraf, judul, kutipan, dan link secara bebas.
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'richText';
+      }
+    | {
+        badge?: string | null;
+        headline: string;
+        description?: string | null;
+        buttonText?: string | null;
+        buttonMessage?: string | null;
+        footnote?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'cta';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3' | '4') | null;
+        bgStyle?: ('white' | 'warm') | null;
+        images: {
+          image?: (number | null) | Media;
+          imageUrlFallback?: string | null;
+          caption?: string | null;
+          tag?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'gallery';
+      }
+  )[];
   updatedAt: string;
   createdAt: string;
 }
@@ -1205,6 +1452,32 @@ export interface Page {
             blockName?: string | null;
             blockType: 'cta';
           }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            bgStyle?: ('white' | 'warm') | null;
+            images: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              caption?: string | null;
+              tag?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            /**
+             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
+             */
+            template: number | BlockTemplate;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'templateRef';
+          }
       )[]
     | null;
   /**
@@ -1319,6 +1592,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'block-templates';
+        value: number | BlockTemplate;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1830,6 +2107,33 @@ export interface LandingPagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        templateRef?:
+          | T
+          | {
+              template?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
   price?: T;
   duration?: T;
@@ -2066,6 +2370,33 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        templateRef?:
+          | T
+          | {
+              template?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
   showWhatsAppCta?: T;
   whatsappCustomMessage?: T;
@@ -2083,6 +2414,222 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "block-templates_select".
+ */
+export interface BlockTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  category?: T;
+  description?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

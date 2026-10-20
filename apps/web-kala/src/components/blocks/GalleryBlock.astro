@@ -1,0 +1,92 @@
+---
+interface GalleryItem {
+  image?: { url?: string; alt?: string } | string;
+  imageUrlFallback?: string;
+  caption?: string;
+  tag?: string;
+}
+
+interface Props {
+  block: {
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    columns?: '2' | '3' | '4';
+    bgStyle?: 'white' | 'warm';
+    images: GalleryItem[];
+  };
+}
+
+const { block } = Astro.props;
+const images = block.images || [];
+
+const colClasses = {
+  '2': 'grid-cols-1 sm:grid-cols-2',
+  '3': 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+  '4': 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4',
+};
+
+const currentCols = colClasses[block.columns || '3'] || colClasses['3'];
+const isWarm = block.bgStyle === 'warm';
+---
+
+<section class={`py-14 md:py-20 border-b border-[#F6DCCD] ${isWarm ? 'bg-[#FFF9F4]' : 'bg-white'}`}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    
+    <!-- Header -->
+    <div class="text-center mb-12">
+      {block.badge && (
+        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+          {block.badge}
+        </span>
+      )}
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block.title}
+      </h2>
+      {block.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] max-w-2xl mx-auto">
+          {block.subtitle}
+        </p>
+      )}
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class={`grid gap-4 sm:gap-6 ${currentCols}`}>
+      {images.map((item, idx) => {
+        const rawUrl = typeof item.image === 'string' ? item.image : item.image?.url;
+        const finalUrl = rawUrl || item.imageUrlFallback || '/images/hero-baby.jpg';
+        const altText = typeof item.image === 'object' ? item.image?.alt : item.caption || block.title;
+
+        return (
+          <div class="group relative rounded-3xl overflow-hidden border border-[#F6DCCD] bg-[#FFEFE5] shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+            <div class="aspect-[4/3] overflow-hidden">
+              <img
+                src={finalUrl}
+                alt={altText}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+            </div>
+            
+            {item.tag && (
+              <div class="absolute top-3 left-3">
+                <span class="text-[11px] font-bold text-[#4B2E22] bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-full border border-[#F6DCCD] shadow-xs">
+                  {item.tag}
+                </span>
+              </div>
+            )}
+
+            {item.caption && (
+              <div class="p-3.5 bg-white border-t border-[#F6DCCD]/80">
+                <p class="text-xs sm:text-sm font-medium text-[#4B2E22] leading-snug">
+                  {item.caption}
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+  </div>
+</section>

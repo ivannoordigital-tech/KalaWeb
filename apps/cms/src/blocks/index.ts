@@ -9,8 +9,10 @@ import { GuaranteeBlock } from './GuaranteeBlock'
 import { FaqAccordionBlock } from './FaqAccordionBlock'
 import { RichTextBlock } from './RichTextBlock'
 import { CallToActionBlock } from './CallToActionBlock'
+import { GalleryBlock } from './GalleryBlock'
+import { TemplateRefBlock } from './TemplateRefBlock'
 
-export const allBlocks = [
+export const baseBlocks = [
   HeroBlock,
   PainPointsBlock,
   SolutionsBlock,
@@ -22,6 +24,12 @@ export const allBlocks = [
   FaqAccordionBlock,
   RichTextBlock,
   CallToActionBlock,
+  GalleryBlock,
+]
+
+export const allBlocks = [
+  ...baseBlocks,
+  TemplateRefBlock,
 ]
 
 export {
@@ -36,4 +44,6 @@ export {
   FaqAccordionBlock,
   RichTextBlock,
   CallToActionBlock,
+  GalleryBlock,
+  TemplateRefBlock,
 }

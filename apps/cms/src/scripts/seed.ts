@@ -526,6 +526,104 @@ export async function seed() {
     }
   }
 
+  // 7. Seed Block Templates (Pustaka Template Blok)
+  const initialTemplates = [
+    {
+      name: 'Template Galeri Momen & Testimoni',
+      slug: 'template-galeri-testimoni',
+      category: 'galeri',
+      description: 'Kombinasi blok dokumentasi foto tindakan bidan dan ulasan kepuasan Bunda untuk meningkatkan rasa percaya (social proof).',
+      layout: [
+        {
+          blockType: 'gallery',
+          badge: 'Dokumentasi Kala',
+          title: 'Momen Hangat & Ceria Buah Hati Bersama Bidan',
+          subtitle: 'Dokumentasi asli kenyamanan penanganan homecare langsung di kamar Bunda di Surabaya & Sidoarjo.',
+          columns: '3',
+          bgStyle: 'warm',
+          images: [
+            {
+              imageUrlFallback: '/images/hero-baby.jpg',
+              caption: 'Pijat kolik meredakan perut begah Baby Zayn',
+              tag: 'Baby Massage · 1 Bulan',
+            },
+            {
+              imageUrlFallback: '/images/hero-baby.jpg',
+              caption: 'Stimulasi sensori taktil lembut untuk newborn',
+              tag: 'Newborn Ceria · 2 Minggu',
+            },
+            {
+              imageUrlFallback: '/images/hero-baby.jpg',
+              caption: 'Pijat laktasi nifas melancarkan ASI Bunda',
+              tag: 'Postpartum Mom Care',
+            },
+          ],
+        },
+        {
+          blockType: 'testimonials',
+          title: 'Apa Kata Bunda yang Telah Menggunakan Kala?',
+          subtitle: 'Kepuasan dan kebahagiaan keluarga Anda adalah energi utama kami.',
+          items: [
+            {
+              quote: 'Setelah sesi pertama baby massage, Zayn langsung tidur nyenyak 4 jam berturut-turut. Bidan sangat ramah dan telaten!',
+              author: 'Bunda Nadhira',
+              role: 'Mama dari Baby Zayn (3 minggu)',
+              area: 'Waru, Sidoarjo',
+            },
+            {
+              quote: 'Pasca operasi caesar gerak serba nyeri. Bidan Kala datang bantu pijat laktasi dan baby massage. ASI langsung lancar dan badan enteng!',
+              author: 'Bunda Clarissa',
+              role: 'Mama dari Baby Kenzo (1 bulan)',
+              area: 'Wiyung, Surabaya Barat',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Template Penawaran Promo & WhatsApp Langsung',
+      slug: 'template-promo-kilat',
+      category: 'promo',
+      description: 'Template ringkas untuk promo kilat: Hero banner diskon langsung ke WhatsApp CTA.',
+      layout: [
+        {
+          blockType: 'hero',
+          badge: '⚡ Promo Terbatas Khusus Pekan Ini',
+          headline: 'Booking Homecare Bidan Kala, Diskon Spesial Treatment Pertama',
+          subheadline: 'Perawatan lembut penuh kasih untuk Bunda & Bayi langsung di rumah oleh bidan ber-STR resmi.',
+          price: 'Mulai Rp60.000',
+          duration: '40 Menit',
+          ctaText: 'Klaim Promo via WhatsApp',
+          ctaMessage: 'Halo Bidan Kala, saya mau klaim promo diskon treatment pertama',
+          bgStyle: 'gradient',
+        },
+        {
+          blockType: 'cta',
+          badge: 'Slot Terbatas',
+          headline: 'Amankan Jadwal Bidan ke Rumah Anda Sekarang',
+          description: 'Tim kami merespons cepat setiap hari demi kenyamanan buah hati Anda.',
+          buttonText: '💬 Chat WhatsApp Bidan Sekarang',
+          buttonMessage: 'Halo Bidan Kala, saya mau reservasi homecare promo',
+          footnote: '⚡ Respon cepat dalam 5 menit · Bebas mom-shaming',
+        },
+      ],
+    },
+  ]
+
+  for (const tmpl of initialTemplates) {
+    const existing = await payload.find({
+      collection: 'block-templates',
+      where: { slug: { equals: tmpl.slug } },
+    })
+    if (existing.totalDocs === 0) {
+      console.log(`Seeding block template: ${tmpl.name}`)
+      await (payload.create as any)({
+        collection: 'block-templates',
+        data: tmpl,
+      })
+    }
+  }
+
   console.log('Seeding completed successfully!')
   process.exit(0)
 }

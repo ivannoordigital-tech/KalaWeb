@@ -15,6 +15,7 @@ import { Midwives } from './collections/Midwives'
 import { Redirects } from './collections/Redirects'
 import { LandingPages } from './collections/LandingPages'
 import { Pages } from './collections/Pages'
+import { BlockTemplates } from './collections/BlockTemplates'
 import { SiteSettings } from './globals/SiteSettings'
 
 const filename = fileURLToPath(import.meta.url)
@@ -39,6 +40,7 @@ export default buildConfig({
     Redirects,
     LandingPages,
     Pages,
+    BlockTemplates,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor(),

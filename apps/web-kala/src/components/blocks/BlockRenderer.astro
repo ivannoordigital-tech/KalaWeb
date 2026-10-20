@@ -10,6 +10,7 @@ import GuaranteeBlock from './GuaranteeBlock.astro';
 import FaqAccordionBlock from './FaqAccordionBlock.astro';
 import RichTextBlock from './RichTextBlock.astro';
 import CallToActionBlock from './CallToActionBlock.astro';
+import GalleryBlock from './GalleryBlock.astro';
 
 interface Props {
   block: {
@@ -19,6 +20,11 @@ interface Props {
 }
 
 const { block } = Astro.props;
+
+// Ekstrak layout jika blok ini adalah TemplateRef
+const templateLayout = block.blockType === 'templateRef' && typeof block.template === 'object' && Array.isArray(block.template?.layout)
+  ? block.template.layout
+  : [];
 ---
 
 {block.blockType === 'hero' && <HeroBlock block={block as any} />}
@@ -32,3 +38,9 @@ const { block } = Astro.props;
 {block.blockType === 'faq' && <FaqAccordionBlock block={block as any} />}
 {block.blockType === 'richText' && <RichTextBlock block={block as any} />}
 {block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
+{block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
+
+<!-- Render template tersimpan secara modular -->
+{block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
+  <Astro.self block={innerBlock} />
+))}

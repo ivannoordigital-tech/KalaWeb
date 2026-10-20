@@ -313,12 +313,21 @@ export async function fetchPayloadRedirects(): Promise<PayloadRedirect[]> {
   }
 }
 
+export interface PayloadBlockTemplate {
+  id: string;
+  name: string;
+  slug: string;
+  category?: 'promo' | 'galeri' | 'edukasi' | 'review' | 'umum';
+  description?: string;
+  layout: any[];
+}
+
 /**
  * Fetch active ads landing pages from Payload CMS
  */
 export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&depth=2&limit=100`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&depth=3&limit=100`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });
@@ -336,7 +345,7 @@ export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> 
  */
 export async function fetchPayloadPages(): Promise<PayloadPage[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/pages?where[_status][equals]=published&depth=2&limit=100`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/pages?where[_status][equals]=published&depth=3&limit=100`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });
@@ -345,6 +354,24 @@ export async function fetchPayloadPages(): Promise<PayloadPage[]> {
     return data.docs || [];
   } catch (err) {
     handleFetchError('pages', err as Error);
+    return [];
+  }
+}
+
+/**
+ * Fetch block templates from Payload CMS
+ */
+export async function fetchPayloadBlockTemplates(): Promise<PayloadBlockTemplate[]> {
+  try {
+    const res = await fetch(`${PAYLOAD_URL}/api/block-templates?depth=2&limit=100`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
+    const data = await res.json();
+    return data.docs || [];
+  } catch (err) {
+    handleFetchError('block-templates', err as Error);
     return [];
   }
 }
