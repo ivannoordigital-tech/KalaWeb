@@ -1,4 +1,2 @@
-# Cloudflare Pages 301 Redirects for Canonical Domain Consolidation
-https://www.kalababyspa.com/* https://kalababyspa.com/:splat 301!
-https://kalababyspa.online/* https://kalababyspa.com/:splat 301!
-https://www.kalababyspa.online/* https://kalababyspa.com/:splat 301!
+# Cloudflare Workers Static Assets Redirects
+# (Only relative URLs allowed. Domain canonical redirects are managed via Cloudflare Dashboard > Rules > Redirect Rules)
