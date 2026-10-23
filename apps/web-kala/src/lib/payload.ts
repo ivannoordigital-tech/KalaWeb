@@ -78,6 +78,7 @@ export interface PayloadTestimonial {
   quote: string;
   date?: string;
   permissionGranted?: boolean;
+  externalRef?: string;
 }
 
 export interface PayloadFAQ {
@@ -167,6 +168,16 @@ export interface SiteSettingsData {
   whatsappNumberFormatted?: string;
   instagram?: string;
   operationalHours?: string;
+  operationalSchedule?: {
+    timezone?: string;
+    days?: Array<{
+      day: string;
+      closed?: boolean;
+      open?: string;
+      close?: string;
+    }>;
+    afterHoursAnnouncement?: string;
+  };
   heroBadgeText?: string;
   socialProofText?: string;
   announcementBanner?: string;

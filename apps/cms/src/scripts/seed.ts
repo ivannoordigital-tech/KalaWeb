@@ -29,6 +29,46 @@ export async function seed() {
     })
   }
 
+    // 1b. Create Bot Operator user with API Key if not exists
+  const existingBot = await payload.find({
+    collection: 'users',
+    where: {
+      email: {
+        equals: 'bot@kalababyspa.com',
+      },
+    },
+  });
+
+  if (existingBot.totalDocs === 0) {
+    const botApiKey = process.env.CMS_BOT_API_KEY;
+    const botPassword = process.env.BOT_OPERATOR_PASSWORD;
+
+    if (process.env.NODE_ENV === 'production' && (!botApiKey || !botPassword)) {
+      throw new Error(
+        'CMS_BOT_API_KEY dan BOT_OPERATOR_PASSWORD wajib diisi di production sebelum membuat akun bot.',
+      );
+    }
+
+    console.log('Creating bot operator user: bot@kalababyspa.com');
+    const botUser = await (payload.create as any)({
+      collection: 'users',
+      data: {
+        email: 'bot@kalababyspa.com',
+        password: botPassword || 'KalaBotOperatorSecPass2026!',
+        name: 'Kala Clinic Bot Service',
+        role: 'operator',
+        enableAPIKey: true,
+        apiKey: botApiKey || 'kala_bot_api_key_secure_2026_super_random_token',
+      },
+    });
+
+    if (botApiKey && botUser?.apiKey && botUser.apiKey !== botApiKey) {
+      console.warn(
+        'PERINGATAN: API key akun bot berbeda dari CMS_BOT_API_KEY. Salin nilai api_key dari panel admin / tabel users ke env bot klinik.',
+      );
+    }
+  }
+
   // 2. Seed Services
   const initialServices = [
     {
@@ -738,6 +778,50 @@ export async function seed() {
         data: guide,
       })
     }
+  }
+
+    // 7. Seed initial SiteSettings if needed
+  try {
+    const settings = await (payload as any).findGlobal({
+      slug: 'site-settings',
+    });
+    if (!settings?.whatsappNumber) {
+      console.log('Seeding initial SiteSettings...');
+      await (payload as any).updateGlobal({
+        slug: 'site-settings',
+        data: {
+          whatsappNumber: '6281234567890',
+          whatsappNumberFormatted: '+62 812-3456-7890',
+          instagram: '@kala.babyspa',
+          operationalHours: 'Senin - Minggu: 08.00 - 17.00 WIB',
+          operationalSchedule: {
+            timezone: 'Asia/Jakarta',
+            days: [
+              { day: '0', closed: false, open: '08:00', close: '17:00' },
+              { day: '1', closed: false, open: '08:00', close: '17:00' },
+              { day: '2', closed: false, open: '08:00', close: '17:00' },
+              { day: '3', closed: false, open: '08:00', close: '17:00' },
+              { day: '4', closed: false, open: '08:00', close: '17:00' },
+              { day: '5', closed: false, open: '08:00', close: '17:00' },
+              { day: '6', closed: false, open: '08:00', close: '17:00' },
+            ],
+            afterHoursAnnouncement: 'Terima kasih telah menghubungi Kala Moms & Baby Spa. Layanan konsultasi saat ini sedang di luar jam operasional (08.00–17.00 WIB). Pesan Bunda telah tercatat dalam antrean dan akan segera dihubungi oleh Bidan kami besok pagi.',
+          },
+          heroBadgeText: '✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes',
+          socialProofText: 'Dipercaya 500+ Bunda di Surabaya & Sidoarjo',
+          coverageAreas: [
+            { area: 'Surabaya Barat (Wiyung, Lakarsantri, Sambikerep, CitraLand)' },
+            { area: 'Surabaya Timur (Rungkut, Sukolilo, Mulyorejo, Pakuwon City)' },
+            { area: 'Surabaya Selatan (Wonokromo, Gayungan, Jambangan)' },
+            { area: 'Surabaya Pusat (Tegalsari, Genteng, Gubeng)' },
+            { area: 'Surabaya Utara (Kenjeran, Tambaksari)' },
+            { area: 'Sidoarjo (Waru, Gedangan, Sedati, Candi, Buduran)' },
+          ],
+        },
+      });
+    }
+  } catch (err) {
+    console.debug('SiteSettings global init skipped or failed:', (err as Error).message);
   }
 
   console.log('Seeding completed successfully!')

@@ -8,8 +8,8 @@ services:
     container_name: kala-cms-app
     restart: unless-stopped
     environment:
-      - DATABASE_URI=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/kala_cms_db
-      - PAYLOAD_SECRET=${PAYLOAD_SECRET:-kala_moms_and_baby_spa_secret_key_2026_super_secure}
+      - DATABASE_URI=postgresql://kala_cms_user:${CMS_DB_PASSWORD}@postgres:5432/kala_cms_db
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET}
       - NEXT_PUBLIC_SERVER_URL=https://admin.kalababyspa.com
       - NODE_ENV=production
     volumes:

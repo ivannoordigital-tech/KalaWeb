@@ -66,11 +66,86 @@ export const SiteSettings: GlobalConfig = {
     {
       name: 'operationalHours',
       type: 'text',
-      label: 'Jam Layanan & Operasional',
+      label: 'Jam Layanan & Operasional (Display Teks)',
       admin: {
         description: 'Jadwal pelayanan homecare yang tampil di footer web. Contoh: Senin - Minggu: 08.00 - 17.00 WIB',
         placeholder: 'Senin - Minggu: 08.00 - 17.00 WIB',
       },
+    },
+    // Jadwal Operasional Terstruktur (Untuk Bot WhatsApp)
+    {
+      name: 'operationalSchedule',
+      type: 'group',
+      label: '🕒 Jadwal Operasional Terstruktur (Integrasi Bot WA)',
+      admin: {
+        description: 'Jadwal terstruktur yang dibaca langsung oleh Kala Clinic Bot untuk kalkulasi ketersediaan live CS vs antrean luar jam kerja.',
+      },
+      fields: [
+        {
+          name: 'timezone',
+          type: 'text',
+          defaultValue: 'Asia/Jakarta',
+          label: 'Zona Waktu (Default: Asia/Jakarta)',
+          admin: {
+            placeholder: 'Asia/Jakarta',
+          },
+        },
+        {
+          name: 'days',
+          type: 'array',
+          label: 'Jadwal per Hari',
+          fields: [
+            {
+              name: 'day',
+              type: 'select',
+              required: true,
+              options: [
+                { label: 'Minggu (0)', value: '0' },
+                { label: 'Senin (1)', value: '1' },
+                { label: 'Selasa (2)', value: '2' },
+                { label: 'Rabu (3)', value: '3' },
+                { label: 'Kamis (4)', value: '4' },
+                { label: 'Jumat (5)', value: '5' },
+                { label: 'Sabtu (6)', value: '6' },
+              ],
+              label: 'Hari',
+            },
+            {
+              name: 'closed',
+              type: 'checkbox',
+              defaultValue: false,
+              label: 'Libur / Tutup pada hari ini',
+            },
+            {
+              name: 'open',
+              type: 'text',
+              defaultValue: '08:00',
+              label: 'Jam Buka (Format HH:mm)',
+              admin: {
+                placeholder: '08:00',
+              },
+            },
+            {
+              name: 'close',
+              type: 'text',
+              defaultValue: '17:00',
+              label: 'Jam Tutup (Format HH:mm)',
+              admin: {
+                placeholder: '17:00',
+              },
+            },
+          ],
+        },
+        {
+          name: 'afterHoursAnnouncement',
+          type: 'textarea',
+          label: 'Pesan Antrean di Luar Jam Operasional',
+          defaultValue: 'Terima kasih telah menghubungi Kala Moms & Baby Spa. Layanan konsultasi saat ini sedang di luar jam operasional (08.00–17.00 WIB). Pesan Bunda telah tercatat dalam antrean dan akan segera dihubungi oleh Bidan kami besok pagi.',
+          admin: {
+            description: 'Pesan otomatis yang dikirimkan oleh Bot WA jika pasien chat di luar jam kerja.',
+          },
+        },
+      ],
     },
     // Teks Promosi Dinamis
     {

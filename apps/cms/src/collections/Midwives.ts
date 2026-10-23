@@ -63,9 +63,10 @@ export const Midwives: CollectionConfig = {
       name: 'strNumber',
       type: 'text',
       required: true,
-      label: 'Nomor Surat Tanda Registrasi (STR) Kemenkes RI',
+      unique: true,
+      label: 'Nomor Surat Tanda Registrasi (STR) Kemenkes RI (Unik)',
       admin: {
-        description: 'Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google.',
+        description: 'Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google dan foreign key bot klinik.',
         placeholder: 'Contoh: 160252120-3456789',
       },
     },

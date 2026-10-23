@@ -25,7 +25,9 @@ export const Users: CollectionConfig = {
     },
     delete: isSuperAdmin,
   },
-  auth: true,
+  auth: {
+    useAPIKey: true,
+  },
   fields: [
     {
       name: 'name',

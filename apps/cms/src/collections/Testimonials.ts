@@ -11,7 +11,7 @@ export const Testimonials: CollectionConfig = {
   admin: {
     group: '🏥 Data Layanan & Klinik',
     useAsTitle: 'author',
-    defaultColumns: ['author', 'area', 'service', 'permissionGranted', 'active', 'order'],
+    defaultColumns: ['author', 'area', 'service', 'permissionGranted', 'active', 'externalRef', 'order'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author';
@@ -116,6 +116,16 @@ export const Testimonials: CollectionConfig = {
     },
     // Sidebar
     {
+      name: 'externalRef',
+      type: 'text',
+      unique: true,
+      label: 'ID Referensi Eksternal (Bot / Booking ID)',
+      admin: {
+        position: 'sidebar',
+        description: 'ID unik dari booking bot WA (contoh: booking-20261023-001) untuk mencegah duplikasi webhook (idempotency).',
+      },
+    },
+    {
       name: 'date',
       type: 'date',
       defaultValue: () => new Date().toISOString(),
@@ -140,6 +150,7 @@ export const Testimonials: CollectionConfig = {
       label: 'Status Aktif (Tampil di Website)',
       admin: {
         position: 'sidebar',
+        description: 'Untuk ulasan masuk dari Bot WA, pastikan centang ini HANYA setelah admin memverifikasi kelayakan ulasan.',
       },
     },
   ],

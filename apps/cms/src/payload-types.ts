@@ -67,18 +67,20 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
-    media: Media;
-    articles: Article;
+    'help-center': HelpCenter;
+    'landing-pages': LandingPage;
+    'page-templates': PageTemplate;
+    'block-templates': BlockTemplate;
+    pages: Page;
     services: Service;
+    midwives: Midwife;
+    'service-areas': ServiceArea;
     testimonials: Testimonial;
     faq: Faq;
-    'service-areas': ServiceArea;
-    midwives: Midwife;
+    articles: Article;
+    media: Media;
     redirects: Redirect;
-    'landing-pages': LandingPage;
-    pages: Page;
-    'block-templates': BlockTemplate;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,18 +88,20 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    'help-center': HelpCenterSelect<false> | HelpCenterSelect<true>;
+    'landing-pages': LandingPagesSelect<false> | LandingPagesSelect<true>;
+    'page-templates': PageTemplatesSelect<false> | PageTemplatesSelect<true>;
+    'block-templates': BlockTemplatesSelect<false> | BlockTemplatesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
+    midwives: MidwivesSelect<false> | MidwivesSelect<true>;
+    'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
-    'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
-    midwives: MidwivesSelect<false> | MidwivesSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
-    'landing-pages': LandingPagesSelect<false> | LandingPagesSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
-    'block-templates': BlockTemplatesSelect<false> | BlockTemplatesSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -142,35 +146,374 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Pusat panduan kerja operasional admin KalaWeb. Baca panduan di bawah ini untuk mempelajari cara membuat landing page, etika bahasa iklan kesehatan, dan format foto.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "help-center".
  */
-export interface User {
+export interface HelpCenter {
   id: number;
-  name: string;
-  /**
-   * Menentukan menu apa saja yang dapat dilihat dan diedit oleh pengguna ini di dashboard.
-   */
-  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator';
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
+  title: string;
+  category: 'panduan-lp' | 'etika-iklan-medis' | 'standar-foto-media' | 'pelacakan-wa' | 'faq-kendala';
+  order?: number | null;
+  summary: string;
+  steps?:
     | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
+        stepNumber?: string | null;
+        stepTitle: string;
+        stepDetail: string;
+        id?: string | null;
       }[]
     | null;
-  password?: string | null;
-  collection: 'users';
+  dosAndDonts?: {
+    dos?:
+      | {
+          item: string;
+          id?: string | null;
+        }[]
+      | null;
+    donts?:
+      | {
+          item: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landing-pages".
+ */
+export interface LandingPage {
+  id: number;
+  /**
+   * Nama kampanye iklan untuk referensi internal. Contoh: Iklan Meta - Solusi Bayi Kolik Surabaya
+   */
+  title: string;
+  /**
+   * Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/lp/bayi-kolik)
+   */
+  slug: string;
+  /**
+   * Kosongkan jika ingin dibuat otomatis: KALA-LP-[SLUG]-[VARIAN]. Pesan chat: "Halo Bidan Kala, saya mau reservasi... [ref: ...]"
+   */
+  refCode?: string | null;
+  active?: boolean | null;
+  /**
+   * Pilih pixel pelacakan konversi yang aktif. ID pixel dikonfigurasi terpusat di Site Settings.
+   */
+  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
+  /**
+   * Contoh: KALA-LP-KOLIK. Digunakan untuk mengelompokkan laporan perbandingan varian.
+   */
+  campaignBaseRef?: string | null;
+  /**
+   * Identifikasi varian untuk evaluasi conversion rate iklan.
+   */
+  variant?: ('A' | 'B' | 'C') | null;
+  /**
+   * Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.
+   */
+  layout?:
+    | (
+        | {
+            badge?: string | null;
+            /**
+             * Pemicu minat pertama pengunjung.
+             */
+            headline: string;
+            /**
+             * Penjelasan 1-2 kalimat menenangkan orang tua.
+             */
+            subheadline: string;
+            price?: string | null;
+            originalPrice?: string | null;
+            duration?: string | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            image?: (number | null) | Media;
+            /**
+             * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
+             */
+            imageAlt?: string | null;
+            align?: ('center' | 'left') | null;
+            btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
+            bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3') | null;
+            background?: ('cream' | 'white' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            points: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'painPoints';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            highlightQuote?: {
+              quote?: string | null;
+              author?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'solutions';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            layoutStyle?: ('cards' | 'list') | null;
+            background?: ('cream' | 'white' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            packages: {
+              name: string;
+              target?: string | null;
+              price: string;
+              originalPrice?: string | null;
+              duration?: string | null;
+              description?: string | null;
+              isPopular?: boolean | null;
+              popularBadge?: string | null;
+              features?:
+                | {
+                    feature: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              ctaText?: string | null;
+              refCode?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricing';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            kalaLabel?: string | null;
+            otherLabel?: string | null;
+            rows: {
+              feature: string;
+              kalaValue: string;
+              otherValue: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'comparison';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            steps: {
+              num?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'steps';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              quote: string;
+              author: string;
+              role?: string | null;
+              area?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            description: string;
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'guarantee';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            faqs: {
+              q: string;
+              a: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+        | {
+            /**
+             * Tulis paragraf, judul, kutipan, dan link secara bebas.
+             */
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            badge?: string | null;
+            headline: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonMessage?: string | null;
+            footnote?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            bgStyle?: ('white' | 'warm') | null;
+            images: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              caption?: string | null;
+              tag?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            /**
+             * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+             */
+            heading: string;
+            subheading?: string | null;
+            /**
+             * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+             */
+            midwives?: (number | Midwife)[] | null;
+            /**
+             * Pilihan palet warna latar belakang.
+             */
+            background?: ('white' | 'cream' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'midwifeSpotlight';
+          }
+        | {
+            /**
+             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
+             */
+            template: number | BlockTemplate;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'templateRef';
+          }
+      )[]
+    | null;
+  /**
+   * Diabaikan jika Anda menggunakan Susunan Blok di atas.
+   */
+  price?: string | null;
+  /**
+   * Diabaikan jika Anda menggunakan Susunan Blok di atas.
+   */
+  duration?: string | null;
+  /**
+   * Kalimat pemikat utama di bagian atas (diabaikan jika menggunakan Blok Hero di Page Builder).
+   */
+  headline?: string | null;
+  /**
+   * Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).
+   */
+  subheadline?: string | null;
+  /**
+   * Daftar keluhan yang dialami calon pasien (tampil dengan tanda silang merah).
+   */
+  painPoints?:
+    | {
+        point: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 3 poin solusi klinis yang ditawarkan Bidan Kala.
+   */
+  solutions?:
+    | {
+        title: string;
+        desc: string;
+        id?: string | null;
+      }[]
+    | null;
+  steps?:
+    | {
+        num: string;
+        title: string;
+        desc: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.
+   */
+  testimonial?: {
+    quote?: string | null;
+    author?: string | null;
+    area?: string | null;
+  };
+  faqs?:
+    | {
+        q: string;
+        a: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -218,51 +561,622 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles".
+ * via the `definition` "midwives".
  */
-export interface Article {
+export interface Midwife {
   id: number;
   /**
-   * Judul artikel yang edukatif dan menenangkan Bunda. Contoh: Cara Mengatasi Bayi Kolik Malam Hari
+   * Contoh: Bidan Annisa Rahmawati
+   */
+  name: string;
+  /**
+   * Contoh: S.Tr.Keb, Bdn
    */
   title: string;
-  category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
-  pubDate: string;
-  updatedDate: string;
   /**
-   * Nama tenaga kesehatan resmi yang menyusun artikel.
+   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google dan foreign key bot klinik.
    */
-  author: string;
-  authorTitle: string;
+  strNumber: string;
   /**
-   * Otoritas medis yang memvalidasi kebenaran klinis isi artikel.
+   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
    */
-  medicalReviewer: string;
+  photo?: (number | null) | Media;
   /**
-   * Ringkasan isi artikel (1–2 paragraf) untuk pembuka dan cuplikan kartu blog.
+   * Lama pengalaman menangani ibu dan anak. Contoh: 5
    */
-  description: string;
+  experienceYears?: number | null;
   /**
-   * Unggah foto resmi bidan / perawatan bayi (format WebP/JPG/PNG).
+   * Daftar kompetensi khusus yang dimiliki bidan.
    */
-  heroImage?: (number | null) | Media;
-  /**
-   * URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).
-   */
-  heroImageUrlFallback?: string | null;
-  /**
-   * Deskripsikan isi visual gambar secara jelas. Contoh: Bidan sedang mengedukasi teknik pijat ILU pada bayi.
-   */
-  heroImageAlt: string;
-  /**
-   * Daftar kata kunci pencarian Google yang relevan dengan artikel ini.
-   */
-  keywords?:
+  specialties?:
     | {
-        keyword: string;
+        specialty: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
+   */
+  bio: string;
+  /**
+   * Huruf kecil dan strip. Contoh: bidan-annisa
+   */
+  slug: string;
+  /**
+   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
+   */
+  active?: boolean | null;
+  /**
+   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Pustaka template susunan blok yang dapat disimpan dan dipakai berulang kali di halaman mana pun tanpa perlu menyusun dari nol.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "block-templates".
+ */
+export interface BlockTemplate {
+  id: number;
+  /**
+   * Beri nama template yang mudah dikenali oleh tim admin Anda.
+   */
+  name: string;
+  /**
+   * Huruf kecil dan tanda hubung (-).
+   */
+  slug: string;
+  category?: ('promo' | 'galeri' | 'edukasi' | 'review' | 'umum') | null;
+  description?: string | null;
+  /**
+   * Susun blok-blok yang ingin Anda jadikan template master (misal: Galeri + Testimoni + CTA). Blok yang Anda simpan di sini akan bisa disisipkan ke halaman mana pun.
+   */
+  layout: (
+    | {
+        badge?: string | null;
+        /**
+         * Pemicu minat pertama pengunjung.
+         */
+        headline: string;
+        /**
+         * Penjelasan 1-2 kalimat menenangkan orang tua.
+         */
+        subheadline: string;
+        price?: string | null;
+        originalPrice?: string | null;
+        duration?: string | null;
+        ctaText?: string | null;
+        ctaMessage?: string | null;
+        image?: (number | null) | Media;
+        /**
+         * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
+         */
+        imageAlt?: string | null;
+        align?: ('center' | 'left') | null;
+        btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
+        bgStyle?: ('gradient' | 'plain' | 'white') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'hero';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3') | null;
+        background?: ('cream' | 'white' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        points: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'painPoints';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        highlightQuote?: {
+          quote?: string | null;
+          author?: string | null;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'solutions';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        layoutStyle?: ('cards' | 'list') | null;
+        background?: ('cream' | 'white' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        packages: {
+          name: string;
+          target?: string | null;
+          price: string;
+          originalPrice?: string | null;
+          duration?: string | null;
+          description?: string | null;
+          isPopular?: boolean | null;
+          popularBadge?: string | null;
+          features?:
+            | {
+                feature: string;
+                id?: string | null;
+              }[]
+            | null;
+          ctaText?: string | null;
+          refCode?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pricing';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        kalaLabel?: string | null;
+        otherLabel?: string | null;
+        rows: {
+          feature: string;
+          kalaValue: string;
+          otherValue: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'comparison';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        steps: {
+          num?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'steps';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          quote: string;
+          author: string;
+          role?: string | null;
+          area?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'testimonials';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        description: string;
+        note?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'guarantee';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        faqs: {
+          q: string;
+          a: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'faq';
+      }
+    | {
+        /**
+         * Tulis paragraf, judul, kutipan, dan link secara bebas.
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'richText';
+      }
+    | {
+        badge?: string | null;
+        headline: string;
+        description?: string | null;
+        buttonText?: string | null;
+        buttonMessage?: string | null;
+        footnote?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'cta';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3' | '4') | null;
+        bgStyle?: ('white' | 'warm') | null;
+        images: {
+          image?: (number | null) | Media;
+          imageUrlFallback?: string | null;
+          caption?: string | null;
+          tag?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'gallery';
+      }
+    | {
+        /**
+         * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+         */
+        heading: string;
+        subheading?: string | null;
+        /**
+         * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+         */
+        midwives?: (number | Midwife)[] | null;
+        /**
+         * Pilihan palet warna latar belakang.
+         */
+        background?: ('white' | 'cream' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'midwifeSpotlight';
+      }
+  )[];
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Pustaka susunan halaman utuh lengkap (Full Page Blueprint). Membuat kampanye baru cukup dimulai dengan menyalin susunan blok dari template ini.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-templates".
+ */
+export interface PageTemplate {
+  id: number;
+  /**
+   * Beri nama template yang mendeskripsikan target audiens kampanye.
+   */
+  name: string;
+  slug: string;
+  category?: ('kolik' | 'newborn' | 'laktasi' | 'selapanan' | 'promo') | null;
+  /**
+   * Kapan tim marketing harus memakai template halaman ini? Panduan singkat bagi tim iklan.
+   */
+  description?: string | null;
+  /**
+   * Rangkaian blok lengkap dari Hero, Masalah, Solusi, Paket Harga, Testimoni, FAQ, hingga CTA.
+   */
+  layout: (
+    | {
+        badge?: string | null;
+        /**
+         * Pemicu minat pertama pengunjung.
+         */
+        headline: string;
+        /**
+         * Penjelasan 1-2 kalimat menenangkan orang tua.
+         */
+        subheadline: string;
+        price?: string | null;
+        originalPrice?: string | null;
+        duration?: string | null;
+        ctaText?: string | null;
+        ctaMessage?: string | null;
+        image?: (number | null) | Media;
+        /**
+         * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
+         */
+        imageAlt?: string | null;
+        align?: ('center' | 'left') | null;
+        btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
+        bgStyle?: ('gradient' | 'plain' | 'white') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'hero';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3') | null;
+        background?: ('cream' | 'white' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        points: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'painPoints';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        highlightQuote?: {
+          quote?: string | null;
+          author?: string | null;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'solutions';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        layoutStyle?: ('cards' | 'list') | null;
+        background?: ('cream' | 'white' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        packages: {
+          name: string;
+          target?: string | null;
+          price: string;
+          originalPrice?: string | null;
+          duration?: string | null;
+          description?: string | null;
+          isPopular?: boolean | null;
+          popularBadge?: string | null;
+          features?:
+            | {
+                feature: string;
+                id?: string | null;
+              }[]
+            | null;
+          ctaText?: string | null;
+          refCode?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pricing';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        kalaLabel?: string | null;
+        otherLabel?: string | null;
+        rows: {
+          feature: string;
+          kalaValue: string;
+          otherValue: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'comparison';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        steps: {
+          num?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'steps';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          quote: string;
+          author: string;
+          role?: string | null;
+          area?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'testimonials';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        description: string;
+        note?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'guarantee';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        faqs: {
+          q: string;
+          a: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'faq';
+      }
+    | {
+        /**
+         * Tulis paragraf, judul, kutipan, dan link secara bebas.
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'richText';
+      }
+    | {
+        badge?: string | null;
+        headline: string;
+        description?: string | null;
+        buttonText?: string | null;
+        buttonMessage?: string | null;
+        footnote?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'cta';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3' | '4') | null;
+        bgStyle?: ('white' | 'warm') | null;
+        images: {
+          image?: (number | null) | Media;
+          imageUrlFallback?: string | null;
+          caption?: string | null;
+          tag?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'gallery';
+      }
+    | {
+        /**
+         * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+         */
+        heading: string;
+        subheading?: string | null;
+        /**
+         * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+         */
+        midwives?: (number | Midwife)[] | null;
+        /**
+         * Pilihan palet warna latar belakang.
+         */
+        background?: ('white' | 'cream' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'midwifeSpotlight';
+      }
+    | {
+        /**
+         * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
+         */
+        template: number | BlockTemplate;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'templateRef';
+      }
+  )[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * Judul utama halaman yang tampil di bagian atas. Contoh: Syarat dan Ketentuan Layanan
+   */
+  title: string;
+  /**
+   * Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: syarat-ketentuan
+   */
+  slug: string;
+  /**
+   * Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.
+   */
+  description?: string | null;
+  /**
+   * Unggah foto banner atas halaman (format WebP/JPG/PNG).
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.
+   */
   content?: {
     root: {
       type: string;
@@ -279,34 +1193,253 @@ export interface Article {
     [k: string]: unknown;
   } | null;
   /**
-   * Alamat URL artikel (huruf kecil dan tanda hubung). Contoh: bayi-kolik-malam-hari
+   * Gunakan blok ini untuk menyusun seksi halaman secara visual (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.
    */
-  slug: string;
+  layout?:
+    | (
+        | {
+            badge?: string | null;
+            /**
+             * Pemicu minat pertama pengunjung.
+             */
+            headline: string;
+            /**
+             * Penjelasan 1-2 kalimat menenangkan orang tua.
+             */
+            subheadline: string;
+            price?: string | null;
+            originalPrice?: string | null;
+            duration?: string | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            image?: (number | null) | Media;
+            /**
+             * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
+             */
+            imageAlt?: string | null;
+            align?: ('center' | 'left') | null;
+            btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
+            bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3') | null;
+            background?: ('cream' | 'white' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            points: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'painPoints';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            highlightQuote?: {
+              quote?: string | null;
+              author?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'solutions';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            layoutStyle?: ('cards' | 'list') | null;
+            background?: ('cream' | 'white' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            packages: {
+              name: string;
+              target?: string | null;
+              price: string;
+              originalPrice?: string | null;
+              duration?: string | null;
+              description?: string | null;
+              isPopular?: boolean | null;
+              popularBadge?: string | null;
+              features?:
+                | {
+                    feature: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              ctaText?: string | null;
+              refCode?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricing';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            kalaLabel?: string | null;
+            otherLabel?: string | null;
+            rows: {
+              feature: string;
+              kalaValue: string;
+              otherValue: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'comparison';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            steps: {
+              num?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'steps';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              quote: string;
+              author: string;
+              role?: string | null;
+              area?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            description: string;
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'guarantee';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            faqs: {
+              q: string;
+              a: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+        | {
+            /**
+             * Tulis paragraf, judul, kutipan, dan link secara bebas.
+             */
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            badge?: string | null;
+            headline: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonMessage?: string | null;
+            footnote?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            bgStyle?: ('white' | 'warm') | null;
+            images: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              caption?: string | null;
+              tag?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            /**
+             * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+             */
+            heading: string;
+            subheading?: string | null;
+            /**
+             * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+             */
+            midwives?: (number | Midwife)[] | null;
+            /**
+             * Pilihan palet warna latar belakang.
+             */
+            background?: ('white' | 'cream' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'midwifeSpotlight';
+          }
+        | {
+            /**
+             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
+             */
+            template: number | BlockTemplate;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'templateRef';
+          }
+      )[]
+    | null;
   /**
-   * Hubungkan artikel ini dengan layanan komersial dan artikel lain untuk memperkuat SEO & konversi.
+   * Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.
    */
-  internalLinking?: {
-    /**
-     * Centang jika artikel ini adalah panduan komprehensif utama (pillar of content) untuk satu topik besar.
-     */
-    isPillarArticle?: boolean | null;
-    /**
-     * Pilih artikel pilar yang menjadi induk dari artikel pendukung (cluster content) ini.
-     */
-    parentPillar?: (number | null) | Article;
-    /**
-     * Sangat disarankan: hubungkan minimal 1 layanan relevan agar Bunda bisa langsung reservasi homecare.
-     */
-    relatedServices?: (number | Service)[] | null;
-    /**
-     * Pilih 2-4 artikel edukasi relevan untuk direkomendasikan kepada pembaca.
-     */
-    relatedArticles?: (number | Article)[] | null;
-    /**
-     * Hubungkan dengan area jangkauan (misal: Surabaya Timur, Sidoarjo) jika artikel menyinggung lokasi.
-     */
-    relatedAreas?: (number | ServiceArea)[] | null;
-  };
+  showWhatsAppCta?: boolean | null;
+  /**
+   * Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya soal kemitraan
+   */
+  whatsappCustomMessage?: string | null;
   /**
    * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
    */
@@ -583,8 +1716,15 @@ export interface Testimonial {
    * Wajib dicentang demi mematuhi UU Perlindungan Data Pribadi (UU PDP) dan etika kerahasiaan medis.
    */
   permissionGranted: boolean;
+  /**
+   * ID unik dari booking bot WA (contoh: booking-20261023-001) untuk mencegah duplikasi webhook (idempotency).
+   */
+  externalRef?: string | null;
   date?: string | null;
   order?: number | null;
+  /**
+   * Untuk ulasan masuk dari Bot WA, pastikan centang ini HANYA setelah admin memverifikasi kelayakan ulasan.
+   */
   active?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -619,643 +1759,51 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "midwives".
+ * via the `definition` "articles".
  */
-export interface Midwife {
+export interface Article {
   id: number;
   /**
-   * Contoh: Bidan Annisa Rahmawati
-   */
-  name: string;
-  /**
-   * Contoh: S.Tr.Keb, Bdn
+   * Judul artikel yang edukatif dan menenangkan Bunda. Contoh: Cara Mengatasi Bayi Kolik Malam Hari
    */
   title: string;
+  category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
+  pubDate: string;
+  updatedDate: string;
   /**
-   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google.
+   * Nama tenaga kesehatan resmi yang menyusun artikel.
    */
-  strNumber: string;
+  author: string;
+  authorTitle: string;
   /**
-   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
+   * Otoritas medis yang memvalidasi kebenaran klinis isi artikel.
    */
-  photo?: (number | null) | Media;
+  medicalReviewer: string;
   /**
-   * Lama pengalaman menangani ibu dan anak. Contoh: 5
+   * Ringkasan isi artikel (1–2 paragraf) untuk pembuka dan cuplikan kartu blog.
    */
-  experienceYears?: number | null;
+  description: string;
   /**
-   * Daftar kompetensi khusus yang dimiliki bidan.
-   */
-  specialties?:
-    | {
-        specialty: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
-   */
-  bio: string;
-  /**
-   * Huruf kecil dan strip. Contoh: bidan-annisa
-   */
-  slug: string;
-  /**
-   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
-   */
-  active?: boolean | null;
-  /**
-   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects".
- */
-export interface Redirect {
-  id: number;
-  /**
-   * URL lama yang ingin dialihkan. Contoh: /promo-selapan atau /layanan-lama
-   */
-  from: string;
-  /**
-   * URL halaman baru tujuan pengalihan. Contoh: /layanan/bundle-selapan
-   */
-  to: string;
-  /**
-   * Pilih 301 agar Google mentransfer otoritas ranking lama ke URL baru.
-   */
-  type: '301' | '302';
-  active?: boolean | null;
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "landing-pages".
- */
-export interface LandingPage {
-  id: number;
-  /**
-   * Nama kampanye iklan untuk referensi internal. Contoh: Iklan Meta - Solusi Bayi Kolik Surabaya
-   */
-  title: string;
-  /**
-   * Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/lp/bayi-kolik)
-   */
-  slug: string;
-  /**
-   * Kode unik pelacak pesan WA agar tim CS/Admin tahu asal kampanye iklan. Contoh: LP-KOLIK-ADS
-   */
-  refCode: string;
-  active?: boolean | null;
-  /**
-   * Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.
-   */
-  layout?:
-    | (
-        | {
-            badge?: string | null;
-            /**
-             * Pemicu minat pertama pengunjung.
-             */
-            headline: string;
-            /**
-             * Penjelasan 1-2 kalimat menenangkan orang tua.
-             */
-            subheadline: string;
-            price?: string | null;
-            originalPrice?: string | null;
-            duration?: string | null;
-            ctaText?: string | null;
-            ctaMessage?: string | null;
-            image?: (number | null) | Media;
-            bgStyle?: ('gradient' | 'plain' | 'white') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'hero';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            points: {
-              icon?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'painPoints';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            items: {
-              icon?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            highlightQuote?: {
-              quote?: string | null;
-              author?: string | null;
-            };
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'solutions';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            subtitle?: string | null;
-            packages: {
-              name: string;
-              target?: string | null;
-              price: string;
-              originalPrice?: string | null;
-              duration?: string | null;
-              description?: string | null;
-              isPopular?: boolean | null;
-              popularBadge?: string | null;
-              features?:
-                | {
-                    feature: string;
-                    id?: string | null;
-                  }[]
-                | null;
-              ctaText?: string | null;
-              refCode?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pricing';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            kalaLabel?: string | null;
-            otherLabel?: string | null;
-            rows: {
-              feature: string;
-              kalaValue: string;
-              otherValue: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'comparison';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            steps: {
-              num?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'steps';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            items: {
-              quote: string;
-              author: string;
-              role?: string | null;
-              area?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'testimonials';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            description: string;
-            note?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'guarantee';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            faqs: {
-              q: string;
-              a: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faq';
-          }
-        | {
-            /**
-             * Tulis paragraf, judul, kutipan, dan link secara bebas.
-             */
-            content: {
-              root: {
-                type: string;
-                children: {
-                  type: any;
-                  version: number;
-                  [k: string]: unknown;
-                }[];
-                direction: ('ltr' | 'rtl') | null;
-                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                indent: number;
-                version: number;
-              };
-              [k: string]: unknown;
-            };
-            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'richText';
-          }
-        | {
-            badge?: string | null;
-            headline: string;
-            description?: string | null;
-            buttonText?: string | null;
-            buttonMessage?: string | null;
-            footnote?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'cta';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            subtitle?: string | null;
-            columns?: ('2' | '3' | '4') | null;
-            bgStyle?: ('white' | 'warm') | null;
-            images: {
-              image?: (number | null) | Media;
-              imageUrlFallback?: string | null;
-              caption?: string | null;
-              tag?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'gallery';
-          }
-        | {
-            /**
-             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
-             */
-            template: number | BlockTemplate;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'templateRef';
-          }
-      )[]
-    | null;
-  /**
-   * Diabaikan jika Anda menggunakan Susunan Blok di atas.
-   */
-  price?: string | null;
-  /**
-   * Diabaikan jika Anda menggunakan Susunan Blok di atas.
-   */
-  duration?: string | null;
-  /**
-   * Kalimat pemikat utama di bagian atas (diabaikan jika menggunakan Blok Hero di Page Builder).
-   */
-  headline?: string | null;
-  /**
-   * Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).
-   */
-  subheadline?: string | null;
-  /**
-   * Daftar keluhan yang dialami calon pasien (tampil dengan tanda silang merah).
-   */
-  painPoints?:
-    | {
-        point: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * 3 poin solusi klinis yang ditawarkan Bidan Kala.
-   */
-  solutions?:
-    | {
-        title: string;
-        desc: string;
-        id?: string | null;
-      }[]
-    | null;
-  steps?:
-    | {
-        num: string;
-        title: string;
-        desc: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.
-   */
-  testimonial?: {
-    quote?: string | null;
-    author?: string | null;
-    area?: string | null;
-  };
-  faqs?:
-    | {
-        q: string;
-        a: string;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Pustaka template susunan blok yang dapat disimpan dan dipakai berulang kali di halaman mana pun tanpa perlu menyusun dari nol.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "block-templates".
- */
-export interface BlockTemplate {
-  id: number;
-  /**
-   * Beri nama template yang mudah dikenali oleh tim admin Anda.
-   */
-  name: string;
-  /**
-   * Huruf kecil dan tanda hubung (-).
-   */
-  slug: string;
-  category?: ('promo' | 'galeri' | 'edukasi' | 'review' | 'umum') | null;
-  description?: string | null;
-  /**
-   * Susun blok-blok yang ingin Anda jadikan template master (misal: Galeri + Testimoni + CTA). Blok yang Anda simpan di sini akan bisa disisipkan ke halaman mana pun.
-   */
-  layout: (
-    | {
-        badge?: string | null;
-        /**
-         * Pemicu minat pertama pengunjung.
-         */
-        headline: string;
-        /**
-         * Penjelasan 1-2 kalimat menenangkan orang tua.
-         */
-        subheadline: string;
-        price?: string | null;
-        originalPrice?: string | null;
-        duration?: string | null;
-        ctaText?: string | null;
-        ctaMessage?: string | null;
-        image?: (number | null) | Media;
-        bgStyle?: ('gradient' | 'plain' | 'white') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'hero';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        points: {
-          icon?: string | null;
-          title: string;
-          description: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'painPoints';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        items: {
-          icon?: string | null;
-          title: string;
-          description: string;
-          id?: string | null;
-        }[];
-        highlightQuote?: {
-          quote?: string | null;
-          author?: string | null;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'solutions';
-      }
-    | {
-        badge?: string | null;
-        title: string;
-        subtitle?: string | null;
-        packages: {
-          name: string;
-          target?: string | null;
-          price: string;
-          originalPrice?: string | null;
-          duration?: string | null;
-          description?: string | null;
-          isPopular?: boolean | null;
-          popularBadge?: string | null;
-          features?:
-            | {
-                feature: string;
-                id?: string | null;
-              }[]
-            | null;
-          ctaText?: string | null;
-          refCode?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'pricing';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        kalaLabel?: string | null;
-        otherLabel?: string | null;
-        rows: {
-          feature: string;
-          kalaValue: string;
-          otherValue: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'comparison';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        steps: {
-          num?: string | null;
-          title: string;
-          description: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'steps';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        items: {
-          quote: string;
-          author: string;
-          role?: string | null;
-          area?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'testimonials';
-      }
-    | {
-        badge?: string | null;
-        title: string;
-        description: string;
-        note?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'guarantee';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        faqs: {
-          q: string;
-          a: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'faq';
-      }
-    | {
-        /**
-         * Tulis paragraf, judul, kutipan, dan link secara bebas.
-         */
-        content: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'richText';
-      }
-    | {
-        badge?: string | null;
-        headline: string;
-        description?: string | null;
-        buttonText?: string | null;
-        buttonMessage?: string | null;
-        footnote?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'cta';
-      }
-    | {
-        badge?: string | null;
-        title: string;
-        subtitle?: string | null;
-        columns?: ('2' | '3' | '4') | null;
-        bgStyle?: ('white' | 'warm') | null;
-        images: {
-          image?: (number | null) | Media;
-          imageUrlFallback?: string | null;
-          caption?: string | null;
-          tag?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'gallery';
-      }
-  )[];
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: number;
-  /**
-   * Judul utama halaman yang tampil di bagian atas. Contoh: Syarat dan Ketentuan Layanan
-   */
-  title: string;
-  /**
-   * Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: syarat-ketentuan
-   */
-  slug: string;
-  /**
-   * Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.
-   */
-  description?: string | null;
-  /**
-   * Unggah foto banner atas halaman (format WebP/JPG/PNG).
+   * Unggah foto resmi bidan / perawatan bayi (format WebP/JPG/PNG).
    */
   heroImage?: (number | null) | Media;
   /**
-   * Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.
+   * URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).
    */
+  heroImageUrlFallback?: string | null;
+  /**
+   * Deskripsikan isi visual gambar secara jelas. Contoh: Bidan sedang mengedukasi teknik pijat ILU pada bayi.
+   */
+  heroImageAlt: string;
+  /**
+   * Daftar kata kunci pencarian Google yang relevan dengan artikel ini.
+   */
+  keywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
   content?: {
     root: {
       type: string;
@@ -1272,222 +1820,34 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   /**
-   * Gunakan blok ini untuk menyusun seksi halaman secara visual (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.
+   * Alamat URL artikel (huruf kecil dan tanda hubung). Contoh: bayi-kolik-malam-hari
    */
-  layout?:
-    | (
-        | {
-            badge?: string | null;
-            /**
-             * Pemicu minat pertama pengunjung.
-             */
-            headline: string;
-            /**
-             * Penjelasan 1-2 kalimat menenangkan orang tua.
-             */
-            subheadline: string;
-            price?: string | null;
-            originalPrice?: string | null;
-            duration?: string | null;
-            ctaText?: string | null;
-            ctaMessage?: string | null;
-            image?: (number | null) | Media;
-            bgStyle?: ('gradient' | 'plain' | 'white') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'hero';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            points: {
-              icon?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'painPoints';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            items: {
-              icon?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            highlightQuote?: {
-              quote?: string | null;
-              author?: string | null;
-            };
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'solutions';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            subtitle?: string | null;
-            packages: {
-              name: string;
-              target?: string | null;
-              price: string;
-              originalPrice?: string | null;
-              duration?: string | null;
-              description?: string | null;
-              isPopular?: boolean | null;
-              popularBadge?: string | null;
-              features?:
-                | {
-                    feature: string;
-                    id?: string | null;
-                  }[]
-                | null;
-              ctaText?: string | null;
-              refCode?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pricing';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            kalaLabel?: string | null;
-            otherLabel?: string | null;
-            rows: {
-              feature: string;
-              kalaValue: string;
-              otherValue: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'comparison';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            steps: {
-              num?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'steps';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            items: {
-              quote: string;
-              author: string;
-              role?: string | null;
-              area?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'testimonials';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            description: string;
-            note?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'guarantee';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            faqs: {
-              q: string;
-              a: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faq';
-          }
-        | {
-            /**
-             * Tulis paragraf, judul, kutipan, dan link secara bebas.
-             */
-            content: {
-              root: {
-                type: string;
-                children: {
-                  type: any;
-                  version: number;
-                  [k: string]: unknown;
-                }[];
-                direction: ('ltr' | 'rtl') | null;
-                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                indent: number;
-                version: number;
-              };
-              [k: string]: unknown;
-            };
-            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'richText';
-          }
-        | {
-            badge?: string | null;
-            headline: string;
-            description?: string | null;
-            buttonText?: string | null;
-            buttonMessage?: string | null;
-            footnote?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'cta';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            subtitle?: string | null;
-            columns?: ('2' | '3' | '4') | null;
-            bgStyle?: ('white' | 'warm') | null;
-            images: {
-              image?: (number | null) | Media;
-              imageUrlFallback?: string | null;
-              caption?: string | null;
-              tag?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'gallery';
-          }
-        | {
-            /**
-             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
-             */
-            template: number | BlockTemplate;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'templateRef';
-          }
-      )[]
-    | null;
+  slug: string;
   /**
-   * Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.
+   * Hubungkan artikel ini dengan layanan komersial dan artikel lain untuk memperkuat SEO & konversi.
    */
-  showWhatsAppCta?: boolean | null;
-  /**
-   * Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya soal kemitraan
-   */
-  whatsappCustomMessage?: string | null;
+  internalLinking?: {
+    /**
+     * Centang jika artikel ini adalah panduan komprehensif utama (pillar of content) untuk satu topik besar.
+     */
+    isPillarArticle?: boolean | null;
+    /**
+     * Pilih artikel pilar yang menjadi induk dari artikel pendukung (cluster content) ini.
+     */
+    parentPillar?: (number | null) | Article;
+    /**
+     * Sangat disarankan: hubungkan minimal 1 layanan relevan agar Bunda bisa langsung reservasi homecare.
+     */
+    relatedServices?: (number | Service)[] | null;
+    /**
+     * Pilih 2-4 artikel edukasi relevan untuk direkomendasikan kepada pembaca.
+     */
+    relatedArticles?: (number | Article)[] | null;
+    /**
+     * Hubungkan dengan area jangkauan (misal: Surabaya Timur, Sidoarjo) jika artikel menyinggung lokasi.
+     */
+    relatedAreas?: (number | ServiceArea)[] | null;
+  };
   /**
    * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
    */
@@ -1527,6 +1887,64 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * URL lama yang ingin dialihkan. Contoh: /promo-selapan atau /layanan-lama
+   */
+  from: string;
+  /**
+   * URL halaman baru tujuan pengalihan. Contoh: /layanan/bundle-selapan
+   */
+  to: string;
+  /**
+   * Pilih 301 agar Google mentransfer otoritas ranking lama ke URL baru.
+   */
+  type: '301' | '302';
+  active?: boolean | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  name: string;
+  /**
+   * Menentukan menu apa saja yang dapat dilihat dan diedit oleh pengguna ini di dashboard.
+   */
+  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing';
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  hasAPIKey?: boolean | null;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1550,20 +1968,36 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'help-center';
+        value: number | HelpCenter;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'landing-pages';
+        value: number | LandingPage;
       } | null)
     | ({
-        relationTo: 'articles';
-        value: number | Article;
+        relationTo: 'page-templates';
+        value: number | PageTemplate;
+      } | null)
+    | ({
+        relationTo: 'block-templates';
+        value: number | BlockTemplate;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'services';
         value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'midwives';
+        value: number | Midwife;
+      } | null)
+    | ({
+        relationTo: 'service-areas';
+        value: number | ServiceArea;
       } | null)
     | ({
         relationTo: 'testimonials';
@@ -1574,28 +2008,20 @@ export interface PayloadLockedDocument {
         value: number | Faq;
       } | null)
     | ({
-        relationTo: 'service-areas';
-        value: number | ServiceArea;
+        relationTo: 'articles';
+        value: number | Article;
       } | null)
     | ({
-        relationTo: 'midwives';
-        value: number | Midwife;
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
     | ({
-        relationTo: 'landing-pages';
-        value: number | LandingPage;
-      } | null)
-    | ({
-        relationTo: 'pages';
-        value: number | Page;
-      } | null)
-    | ({
-        relationTo: 'block-templates';
-        value: number | BlockTemplate;
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1641,105 +2067,1049 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "help-center_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface HelpCenterSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  order?: T;
+  summary?: T;
+  steps?:
     | T
     | {
+        stepNumber?: T;
+        stepTitle?: T;
+        stepDetail?: T;
         id?: T;
-        createdAt?: T;
-        expiresAt?: T;
       };
+  dosAndDonts?:
+    | T
+    | {
+        dos?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+        donts?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "landing-pages_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
+export interface LandingPagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  refCode?: T;
+  active?: T;
+  activePixels?: T;
+  campaignBaseRef?: T;
+  variant?: T;
+  layout?:
     | T
     | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
         hero?:
           | T
           | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              imageAlt?: T;
+              align?: T;
+              btnColor?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              background?: T;
+              spacing?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              layoutStyle?: T;
+              background?: T;
+              spacing?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        midwifeSpotlight?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              background?: T;
+              spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+        templateRef?:
+          | T
+          | {
+              template?: T;
+              id?: T;
+              blockName?: T;
             };
       };
+  price?: T;
+  duration?: T;
+  headline?: T;
+  subheadline?: T;
+  painPoints?:
+    | T
+    | {
+        point?: T;
+        id?: T;
+      };
+  solutions?:
+    | T
+    | {
+        title?: T;
+        desc?: T;
+        id?: T;
+      };
+  steps?:
+    | T
+    | {
+        num?: T;
+        title?: T;
+        desc?: T;
+        id?: T;
+      };
+  testimonial?:
+    | T
+    | {
+        quote?: T;
+        author?: T;
+        area?: T;
+      };
+  faqs?:
+    | T
+    | {
+        q?: T;
+        a?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles_select".
+ * via the `definition` "page-templates_select".
  */
-export interface ArticlesSelect<T extends boolean = true> {
-  title?: T;
+export interface PageTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
   category?: T;
-  pubDate?: T;
-  updatedDate?: T;
-  author?: T;
-  authorTitle?: T;
-  medicalReviewer?: T;
+  description?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              imageAlt?: T;
+              align?: T;
+              btnColor?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              background?: T;
+              spacing?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              layoutStyle?: T;
+              background?: T;
+              spacing?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        midwifeSpotlight?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              background?: T;
+              spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+        templateRef?:
+          | T
+          | {
+              template?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "block-templates_select".
+ */
+export interface BlockTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  category?: T;
+  description?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              imageAlt?: T;
+              align?: T;
+              btnColor?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              background?: T;
+              spacing?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              layoutStyle?: T;
+              background?: T;
+              spacing?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        midwifeSpotlight?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              background?: T;
+              spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
   description?: T;
   heroImage?: T;
-  heroImageUrlFallback?: T;
-  heroImageAlt?: T;
-  keywords?:
-    | T
-    | {
-        keyword?: T;
-        id?: T;
-      };
   content?: T;
-  slug?: T;
-  internalLinking?:
+  layout?:
     | T
     | {
-        isPillarArticle?: T;
-        parentPillar?: T;
-        relatedServices?: T;
-        relatedArticles?: T;
-        relatedAreas?: T;
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              imageAlt?: T;
+              align?: T;
+              btnColor?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              background?: T;
+              spacing?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              layoutStyle?: T;
+              background?: T;
+              spacing?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        midwifeSpotlight?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              background?: T;
+              spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+        templateRef?:
+          | T
+          | {
+              template?: T;
+              id?: T;
+              blockName?: T;
+            };
       };
+  showWhatsAppCta?: T;
+  whatsappCustomMessage?: T;
   seo?:
     | T
     | {
@@ -1800,35 +3170,34 @@ export interface ServicesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials_select".
+ * via the `definition` "midwives_select".
  */
-export interface TestimonialsSelect<T extends boolean = true> {
-  author?: T;
-  area?: T;
-  service?: T;
-  relatedService?: T;
-  relatedArea?: T;
-  quote?: T;
+export interface MidwivesSelect<T extends boolean = true> {
+  name?: T;
+  title?: T;
+  strNumber?: T;
   photo?: T;
-  permissionGranted?: T;
-  date?: T;
-  order?: T;
+  experienceYears?: T;
+  specialties?:
+    | T
+    | {
+        specialty?: T;
+        id?: T;
+      };
+  bio?: T;
+  slug?: T;
   active?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faq_select".
- */
-export interface FaqSelect<T extends boolean = true> {
-  question?: T;
-  answer?: T;
-  category?: T;
-  relatedServices?: T;
-  relatedAreas?: T;
-  order?: T;
-  active?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1871,535 +3240,72 @@ export interface ServiceAreasSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "midwives_select".
+ * via the `definition` "testimonials_select".
  */
-export interface MidwivesSelect<T extends boolean = true> {
-  name?: T;
-  title?: T;
-  strNumber?: T;
+export interface TestimonialsSelect<T extends boolean = true> {
+  author?: T;
+  area?: T;
+  service?: T;
+  relatedService?: T;
+  relatedArea?: T;
+  quote?: T;
   photo?: T;
-  experienceYears?: T;
-  specialties?:
-    | T
-    | {
-        specialty?: T;
-        id?: T;
-      };
-  bio?: T;
-  slug?: T;
+  permissionGranted?: T;
+  externalRef?: T;
+  date?: T;
+  order?: T;
   active?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        focusKeyword?: T;
-        ogImage?: T;
-        canonicalUrl?: T;
-        noIndex?: T;
-        isSubstantiveUpdate?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "redirects_select".
+ * via the `definition` "faq_select".
  */
-export interface RedirectsSelect<T extends boolean = true> {
-  from?: T;
-  to?: T;
-  type?: T;
+export interface FaqSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  category?: T;
+  relatedServices?: T;
+  relatedAreas?: T;
+  order?: T;
   active?: T;
-  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "landing-pages_select".
+ * via the `definition` "articles_select".
  */
-export interface LandingPagesSelect<T extends boolean = true> {
+export interface ArticlesSelect<T extends boolean = true> {
   title?: T;
-  slug?: T;
-  refCode?: T;
-  active?: T;
-  layout?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              subheadline?: T;
-              price?: T;
-              originalPrice?: T;
-              duration?: T;
-              ctaText?: T;
-              ctaMessage?: T;
-              image?: T;
-              bgStyle?: T;
-              id?: T;
-              blockName?: T;
-            };
-        painPoints?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              points?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        solutions?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              highlightQuote?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        pricing?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              packages?:
-                | T
-                | {
-                    name?: T;
-                    target?: T;
-                    price?: T;
-                    originalPrice?: T;
-                    duration?: T;
-                    description?: T;
-                    isPopular?: T;
-                    popularBadge?: T;
-                    features?:
-                      | T
-                      | {
-                          feature?: T;
-                          id?: T;
-                        };
-                    ctaText?: T;
-                    refCode?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        comparison?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              kalaLabel?: T;
-              otherLabel?: T;
-              rows?:
-                | T
-                | {
-                    feature?: T;
-                    kalaValue?: T;
-                    otherValue?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        steps?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              steps?:
-                | T
-                | {
-                    num?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        testimonials?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                    role?: T;
-                    area?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        guarantee?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              description?: T;
-              note?: T;
-              id?: T;
-              blockName?: T;
-            };
-        faq?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              faqs?:
-                | T
-                | {
-                    q?: T;
-                    a?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        richText?:
-          | T
-          | {
-              content?: T;
-              containerWidth?: T;
-              id?: T;
-              blockName?: T;
-            };
-        cta?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              description?: T;
-              buttonText?: T;
-              buttonMessage?: T;
-              footnote?: T;
-              id?: T;
-              blockName?: T;
-            };
-        gallery?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              columns?: T;
-              bgStyle?: T;
-              images?:
-                | T
-                | {
-                    image?: T;
-                    imageUrlFallback?: T;
-                    caption?: T;
-                    tag?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        templateRef?:
-          | T
-          | {
-              template?: T;
-              id?: T;
-              blockName?: T;
-            };
-      };
-  price?: T;
-  duration?: T;
-  headline?: T;
-  subheadline?: T;
-  painPoints?:
-    | T
-    | {
-        point?: T;
-        id?: T;
-      };
-  solutions?:
-    | T
-    | {
-        title?: T;
-        desc?: T;
-        id?: T;
-      };
-  steps?:
-    | T
-    | {
-        num?: T;
-        title?: T;
-        desc?: T;
-        id?: T;
-      };
-  testimonial?:
-    | T
-    | {
-        quote?: T;
-        author?: T;
-        area?: T;
-      };
-  faqs?:
-    | T
-    | {
-        q?: T;
-        a?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
- */
-export interface PagesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
+  category?: T;
+  pubDate?: T;
+  updatedDate?: T;
+  author?: T;
+  authorTitle?: T;
+  medicalReviewer?: T;
   description?: T;
   heroImage?: T;
-  content?: T;
-  layout?:
+  heroImageUrlFallback?: T;
+  heroImageAlt?: T;
+  keywords?:
     | T
     | {
-        hero?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              subheadline?: T;
-              price?: T;
-              originalPrice?: T;
-              duration?: T;
-              ctaText?: T;
-              ctaMessage?: T;
-              image?: T;
-              bgStyle?: T;
-              id?: T;
-              blockName?: T;
-            };
-        painPoints?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              points?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        solutions?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              highlightQuote?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        pricing?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              packages?:
-                | T
-                | {
-                    name?: T;
-                    target?: T;
-                    price?: T;
-                    originalPrice?: T;
-                    duration?: T;
-                    description?: T;
-                    isPopular?: T;
-                    popularBadge?: T;
-                    features?:
-                      | T
-                      | {
-                          feature?: T;
-                          id?: T;
-                        };
-                    ctaText?: T;
-                    refCode?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        comparison?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              kalaLabel?: T;
-              otherLabel?: T;
-              rows?:
-                | T
-                | {
-                    feature?: T;
-                    kalaValue?: T;
-                    otherValue?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        steps?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              steps?:
-                | T
-                | {
-                    num?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        testimonials?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                    role?: T;
-                    area?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        guarantee?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              description?: T;
-              note?: T;
-              id?: T;
-              blockName?: T;
-            };
-        faq?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              faqs?:
-                | T
-                | {
-                    q?: T;
-                    a?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        richText?:
-          | T
-          | {
-              content?: T;
-              containerWidth?: T;
-              id?: T;
-              blockName?: T;
-            };
-        cta?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              description?: T;
-              buttonText?: T;
-              buttonMessage?: T;
-              footnote?: T;
-              id?: T;
-              blockName?: T;
-            };
-        gallery?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              columns?: T;
-              bgStyle?: T;
-              images?:
-                | T
-                | {
-                    image?: T;
-                    imageUrlFallback?: T;
-                    caption?: T;
-                    tag?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        templateRef?:
-          | T
-          | {
-              template?: T;
-              id?: T;
-              blockName?: T;
-            };
+        keyword?: T;
+        id?: T;
       };
-  showWhatsAppCta?: T;
-  whatsappCustomMessage?: T;
+  content?: T;
+  slug?: T;
+  internalLinking?:
+    | T
+    | {
+        isPillarArticle?: T;
+        parentPillar?: T;
+        relatedServices?: T;
+        relatedArticles?: T;
+        relatedAreas?: T;
+      };
   seo?:
     | T
     | {
@@ -2417,219 +3323,88 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "block-templates_select".
+ * via the `definition` "media_select".
  */
-export interface BlockTemplatesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  category?: T;
-  description?: T;
-  layout?:
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
     | T
     | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
         hero?:
           | T
           | {
-              badge?: T;
-              headline?: T;
-              subheadline?: T;
-              price?: T;
-              originalPrice?: T;
-              duration?: T;
-              ctaText?: T;
-              ctaMessage?: T;
-              image?: T;
-              bgStyle?: T;
-              id?: T;
-              blockName?: T;
-            };
-        painPoints?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              points?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        solutions?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              highlightQuote?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        pricing?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              packages?:
-                | T
-                | {
-                    name?: T;
-                    target?: T;
-                    price?: T;
-                    originalPrice?: T;
-                    duration?: T;
-                    description?: T;
-                    isPopular?: T;
-                    popularBadge?: T;
-                    features?:
-                      | T
-                      | {
-                          feature?: T;
-                          id?: T;
-                        };
-                    ctaText?: T;
-                    refCode?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        comparison?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              kalaLabel?: T;
-              otherLabel?: T;
-              rows?:
-                | T
-                | {
-                    feature?: T;
-                    kalaValue?: T;
-                    otherValue?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        steps?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              steps?:
-                | T
-                | {
-                    num?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        testimonials?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                    role?: T;
-                    area?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        guarantee?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              description?: T;
-              note?: T;
-              id?: T;
-              blockName?: T;
-            };
-        faq?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              faqs?:
-                | T
-                | {
-                    q?: T;
-                    a?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        richText?:
-          | T
-          | {
-              content?: T;
-              containerWidth?: T;
-              id?: T;
-              blockName?: T;
-            };
-        cta?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              description?: T;
-              buttonText?: T;
-              buttonMessage?: T;
-              footnote?: T;
-              id?: T;
-              blockName?: T;
-            };
-        gallery?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              columns?: T;
-              bgStyle?: T;
-              images?:
-                | T
-                | {
-                    image?: T;
-                    imageUrlFallback?: T;
-                    caption?: T;
-                    tag?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  type?: T;
+  active?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  hasAPIKey?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2694,6 +3469,25 @@ export interface SiteSetting {
    */
   operationalHours?: string | null;
   /**
+   * Jadwal terstruktur yang dibaca langsung oleh Kala Clinic Bot untuk kalkulasi ketersediaan live CS vs antrean luar jam kerja.
+   */
+  operationalSchedule?: {
+    timezone?: string | null;
+    days?:
+      | {
+          day: '0' | '1' | '2' | '3' | '4' | '5' | '6';
+          closed?: boolean | null;
+          open?: string | null;
+          close?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Pesan otomatis yang dikirimkan oleh Bot WA jika pasien chat di luar jam kerja.
+     */
+    afterHoursAnnouncement?: string | null;
+  };
+  /**
    * Badge penanda di atas judul beranda (contoh: ✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes)
    */
   heroBadgeText?: string | null;
@@ -2736,6 +3530,21 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   whatsappNumberFormatted?: T;
   instagram?: T;
   operationalHours?: T;
+  operationalSchedule?:
+    | T
+    | {
+        timezone?: T;
+        days?:
+          | T
+          | {
+              day?: T;
+              closed?: T;
+              open?: T;
+              close?: T;
+              id?: T;
+            };
+        afterHoursAnnouncement?: T;
+      };
   heroBadgeText?: T;
   socialProofText?: T;
   bannerGroup?:

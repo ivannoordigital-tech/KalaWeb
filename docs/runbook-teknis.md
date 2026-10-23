@@ -17,12 +17,12 @@ Dokumen panduan operasional teknis, pemulihan bencana (disaster recovery), rotas
                   ┌──────────┴──────────┐
                   ▼                     ▼
           [PostgreSQL DB]       [Cloudflare R2]
-          (Data & Relasi)       (Media & Aset Gambar)
+          (kala_cms_db)         (Media & Aset Gambar)
 ```
 
-- **Frontend:** Astro 5 SSG di Cloudflare Pages.
-- **CMS:** Payload CMS 3.x (Next.js) di VPS Linux.
-- **Database:** PostgreSQL di VPS.
+- **Frontend:** Astro 5 SSG di Cloudflare Pages / Workers.
+- **CMS:** Payload CMS 3.x (Next.js 15) di VPS Linux via Docker (`kala-cms-app`).
+- **Database:** PostgreSQL di VPS (`kala_cms_db` dengan user `kala_cms_user`).
 - **Media Storage:** Cloudflare R2 via S3 Storage Adapter.
 - **Deploy Trigger:** Debounced Deploy Hook (60s cooldown, 2.5s DB safety delay).
 
@@ -35,7 +35,7 @@ Script backup otomatis terletak di:
 `apps/cms/scripts/backup-postgres.sh`
 
 Karakteristik:
-- Dump terkompresi `gzip` disimpan secara lokal di `/var/backups/postgres`.
+- Dump terkompresi `gzip` disimpan secara lokal di `/var/backups/kala-postgres`.
 - Rotasi lokal otomatis: menghapus backup yang lebih tua dari 30 hari.
 - Diunggah ke bucket Cloudflare R2 (`s3cmd` / `aws cli` atau `rclone`).
 - Penjadwalan via cron harian:
@@ -51,21 +51,20 @@ Script restore terletak di:
 Langkah-langkah:
 1. Pastikan layanan Payload dihentikan sementara:
    ```bash
-   sudo systemctl stop kala-cms
+   cd /var/www/kalaweb/apps/cms && docker compose stop cms
    ```
 2. Jalankan perintah restore dengan menentukan file backup:
    ```bash
-   /var/www/kalaweb/apps/cms/scripts/restore-postgres.sh /var/backups/postgres/kala_cms_20261020_020000.sql.gz
+   /var/www/kalaweb/apps/cms/scripts/restore-postgres.sh /var/backups/kala-postgres/kala_cms_db_20261020_020000.sql.gz
    ```
 3. Verifikasi data:
    ```bash
-   sudo -u postgres psql -d kala_cms -c "SELECT count(*) FROM articles;"
-   sudo -u postgres psql -d kala_cms -c "SELECT count(*) FROM services;"
+   sudo -u postgres psql -d kala_cms_db -c "SELECT count(*) FROM articles;"
+   sudo -u postgres psql -d kala_cms_db -c "SELECT count(*) FROM services;"
    ```
 4. Nyalakan kembali layanan Payload CMS:
    ```bash
-   sudo systemctl start kala-cms
-   sudo systemctl status kala-cms
+   cd /var/www/kalaweb/apps/cms && docker compose start cms
    ```
 
 ---
@@ -77,15 +76,16 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
 ### 3.1 Database Password
 1. Ganti password di PostgreSQL:
    ```sql
-   ALTER USER kala_user WITH PASSWORD 'PasswordBaruYangSangatKuatDanPanjang123!';
+   ALTER USER kala_cms_user WITH PASSWORD 'PasswordBaruYangSangatKuatDanPanjang123!';
    ```
 2. Perbarui `DATABASE_URI` di file `apps/cms/.env`:
    ```env
-   DATABASE_URI=postgresql://kala_user:PasswordBaruYangSangatKuatDanPanjang123!@127.0.0.1:5432/kala_cms
+   CMS_DB_PASSWORD=PasswordBaruYangSangatKuatDanPanjang123%21
+   DATABASE_URI=postgresql://kala_cms_user:PasswordBaruYangSangatKuatDanPanjang123%21@postgres:5432/kala_cms_db
    ```
 3. Restart CMS:
    ```bash
-   sudo systemctl restart kala-cms
+   cd /var/www/kalaweb/apps/cms && docker compose restart cms
    ```
 
 ### 3.2 Payload CMS Secret
@@ -119,11 +119,34 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
 
 ---
 
-## 5. Proteksi & Hardening VPS
+## 5. Integrasi Database Bersama (PostgreSQL VPS ↔ WA Clinic Bot)
+
+### 5.1 Isolasi Multi-Database
+PostgreSQL di VPS melayani dua sistem secara independen dalam 1 Docker network (`wa-clinic-bot_default`):
+- `wa_clinic_db` (Milik Bot WA: Pasien, Chat, Booking, Penugasan Bidan)
+- `kala_cms_db` (Milik CMS: Master Katalog Layanan, Artikel E-E-A-T, Testimoni, Settings)
+
+User `kala_cms_user` hanya memiliki hak akses ke `kala_cms_db` dan schema `public`-nya, tidak bisa mengakses tabel percakapan/medis bot.
+
+### 5.2 Referensi Kunci Alami (Natural Keys)
+- **Layanan:** `services.refCode` (unik, misal: `KALA-SRV-DUO`)
+- **Bidan:** `midwives.strNumber` (unik, nomor STR Kemenkes RI)
+- **Area Layanan:** `service-areas.slug` (unik, misal: `surabaya-barat`)
+- **Jam Kerja:** `site-settings.operationalSchedule` (format JSON terstruktur)
+
+### 5.3 Akses Bot ke API CMS
+Bot WA memanggil CMS via internal Docker URL:
+- Header: `Authorization: users API-Key <CMS_BOT_API_KEY>`
+- Ambil Katalog: `GET http://kala-cms-app:3000/api/services?where[active][equals]=true&sort=order&depth=0&limit=100`
+- Kirim Feedback Pasien: `POST http://kala-cms-app:3000/api/testimonials` (status otomatis `active: false` untuk di-review admin)
+
+---
+
+## 6. Proteksi & Hardening VPS
 
 1. **Firewall (UFW):**
    - Hanya buka port `22` (SSH, disarankan non-standar), `80` (HTTP), dan `443` (HTTPS).
-   - Port `5432` (Postgres) **dilarang dibuka ke publik** (bind ke `127.0.0.1`).
+   - Port `5432` (Postgres) **dilarang dibuka ke publik** (bind ke internal docker / `127.0.0.1`).
 2. **Cloudflare Zero Trust / Access:**
    - Pasang proteksi Cloudflare Access di depan `admin.kalababyspa.com` (OTP via email/2FA).
 3. **Fail2ban:**
@@ -131,12 +154,12 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
 4. **Monitoring Uptime:**
    - Pasang UptimeRobot atau Better Stack pada:
      - `https://kalababyspa.com` (Target respons < 300ms)
-     - `https://admin.kalababyspa.com/api/health`
+     - `https://admin.kalababyspa.com/api/deploy-status`
    - Integrasikan alert langsung ke WhatsApp/Telegram PIC.
 
 ---
 
-## 6. Matriks Kontak & Eskalasi Darurat
+## 7. Matriks Kontak & Eskalasi Darurat
 
 | Peran | Tanggung Jawab | Jalur Komunikasi |
 | :--- | :--- | :--- |

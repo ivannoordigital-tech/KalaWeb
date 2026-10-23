@@ -263,7 +263,8 @@ export const Services: CollectionConfig = {
       name: 'refCode',
       type: 'text',
       required: true,
-      label: 'Kode Ref Tracking WhatsApp',
+      unique: true,
+      label: 'Kode Ref Tracking WhatsApp (Unik)',
       admin: {
         position: 'sidebar',
         description: 'Kode identifikasi unik untuk melacak konversi di bot WA. Contoh: KALA-SRV-DUO',

@@ -17,14 +17,14 @@ RETENTION_DAYS=30
 DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-5432}"
 DB_NAME="${DB_NAME:-kala_cms_db}"
-DB_USER="${DB_USER:-postgres}"
+DB_USER="${DB_USER:-kala_cms_user}"
 
 mkdir -p "${BACKUP_DIR}"
 
-echo "[$(date)] Starting PostgreSQL backup for ${DB_NAME}..."
+echo "[$(date)] Starting PostgreSQL backup for ${DB_NAME} (User: ${DB_USER})..."
 
 # Export database with pg_dump and gzip compression
-PGPASSWORD="${DB_PASSWORD:-postgres}" pg_dump \
+PGPASSWORD="${DB_PASSWORD:-${CMS_DB_PASSWORD:-}}" pg_dump \
   -h "${DB_HOST}" \
   -p "${DB_PORT}" \
   -U "${DB_USER}" \
