@@ -11,7 +11,7 @@ interface Props {
 const {
   phone = siteConfig.whatsappNumber,
   refCode = 'KALA-MOB-BAR',
-  priceNote = 'Mulai Rp60.000',
+  priceNote = `Mulai ${siteConfig.promotion.price}`,
 } = Astro.props;
 ---
 

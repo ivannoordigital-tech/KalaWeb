@@ -31,14 +31,17 @@ const variantStyles = {
   nav: 'bg-[#128C4A] hover:bg-[#0E6C38] text-white font-semibold py-2 px-4 rounded-full shadow-sm hover:shadow transition-all duration-200 inline-flex items-center justify-center gap-1.5 text-sm',
   floating: 'fixed bottom-5 right-5 z-50 bg-[#128C4A] hover:bg-[#0E6C38] text-white p-3.5 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2',
   card: 'w-full bg-[#128C4A] hover:bg-[#0E6C38] text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm text-center',
+  promo: 'bg-[#F5C24E] hover:bg-[#F7CE6A] text-[#3A2A00] font-extrabold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2.5 text-base',
 };
+
+const focusStyles = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2552B] focus-visible:ring-offset-2';
 ---
 
 <a
   href={baseWaUrl}
   target="_blank"
   rel="noopener noreferrer"
-  class={`kala-wa-btn ${variantStyles[variant]} ${className}`}
+  class={`kala-wa-btn ${variantStyles[variant]} ${focusStyles} ${className}`}
   data-ref-code={refCode}
   data-base-msg={defaultMessage}
   data-phone={phone}

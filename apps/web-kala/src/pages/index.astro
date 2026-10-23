@@ -1,17 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
-import ValueProps from '../components/ValueProps.astro';
 import FeaturedServices from '../components/FeaturedServices.astro';
+import ValueProps from '../components/ValueProps.astro';
 import Testimonials from '../components/Testimonials.astro';
 import CoverageArea from '../components/CoverageArea.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
-import { getCollection } from 'astro:content';
-import { fetchSiteSettings } from '../lib/payload';
+import { fetchSiteSettings, fetchPayloadFAQs } from '../lib/payload';
 import { siteConfig } from '../config/site';
-
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const latestPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
 
 const cmsSettings = await fetchSiteSettings();
 const siteSettings = {
@@ -22,102 +18,324 @@ const siteSettings = {
   operationalHours: cmsSettings?.operationalHours || siteConfig.operationalHours,
   socialProofText: cmsSettings?.socialProofText || siteConfig.socialProofText,
   heroBadgeText: cmsSettings?.heroBadgeText || '✨ Bidan Resmi Ber-STR',
-  announcementBanner: cmsSettings?.announcementBanner || '',
-  coverageAreas: cmsSettings?.coverageAreas?.length ? cmsSettings.coverageAreas.map((c) => c.area) : siteConfig.coverageAreas,
 };
+
+const cmsFaqs = await fetchPayloadFAQs();
+const capacityFaq = siteConfig.faqs.find(
+  (faq) => faq.question === 'Berapa sesi yang bisa dijadwalkan setiap hari?'
+);
+const faqs = cmsFaqs.length > 0
+  ? [
+      ...cmsFaqs.map((item) => ({ question: item.question, answer: item.answer })),
+      ...(capacityFaq && !cmsFaqs.some((item) => item.question === capacityFaq.question)
+        ? [capacityFaq]
+        : []),
+    ]
+  : siteConfig.faqs;
+
+const painPoints = [
+  {
+    title: 'Bayi rewel dan susah tidur',
+    description: 'Menangis tanpa sebab yang jelas, malam jadi panjang, Bunda dan Papa kelelahan.',
+  },
+  {
+    title: 'Perut kembung dan gelisah',
+    description: 'Menarik kaki ke perut sambil menangis. Bunda ingin membantu tapi bingung harus mulai dari mana.',
+  },
+  {
+    title: 'Bingung soal stimulasi',
+    description: 'Informasi di internet banyak dan saling bertentangan. Bunda ingin tahu yang aman untuk usia si kecil.',
+  },
+];
+
+const benefits = [
+  {
+    title: 'Lebih rileks menjelang tidur',
+    description: 'Banyak orang tua melaporkan bayi tampak lebih tenang setelah dipijat.',
+  },
+  {
+    title: 'Perut lebih nyaman',
+    description: 'Teknik pijat perut lembut untuk membantu bayi yang sering kembung.',
+  },
+  {
+    title: 'Stimulasi sesuai usia',
+    description: 'Gerakan disesuaikan tahap tumbuh kembang, plus panduan lanjutan di rumah.',
+  },
+  {
+    title: 'Bonding Bunda dan bayi',
+    description: 'Bunda bisa ikut belajar sentuhan yang menenangkan.',
+  },
+];
+
+const bookingSteps = [
+  {
+    title: 'Konsultasi gratis',
+    description: 'Ceritakan usia dan kondisi si kecil. Bidan kami sarankan layanan yang paling sesuai.',
+  },
+  {
+    title: 'Pilih hari dan jam',
+    description: 'Kuota maksimal 5 sesi per hari. Jadwal dan area dikonfirmasi lewat WhatsApp.',
+  },
+  {
+    title: 'Bidan datang ke rumah',
+    description: 'Kami membawa semua perlengkapan. Bunda cukup menyiapkan ruang yang nyaman.',
+  },
+  {
+    title: 'Lanjutkan di rumah',
+    description: 'Bunda mendapat panduan sederhana untuk stimulasi harian.',
+  },
+];
 ---
 
 <BaseLayout
-  title="Kala Moms and Baby Spa"
-  description="Layanan perawatan ibu dan bayi di rumah oleh bidan profesional ber-STR resmi di Surabaya dan Sidoarjo. Menghadirkan kenyamanan, higienitas steril, dan zero mom-shaming."
+  title="Baby Spa Homecare Surabaya & Sidoarjo"
+  description="Baby massage, pijat newborn, dan pijat nifas homecare di Surabaya & Sidoarjo oleh bidan ber-STR. Konsultasi gratis via WhatsApp."
   schemaType="home"
 >
-  <!-- Hero Section -->
   <Hero siteSettings={siteSettings} />
 
-  <!-- 5 Pembeda Keunggulan Bidan Kala -->
-  <ValueProps />
-
-  <!-- 3 Layanan Unggulan + WhatsApp Catalog -->
-  <FeaturedServices />
-
-  <!-- 3 Cuplikan Cerita Nyata Bunda -->
-  <Testimonials />
-
-  <!-- Area Jangkauan Homecare Surabaya & Sidoarjo -->
-  <CoverageArea />
-
-  <!-- Section Blog Edukasi Pilar -->
-  <section class="py-16 md:py-24 bg-white border-t border-[#F6DCCD]/80">
+  <section id="keluhan" class="py-16 md:py-24 bg-[#FFD9C4]/50">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
-        <div>
-          <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
-            Edukasi Kebidanan & Pediatrik
-          </span>
-          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4">
-            Artikel & Panduan Medis untuk Bunda
-          </h2>
-          <p class="text-sm sm:text-base text-[#86675A] mt-2 max-w-xl">
-            Materi berbasis panduan kebidanan resmi untuk mendampingi masa adaptasi Bunda dan si kecil dengan tenang.
-          </p>
-        </div>
-        <div class="mt-4 md:mt-0">
-          <a href="/blog" class="inline-flex items-center text-sm font-bold text-[#C2552B] hover:underline gap-1">
-            Lihat Semua Artikel →
-          </a>
-        </div>
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-white px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Kenali Kebutuhannya
+        </span>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Apakah ini yang sedang Bunda alami?
+        </h2>
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
+          Bunda tidak perlu menghadapinya sendiri. Bidan Kala datang ke rumah untuk membantu dengan pendekatan yang tenang dan sesuai usia bayi.
+        </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {latestPosts.map((post) => (
-          <article class="bg-[#FFF9F4] rounded-3xl border border-[#F6DCCD] overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300">
-            <div class="p-7">
-              <div class="flex items-center justify-between text-xs text-[#86675A] mb-3">
-                <span class="px-2.5 py-1 bg-[#FFEFE5] text-[#C2552B] font-semibold rounded-lg border border-[#F6DCCD] uppercase tracking-wider text-[10px]">
-                  {post.data.category}
-                </span>
-                <span>{new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(post.data.pubDate)}</span>
-              </div>
-              <h3 class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22] mb-3 leading-snug hover:text-[#C2552B] transition-colors">
-                <a href={`/blog/${post.slug}`}>
-                  {post.data.title}
-                </a>
-              </h3>
-              <p class="text-xs sm:text-sm text-[#86675A] line-clamp-3 leading-relaxed">
-                {post.data.description}
-              </p>
-            </div>
-
-            <div class="p-7 pt-0 border-t border-[#F6DCCD]/60 mt-4 flex items-center justify-between text-xs">
-              <span class="text-[#86675A]">Oleh <strong class="text-[#4B2E22]">{post.data.author}</strong></span>
-              <a href={`/blog/${post.slug}`} class="font-bold text-[#C2552B] hover:underline flex items-center gap-0.5">
-                Baca Selengkapnya →
-              </a>
-            </div>
-          </article>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {painPoints.map((item) => (
+          <div class="bg-white rounded-3xl border border-[#F6DCCD] p-7 shadow-sm">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FFEFE5] text-[#C2552B] font-brand font-bold">
+              !
+            </span>
+            <h3 class="font-brand font-bold text-lg text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
+            <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+          </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- Final Call to Action -->
-  <section class="py-16 bg-gradient-to-r from-[#FFD9C4] via-[#FFEFE5] to-[#FFD9C4] border-t border-[#F6DCCD] text-center">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-4">
-        Siap Menyambut Bidan Kala ke Rumah Anda?
-      </h2>
-      <p class="text-sm sm:text-base text-[#86675A] max-w-xl mx-auto mb-8 leading-relaxed">
-        Pilih waktu terbaik Bunda. Bidan profesional kami siap hadir mendampingi pemulihan ibu dan relaksasi si kecil dengan higienitas terjamin.
+  <section id="manfaat" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Setelah Sesi
+        </span>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Yang biasa Bunda rasakan setelah sesi
+        </h2>
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
+          Sentuhan yang tepat dan lembut membantu bayi lebih nyaman. Hasil tiap bayi bisa berbeda.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {benefits.map((item) => (
+          <div class="rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] p-6">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FFD9C4] text-[#C2552B] font-bold">
+              ✓
+            </span>
+            <h3 class="font-brand font-bold text-base text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
+            <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+          </div>
+        ))}
+      </div>
+
+      <p class="text-xs text-[#86675A] leading-relaxed text-center mt-8 max-w-2xl mx-auto">
+        Pijat bayi bersifat pendukung kenyamanan, bukan pengganti pemeriksaan dokter.
       </p>
-      <WhatsAppButton
-        refCode="KALA-HOME-BOTTOM"
-        message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-HOME-BOTTOM]"
-        text="Konsultasi & Reservasi Homecare Sekarang"
-        variant="primary"
-        className="text-base py-4 px-8"
-        phone={siteSettings.whatsappNumber}
-      />
+    </div>
+  </section>
+
+  <section id="promo" class="py-14 md:py-20 bg-[#FFF9F4]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative overflow-hidden rounded-[2rem] bg-[#A8431F] px-6 py-10 sm:px-10 md:grid md:grid-cols-[1.4fr_1fr] md:items-center md:gap-10 shadow-kala">
+        <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" aria-hidden="true"></div>
+        <div class="absolute -bottom-14 left-1/3 h-40 w-40 rounded-full bg-[#F5C24E]/10" aria-hidden="true"></div>
+
+        <div class="relative">
+          <span class="inline-block text-[11px] font-bold tracking-wider uppercase text-[#FFE3B0] bg-white/10 px-3 py-1 rounded-full">
+            Penawaran Reservasi Pertama
+          </span>
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-white mt-4 mb-3">
+            {siteConfig.promotion.title}
+          </h2>
+          <p class="text-sm sm:text-base text-white leading-relaxed">
+            {siteConfig.promotion.description}
+          </p>
+
+          <div class="mt-5 flex flex-wrap items-baseline gap-3">
+            <s class="text-lg text-white/80">{siteConfig.promotion.originalPrice}</s>
+            <b class="font-brand text-4xl sm:text-5xl text-[#F5C24E]">{siteConfig.promotion.price}</b>
+            <span class="text-xs font-extrabold uppercase tracking-wide text-[#3A2A00] bg-[#F5C24E] px-2.5 py-1 rounded-lg">
+              {siteConfig.promotion.badge}
+            </span>
+          </div>
+          <p class="text-xs text-white/90 mt-3">{siteConfig.promotion.note}</p>
+          <p class="mt-3 inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-[#FFE3B0]">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-[#F5C24E]" aria-hidden="true"></span>
+            {siteConfig.promotion.capacityNote}
+          </p>
+        </div>
+
+        <div class="relative mt-8 md:mt-0">
+          <WhatsAppButton
+            refCode={siteConfig.promotion.refCode}
+            message={siteConfig.promotion.message}
+            text="Ambil Promo via WhatsApp"
+            variant="promo"
+            className="w-full"
+            phone={siteSettings.whatsappNumber}
+          />
+          <p class="text-xs text-white/90 text-center mt-3">
+            {siteConfig.promotion.serviceName}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FeaturedServices phone={siteSettings.whatsappNumber} />
+
+  <ValueProps />
+
+  <section id="cara-reservasi" class="py-16 md:py-24 bg-[#FFF9F4]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Mudah & Cepat
+        </span>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Cara reservasi homecare
+        </h2>
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
+          Selesai dalam beberapa menit lewat WhatsApp, tanpa perlu keluar rumah.
+        </p>
+      </div>
+
+      <ol class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {bookingSteps.map((step, index) => (
+          <li class="relative rounded-3xl bg-white border border-[#F6DCCD] p-6">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#C2552B] text-white font-brand font-bold">
+              {index + 1}
+            </span>
+            <h3 class="font-brand font-bold text-base text-[#4B2E22] mt-4 mb-2">{step.title}</h3>
+            <p class="text-sm text-[#86675A] leading-relaxed">{step.description}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="text-center mt-10">
+        <WhatsAppButton
+          refCode="KALA-STEPS"
+          message="Halo Bidan Kala, saya mau reservasi homecare. Usia bayi: ______, area/kecamatan: ______ [ref: KALA-STEPS]"
+          text="Mulai Konsultasi Gratis"
+          variant="primary"
+          phone={siteSettings.whatsappNumber}
+        />
+      </div>
+    </div>
+  </section>
+
+  <Testimonials
+    socialProofText={siteSettings.socialProofText}
+    foundedYear={siteSettings.foundedYear}
+  />
+
+  <CoverageArea phone={siteSettings.whatsappNumber} />
+
+  <section id="faq" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-10 lg:gap-16">
+      <div>
+        <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          Tanya Jawab
+        </span>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+          Pertanyaan yang sering muncul
+        </h2>
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed mb-6">
+          Belum menemukan jawabannya? Bidan Kala siap membantu lewat WhatsApp pada jam operasional.
+        </p>
+        <WhatsAppButton
+          refCode="KALA-FAQ"
+          message="Halo Bidan Kala, saya mau tanya seputar layanan homecare [ref: KALA-FAQ]"
+          text="Tanya Langsung ke Bidan"
+          variant="secondary"
+          phone={siteSettings.whatsappNumber}
+        />
+        <p class="text-xs text-[#86675A] mt-4">Jam layanan: {siteSettings.operationalHours}</p>
+      </div>
+
+      <div class="faq space-y-3">
+        {faqs.map((faq, index) => (
+          <details class="group rounded-2xl border border-[#F6DCCD] bg-[#FFF9F4]" open={index === 0}>
+            <summary class="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-bold text-[#4B2E22]">
+              <span>{faq.question}</span>
+            </summary>
+            <p class="px-5 pb-5 text-sm leading-relaxed text-[#86675A]">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 md:py-24 bg-[#FFF9F4]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="rounded-[2rem] bg-[#A8431F] px-6 py-12 sm:px-12 text-center shadow-kala">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-white mb-4">
+          Beri si kecil awal yang nyaman
+        </h2>
+        <p class="text-sm sm:text-base text-white leading-relaxed max-w-xl mx-auto mb-8">
+          Chat sekarang untuk konsultasi gratis. Bidan Kala bantu pilih layanan yang tepat untuk usia dan kebutuhan si kecil.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <WhatsAppButton
+            refCode="KALA-FINAL"
+            message="Halo Bidan Kala, saya mau reservasi homecare. Usia bayi: ______, area/kecamatan: ______ [ref: KALA-FINAL]"
+            text="Chat WhatsApp Sekarang"
+            variant="promo"
+            className="w-full sm:w-auto"
+            phone={siteSettings.whatsappNumber}
+          />
+          <a
+            href="/layanan"
+            class="inline-flex w-full sm:w-auto items-center justify-center rounded-xl border border-white/40 px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5C24E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#A8431F]"
+          >
+            Lihat Semua Layanan
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq summary {
+    list-style: none;
+  }
+
+  .faq summary::after {
+    content: '+';
+    flex: none;
+    font-family: 'Fredoka', 'Nunito', sans-serif;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: #C2552B;
+    transition: transform 0.2s ease;
+  }
+
+  .faq details[open] summary::after {
+    transform: rotate(45deg);
+  }
+</style>

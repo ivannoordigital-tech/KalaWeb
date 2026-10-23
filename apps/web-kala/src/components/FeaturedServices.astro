@@ -3,6 +3,12 @@ import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
 import { fetchPayloadServices } from '../lib/payload';
 
+interface Props {
+  phone?: string;
+}
+
+const { phone = siteConfig.whatsappNumber } = Astro.props;
+
 const cmsServices = await fetchPayloadServices();
 const servicesList = cmsServices.length > 0
   ? cmsServices.slice(0, 3).map((s) => ({
@@ -94,6 +100,7 @@ const servicesList = cmsServices.length > 0
               message={service.message}
               text="Reservasi Layanan Ini"
               variant={service.popular ? 'primary' : 'card'}
+              phone={phone}
             />
           </div>
         </div>
@@ -117,6 +124,7 @@ const servicesList = cmsServices.length > 0
           message="Halo Bidan Kala, boleh minta pricelist dan katalog lengkap 39 layanan Kala? [ref: KALA-KATALOG]"
           text="Minta Katalog Lengkap 39 Menu via WhatsApp"
           variant="secondary"
+          phone={phone}
         />
       </div>
     </div>

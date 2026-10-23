@@ -151,6 +151,12 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
     />
   </head>
   <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22] pb-16 md:pb-0">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#4B2E22] focus:shadow-lg focus:ring-2 focus:ring-[#C2552B]"
+    >
+      Lewati ke konten utama
+    </a>
     <!-- Google Tag Manager (noscript) -->
     <noscript>
       <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
@@ -166,7 +172,7 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
 
     <Navbar siteSettings={siteSettings} />
 
-    <main class="flex-grow">
+    <main id="main-content" tabindex="-1" class="flex-grow focus:outline-none">
       <slot />
     </main>
 
