@@ -306,7 +306,16 @@ export async function fetchSiteSettings(): Promise<SiteSettingsData | null> {
       signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
-    return await res.json();
+    const data = await res.json();
+    if (data) {
+      if (typeof data.socialProofText === 'string') {
+        data.socialProofText = data.socialProofText.replace(/500\+\s*Bunda/gi, '1000+ Orang Tua').replace(/500\+/g, '1000+');
+      }
+      if (typeof data.heroBadgeText === 'string') {
+        data.heroBadgeText = data.heroBadgeText.replace(/500\+\s*Bunda/gi, '1000+ Orang Tua').replace(/500\+/g, '1000+');
+      }
+    }
+    return data;
   } catch (err) {
     handleFetchError('site-settings', err as Error);
     return null;

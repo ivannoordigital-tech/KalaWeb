@@ -11,7 +11,7 @@ Platform web resmi **Kala Moms and Baby Spa** (`kalababyspa.com`), dirancang den
 - **Hero Section:**
   - H1 Tunggal: *"Layanan Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional di Surabaya & Sidoarjo"*.
   - Tagline: *"Tumbuh Berkembang Bersama Kala — Bidan Sahabat Bunda"*.
-  - Social Proof terverifikasi: *"Dipercaya 500+ Bunda di Surabaya & Sidoarjo"*.
+  - Social Proof terverifikasi: *"Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo"*.
   - Tombol WhatsApp utama: `[ref: KALA-HOME]`.
 - **5 Pembeda Layanan:**
   1. Bidan resmi ber-STR dan berizin.

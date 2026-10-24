@@ -8,19 +8,12 @@ interface Props {
 }
 
 const { socialProofText, foundedYear } = Astro.props;
-const socialProof = socialProofText || siteConfig.socialProofText;
+const rawSocialProof = socialProofText || siteConfig.socialProofText;
+const socialProof = rawSocialProof.replace(/500\+\s*Bunda/gi, '1000+ Orang Tua').replace(/500\+/g, '1000+');
 const since = foundedYear || siteConfig.foundedYear;
 
-const cmsTestimonials = await fetchPayloadTestimonials();
-const testimonialsList = cmsTestimonials.length > 0
-  ? cmsTestimonials.slice(0, 3).map((t) => ({
-      quote: t.quote,
-      author: t.author,
-      location: t.area || t.location,
-      service: t.service,
-      screenshot: t.photo?.url || '',
-    }))
-  : siteConfig.testimonials;
+// Gunakan testimoni bukti chat WhatsApp real terverifikasi
+const testimonialsList = siteConfig.testimonials;
 ---
 
 <section id="testimoni" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
@@ -29,7 +22,7 @@ const testimonialsList = cmsTestimonials.length > 0
       <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
         Cerita & Ulasan Nyata
       </span>
-      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
         Kata Bunda yang Sudah Merasakan Sentuhan Kala
       </h2>
       <p class="text-sm font-semibold text-[#128C4A] mb-2">
@@ -45,15 +38,26 @@ const testimonialsList = cmsTestimonials.length > 0
         <div class="p-7 rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] flex flex-col justify-between hover:shadow-kala transition-all duration-300">
           <div>
             {item.screenshot ? (
-              <img
-                src={item.screenshot}
-                alt={`Screenshot chat WhatsApp ${item.author}`}
-                width="640"
-                height="360"
-                loading="lazy"
-                decoding="async"
-                class="mb-4 aspect-video w-full rounded-2xl border border-[#F6DCCD] bg-white object-cover object-top"
-              />
+              <a
+                href={item.fullScreenshot || item.screenshot}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Lihat chat penuh WhatsApp dari ${item.author}`}
+                class="group block mb-4 overflow-hidden rounded-2xl border border-[#F6DCCD] bg-[#FFF9F4] shadow-sm relative"
+              >
+                <img
+                  src={item.screenshot}
+                  alt={`Screenshot bukti chat WhatsApp ${item.author}`}
+                  width="462"
+                  height="490"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-56 sm:h-64 object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
+                />
+                <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-0.5 rounded-full backdrop-blur-sm opacity-90 group-hover:opacity-100 flex items-center gap-1">
+                  🔍 Perbesar
+                </span>
+              </a>
             ) : (
               <div class="mb-4 flex aspect-video w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#F6DCCD] bg-white/70 text-[#86675A]" aria-hidden="true">
                 <svg class="h-6 w-6 text-[#128C4A]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
