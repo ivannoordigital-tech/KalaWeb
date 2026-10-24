@@ -1,6 +1,5 @@
 ---
 import { siteConfig } from '../config/site';
-import { fetchPayloadTestimonials } from '../lib/payload';
 
 interface Props {
   socialProofText?: string;
@@ -12,7 +11,7 @@ const rawSocialProof = socialProofText || siteConfig.socialProofText;
 const socialProof = rawSocialProof.replace(/500\+\s*Bunda/gi, '1000+ Orang Tua').replace(/500\+/g, '1000+');
 const since = foundedYear || siteConfig.foundedYear;
 
-// Gunakan testimoni bukti chat WhatsApp real terverifikasi
+// Kutipan testimoni nyata dari Bunda Kala
 const testimonialsList = siteConfig.testimonials;
 ---
 
@@ -37,39 +36,12 @@ const testimonialsList = siteConfig.testimonials;
       {testimonialsList.map((item) => (
         <div class="p-7 rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] flex flex-col justify-between hover:shadow-kala transition-all duration-300">
           <div>
-            {item.screenshot ? (
-              <a
-                href={item.fullScreenshot || item.screenshot}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={`Lihat chat penuh WhatsApp dari ${item.author}`}
-                class="group block mb-4 overflow-hidden rounded-2xl border border-[#F6DCCD] bg-[#FFF9F4] shadow-sm relative"
-              >
-                <img
-                  src={item.screenshot}
-                  alt={`Screenshot bukti chat WhatsApp ${item.author}`}
-                  width="462"
-                  height="490"
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full h-56 sm:h-64 object-cover object-top group-hover:scale-[1.02] transition-transform duration-300"
-                />
-                <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-2 py-0.5 rounded-full backdrop-blur-sm opacity-90 group-hover:opacity-100 flex items-center gap-1">
-                  🔍 Perbesar
-                </span>
-              </a>
-            ) : (
-              <div class="mb-4 flex aspect-video w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#F6DCCD] bg-white/70 text-[#86675A]" aria-hidden="true">
-                <svg class="h-6 w-6 text-[#128C4A]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.09c-.24.68-1.4 1.31-1.94 1.36-.54.05-1.04.24-3.5-.73-2.96-1.17-4.85-4.2-5-4.4-.15-.2-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.46.27-.3.59-.37.79-.37.2 0 .39.002.56.01.18.008.42-.068.66.5.24.58.83 2.03.9 2.18.07.15.12.32.02.52-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.36 1.46.3.15.47.13.65-.08.18-.2.76-.88.96-1.18.2-.3.4-.25.67-.15.27.1 1.72.81 2.01.96.3.15.5.22.57.35.07.13.07.78-.17 1.46Z" />
-                </svg>
-                <span class="mt-1 text-[10px] font-semibold uppercase tracking-wide">Bukti chat WhatsApp</span>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-1 text-[#C2552B] text-sm" aria-label="Rating 5 bintang">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               </div>
-            )}
-            <div class="flex items-center gap-1 text-[#C2552B] mb-4 text-sm">
-              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-              <span class="text-xs font-bold text-[#128C4A] ml-2 bg-[#128C4A]/10 px-2 py-0.5 rounded-full">
-                {item.screenshot ? 'Chat Terverifikasi' : 'Dengan Izin Tayang'}
+              <span class="text-xs font-bold text-[#128C4A] bg-[#128C4A]/10 px-2.5 py-0.5 rounded-full">
+                Ulasan Terverifikasi
               </span>
             </div>
             <p class="text-sm sm:text-base text-[#4B2E22] leading-relaxed italic mb-6">

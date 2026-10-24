@@ -182,7 +182,7 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
     <Footer siteSettings={siteSettings} />
 
     {showFloatingWa && (
-      <div class="hidden md:block fixed bottom-5 right-5 z-40">
+      <div id="desktop-floating-wa" class="hidden md:block fixed bottom-5 right-5 z-40 transition-all duration-300 ease-in-out transform translate-y-6 opacity-0 pointer-events-none">
         <WhatsAppButton
           refCode="KALA-FLOAT"
           message="Halo Bidan Kala, saya mau tanya layanan homecare Kala [ref: KALA-FLOAT]"

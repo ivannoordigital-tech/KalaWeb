@@ -16,7 +16,8 @@ const {
 ---
 
 <div
-  class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F6DCCD] px-4 py-2.5 shadow-[0_-4px_20px_rgba(75,46,34,0.08)] transition-all"
+  id="mobile-sticky-bar"
+  class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#F6DCCD] px-4 py-2.5 shadow-[0_-4px_20px_rgba(75,46,34,0.08)] transition-all duration-300 ease-in-out transform translate-y-full opacity-0 pointer-events-none"
   style="padding-bottom: max(0.6rem, env(safe-area-inset-bottom));"
 >
   <div class="max-w-md mx-auto flex items-center justify-center">
@@ -29,3 +30,64 @@ const {
     />
   </div>
 </div>
+
+<script is:inline>
+  (function () {
+    function setupStickyScroll() {
+      var mobileBar = document.getElementById('mobile-sticky-bar');
+      var desktopFloating = document.getElementById('desktop-floating-wa');
+      if (!mobileBar && !desktopFloating) return;
+
+      var isVisible = false;
+      var ticking = false;
+
+      function checkScroll() {
+        var doc = document.documentElement;
+        var total = doc.scrollHeight - window.innerHeight;
+        var scrollPercent = total > 0 ? (window.scrollY / total) * 100 : 0;
+        var shouldShow = scrollPercent >= 20;
+
+        if (shouldShow !== isVisible) {
+          isVisible = shouldShow;
+
+          if (mobileBar) {
+            if (isVisible) {
+              mobileBar.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+              mobileBar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            } else {
+              mobileBar.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+              mobileBar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            }
+          }
+
+          if (desktopFloating) {
+            if (isVisible) {
+              desktopFloating.classList.remove('translate-y-6', 'opacity-0', 'pointer-events-none');
+              desktopFloating.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            } else {
+              desktopFloating.classList.add('translate-y-6', 'opacity-0', 'pointer-events-none');
+              desktopFloating.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+            }
+          }
+        }
+
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          window.requestAnimationFrame(checkScroll);
+          ticking = true;
+        }
+      }, { passive: true });
+
+      checkScroll();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupStickyScroll);
+    } else {
+      setupStickyScroll();
+    }
+  })();
+</script>
