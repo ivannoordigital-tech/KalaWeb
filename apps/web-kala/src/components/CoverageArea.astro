@@ -2,6 +2,12 @@
 import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
 
+interface Props {
+  phone?: string;
+}
+
+const { phone = siteConfig.whatsappNumber } = Astro.props;
+
 const districts = [
   {
     region: 'Surabaya Barat',
@@ -89,6 +95,7 @@ const districts = [
         message="Halo Bidan Kala, saya mau tanya apakah lokasi saya dijangkau homecare Kala? [ref: KALA-AREA-CHECK]"
         text="Cek Ketersediaan Bidan ke Rumah Saya"
         variant="primary"
+        phone={phone}
       />
     </div>
   </div>

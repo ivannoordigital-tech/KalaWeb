@@ -76,6 +76,10 @@ export interface PayloadTestimonial {
   location?: string;
   service: string;
   quote: string;
+  photo?: {
+    url?: string;
+    alt?: string;
+  };
   date?: string;
   permissionGranted?: boolean;
   externalRef?: string;

@@ -12,7 +12,7 @@ export const HeroBlock: Block = {
       type: 'text',
       label: 'Badge Penanda / Social Proof (Di atas judul)',
       admin: {
-        placeholder: '✨ Dipercaya 500+ Orang Tua di Surabaya & Sidoarjo',
+        placeholder: '✨ Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo sejak 2020',
       },
     },
     {

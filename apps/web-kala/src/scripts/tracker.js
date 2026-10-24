@@ -156,7 +156,7 @@
 
     const refCode = btn.getAttribute('data-ref-code') || (lpContext?.refCode) || 'KALA-GEN';
     let baseMsg = btn.getAttribute('data-base-msg') || 'Halo Bidan Kala, saya mau reservasi homecare';
-    const phone = btn.getAttribute('data-phone') || '6281234567890';
+    const phone = btn.getAttribute('data-phone') || '6285794210526';
 
     try {
       const stored = loadStoredAttribution();

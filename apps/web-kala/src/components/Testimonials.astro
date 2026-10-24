@@ -2,6 +2,15 @@
 import { siteConfig } from '../config/site';
 import { fetchPayloadTestimonials } from '../lib/payload';
 
+interface Props {
+  socialProofText?: string;
+  foundedYear?: number;
+}
+
+const { socialProofText, foundedYear } = Astro.props;
+const socialProof = socialProofText || siteConfig.socialProofText;
+const since = foundedYear || siteConfig.foundedYear;
+
 const cmsTestimonials = await fetchPayloadTestimonials();
 const testimonialsList = cmsTestimonials.length > 0
   ? cmsTestimonials.slice(0, 3).map((t) => ({
@@ -9,6 +18,7 @@ const testimonialsList = cmsTestimonials.length > 0
       author: t.author,
       location: t.area || t.location,
       service: t.service,
+      screenshot: t.photo?.url || '',
     }))
   : siteConfig.testimonials;
 ---
@@ -22,8 +32,11 @@ const testimonialsList = cmsTestimonials.length > 0
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
         Kata Bunda yang Sudah Merasakan Sentuhan Kala
       </h2>
+      <p class="text-sm font-semibold text-[#128C4A] mb-2">
+        {socialProof} · sejak {since}
+      </p>
       <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
-        Ulasan terverifikasi dari Bunda di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.
+        Cerita dari Bunda di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.
       </p>
     </div>
 
@@ -31,10 +44,28 @@ const testimonialsList = cmsTestimonials.length > 0
       {testimonialsList.map((item) => (
         <div class="p-7 rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] flex flex-col justify-between hover:shadow-kala transition-all duration-300">
           <div>
+            {item.screenshot ? (
+              <img
+                src={item.screenshot}
+                alt={`Screenshot chat WhatsApp ${item.author}`}
+                width="640"
+                height="360"
+                loading="lazy"
+                decoding="async"
+                class="mb-4 aspect-video w-full rounded-2xl border border-[#F6DCCD] bg-white object-cover object-top"
+              />
+            ) : (
+              <div class="mb-4 flex aspect-video w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#F6DCCD] bg-white/70 text-[#86675A]" aria-hidden="true">
+                <svg class="h-6 w-6 text-[#128C4A]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.09c-.24.68-1.4 1.31-1.94 1.36-.54.05-1.04.24-3.5-.73-2.96-1.17-4.85-4.2-5-4.4-.15-.2-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.46.27-.3.59-.37.79-.37.2 0 .39.002.56.01.18.008.42-.068.66.5.24.58.83 2.03.9 2.18.07.15.12.32.02.52-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.36 1.46.3.15.47.13.65-.08.18-.2.76-.88.96-1.18.2-.3.4-.25.67-.15.27.1 1.72.81 2.01.96.3.15.5.22.57.35.07.13.07.78-.17 1.46Z" />
+                </svg>
+                <span class="mt-1 text-[10px] font-semibold uppercase tracking-wide">Bukti chat WhatsApp</span>
+              </div>
+            )}
             <div class="flex items-center gap-1 text-[#C2552B] mb-4 text-sm">
               <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
               <span class="text-xs font-bold text-[#128C4A] ml-2 bg-[#128C4A]/10 px-2 py-0.5 rounded-full">
-                Ulasan Terverifikasi
+                {item.screenshot ? 'Chat Terverifikasi' : 'Dengan Izin Tayang'}
               </span>
             </div>
             <p class="text-sm sm:text-base text-[#4B2E22] leading-relaxed italic mb-6">

@@ -161,7 +161,7 @@ export const SiteSettings: GlobalConfig = {
       type: 'text',
       label: 'Teks Social Proof (Bukti Kepercayaan)',
       admin: {
-        description: 'Statistik kepercayaan Bunda (contoh: Dipercaya 500+ Bunda di Surabaya & Sidoarjo)',
+        description: 'Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Bunda di Surabaya & Sidoarjo sejak 2020)',
       },
     },
     // Banner Pengumuman & Promo
