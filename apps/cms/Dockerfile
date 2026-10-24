@@ -5,7 +5,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 FROM base AS builder
 WORKDIR /app
@@ -14,6 +14,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV PAYLOAD_SECRET="KALA_CMS_TEMPORARY_BUILD_SECRET_2026"
 
 RUN npm run generate:importmap
 RUN npm run build

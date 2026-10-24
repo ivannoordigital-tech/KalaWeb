@@ -28,6 +28,8 @@ const dirname = path.dirname(filename)
 const isBuildPhase =
   process.env.NEXT_PHASE === 'phase-production-build' ||
   process.env.npm_lifecycle_event === 'build' ||
+  Boolean(process.env.npm_lifecycle_event?.includes('generate')) ||
+  process.argv.some((arg) => arg.includes('generate')) ||
   process.argv.some((arg) => arg.includes('next') && arg.includes('build'))
 
 const payloadSecret =
