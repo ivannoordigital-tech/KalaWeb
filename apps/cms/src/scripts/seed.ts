@@ -808,7 +808,7 @@ export async function seed() {
             afterHoursAnnouncement: 'Terima kasih telah menghubungi Kala Moms & Baby Spa. Layanan konsultasi saat ini sedang di luar jam operasional (08.00–17.00 WIB). Pesan Bunda telah tercatat dalam antrean dan akan segera dihubungi oleh Bidan kami besok pagi.',
           },
           heroBadgeText: '✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes',
-          socialProofText: 'Dipercaya 500+ Bunda di Surabaya & Sidoarjo',
+          socialProofText: 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo',
           coverageAreas: [
             { area: 'Surabaya Barat (Wiyung, Lakarsantri, Sambikerep, CitraLand)' },
             { area: 'Surabaya Timur (Rungkut, Sukolilo, Mulyorejo, Pakuwon City)' },

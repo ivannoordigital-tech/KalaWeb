@@ -3492,7 +3492,7 @@ export interface SiteSetting {
    */
   heroBadgeText?: string | null;
   /**
-   * Statistik kepercayaan Bunda (contoh: Dipercaya 500+ Bunda di Surabaya & Sidoarjo)
+   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo)
    */
   socialProofText?: string | null;
   bannerGroup?: {

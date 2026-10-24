@@ -18,7 +18,7 @@ export const siteConfig = {
     'Sidoarjo',
   ],
   priceRange: 'Rp60.000 - Rp600.000',
-  socialProofText: 'Dipercaya 1000+ Bunda di Surabaya & Sidoarjo',
+  socialProofText: 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo',
   foundedYear: 2020,
   promotion: {
     title: 'Promo treatment Kala',
