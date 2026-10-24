@@ -13,8 +13,7 @@ interface Props {
 }
 
 const { siteSettings } = Astro.props;
-const socialProof = siteSettings?.socialProofText || siteConfig.socialProofText;
-const foundedYear = siteSettings?.foundedYear || siteConfig.foundedYear;
+const heroBadge = siteSettings?.heroBadgeText || 'HOMECARE IBU & BAYI • SURABAYA & SIDOARJO';
 const capacityPerDay = siteConfig.promotion.capacityPerDay;
 const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 ---
@@ -28,30 +27,30 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
         <!-- Trust Badge -->
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFEFE5] border border-[#F6DCCD] text-[#C2552B] font-semibold text-xs sm:text-sm mb-6 shadow-sm">
           <span class="inline-block w-2 h-2 rounded-full bg-[#128C4A] animate-pulse"></span>
-          <span>{socialProof} · sejak {foundedYear}</span>
+          <span>{heroBadge}</span>
         </div>
 
         <!-- Single H1 Title -->
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] tracking-tight leading-[1.18] mb-5">
-          Layanan Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional di Surabaya & Sidoarjo
+          Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional
         </h1>
 
         <!-- Tagline / Subtitle -->
         <p class="text-lg sm:text-xl font-medium text-[#C2552B] mb-4 font-brand">
-          {siteConfig.tagline}
+          Bunda Juga Berhak Dirawat dan Ditemani 🤍
         </p>
 
         <!-- Descriptive Paragraph -->
         <p class="text-base sm:text-lg text-[#86675A] leading-relaxed mb-8 max-w-2xl">
-          Sentuhan medis yang hangat dan higienis langsung ke ruang keluarga Anda. Nikmati sesi pemulihan nifas, pijat laktasi, dan stimulasi tumbuh kembang si kecil tanpa lelah menembus kemacetan, tanpa rasa cemas, dan tanpa <span class="font-semibold text-[#4B2E22]">mom-shaming</span>.
+          Menjadi ibu penuh kebahagiaan, tetapi terkadang juga melelahkan. Kala hadir langsung ke rumah untuk membantu Bunda merawat diri dan si kecil, dengan sentuhan lembut serta pendampingan yang hangat.
         </p>
 
         <!-- CTAs -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
           <WhatsAppButton
             refCode="KALA-HOME"
-            message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-HOME]"
-            text="Konsultasi Bidan via WhatsApp"
+            message="Halo Bidan Kala, saya mau konsultasi homecare untuk ibu dan bayi [ref: KALA-HOME]"
+            text="Konsultasi via WhatsApp"
             variant="primary"
             className="text-base py-4 px-8"
             phone={phone}
@@ -60,7 +59,7 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
             href="#layanan"
             class="inline-flex min-h-[52px] items-center justify-center rounded-full border-2 border-[#C2552B] bg-white px-6 py-3.5 text-center text-sm font-semibold text-[#A8431F] transition-all hover:bg-[#FFEFE5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2552B] focus-visible:ring-offset-2 sm:text-base"
           >
-            Lihat Menu Layanan
+            Lihat Pilihan Treatment
           </a>
         </div>
 
@@ -96,29 +95,41 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
                   👶
                 </div>
                 <div>
-                  <h2 class="font-brand font-bold text-base text-[#4B2E22] leading-tight">Protokol Bidan Kala</h2>
+                  <h2 class="font-brand font-bold text-base text-[#4B2E22] leading-tight">Layanan Homecare Kala</h2>
                   <p class="text-xs text-[#86675A]">Kenyamanan Maksimal di Rumah</p>
                 </div>
               </div>
-              <span class="text-xs font-bold px-3 py-1 bg-[#128C4A]/10 text-[#128C4A] rounded-full">Terapis Nakes</span>
+              <span class="text-xs font-bold px-3 py-1 bg-[#128C4A]/10 text-[#128C4A] rounded-full">Bidan Ber-STR</span>
             </div>
 
             <ul class="space-y-4 text-sm text-[#4B2E22]">
               <li class="flex items-start gap-3">
                 <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
-                <span><strong>Ngobrol Hangat 10-15 Menit:</strong> Bidan mendengarkan adaptasi Bunda tanpa penghakiman.</span>
+                <div>
+                  <span class="font-bold text-[#4B2E22]">Bidan Profesional:</span>
+                  <span class="text-[#86675A]"> Perawatan oleh tenaga kesehatan terlatih.</span>
+                </div>
               </li>
               <li class="flex items-start gap-3">
                 <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
-                <span><strong>Linen & Alat Bersih Steril:</strong> Peralatan higienis standar medis dibawa langsung.</span>
+                <div>
+                  <span class="font-bold text-[#4B2E22]">Untuk Ibu & Si Kecil:</span>
+                  <span class="text-[#86675A]"> Beragam treatment dalam satu kunjungan.</span>
+                </div>
               </li>
               <li class="flex items-start gap-3">
                 <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
-                <span><strong>Stimulasi Anatomi Pediatrik:</strong> Teknik pijat aman untuk pernapasan, relaksasi & cerna.</span>
+                <div>
+                  <span class="font-bold text-[#4B2E22]">Nyaman di Rumah:</span>
+                  <span class="text-[#86675A]"> Tanpa repot bepergian atau macet.</span>
+                </div>
               </li>
               <li class="flex items-start gap-3">
                 <span class="w-5 h-5 rounded-full bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center text-xs flex-shrink-0 mt-0.5 font-bold">✓</span>
-                <span><strong>Edukasi Mandiri Orang Tua:</strong> Panduan teknik pijat yang bisa dipraktikkan Ayah-Bunda.</span>
+                <div>
+                  <span class="font-bold text-[#4B2E22]">Perawatan Personal:</span>
+                  <span class="text-[#86675A]"> Disesuaikan dengan kebutuhan Bunda dan si kecil.</span>
+                </div>
               </li>
             </ul>
 

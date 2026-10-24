@@ -28,7 +28,7 @@ const {
 } = Astro.props;
 
 const pageTitle = title === siteConfig.name 
-  ? `${siteConfig.name} — ${siteConfig.tagline}` 
+  ? `${siteConfig.name} | ${siteConfig.tagline}` 
   : `${title} | ${siteConfig.name}`;
 
 const canonicalUrl = new URL(canonical, siteConfig.url).href;

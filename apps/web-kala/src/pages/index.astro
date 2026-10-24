@@ -17,7 +17,7 @@ const siteSettings = {
   instagram: cmsSettings?.instagram || siteConfig.instagram,
   operationalHours: cmsSettings?.operationalHours || siteConfig.operationalHours,
   socialProofText: cmsSettings?.socialProofText || siteConfig.socialProofText,
-  heroBadgeText: cmsSettings?.heroBadgeText || '✨ Bidan Resmi Ber-STR',
+  heroBadgeText: cmsSettings?.heroBadgeText || 'HOMECARE IBU & BAYI • SURABAYA & SIDOARJO',
 };
 
 const cmsFaqs = await fetchPayloadFAQs();
@@ -35,35 +35,51 @@ const faqs = cmsFaqs.length > 0
 
 const painPoints = [
   {
-    title: 'Bayi rewel dan susah tidur',
-    description: 'Menangis tanpa sebab yang jelas, malam jadi panjang, Bunda dan Papa kelelahan.',
+    title: 'Si Kecil Rewel & Sulit Tidur',
+    description: 'Sudah digendong dan ditenangkan, tapi si kecil masih gelisah? Bunda ingin membantunya merasa lebih nyaman.',
   },
   {
-    title: 'Perut kembung dan gelisah',
-    description: 'Menarik kaki ke perut sambil menangis. Bunda ingin membantu tapi bingung harus mulai dari mana.',
+    title: 'Batuk Pilek Bikin Tidur Tak Nyenyak',
+    description: 'Hidung tersumbat, napas berbunyi, dan batuk pilek yang datang-pergi membuat si kecil tidak nyaman. Bunda khawatir, tapi tidak mau sembarangan menangani.',
   },
   {
-    title: 'Bingung soal stimulasi',
-    description: 'Informasi di internet banyak dan saling bertentangan. Bunda ingin tahu yang aman untuk usia si kecil.',
+    title: 'GTM, Makan Jadi Drama',
+    description: 'Mulut tertutup, kepala menoleh, makanan ditolak. Bunda cemas apakah asupannya cukup.',
+  },
+  {
+    title: 'ASI Terasa Kurang Lancar',
+    description: 'Bunda merasa ASI sulit keluar atau payudara terasa penuh dan tidak nyaman? Rasanya ingin menyusui lebih tenang, tanpa terus dibayangi rasa khawatir.',
+  },
+  {
+    title: 'Cemas, Takut Salah Merawat',
+    description: 'Setiap tangisan dan gerak si kecil bikin bertanya-tanya, “Ini normal atau tidak?” Bunda ingin yakin, tapi bingung harus tanya siapa.',
+  },
+  {
+    title: 'Ingin Mendukung Tumbuh Kembang',
+    description: 'Bunda ingin memberikan stimulasi sesuai usia si kecil, sekaligus memahami cara perawatan sederhana di rumah.',
   },
 ];
 
 const benefits = [
   {
-    title: 'Lebih rileks menjelang tidur',
-    description: 'Banyak orang tua melaporkan bayi tampak lebih tenang setelah dipijat.',
+    title: 'Si Kecil Lebih Rileks',
+    description: 'Sentuhan lembut membantu si kecil lebih rileks menjelang waktu tidur. Saat si kecil nyaman, malam Bunda pun bisa terasa lebih tenang.',
   },
   {
-    title: 'Perut lebih nyaman',
-    description: 'Teknik pijat perut lembut untuk membantu bayi yang sering kembung.',
+    title: 'Lebih Nyaman Saat Batuk Pilek',
+    description: 'Saat hidung tersumbat membuat si kecil rewel, kami membantu memberikan kenyamanan melalui sentuhan lembut dan stimulasi aroma terapi serta panduan perawatan sederhana yang aman dilakukan di rumah.',
   },
   {
-    title: 'Stimulasi sesuai usia',
-    description: 'Gerakan disesuaikan tahap tumbuh kembang, plus panduan lanjutan di rumah.',
+    title: 'Stimulasi Sesuai Usia',
+    description: 'Sentuhan dan stimulasi sensorik yang disesuaikan dengan usia si kecil membantu memberikan pengalaman sensorik positif selama masa pertumbuhan.',
   },
   {
-    title: 'Bonding Bunda dan bayi',
-    description: 'Bunda bisa ikut belajar sentuhan yang menenangkan.',
+    title: 'Perawatan yang Lebih Personal 🧸',
+    description: 'Setiap Bunda dan si kecil memiliki kebutuhan berbeda. Kami menyesuaikan treatment dengan kondisi, usia, dan respons masing-masing agar perawatan terasa lebih nyaman.',
+  },
+  {
+    title: 'Bunda Lebih Tenang dan Percaya Diri ✨',
+    description: 'Selain memberikan treatment, kami juga siap berbagi edukasi dan tips perawatan sederhana agar Bunda semakin percaya diri merawat si kecil di rumah.',
   },
 ];
 
@@ -89,7 +105,7 @@ const bookingSteps = [
 
 <BaseLayout
   title="Baby Spa Homecare Surabaya & Sidoarjo"
-  description="Baby massage, pijat newborn, dan pijat nifas homecare di Surabaya & Sidoarjo oleh bidan ber-STR. Konsultasi gratis via WhatsApp."
+  description="Baby massage, pijat newborn, dan pijat nifas homecare di Surabaya & Sidoarjo oleh bidan profesional. Perawatan nyaman untuk Bunda dan si kecil langsung di rumah."
   schemaType="home"
 >
   <Hero siteSettings={siteSettings} />
@@ -101,21 +117,23 @@ const bookingSteps = [
           Kenali Kebutuhannya
         </span>
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
-          Apakah ini yang sedang Bunda alami?
+          Ada yang Sedang Bunda Rasakan?
         </h2>
         <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
-          Bunda tidak perlu menghadapinya sendiri. Bidan Kala datang ke rumah untuk membantu dengan pendekatan yang tenang dan sesuai usia bayi.
+          Setiap Bunda punya cerita, setiap si kecil punya kebutuhan. Apa pun yang sedang Bunda hadapi, Kala siap membantu dengan perawatan yang penuh perhatian.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {painPoints.map((item) => (
-          <div class="bg-white rounded-3xl border border-[#F6DCCD] p-7 shadow-sm">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#FFEFE5] text-[#C2552B] font-brand font-bold">
-              !
-            </span>
-            <h3 class="font-brand font-bold text-lg text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
-            <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {painPoints.map((item, index) => (
+          <div class="bg-white rounded-3xl border border-[#F6DCCD] p-7 shadow-sm hover:shadow-kala transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#FFEFE5] text-[#C2552B] font-brand font-bold text-sm border border-[#F6DCCD]">
+                0{index + 1}
+              </span>
+              <h3 class="font-brand font-bold text-lg text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
+              <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -126,30 +144,34 @@ const bookingSteps = [
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-2xl mx-auto mb-12">
         <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
-          Setelah Sesi
+          Setelah Sesi Bersama Kala
         </span>
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
           Yang biasa Bunda rasakan setelah sesi
         </h2>
         <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
-          Sentuhan yang tepat dan lembut membantu bayi lebih nyaman. Hasil tiap bayi bisa berbeda.
+          Setiap sesi dirancang untuk menghadirkan pengalaman yang nyaman bagi si kecil dan ketenangan bagi Bunda.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {benefits.map((item) => (
-          <div class="rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] p-6">
-            <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FFD9C4] text-[#C2552B] font-bold">
-              ✓
-            </span>
-            <h3 class="font-brand font-bold text-base text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
-            <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+        {benefits.map((item, index) => (
+          <div class={`rounded-3xl bg-[#FFF9F4] border border-[#F6DCCD] p-6 flex flex-col justify-between hover:shadow-kala transition-all duration-300 ${
+            index < 3 ? 'lg:col-span-2' : 'lg:col-span-3'
+          }`}>
+            <div>
+              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FFD9C4] text-[#C2552B] font-bold text-sm">
+                ✓
+              </span>
+              <h3 class="font-brand font-bold text-base text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
+              <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <p class="text-xs text-[#86675A] leading-relaxed text-center mt-8 max-w-2xl mx-auto">
-        Pijat bayi bersifat pendukung kenyamanan, bukan pengganti pemeriksaan dokter.
+      <p class="text-xs text-[#86675A] leading-relaxed text-center mt-8 max-w-2xl mx-auto bg-[#FFEFE5]/60 py-3 px-5 rounded-2xl border border-[#F6DCCD]">
+        Setiap bayi memiliki respons yang berbeda terhadap pijat. Treatment Kala bertujuan mendukung relaksasi, stimulasi, dan kenyamanan si kecil, bukan menggantikan pemeriksaan atau penanganan medis.
       </p>
     </div>
   </section>
@@ -290,16 +312,16 @@ const bookingSteps = [
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="rounded-[2rem] bg-[#A8431F] px-6 py-12 sm:px-12 text-center shadow-kala">
         <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-white mb-4">
-          Beri si kecil awal yang nyaman
+          Perawatan Nyaman untuk Bunda & Si Kecil 🤍
         </h2>
         <p class="text-sm sm:text-base text-white leading-relaxed max-w-xl mx-auto mb-8">
-          Chat sekarang untuk konsultasi gratis. Bidan Kala bantu pilih layanan yang tepat untuk usia dan kebutuhan si kecil.
+          Tak perlu keluar rumah untuk mendapatkan perawatan penuh perhatian. Ceritakan kebutuhan Bunda, kami bantu pilihkan treatment yang sesuai.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
           <WhatsAppButton
             refCode="KALA-FINAL"
-            message="Halo Bidan Kala, saya mau reservasi homecare. Usia bayi: ______, area/kecamatan: ______ [ref: KALA-FINAL]"
-            text="Chat WhatsApp Sekarang"
+            message="Halo Bidan Kala, saya mau konsultasi perawatan untuk Bunda dan si kecil [ref: KALA-FINAL]"
+            text="Konsultasi via WhatsApp"
             variant="promo"
             className="w-full sm:w-auto"
             phone={siteSettings.whatsappNumber}
@@ -308,7 +330,7 @@ const bookingSteps = [
             href="/layanan"
             class="inline-flex w-full sm:w-auto items-center justify-center rounded-xl border border-white/40 px-6 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F5C24E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#A8431F]"
           >
-            Lihat Semua Layanan
+            Lihat Pilihan Treatment
           </a>
         </div>
       </div>
