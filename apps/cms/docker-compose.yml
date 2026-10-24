@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: kala-cms-app
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       - DATABASE_URI=postgresql://kala_cms_user:${CMS_DB_PASSWORD}@postgres:5432/kala_cms_db
       - PAYLOAD_SECRET=${PAYLOAD_SECRET}
@@ -19,7 +21,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
 
 volumes:
   cms_media:
