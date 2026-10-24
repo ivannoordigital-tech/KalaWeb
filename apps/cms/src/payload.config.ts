@@ -50,6 +50,37 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: ' — Kala Moms and Baby Spa Admin',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          url: '/favicon.svg',
+        },
+        {
+          rel: 'icon',
+          type: 'image/png',
+          sizes: '32x32',
+          url: '/favicon-32x32.png',
+        },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          url: '/apple-touch-icon.png',
+        },
+      ],
+      openGraph: {
+        images: [
+          {
+            url: '/images/og-kala-homecare.png',
+            width: 1200,
+            height: 630,
+            alt: 'Kala Moms and Baby Spa Admin',
+          },
+        ],
+      },
+    },
   },
   endpoints: [
     {

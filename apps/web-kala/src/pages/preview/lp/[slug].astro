@@ -49,6 +49,10 @@ const hasBlocks = blocks.length > 0;
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <title>[PRATINJAU DRAFT] {title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <meta name="kala:lp-slug" content={slug} />
     <meta name="kala:variant" content={pageData?.variant || (slug.endsWith('-b') ? 'B' : slug.endsWith('-c') ? 'C' : 'A')} />
     <meta name="kala:ref-code" content={pageData?.refCode || 'PREVIEW-DRAFT'} />
@@ -74,10 +78,14 @@ const hasBlocks = blocks.length > 0;
     <!-- Minimalist Header -->
     <header class="py-4 px-4 bg-white/95 backdrop-blur-md border-b border-[#F6DCCD] sticky top-10 z-30">
       <div class="max-w-4xl mx-auto flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2">
-          <span class="w-8 h-8 rounded-xl bg-[#FFEFE5] text-[#C2552B] flex items-center justify-center font-brand font-bold text-lg border border-[#F6DCCD]">
-            K
-          </span>
+        <a href="/" class="flex items-center gap-2.5">
+          <img
+            src="/images/logo-icon.png"
+            alt="Logo Kala Homecare"
+            width="36"
+            height="36"
+            class="w-9 h-9 object-contain"
+          />
           <span class="font-brand font-bold text-lg text-[#4B2E22]">Kala Homecare</span>
         </a>
         <div class="flex items-center gap-2">

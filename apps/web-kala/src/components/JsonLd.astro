@@ -42,7 +42,7 @@ const homeSchema = {
   legalName: siteConfig.legalName,
   url: siteConfig.url,
   foundingDate: String(siteConfig.foundedYear),
-  logo: `${siteConfig.url}/images/logo-kala.svg`,
+  logo: `${siteConfig.url}/images/logo-kala.png`,
   image: `${siteConfig.url}/images/og-kala-homecare.png`,
   description: siteConfig.description,
   telephone: `+${siteConfig.whatsappNumber}`,
@@ -120,7 +120,7 @@ const articleSchema = articleData
         name: siteConfig.name,
         logo: {
           '@type': 'ImageObject',
-          url: `${siteConfig.url}/images/logo-kala.svg`,
+          url: `${siteConfig.url}/images/logo-kala.png`,
         },
       },
     }

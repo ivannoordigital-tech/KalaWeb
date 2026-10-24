@@ -19,10 +19,14 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-20">
       <!-- Logo Brand -->
-      <a href="/" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#C2552B] rounded-lg p-1">
-        <div class="w-11 h-11 rounded-2xl bg-[#FFD9C4] text-[#C2552B] flex items-center justify-center font-brand font-bold text-2xl shadow-sm border border-[#F6DCCD] group-hover:scale-105 transition-transform">
-          K
-        </div>
+      <a href="/" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#C2552B] rounded-lg p-1" aria-label="Kala Moms & Baby Spa Beranda">
+        <img
+          src="/images/logo-icon.png"
+          alt="Logo Kala Moms & Baby Spa"
+          width="48"
+          height="48"
+          class="w-11 h-11 object-contain group-hover:scale-105 transition-transform"
+        />
         <div class="flex flex-col">
           <span class="font-brand font-bold text-2xl tracking-tight text-[#4B2E22] leading-none">Kala</span>
           <span class="text-[11px] font-semibold text-[#C2552B] tracking-wider uppercase mt-0.5">Moms & Baby Spa</span>
