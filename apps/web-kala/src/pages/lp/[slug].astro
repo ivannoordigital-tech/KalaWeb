@@ -66,7 +66,7 @@ export async function getStaticPaths() {
     },
     {
       slug: 'pijat-newborn',
-      title: 'Pijat Ceria Newborn Homecare Surabaya & Sidoarjo | Bidan Ber-STR',
+      title: 'Pijat Ceria Newborn Homecare Surabaya & Sidoarjo | Bidan Bersertifikat',
       headline: 'Sentuhan Lembut Pertama untuk Kenyamanan Tumbuh Kembang Si Kecil',
       subheadline: 'Perawatan homecare khusus bayi baru lahir (0-6 bulan) langsung di kamar Bunda. Higienis steril, minyak food-grade, dan ditangani 100% oleh bidan resmi.',
       refCode: 'LP-NEWBORN-ADS',
@@ -121,7 +121,7 @@ export async function getStaticPaths() {
       slug: 'reservasi-online',
       title: 'Reservasi Online Homecare Bidan Kala | Surabaya & Sidoarjo',
       headline: 'Si Kecil Lebih Tenang, Tidur Lebih Nyenyak, Tumbuh Lebih Optimal',
-      subheadline: 'Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda oleh bidan ber-STR resmi Kemenkes.',
+      subheadline: 'Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda oleh bidan bersertifikat Kemenkes.',
       refCode: 'LP-RESERVASI-ONLINE',
       price: 'Mulai Rp60.000',
       duration: '40 - 100 Menit',
@@ -130,7 +130,7 @@ export async function getStaticPaths() {
           blockType: 'hero',
           badge: '✨ Pilihan #1 Orang Tua di Surabaya & Sidoarjo',
           headline: 'Si Kecil Lebih Tenang, Tidur Lebih Nyenyak, Tumbuh Lebih Optimal',
-          subheadline: 'Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda oleh bidan ber-STR resmi Kemenkes RI.',
+          subheadline: 'Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda oleh bidan bersertifikat Kemenkes RI.',
           price: 'Mulai Rp60.000',
           duration: '40 - 100 Menit',
           ctaText: 'Konsultasi Gratis via WhatsApp',
@@ -309,7 +309,7 @@ interface Props {
 
 const { campaign } = Astro.props;
 const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
-const metaDescription = campaign.subheadline || `${campaign.title} - Layanan perawatan dan pijat bayi homecare profesional oleh bidan ber-STR resmi di Surabaya dan Sidoarjo.`;
+const metaDescription = campaign.subheadline || `${campaign.title} - Layanan perawatan dan pijat bayi homecare profesional oleh bidan bersertifikat di Surabaya dan Sidoarjo.`;
 ---
 
 <!DOCTYPE html>
@@ -377,7 +377,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
         </a>
         <div class="flex items-center gap-2">
           <span class="hidden sm:inline-block text-xs font-semibold text-[#128C4A] bg-[#E8F8EE] px-2.5 py-1 rounded-full border border-[#C5ECD2]">
-            ✓ Bidan Ber-STR Resmi
+            ✓ Bidan Bersertifikat
           </span>
           <span class="text-xs text-[#86675A] font-semibold">Surabaya & Sidoarjo</span>
         </div>

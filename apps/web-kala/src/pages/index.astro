@@ -116,8 +116,8 @@ const bookingSteps = [
         <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-white px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
           Kenali Kebutuhannya
         </span>
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
-          Ada yang Sedang Bunda Rasakan?
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
+          Apakah ini yang Sedang Bunda Rasakan?
         </h2>
         <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
           Setiap Bunda punya cerita, setiap si kecil punya kebutuhan. Apa pun yang sedang Bunda hadapi, Kala siap membantu dengan perawatan yang penuh perhatian.
@@ -128,10 +128,12 @@ const bookingSteps = [
         {painPoints.map((item, index) => (
           <div class="bg-white rounded-3xl border border-[#F6DCCD] p-7 shadow-sm hover:shadow-kala transition-all duration-300 flex flex-col justify-between">
             <div>
-              <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[#FFEFE5] text-[#C2552B] font-brand font-bold text-sm border border-[#F6DCCD]">
-                0{index + 1}
-              </span>
-              <h3 class="font-brand font-bold text-lg text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
+              <div class="flex items-center gap-3 mb-3">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#FFEFE5] text-[#C2552B] font-brand font-bold text-sm border border-[#F6DCCD] flex-shrink-0">
+                  0{index + 1}
+                </span>
+                <h3 class="font-brand font-semibold text-lg text-[#4B2E22] leading-snug">{item.title}</h3>
+              </div>
               <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
             </div>
           </div>
@@ -146,7 +148,7 @@ const bookingSteps = [
         <span class="inline-block text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
           Setelah Sesi Bersama Kala
         </span>
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
           Yang biasa Bunda rasakan setelah sesi
         </h2>
         <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
@@ -160,10 +162,12 @@ const bookingSteps = [
             index < 3 ? 'lg:col-span-2' : 'lg:col-span-3'
           }`}>
             <div>
-              <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FFD9C4] text-[#C2552B] font-bold text-sm">
-                ✓
-              </span>
-              <h3 class="font-brand font-bold text-base text-[#4B2E22] mt-4 mb-2">{item.title}</h3>
+              <div class="flex items-center gap-3 mb-3">
+                <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#FFD9C4] text-[#C2552B] font-bold text-xs flex-shrink-0">
+                  ✓
+                </span>
+                <h3 class="font-brand font-semibold text-base text-[#4B2E22] leading-snug">{item.title}</h3>
+              </div>
               <p class="text-sm text-[#86675A] leading-relaxed">{item.description}</p>
             </div>
           </div>

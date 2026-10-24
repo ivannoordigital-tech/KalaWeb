@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { siteSettings } = Astro.props;
-const heroBadge = siteSettings?.heroBadgeText || 'HOMECARE IBU & BAYI • SURABAYA & SIDOARJO';
+const heroBadge = siteSettings?.heroBadgeText || 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo';
 const capacityPerDay = siteConfig.promotion.capacityPerDay;
 const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 ---
@@ -31,7 +31,7 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
         </div>
 
         <!-- Single H1 Title -->
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] tracking-tight leading-[1.18] mb-5">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-medium text-[#4B2E22] tracking-tight leading-[1.18] mb-5">
           Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional
         </h1>
 
@@ -66,16 +66,16 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
         <!-- Trust Badges Under Hero -->
         <div class="mt-10 pt-8 border-t border-[#F6DCCD]/80 grid grid-cols-3 gap-4 w-full text-left">
           <div>
-            <div class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22]">100%</div>
-            <div class="text-xs text-[#86675A]">Bidan Ber-STR Resmi</div>
+            <div class="font-brand font-semibold text-base sm:text-lg text-[#4B2E22]">Bidan Bersertifikat</div>
+            <div class="text-xs text-[#86675A]">Tenaga Profesional</div>
           </div>
           <div>
-            <div class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22]">Food-Grade</div>
-            <div class="text-xs text-[#86675A]">Minyak Alami Steril</div>
+            <div class="font-brand font-semibold text-base sm:text-lg text-[#4B2E22]">Personal</div>
+            <div class="text-xs text-[#86675A]">Perawatan Penuh Perhatian</div>
           </div>
           <div>
-            <div class="font-brand font-bold text-lg sm:text-xl text-[#4B2E22]">Surabaya-SDA</div>
-            <div class="text-xs text-[#86675A]">Homecare ke Rumah</div>
+            <div class="font-brand font-semibold text-base sm:text-lg text-[#4B2E22]">Homecare</div>
+            <div class="text-xs text-[#86675A]">Surabaya & Sidoarjo</div>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
                   <p class="text-xs text-[#86675A]">Kenyamanan Maksimal di Rumah</p>
                 </div>
               </div>
-              <span class="text-xs font-bold px-3 py-1 bg-[#128C4A]/10 text-[#128C4A] rounded-full">Bidan Ber-STR</span>
+              <span class="text-xs font-bold px-3 py-1 bg-[#128C4A]/10 text-[#128C4A] rounded-full">Bidan Bersertifikat</span>
             </div>
 
             <ul class="space-y-4 text-sm text-[#4B2E22]">
@@ -133,18 +133,11 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
               </li>
             </ul>
 
-            <div class="mt-6 pt-5 border-t border-[#F6DCCD]/60 bg-[#FFF9F4] -mx-6 -mb-6 p-6 rounded-b-3xl">
-              <div class="flex items-center justify-between gap-2 text-xs text-[#86675A] mb-3">
+            <div class="mt-6 pt-4 border-t border-[#F6DCCD]/60 bg-[#FFF9F4] -mx-6 -mb-6 px-6 py-4 rounded-b-3xl">
+              <div class="flex items-center justify-between gap-2 text-xs text-[#86675A]">
                 <span>Konsultasi awal & tanya jadwal:</span>
                 <span class="whitespace-nowrap font-bold text-[#128C4A]">Maks {capacityPerDay} sesi/hari</span>
               </div>
-              <WhatsAppButton
-                refCode="KALA-HERO-CARD"
-                message="Halo Bidan Kala, saya mau tanya jadwal homecare [ref: KALA-HERO-CARD]"
-                text="Chat Tanya Jadwal"
-                variant="card"
-                phone={phone}
-              />
             </div>
           </div>
         </div>

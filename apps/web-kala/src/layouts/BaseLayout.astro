@@ -5,7 +5,6 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import MobileStickyBar from '../components/MobileStickyBar.astro';
-import ConsentBanner from '../components/ConsentBanner.astro';
 import { fetchSiteSettings } from '../lib/payload';
 import { siteConfig } from '../config/site';
 import '../styles/global.css';
@@ -79,7 +78,7 @@ const siteSettings = {
   instagram: cmsSettings?.instagram || siteConfig.instagram,
   operationalHours: cmsSettings?.operationalHours || siteConfig.operationalHours,
   socialProofText: cmsSettings?.socialProofText || siteConfig.socialProofText,
-  heroBadgeText: cmsSettings?.heroBadgeText || '✨ Bidan Resmi Ber-STR',
+  heroBadgeText: cmsSettings?.heroBadgeText || 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo',
   announcementBanner: cmsSettings?.announcementBanner || '',
   coverageAreas: cmsSettings?.coverageAreas?.length ? cmsSettings.coverageAreas.map((c) => c.area) : siteConfig.coverageAreas,
 };
@@ -197,8 +196,6 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
     <!-- Mobile Sticky Bottom CTA Bar -->
     <MobileStickyBar phone={siteSettings.whatsappNumber} />
 
-    <!-- Privacy Consent Banner (UU PDP Compliance) -->
-    <ConsentBanner />
 
     <!-- Attribution and WhatsApp Click Script -->
     <script src="../scripts/tracker.js"></script>
