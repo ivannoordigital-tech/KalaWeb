@@ -38,36 +38,38 @@ const {
       var desktopFloating = document.getElementById('desktop-floating-wa');
       if (!mobileBar && !desktopFloating) return;
 
-      var isVisible = false;
+      var isMobileVisible = false;
+      var isDesktopVisible = false;
       var ticking = false;
 
       function checkScroll() {
         var doc = document.documentElement;
         var total = doc.scrollHeight - window.innerHeight;
         var scrollPercent = total > 0 ? (window.scrollY / total) * 100 : 0;
-        var shouldShow = scrollPercent >= 20;
 
-        if (shouldShow !== isVisible) {
-          isVisible = shouldShow;
+        // Mobile: 10%, Desktop: 20%
+        var shouldShowMobile = scrollPercent >= 10;
+        var shouldShowDesktop = scrollPercent >= 20;
 
-          if (mobileBar) {
-            if (isVisible) {
-              mobileBar.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
-              mobileBar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            } else {
-              mobileBar.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
-              mobileBar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            }
+        if (mobileBar && shouldShowMobile !== isMobileVisible) {
+          isMobileVisible = shouldShowMobile;
+          if (isMobileVisible) {
+            mobileBar.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
+            mobileBar.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          } else {
+            mobileBar.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
+            mobileBar.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
           }
+        }
 
-          if (desktopFloating) {
-            if (isVisible) {
-              desktopFloating.classList.remove('translate-y-6', 'opacity-0', 'pointer-events-none');
-              desktopFloating.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            } else {
-              desktopFloating.classList.add('translate-y-6', 'opacity-0', 'pointer-events-none');
-              desktopFloating.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            }
+        if (desktopFloating && shouldShowDesktop !== isDesktopVisible) {
+          isDesktopVisible = shouldShowDesktop;
+          if (isDesktopVisible) {
+            desktopFloating.classList.remove('translate-y-6', 'opacity-0', 'pointer-events-none');
+            desktopFloating.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          } else {
+            desktopFloating.classList.add('translate-y-6', 'opacity-0', 'pointer-events-none');
+            desktopFloating.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
           }
         }
 
