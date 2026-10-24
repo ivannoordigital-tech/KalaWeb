@@ -17,7 +17,7 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 
 <header class="sticky top-0 z-40 bg-[#FFF9F4]/95 backdrop-blur-md border-b border-[#F6DCCD] transition-all">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
+    <div class="flex items-center justify-between h-16 md:h-20">
       <!-- Logo Brand -->
       <a href="/" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#C2552B] rounded-lg p-1" aria-label="Kala Moms & Baby Spa Beranda">
         <img
@@ -25,11 +25,11 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
           alt="Logo Kala Moms & Baby Spa"
           width="48"
           height="48"
-          class="w-11 h-11 object-contain group-hover:scale-105 transition-transform"
+          class="w-9 h-9 md:w-11 md:h-11 object-contain group-hover:scale-105 transition-transform"
         />
         <div class="flex flex-col">
-          <span class="font-brand font-bold text-2xl tracking-tight text-[#4B2E22] leading-none">Kala</span>
-          <span class="text-[11px] font-semibold text-[#C2552B] tracking-wider uppercase mt-0.5">Moms & Baby Spa</span>
+          <span class="font-brand font-bold text-xl md:text-2xl tracking-tight text-[#4B2E22] leading-none">Kala</span>
+          <span class="text-[10px] md:text-[11px] font-semibold text-[#C2552B] tracking-wider uppercase mt-0.5">Moms & Baby Spa</span>
         </div>
       </a>
 
@@ -67,15 +67,7 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
       </div>
 
       <!-- Mobile Menu Toggle Button -->
-      <div class="flex md:hidden items-center gap-2">
-        <WhatsAppButton
-          refCode="KALA-NAV-MOB"
-          message="Halo Bidan Kala, saya mau reservasi homecare [ref: KALA-NAV-MOB]"
-          text="Chat"
-          variant="nav"
-          className="text-xs py-1.5 px-3"
-          phone={phone}
-        />
+      <div class="flex md:hidden items-center">
         <button
           type="button"
           id="mobileMenuToggle"
