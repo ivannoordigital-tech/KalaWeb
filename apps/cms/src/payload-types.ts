@@ -3492,7 +3492,7 @@ export interface SiteSetting {
    */
   heroBadgeText?: string | null;
   /**
-   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo)
+   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Bunda di Surabaya & Sidoarjo sejak 2020)
    */
   socialProofText?: string | null;
   bannerGroup?: {
@@ -3518,6 +3518,53 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Kelola seluruh teks judul, keluhan, manfaat, promo, dan langkah reservasi di halaman depan (kalababyspa.com). Kosongkan untuk memakai teks default standar.
+   */
+  homepage?: {
+    heroHeadline?: string | null;
+    heroTagline?: string | null;
+    heroDescription?: string | null;
+    /**
+     * Daftar poin keluhan/masalah yang dihadapi Bunda (Default: 6 poin standar jika dikosongkan).
+     */
+    painPoints?:
+      | {
+          title: string;
+          description: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Daftar hasil positif & ketenangan setelah sesi homecare (Default: 5 poin jika dikosongkan).
+     */
+    benefits?:
+      | {
+          title: string;
+          description: string;
+          id?: string | null;
+        }[]
+      | null;
+    promotion?: {
+      title?: string | null;
+      description?: string | null;
+      serviceName?: string | null;
+      price?: string | null;
+      originalPrice?: string | null;
+      badge?: string | null;
+      note?: string | null;
+      capacityNote?: string | null;
+      refCode?: string | null;
+      message?: string | null;
+    };
+    bookingSteps?:
+      | {
+          title: string;
+          description: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3559,6 +3606,48 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | {
         area?: T;
         id?: T;
+      };
+  homepage?:
+    | T
+    | {
+        heroHeadline?: T;
+        heroTagline?: T;
+        heroDescription?: T;
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        benefits?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        promotion?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              serviceName?: T;
+              price?: T;
+              originalPrice?: T;
+              badge?: T;
+              note?: T;
+              capacityNote?: T;
+              refCode?: T;
+              message?: T;
+            };
+        bookingSteps?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

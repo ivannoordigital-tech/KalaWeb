@@ -3,6 +3,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
+import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -49,6 +50,10 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      beforeNavLinks: ['/components/admin/DeployStatusBar#DeployStatusBar'],
+      beforeDashboard: ['/components/admin/WelcomeDashboard#WelcomeDashboard'],
     },
     meta: {
       titleSuffix: ' — Kala Moms and Baby Spa Admin',
@@ -113,6 +118,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  sharp,
   db: postgresAdapter({
     push: true,
     pool: {

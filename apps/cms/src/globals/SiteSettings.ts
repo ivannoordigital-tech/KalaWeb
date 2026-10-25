@@ -217,5 +217,170 @@ export const SiteSettings: GlobalConfig = {
         },
       ],
     },
+    // Pengaturan Konten Beranda (Homepage) Penuh
+    {
+      name: 'homepage',
+      type: 'group',
+      label: '🏠 Pengaturan Konten Beranda (Homepage)',
+      admin: {
+        description: 'Kelola seluruh teks judul, keluhan, manfaat, promo, dan langkah reservasi di halaman depan (kalababyspa.com). Kosongkan untuk memakai teks default standar.',
+      },
+      fields: [
+        {
+          name: 'heroHeadline',
+          type: 'text',
+          label: 'Judul Utama (H1 Hero Beranda)',
+          admin: {
+            placeholder: 'Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional',
+          },
+        },
+        {
+          name: 'heroTagline',
+          type: 'text',
+          label: 'Tagline / Subjudul Empati',
+          admin: {
+            placeholder: 'Bunda Juga Berhak Dirawat dan Ditemani 🤍',
+          },
+        },
+        {
+          name: 'heroDescription',
+          type: 'textarea',
+          label: 'Paragraf Deskripsi Hero',
+          admin: {
+            placeholder: 'Menjadi ibu penuh kebahagiaan, tetapi terkadang juga melelahkan. Kala hadir langsung ke rumah untuk membantu Bunda merawat diri dan si kecil...',
+          },
+        },
+        {
+          name: 'painPoints',
+          type: 'array',
+          label: 'Section Keluhan Bunda ("Apakah ini yang Sedang Bunda Rasakan?")',
+          admin: {
+            description: 'Daftar poin keluhan/masalah yang dihadapi Bunda (Default: 6 poin standar jika dikosongkan).',
+          },
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Judul Masalah',
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              required: true,
+              label: 'Deskripsi Singkat',
+            },
+          ],
+        },
+        {
+          name: 'benefits',
+          type: 'array',
+          label: 'Section Manfaat ("Yang biasa Bunda rasakan setelah sesi")',
+          admin: {
+            description: 'Daftar hasil positif & ketenangan setelah sesi homecare (Default: 5 poin jika dikosongkan).',
+          },
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Judul Manfaat',
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              required: true,
+              label: 'Deskripsi Singkat',
+            },
+          ],
+        },
+        {
+          name: 'promotion',
+          type: 'group',
+          label: 'Banner Kotak Promo Reservasi Pertama',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              label: 'Judul Penawaran Promo',
+              admin: { placeholder: 'Promo treatment Kala' },
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              label: 'Deskripsi Promo',
+              admin: { placeholder: 'Khusus Bunda di Surabaya & Sidoarjo.' },
+            },
+            {
+              name: 'serviceName',
+              type: 'text',
+              label: 'Nama Layanan Promo',
+              admin: { placeholder: 'Kala Baby: Pijat Ceria Newborn' },
+            },
+            {
+              name: 'price',
+              type: 'text',
+              label: 'Harga Promo (Display)',
+              admin: { placeholder: 'Rp60.000' },
+            },
+            {
+              name: 'originalPrice',
+              type: 'text',
+              label: 'Harga Asli Coret',
+              admin: { placeholder: 'Rp80.000' },
+            },
+            {
+              name: 'badge',
+              type: 'text',
+              label: 'Badge Diskon',
+              admin: { placeholder: 'Hemat 25%' },
+            },
+            {
+              name: 'note',
+              type: 'text',
+              label: 'Catatan Jadwal',
+              admin: { placeholder: 'Konfirmasi jadwal dan area via WhatsApp.' },
+            },
+            {
+              name: 'capacityNote',
+              type: 'text',
+              label: 'Catatan Kuota',
+              admin: { placeholder: 'Kuota harian maksimal 5 sesi agar setiap kunjungan tetap fokus dan higienis.' },
+            },
+            {
+              name: 'refCode',
+              type: 'text',
+              label: 'Kode Pelacak Ref WhatsApp',
+              admin: { placeholder: 'KALA-PROMO-INTRO' },
+            },
+            {
+              name: 'message',
+              type: 'text',
+              label: 'Template Pesan WhatsApp',
+              admin: { placeholder: 'Halo Bidan Kala, saya mau ambil promo treatment Kala Baby Pijat Ceria Newborn Rp60.000 [ref: KALA-PROMO-INTRO]' },
+            },
+          ],
+        },
+        {
+          name: 'bookingSteps',
+          type: 'array',
+          label: 'Alur 4 Langkah Cara Reservasi Homecare',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Judul Langkah',
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              required: true,
+              label: 'Deskripsi Langkah',
+            },
+          ],
+        },
+      ],
+    },
   ],
 }

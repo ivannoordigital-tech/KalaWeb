@@ -186,6 +186,28 @@ export interface SiteSettingsData {
   socialProofText?: string;
   announcementBanner?: string;
   coverageAreas?: Array<{ area: string }>;
+  homepage?: {
+    heroHeadline?: string;
+    heroTagline?: string;
+    heroDescription?: string;
+    painPoints?: Array<{ title: string; description: string }>;
+    benefits?: Array<{ title: string; description: string }>;
+    promotion?: {
+      title?: string;
+      description?: string;
+      serviceName?: string;
+      price?: string;
+      originalPrice?: string;
+      numericPrice?: number;
+      badge?: string;
+      note?: string;
+      capacityNote?: string;
+      capacityPerDay?: number;
+      refCode?: string;
+      message?: string;
+    };
+    bookingSteps?: Array<{ title: string; description: string }>;
+  };
 }
 
 /**

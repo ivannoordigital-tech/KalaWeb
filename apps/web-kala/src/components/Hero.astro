@@ -14,6 +14,9 @@ interface Props {
 
 const { siteSettings } = Astro.props;
 const heroBadge = siteSettings?.heroBadgeText || 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo';
+const heroHeadline = siteSettings?.homepage?.heroHeadline || 'Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional';
+const heroTagline = siteSettings?.homepage?.heroTagline || 'Bunda Juga Berhak Dirawat dan Ditemani 🤍';
+const heroDescription = siteSettings?.homepage?.heroDescription || 'Menjadi ibu penuh kebahagiaan, tetapi terkadang juga melelahkan. Kala hadir langsung ke rumah untuk membantu Bunda merawat diri dan si kecil, dengan sentuhan lembut serta pendampingan yang hangat.';
 const capacityPerDay = siteConfig.promotion.capacityPerDay;
 const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 ---
@@ -32,17 +35,17 @@ const phone = siteSettings?.whatsappNumber || siteConfig.whatsappNumber;
 
         <!-- Single H1 Title -->
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-medium text-[#4B2E22] tracking-tight leading-[1.18] mb-5">
-          Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional
+          {heroHeadline}
         </h1>
 
         <!-- Tagline / Subtitle -->
         <p class="text-lg sm:text-xl font-medium text-[#C2552B] mb-4 font-brand">
-          Bunda Juga Berhak Dirawat dan Ditemani 🤍
+          {heroTagline}
         </p>
 
         <!-- Descriptive Paragraph -->
         <p class="text-base sm:text-lg text-[#86675A] leading-relaxed mb-8 max-w-2xl">
-          Menjadi ibu penuh kebahagiaan, tetapi terkadang juga melelahkan. Kala hadir langsung ke rumah untuk membantu Bunda merawat diri dan si kecil, dengan sentuhan lembut serta pendampingan yang hangat.
+          {heroDescription}
         </p>
 
         <!-- CTAs -->

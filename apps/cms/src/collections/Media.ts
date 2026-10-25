@@ -30,18 +30,36 @@ export const Media: CollectionConfig = {
     staticDir: path.resolve(dirname, '../../public/media'),
     mimeTypes: ['image/*'],
     adminThumbnail: 'thumbnail',
+    formatOptions: {
+      format: 'webp',
+      options: {
+        quality: 85,
+      },
+    },
     imageSizes: [
       {
         name: 'thumbnail',
         width: 400,
         height: 300,
         position: 'centre',
+        formatOptions: {
+          format: 'webp',
+          options: {
+            quality: 80,
+          },
+        },
       },
       {
         name: 'hero',
         width: 1200,
         height: 630,
         position: 'centre',
+        formatOptions: {
+          format: 'webp',
+          options: {
+            quality: 85,
+          },
+        },
       },
     ],
   },

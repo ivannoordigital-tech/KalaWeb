@@ -50,9 +50,10 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  const isPublished = doc._status === 'published' || doc.active === true;
-  // If still a draft, allow saving intermediate state, but if publishing, enforce strict rules.
-  if (!isPublished) {
+  // Hanya terapkan validasi ketat saat dokumen hendak di-PUBLISH.
+  // Saat masih berstatus DRAFT, user bebas menyimpan progres kerja sementara kapan saja.
+  const isPublishing = doc._status === 'published';
+  if (!isPublishing) {
     return { isValid: true, errors: [], warnings: [] };
   }
 

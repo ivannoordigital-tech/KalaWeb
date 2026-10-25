@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { buildSeoFields } from '../fields/seoFields'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
@@ -39,14 +39,16 @@ export const Pages: CollectionConfig = {
     },
     preview: (doc) => {
       if (doc?.slug) {
-        return `http://localhost:4321/preview/${doc.slug}`;
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        return `${baseUrl}/preview/${doc.slug}`;
       }
       return null;
     },
     livePreview: {
       url: ({ data }) => {
         const slug = data?.slug || 'syarat-ketentuan';
-        return `http://localhost:4321/preview/${slug}`;
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        return `${baseUrl}/preview/${slug}`;
       },
       breakpoints: [
         {
@@ -98,7 +100,7 @@ export const Pages: CollectionConfig = {
       async ({ data }) => {
         const { isValid, errors, warnings } = validatePageBuilderDoc(data, false);
         if (!isValid) {
-          throw new Error(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`);
+          throw new APIError(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`, 400);
         }
         if (warnings.length > 0) {
           console.warn('[Pages Validation Warnings]:', warnings);

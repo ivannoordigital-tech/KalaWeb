@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
@@ -20,14 +20,16 @@ export const LandingPages: CollectionConfig = {
     },
     preview: (doc) => {
       if (doc?.slug) {
-        return `http://localhost:4321/preview/lp/${doc.slug}`;
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        return `${baseUrl}/preview/lp/${doc.slug}`;
       }
       return null;
     },
     livePreview: {
       url: ({ data }) => {
         const slug = data?.slug || 'bayi-kolik';
-        return `http://localhost:4321/preview/lp/${slug}`;
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        return `${baseUrl}/preview/lp/${slug}`;
       },
       breakpoints: [
         {
@@ -87,7 +89,7 @@ export const LandingPages: CollectionConfig = {
 
         const { isValid, errors, warnings } = validatePageBuilderDoc(data, true);
         if (!isValid) {
-          throw new Error(`[Validasi Publikasi Landing Page Gagal]:\n• ${errors.join('\n• ')}`);
+          throw new APIError(`[Validasi Publikasi Landing Page Gagal]:\n• ${errors.join('\n• ')}`, 400);
         }
         if (warnings.length > 0) {
           console.warn('[LandingPages Validation Warnings]:', warnings);

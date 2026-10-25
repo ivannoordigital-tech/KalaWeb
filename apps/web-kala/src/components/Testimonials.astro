@@ -1,5 +1,6 @@
 ---
 import { siteConfig } from '../config/site';
+import { fetchPayloadTestimonials } from '../lib/payload';
 
 interface Props {
   socialProofText?: string;
@@ -11,8 +12,16 @@ const rawSocialProof = socialProofText || siteConfig.socialProofText;
 const socialProof = rawSocialProof.replace(/500\+\s*Bunda/gi, '1000+ Orang Tua').replace(/500\+/g, '1000+');
 const since = foundedYear || siteConfig.foundedYear;
 
-// Kutipan testimoni nyata dari Bunda Kala
-const testimonialsList = siteConfig.testimonials;
+// Kutipan testimoni: Ambil dari Payload CMS (jika ada data terverifikasi), fallback ke site.ts
+const cmsTestimonials = await fetchPayloadTestimonials();
+const testimonialsList = cmsTestimonials.length > 0
+  ? cmsTestimonials.map((t) => ({
+      author: t.author,
+      location: t.location || t.area || 'Surabaya & Sidoarjo',
+      service: t.service,
+      quote: t.quote,
+    }))
+  : siteConfig.testimonials;
 ---
 
 <section id="testimoni" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
