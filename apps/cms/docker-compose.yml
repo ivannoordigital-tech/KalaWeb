@@ -13,6 +13,7 @@ services:
       - DATABASE_URI=postgresql://kala_cms_user:${CMS_DB_PASSWORD}@postgres:5432/kala_cms_db
       - PAYLOAD_SECRET=${PAYLOAD_SECRET}
       - NEXT_PUBLIC_SERVER_URL=https://admin.kalababyspa.com
+      - PREVIEW_BASE_URL=https://kalababyspa.com
       - NODE_ENV=production
     volumes:
       - cms_media:/app/public/media
