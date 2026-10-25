@@ -21,7 +21,7 @@ export const LandingPages: CollectionConfig = {
     preview: (doc) => {
       if (doc?.slug) {
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/lp/${doc.slug}`;
+        return `${baseUrl}/preview/lp/${doc.slug}/`;
       }
       return null;
     },
@@ -29,7 +29,7 @@ export const LandingPages: CollectionConfig = {
       url: ({ data }) => {
         const slug = data?.slug || 'bayi-kolik';
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/lp/${slug}`;
+        return `${baseUrl}/preview/lp/${slug}/`;
       },
       breakpoints: [
         {

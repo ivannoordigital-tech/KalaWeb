@@ -40,7 +40,7 @@ export const Pages: CollectionConfig = {
     preview: (doc) => {
       if (doc?.slug) {
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/${doc.slug}`;
+        return `${baseUrl}/preview/${doc.slug}/`;
       }
       return null;
     },
@@ -48,7 +48,7 @@ export const Pages: CollectionConfig = {
       url: ({ data }) => {
         const slug = data?.slug || 'syarat-ketentuan';
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/${slug}`;
+        return `${baseUrl}/preview/${slug}/`;
       },
       breakpoints: [
         {
