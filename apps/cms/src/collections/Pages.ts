@@ -1,6 +1,8 @@
 import { APIError, type CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { buildSeoFields } from '../fields/seoFields'
+import { seoScoreField, seoAuditFields } from '../fields/seoAuditFields'
+import { pageSeoAdapter, calculateSeoScore } from '../lib/seo-engine'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
 import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
@@ -32,7 +34,7 @@ export const Pages: CollectionConfig = {
   admin: {
     group: '📢 Pemasaran & Iklan',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt', '_status'],
+    defaultColumns: ['title', 'slug', 'seoScore', 'updatedAt', '_status'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
@@ -97,7 +99,7 @@ export const Pages: CollectionConfig = {
       },
     ],
     beforeChange: [
-      async ({ data }) => {
+      async ({ data, req }) => {
         const { isValid, errors, warnings } = validatePageBuilderDoc(data, false);
         if (!isValid) {
           throw new APIError(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`, 400);
@@ -105,6 +107,21 @@ export const Pages: CollectionConfig = {
         if (warnings.length > 0) {
           console.warn('[Pages Validation Warnings]:', warnings);
         }
+
+        try {
+          const normalized = pageSeoAdapter(data);
+          const audit = calculateSeoScore(normalized);
+          data.seoScore = audit.score;
+          data.seoAudit = {
+            score: audit.score,
+            grade: audit.grade,
+            issues: audit.issues,
+            lastAuditedAt: new Date().toISOString(),
+          };
+        } catch (err) {
+          req.payload.logger.error({ err }, 'Error auditing SEO for page');
+        }
+
         return data;
       },
     ],
@@ -219,7 +236,9 @@ export const Pages: CollectionConfig = {
         description: 'Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya soal kemitraan',
       },
     },
-    // Reusable SEO Fields
+    // Reusable SEO Fields & Audit Scoring
     buildSeoFields({ titleSourceField: 'title', descriptionSourceField: 'description' }),
+    seoScoreField,
+    seoAuditFields,
   ],
 }

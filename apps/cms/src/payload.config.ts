@@ -52,8 +52,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeNavLinks: ['/components/admin/DeployStatusBar#DeployStatusBar'],
-      beforeDashboard: ['/components/admin/WelcomeDashboard#WelcomeDashboard'],
+      beforeDashboard: ['/components/admin/CustomDashboard#CustomDashboard'],
     },
     meta: {
       titleSuffix: ' — Kala Moms and Baby Spa Admin',

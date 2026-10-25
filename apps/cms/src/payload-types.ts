@@ -511,6 +511,60 @@ export interface LandingPage {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "headline".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  /**
+   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
+   */
+  seoScore?: number | null;
+  /**
+   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
+   */
+  seoAudit?: {
+    score?: number | null;
+    grade?: ('good' | 'fair' | 'poor') | null;
+    issues?:
+      | {
+          code?: string | null;
+          severity?: ('critical' | 'warning') | null;
+          message?: string | null;
+          targetField?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    lastAuditedAt?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -607,7 +661,7 @@ export interface Midwife {
    */
   active?: boolean | null;
   /**
-   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
    */
   seo?: {
     /**
@@ -1441,7 +1495,7 @@ export interface Page {
    */
   whatsappCustomMessage?: string | null;
   /**
-   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
    */
   seo?: {
     /**
@@ -1472,6 +1526,27 @@ export interface Page {
      * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
      */
     isSubstantiveUpdate?: boolean | null;
+  };
+  /**
+   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
+   */
+  seoScore?: number | null;
+  /**
+   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
+   */
+  seoAudit?: {
+    score?: number | null;
+    grade?: ('good' | 'fair' | 'poor') | null;
+    issues?:
+      | {
+          code?: string | null;
+          severity?: ('critical' | 'warning') | null;
+          message?: string | null;
+          targetField?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    lastAuditedAt?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -1565,7 +1640,7 @@ export interface Service {
    */
   message?: string | null;
   /**
-   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
    */
   seo?: {
     /**
@@ -1643,7 +1718,7 @@ export interface ServiceArea {
   slug: string;
   active?: boolean | null;
   /**
-   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
    */
   seo?: {
     /**
@@ -1849,7 +1924,7 @@ export interface Article {
     relatedAreas?: (number | ServiceArea)[] | null;
   };
   /**
-   * Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
    */
   seo?: {
     /**
@@ -1880,6 +1955,27 @@ export interface Article {
      * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
      */
     isSubstantiveUpdate?: boolean | null;
+  };
+  /**
+   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
+   */
+  seoScore?: number | null;
+  /**
+   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
+   */
+  seoAudit?: {
+    score?: number | null;
+    grade?: ('good' | 'fair' | 'poor') | null;
+    issues?:
+      | {
+          code?: string | null;
+          severity?: ('critical' | 'warning') | null;
+          message?: string | null;
+          targetField?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    lastAuditedAt?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -2382,6 +2478,34 @@ export interface LandingPagesSelect<T extends boolean = true> {
         q?: T;
         a?: T;
         id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
+  seoScore?: T;
+  seoAudit?:
+    | T
+    | {
+        score?: T;
+        grade?: T;
+        issues?:
+          | T
+          | {
+              code?: T;
+              severity?: T;
+              message?: T;
+              targetField?: T;
+              id?: T;
+            };
+        lastAuditedAt?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -3121,6 +3245,23 @@ export interface PagesSelect<T extends boolean = true> {
         noIndex?: T;
         isSubstantiveUpdate?: T;
       };
+  seoScore?: T;
+  seoAudit?:
+    | T
+    | {
+        score?: T;
+        grade?: T;
+        issues?:
+          | T
+          | {
+              code?: T;
+              severity?: T;
+              message?: T;
+              targetField?: T;
+              id?: T;
+            };
+        lastAuditedAt?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -3316,6 +3457,23 @@ export interface ArticlesSelect<T extends boolean = true> {
         canonicalUrl?: T;
         noIndex?: T;
         isSubstantiveUpdate?: T;
+      };
+  seoScore?: T;
+  seoAudit?:
+    | T
+    | {
+        score?: T;
+        grade?: T;
+        issues?:
+          | T
+          | {
+              code?: T;
+              severity?: T;
+              message?: T;
+              targetField?: T;
+              id?: T;
+            };
+        lastAuditedAt?: T;
       };
   updatedAt?: T;
   createdAt?: T;

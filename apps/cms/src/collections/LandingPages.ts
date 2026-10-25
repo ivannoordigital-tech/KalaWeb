@@ -1,5 +1,8 @@
 import { APIError, type CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
+import { buildSeoFields } from '../fields/seoFields'
+import { seoScoreField, seoAuditFields } from '../fields/seoAuditFields'
+import { landingPageSeoAdapter, calculateSeoScore } from '../lib/seo-engine'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
 import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
@@ -13,7 +16,7 @@ export const LandingPages: CollectionConfig = {
   admin: {
     group: '📢 Pemasaran & Iklan',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'refCode', 'variant', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'refCode', 'variant', 'seoScore', '_status', 'updatedAt'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
@@ -79,7 +82,7 @@ export const LandingPages: CollectionConfig = {
       },
     ],
     beforeChange: [
-      async ({ data }) => {
+      async ({ data, req }) => {
         // Auto-generate standard refCode if empty
         if (!data.refCode && data.slug) {
           const cleanSlug = String(data.slug).toUpperCase().replace(/[^A-Z0-9]/g, '-');
@@ -94,6 +97,21 @@ export const LandingPages: CollectionConfig = {
         if (warnings.length > 0) {
           console.warn('[LandingPages Validation Warnings]:', warnings);
         }
+
+        try {
+          const normalized = landingPageSeoAdapter(data);
+          const audit = calculateSeoScore(normalized);
+          data.seoScore = audit.score;
+          data.seoAudit = {
+            score: audit.score,
+            grade: audit.grade,
+            issues: audit.issues,
+            lastAuditedAt: new Date().toISOString(),
+          };
+        } catch (err) {
+          req.payload.logger.error({ err }, 'Error auditing SEO for landing page');
+        }
+
         return data;
       },
     ],
@@ -378,5 +396,9 @@ export const LandingPages: CollectionConfig = {
         },
       ],
     },
+    // Reusable SEO Fields & Audit Scoring
+    buildSeoFields({ titleSourceField: 'title', descriptionSourceField: 'headline' }),
+    seoScoreField,
+    seoAuditFields,
   ],
 }

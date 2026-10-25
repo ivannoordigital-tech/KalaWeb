@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { buildSeoFields } from '../fields/seoFields'
+import { seoScoreField, seoAuditFields } from '../fields/seoAuditFields'
+import { articleSeoAdapter, calculateSeoScore } from '../lib/seo-engine'
 import { canManageArticles, getUserRole } from '../access/roles'
 
 export const Articles: CollectionConfig = {
@@ -12,7 +14,7 @@ export const Articles: CollectionConfig = {
   admin: {
     group: '✍️ Edukasi & Blog',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'author', 'pubDate', 'status'],
+    defaultColumns: ['title', 'category', 'seoScore', 'pubDate', '_status'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'midwife_coordinator';
@@ -28,6 +30,24 @@ export const Articles: CollectionConfig = {
     drafts: true,
   },
   hooks: {
+    beforeChange: [
+      async ({ data, req }) => {
+        try {
+          const normalized = articleSeoAdapter(data);
+          const audit = calculateSeoScore(normalized);
+          data.seoScore = audit.score;
+          data.seoAudit = {
+            score: audit.score,
+            grade: audit.grade,
+            issues: audit.issues,
+            lastAuditedAt: new Date().toISOString(),
+          };
+        } catch (err) {
+          req.payload.logger.error({ err }, 'Error auditing SEO for article');
+        }
+        return data;
+      },
+    ],
     afterChange: [
       async ({ doc, previousDoc }) => {
         const isNowPublished = doc._status === 'published' || doc.status === 'published';
@@ -259,7 +279,9 @@ export const Articles: CollectionConfig = {
         },
       ],
     },
-    // Reusable SEO Fields
+    // Reusable SEO Fields & Audit Scoring
     buildSeoFields({ titleSourceField: 'title', descriptionSourceField: 'description' }),
+    seoScoreField,
+    seoAuditFields,
   ],
 }

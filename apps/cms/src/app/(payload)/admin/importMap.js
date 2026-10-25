@@ -21,8 +21,9 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { WelcomeDashboard as WelcomeDashboard_1a68d16f6390dcabe453495a1f93438a } from '../../../components/admin/WelcomeDashboard'
-import { DeployStatusBar as DeployStatusBar_3ea70f91aa50bbffddb8ece2f8c14322 } from '../../../components/admin/DeployStatusBar'
+import { SeoPanelField as SeoPanelField_b4a702521fedbede19f4fa7a420b433d } from '../../../components/admin/SeoPanelField'
+import { SeoScoreCell as SeoScoreCell_2ea760479321e603308d6fc1ef48049f } from '../../../components/admin/SeoScoreCell'
+import { CustomDashboard as CustomDashboard_bff5a882fa66ab8185114b0a616ede47 } from '../../../components/admin/CustomDashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -50,7 +51,8 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "/components/admin/WelcomeDashboard#WelcomeDashboard": WelcomeDashboard_1a68d16f6390dcabe453495a1f93438a,
-  "/components/admin/DeployStatusBar#DeployStatusBar": DeployStatusBar_3ea70f91aa50bbffddb8ece2f8c14322,
+  "/components/admin/SeoPanelField#SeoPanelField": SeoPanelField_b4a702521fedbede19f4fa7a420b433d,
+  "/components/admin/SeoScoreCell#SeoScoreCell": SeoScoreCell_2ea760479321e603308d6fc1ef48049f,
+  "/components/admin/CustomDashboard#CustomDashboard": CustomDashboard_bff5a882fa66ab8185114b0a616ede47,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

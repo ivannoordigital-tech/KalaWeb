@@ -7,8 +7,8 @@ export interface SeoFieldOptions {
 
 /**
  * Paket Field SEO Terpadu (Reusable SEO Field Group)
- * Digunakan seragam di seluruh koleksi publik (Articles, Services, ServiceAreas, Midwives)
- * sesuai spesifikasi Track B - B1.
+ * Digunakan seragam di seluruh koleksi publik (Articles, Pages, LandingPages, Services, ServiceAreas)
+ * Dilengkapi dengan Interactive Real-time SEO Panel & Google Search Result Preview.
  */
 export function buildSeoFields(options: SeoFieldOptions = {}): Field {
   const titleHint = options.titleSourceField 
@@ -22,12 +22,21 @@ export function buildSeoFields(options: SeoFieldOptions = {}): Field {
   return {
     name: 'seo',
     type: 'group',
-    label: '🔍 Optimasi SEO & Social Share (Google & WhatsApp)',
+    label: '🔍 Panel Optimasi SEO & Social Share',
     admin: {
       position: 'sidebar',
-      description: 'Pengaturan metadata mesin pencari dan tampilan preview saat link dibagikan.',
+      description: 'Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.',
     },
     fields: [
+      {
+        name: 'seoPanelLive',
+        type: 'ui',
+        admin: {
+          components: {
+            Field: '/components/admin/SeoPanelField#SeoPanelField',
+          },
+        },
+      },
       {
         name: 'metaTitle',
         type: 'text',
