@@ -60,11 +60,10 @@
   }
 }
 
-/* 2. Hide Default Redundant Payload Dashboard Cards/Modules */
-.dashboard__modules,
-.modular-dashboard,
-.dashboard__collections,
-.collection-list {
+/* 2. Hide Default Redundant Payload Dashboard Cards ONLY inside Dashboard view */
+.dashboard .dashboard__modules,
+.dashboard .modular-dashboard,
+.dashboard .dashboard__collections {
   display: none !important;
 }
 
