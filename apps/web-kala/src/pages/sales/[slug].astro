@@ -300,7 +300,13 @@ export async function getStaticPaths() {
     },
   ];
 
-  const rawList = cmsCampaigns.length > 0 ? cmsCampaigns : fallbackCampaigns;
+  const combinedCampaigns = [...cmsCampaigns];
+  for (const lp of landingFromPages) {
+    if (!combinedCampaigns.some((c) => c.slug === lp.slug)) {
+      combinedCampaigns.push(lp);
+    }
+  }
+  const rawList = combinedCampaigns.length > 0 ? combinedCampaigns : fallbackCampaigns;
 
   const campaigns = rawList.map((c) => ({
     ...c,
