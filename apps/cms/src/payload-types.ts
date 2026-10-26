@@ -67,19 +67,19 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    'help-center': HelpCenter;
+    articles: Article;
+    media: Media;
+    pages: Page;
     'landing-pages': LandingPage;
     'page-templates': PageTemplate;
     'block-templates': BlockTemplate;
-    pages: Page;
     services: Service;
     midwives: Midwife;
     'service-areas': ServiceArea;
     testimonials: Testimonial;
     faq: Faq;
-    articles: Article;
-    media: Media;
     redirects: Redirect;
+    'help-center': HelpCenter;
     users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -88,19 +88,19 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    'help-center': HelpCenterSelect<false> | HelpCenterSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'landing-pages': LandingPagesSelect<false> | LandingPagesSelect<true>;
     'page-templates': PageTemplatesSelect<false> | PageTemplatesSelect<true>;
     'block-templates': BlockTemplatesSelect<false> | BlockTemplatesSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     midwives: MidwivesSelect<false> | MidwivesSelect<true>;
     'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
-    articles: ArticlesSelect<false> | ArticlesSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'help-center': HelpCenterSelect<false> | HelpCenterSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -146,41 +146,1107 @@ export interface UserAuthOperations {
   };
 }
 /**
- * Pusat panduan kerja operasional admin KalaWeb. Baca panduan di bawah ini untuk mempelajari cara membuat landing page, etika bahasa iklan kesehatan, dan format foto.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "help-center".
+ * via the `definition` "articles".
  */
-export interface HelpCenter {
+export interface Article {
   id: number;
+  /**
+   * Judul artikel yang edukatif dan menenangkan Bunda.
+   */
   title: string;
-  category: 'panduan-lp' | 'etika-iklan-medis' | 'standar-foto-media' | 'pelacakan-wa' | 'faq-kendala';
-  order?: number | null;
-  summary: string;
-  steps?:
+  /**
+   * Editor teks lengkap artikel. Tekan "/" untuk menyisipkan subjudul (H2/H3), daftar poin, kutipan, atau gambar.
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Ringkasan isi artikel (1–2 paragraf) untuk pembuka dan cuplikan kartu blog.
+   */
+  description: string;
+  /**
+   * Unggah foto resmi bidan / perawatan bayi (format WebP/JPG/PNG).
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Deskripsikan isi visual gambar secara jelas. Contoh: Bidan sedang mengedukasi teknik pijat ILU pada bayi.
+   */
+  heroImageAlt: string;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "description".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  /**
+   * Hubungkan artikel ini dengan layanan komersial dan artikel lain untuk memperkuat SEO & konversi reservasi.
+   */
+  internalLinking?: {
+    /**
+     * Centang jika artikel ini adalah panduan komprehensif utama (pillar of content) untuk satu topik besar.
+     */
+    isPillarArticle?: boolean | null;
+    /**
+     * Pilih artikel pilar yang menjadi induk dari artikel pendukung ini.
+     */
+    parentPillar?: (number | null) | Article;
+    /**
+     * Sangat disarankan: hubungkan minimal 1 layanan relevan agar Bunda bisa langsung reservasi homecare.
+     */
+    relatedServices?: (number | Service)[] | null;
+    /**
+     * Pilih 2-4 artikel edukasi relevan untuk direkomendasikan kepada pembaca.
+     */
+    relatedArticles?: (number | Article)[] | null;
+    /**
+     * Hubungkan dengan area jangkauan (misal: Surabaya Timur, Sidoarjo) jika artikel menyinggung lokasi.
+     */
+    relatedAreas?: (number | ServiceArea)[] | null;
+  };
+  /**
+   * Nama tenaga kesehatan resmi yang menyusun artikel.
+   */
+  author: string;
+  authorTitle: string;
+  /**
+   * Otoritas medis yang memvalidasi kebenaran klinis isi artikel.
+   */
+  medicalReviewer: string;
+  /**
+   * URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).
+   */
+  heroImageUrlFallback?: string | null;
+  /**
+   * Daftar variasi kata kunci sekunder untuk pengayaan semantik konten.
+   */
+  keywords?:
     | {
-        stepNumber?: string | null;
-        stepTitle: string;
-        stepDetail: string;
+        keyword: string;
         id?: string | null;
       }[]
     | null;
-  dosAndDonts?: {
-    dos?:
+  pubDate: string;
+  /**
+   * Otomatis diperbarui setiap kali artikel disimpan.
+   */
+  updatedDate: string;
+  /**
+   * Alamat URL artikel (otomatis terisi dari judul jika kosong).
+   */
+  slug: string;
+  category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
+  /**
+   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
+   */
+  seoScore?: number | null;
+  /**
+   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
+   */
+  seoAudit?: {
+    score?: number | null;
+    grade?: ('good' | 'fair' | 'poor') | null;
+    issues?:
       | {
-          item: string;
+          code?: string | null;
+          severity?: ('critical' | 'warning') | null;
+          message?: string | null;
+          targetField?: string | null;
           id?: string | null;
         }[]
       | null;
-    donts?:
-      | {
-          item: string;
-          id?: string | null;
-        }[]
-      | null;
+    lastAuditedAt?: string | null;
   };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Wajib diisi untuk aksesibilitas pembaca layar dan perayap Google Images. Jelaskan apa yang terlihat di gambar.
+   */
+  alt: string;
+  /**
+   * Keterangan singkat yang tampil di bawah foto jika disematkan dalam artikel.
+   */
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  /**
+   * Nama paket perawatan homecare. Contoh: Kala Bundle Duo (Mom & Baby Ceria)
+   */
+  name: string;
+  /**
+   * Kelompok usia atau target tindakan. Contoh: 1 Ibu + 1 Bayi, Bayi 0 - 6 Bulan
+   */
+  target: string;
+  /**
+   * Masukkan angka saja tanpa titik/koma. Contoh: 150000
+   */
+  numericPrice: number;
+  /**
+   * Kosongkan untuk auto-format dari angka di samping. Contoh: Rp150.000
+   */
+  price?: string | null;
+  /**
+   * Jika ada promo diskon. Wajib lebih besar dari harga promo. Contoh: Rp190.000
+   */
+  originalPrice?: string | null;
+  /**
+   * Contoh: 100, 80, 40
+   */
+  durationMinutes?: number | null;
+  /**
+   * Otomatis dari menit jika dikosongkan. Contoh: 100 Menit
+   */
+  duration?: string | null;
+  /**
+   * Centang kotak ini jika Anda memang berniat mengubah harga lebih dari 30% dari harga sebelumnya.
+   */
+  confirmLargePriceChange?: boolean | null;
+  /**
+   * Teks ringkas 1-2 kalimat untuk kartu di beranda. Contoh: Perawatan komplit relaksasi pasca-persalinan untuk Bunda dan stimulasi si kecil.
+   */
+  shortDescription?: string | null;
+  /**
+   * Jelaskan manfaat klinis dan keunggulan tindakan ini secara mendalam untuk calon Bunda.
+   */
+  description: string;
+  /**
+   * Daftar rincian tindakan (misal: Pijat oksitosin, Pijat relaksasi bayi, Totok wajah ibu).
+   */
+  includedItems?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Unggah foto resmi tindakan bidan (format WebP/JPG/PNG).
+   */
+  image?: (number | null) | Media;
+  /**
+   * Teks pemikat di atas kartu. Contoh: Paling Diminati Bunda, Tradisi Praktis Steril
+   */
+  badge?: string | null;
+  /**
+   * Jika dicentang, paket ini akan diberi bingkai warna aksen dan diprioritaskan di beranda.
+   */
+  recommended?: boolean | null;
+  /**
+   * Alamat URL ramah SEO. Huruf kecil dan strip. Contoh: bundle-duo, baby-newborn
+   */
+  slug: string;
+  /**
+   * Hapus centang untuk menyembunyikan layanan ini sementara tanpa menghapus datanya.
+   */
+  active?: boolean | null;
+  /**
+   * Angka lebih kecil akan tampil lebih awal di katalog (1, 2, 3...).
+   */
+  order?: number | null;
+  /**
+   * Kode identifikasi unik untuk melacak konversi di bot WA. Contoh: KALA-SRV-DUO
+   */
+  refCode: string;
+  /**
+   * Draft pesan yang terisi otomatis di aplikasi WhatsApp pasien. Contoh: Halo Bidan Kala, saya mau reservasi...
+   */
+  message?: string | null;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "shortDescription".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-areas".
+ */
+export interface ServiceArea {
+  id: number;
+  /**
+   * Contoh: Surabaya Barat, Waru Sidoarjo, Rungkut & Surabaya Timur
+   */
+  name: string;
+  city: 'Surabaya' | 'Sidoarjo';
+  /**
+   * Tuliskan ulasan spesifik mengenai karakter wilayah, perumahan, dan aksesibilitas bidan. Hindari teks generik agar tidak dianggap thin-content oleh Google.
+   */
+  uniqueDescription: string;
+  /**
+   * Daftar perumahan besar, jalan protokol, atau kecamatan yang tercakup.
+   */
+  landmarks?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Perkiraan durasi perjalanan tim bidan tiba di kediaman pasien. Contoh: 20–35 Menit
+   */
+  estimatedArrivalMinutes?: string | null;
+  /**
+   * Paket perawatan yang dapat dipanggil ke wilayah ini.
+   */
+  availableServices?:
+    | {
+        serviceName: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Huruf kecil dan strip. Contoh: surabaya-barat
+   */
+  slug: string;
+  active?: boolean | null;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "uniqueDescription".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * Judul utama halaman. Contoh: Promo Spesial Pijat Newborn atau Syarat & Ketentuan.
+   */
+  title: string;
+  /**
+   * Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.
+   */
+  description?: string | null;
+  /**
+   * Unggah foto banner atas halaman (format WebP/JPG/PNG).
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Gunakan untuk halaman informasi umum yang membutuhkan format teks bebas (paragraf, poin daftar, dan subjudul). Jika blok di bawah diisi, susunan blok akan diprioritaskan.
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Gunakan blok visual ini untuk menyusun halaman promo dan penawaran (Banner Utama, Masalah Bunda, Solusi, Paket Harga, Testimoni, FAQ).
+   */
+  layout?:
+    | (
+        | {
+            badge?: string | null;
+            /**
+             * Pemicu minat pertama pengunjung.
+             */
+            headline: string;
+            /**
+             * Penjelasan 1-2 kalimat menenangkan orang tua.
+             */
+            subheadline: string;
+            price?: string | null;
+            originalPrice?: string | null;
+            duration?: string | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            image?: (number | null) | Media;
+            /**
+             * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
+             */
+            imageAlt?: string | null;
+            align?: ('center' | 'left') | null;
+            btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
+            bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3') | null;
+            background?: ('cream' | 'white' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            points: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'painPoints';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              icon?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            highlightQuote?: {
+              quote?: string | null;
+              author?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'solutions';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            layoutStyle?: ('cards' | 'list') | null;
+            background?: ('cream' | 'white' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            packages: {
+              name: string;
+              target?: string | null;
+              price: string;
+              originalPrice?: string | null;
+              duration?: string | null;
+              description?: string | null;
+              isPopular?: boolean | null;
+              popularBadge?: string | null;
+              features?:
+                | {
+                    feature: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              ctaText?: string | null;
+              refCode?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricing';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            kalaLabel?: string | null;
+            otherLabel?: string | null;
+            rows: {
+              feature: string;
+              kalaValue: string;
+              otherValue: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'comparison';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            steps: {
+              num?: string | null;
+              title: string;
+              description: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'steps';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            items: {
+              quote: string;
+              author: string;
+              role?: string | null;
+              area?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'testimonials';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            description: string;
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'guarantee';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            faqs: {
+              q: string;
+              a: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faq';
+          }
+        | {
+            /**
+             * Tulis paragraf, judul, kutipan, dan link secara bebas.
+             */
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            badge?: string | null;
+            headline: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonMessage?: string | null;
+            footnote?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cta';
+          }
+        | {
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            bgStyle?: ('white' | 'warm') | null;
+            images: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              caption?: string | null;
+              tag?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'gallery';
+          }
+        | {
+            /**
+             * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+             */
+            heading: string;
+            subheading?: string | null;
+            /**
+             * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+             */
+            midwives?: (number | Midwife)[] | null;
+            /**
+             * Pilihan palet warna latar belakang.
+             */
+            background?: ('white' | 'cream' | 'peach') | null;
+            spacing?: ('compact' | 'normal' | 'spacious') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'midwifeSpotlight';
+          }
+        | {
+            /**
+             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
+             */
+            template: number | BlockTemplate;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'templateRef';
+          }
+      )[]
+    | null;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "description".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  /**
+   * • Standar: Layout bawaan web dengan navbar & footer.
+   * • Kanvas Bersih: 100% blank canvas tanpa header/footer untuk fokus konversi.
+   * • Lebar Penuh: Konten melebar penuh dengan header/footer tema.
+   */
+  pageLayout?: ('default' | 'canvas' | 'full_width') | null;
+  /**
+   * Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.
+   */
+  showWhatsAppCta?: boolean | null;
+  /**
+   * Teks pesan otomatis saat pasien menekan tombol WA. Contoh: Halo Bidan Kala, saya mau tanya promo newborn
+   */
+  whatsappCustomMessage?: string | null;
+  /**
+   * Kode unik otomatis pelacak pesan WA masuk. Contoh: KALA-LP-PROMO-A
+   */
+  refCode?: string | null;
+  /**
+   * Identifikasi varian untuk evaluasi efektivitas iklan.
+   */
+  variant?: ('A' | 'B' | 'C') | null;
+  /**
+   * Pilih sistem analitik iklan yang aktif untuk halaman ini.
+   */
+  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
+  /**
+   * Alamat URL halaman (huruf kecil dan tanda hubung). Otomatis dibuat dari judul jika kosong.
+   */
+  slug: string;
+  /**
+   * • Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.
+   * • Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan WhatsApp & Pixel.
+   */
+  pageType?: ('standard' | 'landing') | null;
+  /**
+   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
+   */
+  seoScore?: number | null;
+  /**
+   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
+   */
+  seoAudit?: {
+    score?: number | null;
+    grade?: ('good' | 'fair' | 'poor') | null;
+    issues?:
+      | {
+          code?: string | null;
+          severity?: ('critical' | 'warning') | null;
+          message?: string | null;
+          targetField?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    lastAuditedAt?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "midwives".
+ */
+export interface Midwife {
+  id: number;
+  /**
+   * Contoh: Bidan Annisa Rahmawati
+   */
+  name: string;
+  /**
+   * Contoh: S.Tr.Keb, Bdn
+   */
+  title: string;
+  /**
+   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google dan foreign key bot klinik.
+   */
+  strNumber: string;
+  /**
+   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Lama pengalaman menangani ibu dan anak. Contoh: 5
+   */
+  experienceYears?: number | null;
+  /**
+   * Daftar kompetensi khusus yang dimiliki bidan.
+   */
+  specialties?:
+    | {
+        specialty: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
+   */
+  bio: string;
+  /**
+   * Huruf kecil dan strip. Contoh: bidan-annisa
+   */
+  slug: string;
+  /**
+   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
+   */
+  active?: boolean | null;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Pustaka template susunan blok yang dapat disimpan dan dipakai berulang kali di halaman mana pun tanpa perlu menyusun dari nol.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "block-templates".
+ */
+export interface BlockTemplate {
+  id: number;
+  /**
+   * Beri nama template yang mudah dikenali oleh tim admin Anda.
+   */
+  name: string;
+  /**
+   * Huruf kecil dan tanda hubung (-).
+   */
+  slug: string;
+  category?: ('promo' | 'galeri' | 'edukasi' | 'review' | 'umum') | null;
+  description?: string | null;
+  /**
+   * Susun blok-blok yang ingin Anda jadikan template master (misal: Galeri + Testimoni + CTA). Blok yang Anda simpan di sini akan bisa disisipkan ke halaman mana pun.
+   */
+  layout: (
+    | {
+        badge?: string | null;
+        /**
+         * Pemicu minat pertama pengunjung.
+         */
+        headline: string;
+        /**
+         * Penjelasan 1-2 kalimat menenangkan orang tua.
+         */
+        subheadline: string;
+        price?: string | null;
+        originalPrice?: string | null;
+        duration?: string | null;
+        ctaText?: string | null;
+        ctaMessage?: string | null;
+        image?: (number | null) | Media;
+        /**
+         * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
+         */
+        imageAlt?: string | null;
+        align?: ('center' | 'left') | null;
+        btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
+        bgStyle?: ('gradient' | 'plain' | 'white') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'hero';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3') | null;
+        background?: ('cream' | 'white' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        points: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'painPoints';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          icon?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        highlightQuote?: {
+          quote?: string | null;
+          author?: string | null;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'solutions';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        layoutStyle?: ('cards' | 'list') | null;
+        background?: ('cream' | 'white' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        packages: {
+          name: string;
+          target?: string | null;
+          price: string;
+          originalPrice?: string | null;
+          duration?: string | null;
+          description?: string | null;
+          isPopular?: boolean | null;
+          popularBadge?: string | null;
+          features?:
+            | {
+                feature: string;
+                id?: string | null;
+              }[]
+            | null;
+          ctaText?: string | null;
+          refCode?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pricing';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        kalaLabel?: string | null;
+        otherLabel?: string | null;
+        rows: {
+          feature: string;
+          kalaValue: string;
+          otherValue: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'comparison';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        steps: {
+          num?: string | null;
+          title: string;
+          description: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'steps';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        items: {
+          quote: string;
+          author: string;
+          role?: string | null;
+          area?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'testimonials';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        description: string;
+        note?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'guarantee';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        faqs: {
+          q: string;
+          a: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'faq';
+      }
+    | {
+        /**
+         * Tulis paragraf, judul, kutipan, dan link secara bebas.
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'richText';
+      }
+    | {
+        badge?: string | null;
+        headline: string;
+        description?: string | null;
+        buttonText?: string | null;
+        buttonMessage?: string | null;
+        footnote?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'cta';
+      }
+    | {
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        columns?: ('2' | '3' | '4') | null;
+        bgStyle?: ('white' | 'warm') | null;
+        images: {
+          image?: (number | null) | Media;
+          imageUrlFallback?: string | null;
+          caption?: string | null;
+          tag?: string | null;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'gallery';
+      }
+    | {
+        /**
+         * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+         */
+        heading: string;
+        subheading?: string | null;
+        /**
+         * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+         */
+        midwives?: (number | Midwife)[] | null;
+        /**
+         * Pilihan palet warna latar belakang.
+         */
+        background?: ('white' | 'cream' | 'peach') | null;
+        spacing?: ('compact' | 'normal' | 'spacious') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'midwifeSpotlight';
+      }
+  )[];
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -527,7 +1593,7 @@ export interface LandingPage {
      */
     metaTitle?: string | null;
     /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "headline".
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "headline".
      */
     metaDescription?: string | null;
     /**
@@ -572,384 +1638,6 @@ export interface LandingPage {
       | null;
     lastAuditedAt?: string | null;
   };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Jelaskan isi visual gambar kepada pengguna tunanetra dan perayap Google. Contoh: Bidan mengoleskan minyak pijat food-grade pada punggung bayi.
-   */
-  alt: string;
-  /**
-   * Keterangan singkat yang tampil di bawah foto jika ditampilkan di artikel.
-   */
-  caption?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    hero?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "midwives".
- */
-export interface Midwife {
-  id: number;
-  /**
-   * Contoh: Bidan Annisa Rahmawati
-   */
-  name: string;
-  /**
-   * Contoh: S.Tr.Keb, Bdn
-   */
-  title: string;
-  /**
-   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google dan foreign key bot klinik.
-   */
-  strNumber: string;
-  /**
-   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
-   */
-  photo?: (number | null) | Media;
-  /**
-   * Lama pengalaman menangani ibu dan anak. Contoh: 5
-   */
-  experienceYears?: number | null;
-  /**
-   * Daftar kompetensi khusus yang dimiliki bidan.
-   */
-  specialties?:
-    | {
-        specialty: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
-   */
-  bio: string;
-  /**
-   * Huruf kecil dan strip. Contoh: bidan-annisa
-   */
-  slug: string;
-  /**
-   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
-   */
-  active?: boolean | null;
-  /**
-   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Pustaka template susunan blok yang dapat disimpan dan dipakai berulang kali di halaman mana pun tanpa perlu menyusun dari nol.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "block-templates".
- */
-export interface BlockTemplate {
-  id: number;
-  /**
-   * Beri nama template yang mudah dikenali oleh tim admin Anda.
-   */
-  name: string;
-  /**
-   * Huruf kecil dan tanda hubung (-).
-   */
-  slug: string;
-  category?: ('promo' | 'galeri' | 'edukasi' | 'review' | 'umum') | null;
-  description?: string | null;
-  /**
-   * Susun blok-blok yang ingin Anda jadikan template master (misal: Galeri + Testimoni + CTA). Blok yang Anda simpan di sini akan bisa disisipkan ke halaman mana pun.
-   */
-  layout: (
-    | {
-        badge?: string | null;
-        /**
-         * Pemicu minat pertama pengunjung.
-         */
-        headline: string;
-        /**
-         * Penjelasan 1-2 kalimat menenangkan orang tua.
-         */
-        subheadline: string;
-        price?: string | null;
-        originalPrice?: string | null;
-        duration?: string | null;
-        ctaText?: string | null;
-        ctaMessage?: string | null;
-        image?: (number | null) | Media;
-        /**
-         * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
-         */
-        imageAlt?: string | null;
-        align?: ('center' | 'left') | null;
-        btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
-        bgStyle?: ('gradient' | 'plain' | 'white') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'hero';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        columns?: ('2' | '3') | null;
-        background?: ('cream' | 'white' | 'peach') | null;
-        spacing?: ('compact' | 'normal' | 'spacious') | null;
-        points: {
-          icon?: string | null;
-          title: string;
-          description: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'painPoints';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        items: {
-          icon?: string | null;
-          title: string;
-          description: string;
-          id?: string | null;
-        }[];
-        highlightQuote?: {
-          quote?: string | null;
-          author?: string | null;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'solutions';
-      }
-    | {
-        badge?: string | null;
-        title: string;
-        subtitle?: string | null;
-        layoutStyle?: ('cards' | 'list') | null;
-        background?: ('cream' | 'white' | 'peach') | null;
-        spacing?: ('compact' | 'normal' | 'spacious') | null;
-        packages: {
-          name: string;
-          target?: string | null;
-          price: string;
-          originalPrice?: string | null;
-          duration?: string | null;
-          description?: string | null;
-          isPopular?: boolean | null;
-          popularBadge?: string | null;
-          features?:
-            | {
-                feature: string;
-                id?: string | null;
-              }[]
-            | null;
-          ctaText?: string | null;
-          refCode?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'pricing';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        kalaLabel?: string | null;
-        otherLabel?: string | null;
-        rows: {
-          feature: string;
-          kalaValue: string;
-          otherValue: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'comparison';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        steps: {
-          num?: string | null;
-          title: string;
-          description: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'steps';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        items: {
-          quote: string;
-          author: string;
-          role?: string | null;
-          area?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'testimonials';
-      }
-    | {
-        badge?: string | null;
-        title: string;
-        description: string;
-        note?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'guarantee';
-      }
-    | {
-        title: string;
-        subtitle?: string | null;
-        faqs: {
-          q: string;
-          a: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'faq';
-      }
-    | {
-        /**
-         * Tulis paragraf, judul, kutipan, dan link secara bebas.
-         */
-        content: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'richText';
-      }
-    | {
-        badge?: string | null;
-        headline: string;
-        description?: string | null;
-        buttonText?: string | null;
-        buttonMessage?: string | null;
-        footnote?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'cta';
-      }
-    | {
-        badge?: string | null;
-        title: string;
-        subtitle?: string | null;
-        columns?: ('2' | '3' | '4') | null;
-        bgStyle?: ('white' | 'warm') | null;
-        images: {
-          image?: (number | null) | Media;
-          imageUrlFallback?: string | null;
-          caption?: string | null;
-          tag?: string | null;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'gallery';
-      }
-    | {
-        /**
-         * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
-         */
-        heading: string;
-        subheading?: string | null;
-        /**
-         * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
-         */
-        midwives?: (number | Midwife)[] | null;
-        /**
-         * Pilihan palet warna latar belakang.
-         */
-        background?: ('white' | 'cream' | 'peach') | null;
-        spacing?: ('compact' | 'normal' | 'spacious') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'midwifeSpotlight';
-      }
-  )[];
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1215,578 +1903,6 @@ export interface PageTemplate {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: number;
-  /**
-   * Judul utama halaman. Contoh: Promo Paket Newborn atau Syarat & Ketentuan
-   */
-  title: string;
-  /**
-   * Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: promo-newborn
-   */
-  slug: string;
-  /**
-   * Pilih tujuan fungsi halaman:
-   * • Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.
-   * • Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan konversi WhatsApp & Pixel.
-   */
-  pageType?: ('standard' | 'landing') | null;
-  /**
-   * Pilih tata letak visual halaman seperti di Elementor:
-   * • Default: Layout standar tema dengan navbar & footer.
-   * • Elementor Canvas: 100% blank canvas tanpa header/footer tema.
-   * • Full Width: Memenuhi lebar layar dengan header/footer bawaan.
-   */
-  pageLayout?: ('default' | 'canvas' | 'full_width') | null;
-  /**
-   * Kode unik otomatis pelacak pesan WA masuk. Contoh: KALA-LP-PROMO-A
-   */
-  refCode?: string | null;
-  /**
-   * Identifikasi varian untuk evaluasi conversion rate.
-   */
-  variant?: ('A' | 'B' | 'C') | null;
-  /**
-   * Pilih pixel pelacakan iklan yang aktif untuk halaman ini.
-   */
-  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
-  /**
-   * Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.
-   */
-  description?: string | null;
-  /**
-   * Unggah foto banner atas halaman (format WebP/JPG/PNG).
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.
-   */
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Gunakan blok visual ini untuk menyusun halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.
-   */
-  layout?:
-    | (
-        | {
-            badge?: string | null;
-            /**
-             * Pemicu minat pertama pengunjung.
-             */
-            headline: string;
-            /**
-             * Penjelasan 1-2 kalimat menenangkan orang tua.
-             */
-            subheadline: string;
-            price?: string | null;
-            originalPrice?: string | null;
-            duration?: string | null;
-            ctaText?: string | null;
-            ctaMessage?: string | null;
-            image?: (number | null) | Media;
-            /**
-             * Deskripsi gambar untuk SEO dan tuna netra. Contoh: Bidan sedang memijat bayi dengan lembut.
-             */
-            imageAlt?: string | null;
-            align?: ('center' | 'left') | null;
-            btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
-            bgStyle?: ('gradient' | 'plain' | 'white') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'hero';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            columns?: ('2' | '3') | null;
-            background?: ('cream' | 'white' | 'peach') | null;
-            spacing?: ('compact' | 'normal' | 'spacious') | null;
-            points: {
-              icon?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'painPoints';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            items: {
-              icon?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            highlightQuote?: {
-              quote?: string | null;
-              author?: string | null;
-            };
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'solutions';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            subtitle?: string | null;
-            layoutStyle?: ('cards' | 'list') | null;
-            background?: ('cream' | 'white' | 'peach') | null;
-            spacing?: ('compact' | 'normal' | 'spacious') | null;
-            packages: {
-              name: string;
-              target?: string | null;
-              price: string;
-              originalPrice?: string | null;
-              duration?: string | null;
-              description?: string | null;
-              isPopular?: boolean | null;
-              popularBadge?: string | null;
-              features?:
-                | {
-                    feature: string;
-                    id?: string | null;
-                  }[]
-                | null;
-              ctaText?: string | null;
-              refCode?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'pricing';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            kalaLabel?: string | null;
-            otherLabel?: string | null;
-            rows: {
-              feature: string;
-              kalaValue: string;
-              otherValue: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'comparison';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            steps: {
-              num?: string | null;
-              title: string;
-              description: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'steps';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            items: {
-              quote: string;
-              author: string;
-              role?: string | null;
-              area?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'testimonials';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            description: string;
-            note?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'guarantee';
-          }
-        | {
-            title: string;
-            subtitle?: string | null;
-            faqs: {
-              q: string;
-              a: string;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faq';
-          }
-        | {
-            /**
-             * Tulis paragraf, judul, kutipan, dan link secara bebas.
-             */
-            content: {
-              root: {
-                type: string;
-                children: {
-                  type: any;
-                  version: number;
-                  [k: string]: unknown;
-                }[];
-                direction: ('ltr' | 'rtl') | null;
-                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-                indent: number;
-                version: number;
-              };
-              [k: string]: unknown;
-            };
-            containerWidth?: ('narrow' | 'normal' | 'wide') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'richText';
-          }
-        | {
-            badge?: string | null;
-            headline: string;
-            description?: string | null;
-            buttonText?: string | null;
-            buttonMessage?: string | null;
-            footnote?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'cta';
-          }
-        | {
-            badge?: string | null;
-            title: string;
-            subtitle?: string | null;
-            columns?: ('2' | '3' | '4') | null;
-            bgStyle?: ('white' | 'warm') | null;
-            images: {
-              image?: (number | null) | Media;
-              imageUrlFallback?: string | null;
-              caption?: string | null;
-              tag?: string | null;
-              id?: string | null;
-            }[];
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'gallery';
-          }
-        | {
-            /**
-             * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
-             */
-            heading: string;
-            subheading?: string | null;
-            /**
-             * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
-             */
-            midwives?: (number | Midwife)[] | null;
-            /**
-             * Pilihan palet warna latar belakang.
-             */
-            background?: ('white' | 'cream' | 'peach') | null;
-            spacing?: ('compact' | 'normal' | 'spacious') | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'midwifeSpotlight';
-          }
-        | {
-            /**
-             * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
-             */
-            template: number | BlockTemplate;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'templateRef';
-          }
-      )[]
-    | null;
-  /**
-   * Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.
-   */
-  showWhatsAppCta?: boolean | null;
-  /**
-   * Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya promo ini
-   */
-  whatsappCustomMessage?: string | null;
-  /**
-   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "description".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  /**
-   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
-   */
-  seoScore?: number | null;
-  /**
-   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
-   */
-  seoAudit?: {
-    score?: number | null;
-    grade?: ('good' | 'fair' | 'poor') | null;
-    issues?:
-      | {
-          code?: string | null;
-          severity?: ('critical' | 'warning') | null;
-          message?: string | null;
-          targetField?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    lastAuditedAt?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: number;
-  /**
-   * Nama paket perawatan homecare. Contoh: Kala Bundle Duo (Mom & Baby Ceria)
-   */
-  name: string;
-  /**
-   * Kelompok usia atau target tindakan. Contoh: 1 Ibu + 1 Bayi, Bayi 0 - 6 Bulan
-   */
-  target: string;
-  /**
-   * Masukkan angka saja tanpa titik/koma. Contoh: 150000
-   */
-  numericPrice: number;
-  /**
-   * Kosongkan untuk auto-format dari angka di samping. Contoh: Rp150.000
-   */
-  price?: string | null;
-  /**
-   * Jika ada promo diskon. Wajib lebih besar dari harga promo. Contoh: Rp190.000
-   */
-  originalPrice?: string | null;
-  /**
-   * Contoh: 100, 80, 40
-   */
-  durationMinutes?: number | null;
-  /**
-   * Otomatis dari menit jika dikosongkan. Contoh: 100 Menit
-   */
-  duration?: string | null;
-  /**
-   * Centang kotak ini jika Anda memang berniat mengubah harga lebih dari 30% dari harga sebelumnya.
-   */
-  confirmLargePriceChange?: boolean | null;
-  /**
-   * Teks ringkas 1-2 kalimat untuk kartu di beranda. Contoh: Perawatan komplit relaksasi pasca-persalinan untuk Bunda dan stimulasi si kecil.
-   */
-  shortDescription?: string | null;
-  /**
-   * Jelaskan manfaat klinis dan keunggulan tindakan ini secara mendalam untuk calon Bunda.
-   */
-  description: string;
-  /**
-   * Daftar rincian tindakan (misal: Pijat oksitosin, Pijat relaksasi bayi, Totok wajah ibu).
-   */
-  includedItems?:
-    | {
-        item: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Unggah foto resmi tindakan bidan (format WebP/JPG/PNG).
-   */
-  image?: (number | null) | Media;
-  /**
-   * Teks pemikat di atas kartu. Contoh: Paling Diminati Bunda, Tradisi Praktis Steril
-   */
-  badge?: string | null;
-  /**
-   * Jika dicentang, paket ini akan diberi bingkai warna aksen dan diprioritaskan di beranda.
-   */
-  recommended?: boolean | null;
-  /**
-   * Alamat URL ramah SEO. Huruf kecil dan strip. Contoh: bundle-duo, baby-newborn
-   */
-  slug: string;
-  /**
-   * Hapus centang untuk menyembunyikan layanan ini sementara tanpa menghapus datanya.
-   */
-  active?: boolean | null;
-  /**
-   * Angka lebih kecil akan tampil lebih awal di katalog (1, 2, 3...).
-   */
-  order?: number | null;
-  /**
-   * Kode identifikasi unik untuk melacak konversi di bot WA. Contoh: KALA-SRV-DUO
-   */
-  refCode: string;
-  /**
-   * Draft pesan yang terisi otomatis di aplikasi WhatsApp pasien. Contoh: Halo Bidan Kala, saya mau reservasi...
-   */
-  message?: string | null;
-  /**
-   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "shortDescription".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "service-areas".
- */
-export interface ServiceArea {
-  id: number;
-  /**
-   * Contoh: Surabaya Barat, Waru Sidoarjo, Rungkut & Surabaya Timur
-   */
-  name: string;
-  city: 'Surabaya' | 'Sidoarjo';
-  /**
-   * Tuliskan ulasan spesifik mengenai karakter wilayah, perumahan, dan aksesibilitas bidan. Hindari teks generik agar tidak dianggap thin-content oleh Google.
-   */
-  uniqueDescription: string;
-  /**
-   * Daftar perumahan besar, jalan protokol, atau kecamatan yang tercakup.
-   */
-  landmarks?:
-    | {
-        name: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Perkiraan durasi perjalanan tim bidan tiba di kediaman pasien. Contoh: 20–35 Menit
-   */
-  estimatedArrivalMinutes?: string | null;
-  /**
-   * Paket perawatan yang dapat dipanggil ke wilayah ini.
-   */
-  availableServices?:
-    | {
-        serviceName: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Huruf kecil dan strip. Contoh: surabaya-barat
-   */
-  slug: string;
-  active?: boolean | null;
-  /**
-   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "uniqueDescription".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "testimonials".
  */
 export interface Testimonial {
@@ -1866,155 +1982,6 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles".
- */
-export interface Article {
-  id: number;
-  /**
-   * Judul artikel yang edukatif dan menenangkan Bunda. Contoh: Cara Mengatasi Bayi Kolik Malam Hari
-   */
-  title: string;
-  category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
-  pubDate: string;
-  updatedDate: string;
-  /**
-   * Nama tenaga kesehatan resmi yang menyusun artikel.
-   */
-  author: string;
-  authorTitle: string;
-  /**
-   * Otoritas medis yang memvalidasi kebenaran klinis isi artikel.
-   */
-  medicalReviewer: string;
-  /**
-   * Ringkasan isi artikel (1–2 paragraf) untuk pembuka dan cuplikan kartu blog.
-   */
-  description: string;
-  /**
-   * Unggah foto resmi bidan / perawatan bayi (format WebP/JPG/PNG).
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).
-   */
-  heroImageUrlFallback?: string | null;
-  /**
-   * Deskripsikan isi visual gambar secara jelas. Contoh: Bidan sedang mengedukasi teknik pijat ILU pada bayi.
-   */
-  heroImageAlt: string;
-  /**
-   * Daftar kata kunci pencarian Google yang relevan dengan artikel ini.
-   */
-  keywords?:
-    | {
-        keyword: string;
-        id?: string | null;
-      }[]
-    | null;
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Alamat URL artikel (huruf kecil dan tanda hubung). Contoh: bayi-kolik-malam-hari
-   */
-  slug: string;
-  /**
-   * Hubungkan artikel ini dengan layanan komersial dan artikel lain untuk memperkuat SEO & konversi.
-   */
-  internalLinking?: {
-    /**
-     * Centang jika artikel ini adalah panduan komprehensif utama (pillar of content) untuk satu topik besar.
-     */
-    isPillarArticle?: boolean | null;
-    /**
-     * Pilih artikel pilar yang menjadi induk dari artikel pendukung (cluster content) ini.
-     */
-    parentPillar?: (number | null) | Article;
-    /**
-     * Sangat disarankan: hubungkan minimal 1 layanan relevan agar Bunda bisa langsung reservasi homecare.
-     */
-    relatedServices?: (number | Service)[] | null;
-    /**
-     * Pilih 2-4 artikel edukasi relevan untuk direkomendasikan kepada pembaca.
-     */
-    relatedArticles?: (number | Article)[] | null;
-    /**
-     * Hubungkan dengan area jangkauan (misal: Surabaya Timur, Sidoarjo) jika artikel menyinggung lokasi.
-     */
-    relatedAreas?: (number | ServiceArea)[] | null;
-  };
-  /**
-   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "title".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 120–155 karakter. Kosongkan untuk otomatis menggunakan isi dari "description".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  /**
-   * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
-   */
-  seoScore?: number | null;
-  /**
-   * Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.
-   */
-  seoAudit?: {
-    score?: number | null;
-    grade?: ('good' | 'fair' | 'poor') | null;
-    issues?:
-      | {
-          code?: string | null;
-          severity?: ('critical' | 'warning') | null;
-          message?: string | null;
-          targetField?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    lastAuditedAt?: string | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -2033,6 +2000,43 @@ export interface Redirect {
   type: '301' | '302';
   active?: boolean | null;
   notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Pusat panduan kerja operasional admin KalaWeb. Baca panduan di bawah ini untuk mempelajari cara membuat landing page, etika bahasa iklan kesehatan, dan format foto.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "help-center".
+ */
+export interface HelpCenter {
+  id: number;
+  title: string;
+  category: 'panduan-lp' | 'etika-iklan-medis' | 'standar-foto-media' | 'pelacakan-wa' | 'faq-kendala';
+  order?: number | null;
+  summary: string;
+  steps?:
+    | {
+        stepNumber?: string | null;
+        stepTitle: string;
+        stepDetail: string;
+        id?: string | null;
+      }[]
+    | null;
+  dosAndDonts?: {
+    dos?:
+      | {
+          item: string;
+          id?: string | null;
+        }[]
+      | null;
+    donts?:
+      | {
+          item: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -2096,8 +2100,16 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'help-center';
-        value: number | HelpCenter;
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'landing-pages';
@@ -2110,10 +2122,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'block-templates';
         value: number | BlockTemplate;
-      } | null)
-    | ({
-        relationTo: 'pages';
-        value: number | Page;
       } | null)
     | ({
         relationTo: 'services';
@@ -2136,16 +2144,12 @@ export interface PayloadLockedDocument {
         value: number | Faq;
       } | null)
     | ({
-        relationTo: 'articles';
-        value: number | Article;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'help-center';
+        value: number | HelpCenter;
       } | null)
     | ({
         relationTo: 'users';
@@ -2195,39 +2199,391 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "help-center_select".
+ * via the `definition` "articles_select".
  */
-export interface HelpCenterSelect<T extends boolean = true> {
+export interface ArticlesSelect<T extends boolean = true> {
   title?: T;
-  category?: T;
-  order?: T;
-  summary?: T;
-  steps?:
+  content?: T;
+  description?: T;
+  heroImage?: T;
+  heroImageAlt?: T;
+  seo?:
     | T
     | {
-        stepNumber?: T;
-        stepTitle?: T;
-        stepDetail?: T;
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
+  internalLinking?:
+    | T
+    | {
+        isPillarArticle?: T;
+        parentPillar?: T;
+        relatedServices?: T;
+        relatedArticles?: T;
+        relatedAreas?: T;
+      };
+  author?: T;
+  authorTitle?: T;
+  medicalReviewer?: T;
+  heroImageUrlFallback?: T;
+  keywords?:
+    | T
+    | {
+        keyword?: T;
         id?: T;
       };
-  dosAndDonts?:
+  pubDate?: T;
+  updatedDate?: T;
+  slug?: T;
+  category?: T;
+  seoScore?: T;
+  seoAudit?:
     | T
     | {
-        dos?:
+        score?: T;
+        grade?: T;
+        issues?:
           | T
           | {
-              item?: T;
+              code?: T;
+              severity?: T;
+              message?: T;
+              targetField?: T;
               id?: T;
             };
-        donts?:
-          | T
-          | {
-              item?: T;
-              id?: T;
-            };
+        lastAuditedAt?: T;
       };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  heroImage?: T;
+  content?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              subheadline?: T;
+              price?: T;
+              originalPrice?: T;
+              duration?: T;
+              ctaText?: T;
+              ctaMessage?: T;
+              image?: T;
+              imageAlt?: T;
+              align?: T;
+              btnColor?: T;
+              bgStyle?: T;
+              id?: T;
+              blockName?: T;
+            };
+        painPoints?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              background?: T;
+              spacing?: T;
+              points?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        solutions?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              highlightQuote?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pricing?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              layoutStyle?: T;
+              background?: T;
+              spacing?: T;
+              packages?:
+                | T
+                | {
+                    name?: T;
+                    target?: T;
+                    price?: T;
+                    originalPrice?: T;
+                    duration?: T;
+                    description?: T;
+                    isPopular?: T;
+                    popularBadge?: T;
+                    features?:
+                      | T
+                      | {
+                          feature?: T;
+                          id?: T;
+                        };
+                    ctaText?: T;
+                    refCode?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        comparison?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              kalaLabel?: T;
+              otherLabel?: T;
+              rows?:
+                | T
+                | {
+                    feature?: T;
+                    kalaValue?: T;
+                    otherValue?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              steps?:
+                | T
+                | {
+                    num?: T;
+                    title?: T;
+                    description?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        testimonials?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    role?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        guarantee?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              description?: T;
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faq?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              faqs?:
+                | T
+                | {
+                    q?: T;
+                    a?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richText?:
+          | T
+          | {
+              content?: T;
+              containerWidth?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cta?:
+          | T
+          | {
+              badge?: T;
+              headline?: T;
+              description?: T;
+              buttonText?: T;
+              buttonMessage?: T;
+              footnote?: T;
+              id?: T;
+              blockName?: T;
+            };
+        gallery?:
+          | T
+          | {
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              columns?: T;
+              bgStyle?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    caption?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        midwifeSpotlight?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              background?: T;
+              spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+        templateRef?:
+          | T
+          | {
+              template?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        ogImage?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        isSubstantiveUpdate?: T;
+      };
+  pageLayout?: T;
+  showWhatsAppCta?: T;
+  whatsappCustomMessage?: T;
+  refCode?: T;
+  variant?: T;
+  activePixels?: T;
+  slug?: T;
+  pageType?: T;
+  seoScore?: T;
+  seoAudit?:
+    | T
+    | {
+        score?: T;
+        grade?: T;
+        issues?:
+          | T
+          | {
+              code?: T;
+              severity?: T;
+              message?: T;
+              targetField?: T;
+              id?: T;
+            };
+        lastAuditedAt?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3026,286 +3382,6 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
- */
-export interface PagesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  pageType?: T;
-  pageLayout?: T;
-  refCode?: T;
-  variant?: T;
-  activePixels?: T;
-  description?: T;
-  heroImage?: T;
-  content?: T;
-  layout?:
-    | T
-    | {
-        hero?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              subheadline?: T;
-              price?: T;
-              originalPrice?: T;
-              duration?: T;
-              ctaText?: T;
-              ctaMessage?: T;
-              image?: T;
-              imageAlt?: T;
-              align?: T;
-              btnColor?: T;
-              bgStyle?: T;
-              id?: T;
-              blockName?: T;
-            };
-        painPoints?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              columns?: T;
-              background?: T;
-              spacing?: T;
-              points?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        solutions?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    icon?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              highlightQuote?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        pricing?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              layoutStyle?: T;
-              background?: T;
-              spacing?: T;
-              packages?:
-                | T
-                | {
-                    name?: T;
-                    target?: T;
-                    price?: T;
-                    originalPrice?: T;
-                    duration?: T;
-                    description?: T;
-                    isPopular?: T;
-                    popularBadge?: T;
-                    features?:
-                      | T
-                      | {
-                          feature?: T;
-                          id?: T;
-                        };
-                    ctaText?: T;
-                    refCode?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        comparison?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              kalaLabel?: T;
-              otherLabel?: T;
-              rows?:
-                | T
-                | {
-                    feature?: T;
-                    kalaValue?: T;
-                    otherValue?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        steps?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              steps?:
-                | T
-                | {
-                    num?: T;
-                    title?: T;
-                    description?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        testimonials?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              items?:
-                | T
-                | {
-                    quote?: T;
-                    author?: T;
-                    role?: T;
-                    area?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        guarantee?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              description?: T;
-              note?: T;
-              id?: T;
-              blockName?: T;
-            };
-        faq?:
-          | T
-          | {
-              title?: T;
-              subtitle?: T;
-              faqs?:
-                | T
-                | {
-                    q?: T;
-                    a?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        richText?:
-          | T
-          | {
-              content?: T;
-              containerWidth?: T;
-              id?: T;
-              blockName?: T;
-            };
-        cta?:
-          | T
-          | {
-              badge?: T;
-              headline?: T;
-              description?: T;
-              buttonText?: T;
-              buttonMessage?: T;
-              footnote?: T;
-              id?: T;
-              blockName?: T;
-            };
-        gallery?:
-          | T
-          | {
-              badge?: T;
-              title?: T;
-              subtitle?: T;
-              columns?: T;
-              bgStyle?: T;
-              images?:
-                | T
-                | {
-                    image?: T;
-                    imageUrlFallback?: T;
-                    caption?: T;
-                    tag?: T;
-                    id?: T;
-                  };
-              id?: T;
-              blockName?: T;
-            };
-        midwifeSpotlight?:
-          | T
-          | {
-              heading?: T;
-              subheading?: T;
-              midwives?: T;
-              background?: T;
-              spacing?: T;
-              id?: T;
-              blockName?: T;
-            };
-        templateRef?:
-          | T
-          | {
-              template?: T;
-              id?: T;
-              blockName?: T;
-            };
-      };
-  showWhatsAppCta?: T;
-  whatsappCustomMessage?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        focusKeyword?: T;
-        ogImage?: T;
-        canonicalUrl?: T;
-        noIndex?: T;
-        isSubstantiveUpdate?: T;
-      };
-  seoScore?: T;
-  seoAudit?:
-    | T
-    | {
-        score?: T;
-        grade?: T;
-        issues?:
-          | T
-          | {
-              code?: T;
-              severity?: T;
-              message?: T;
-              targetField?: T;
-              id?: T;
-            };
-        lastAuditedAt?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services_select".
  */
 export interface ServicesSelect<T extends boolean = true> {
@@ -3454,114 +3530,6 @@ export interface FaqSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles_select".
- */
-export interface ArticlesSelect<T extends boolean = true> {
-  title?: T;
-  category?: T;
-  pubDate?: T;
-  updatedDate?: T;
-  author?: T;
-  authorTitle?: T;
-  medicalReviewer?: T;
-  description?: T;
-  heroImage?: T;
-  heroImageUrlFallback?: T;
-  heroImageAlt?: T;
-  keywords?:
-    | T
-    | {
-        keyword?: T;
-        id?: T;
-      };
-  content?: T;
-  slug?: T;
-  internalLinking?:
-    | T
-    | {
-        isPillarArticle?: T;
-        parentPillar?: T;
-        relatedServices?: T;
-        relatedArticles?: T;
-        relatedAreas?: T;
-      };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        focusKeyword?: T;
-        ogImage?: T;
-        canonicalUrl?: T;
-        noIndex?: T;
-        isSubstantiveUpdate?: T;
-      };
-  seoScore?: T;
-  seoAudit?:
-    | T
-    | {
-        score?: T;
-        grade?: T;
-        issues?:
-          | T
-          | {
-              code?: T;
-              severity?: T;
-              message?: T;
-              targetField?: T;
-              id?: T;
-            };
-        lastAuditedAt?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        hero?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -3570,6 +3538,42 @@ export interface RedirectsSelect<T extends boolean = true> {
   type?: T;
   active?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "help-center_select".
+ */
+export interface HelpCenterSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  order?: T;
+  summary?: T;
+  steps?:
+    | T
+    | {
+        stepNumber?: T;
+        stepTitle?: T;
+        stepDetail?: T;
+        id?: T;
+      };
+  dosAndDonts?:
+    | T
+    | {
+        dos?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+        donts?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
 }
