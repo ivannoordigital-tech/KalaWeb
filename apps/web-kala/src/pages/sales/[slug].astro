@@ -4,11 +4,28 @@ import MobileStickyBar from '../../components/MobileStickyBar.astro';
 import ConsentBanner from '../../components/ConsentBanner.astro';
 import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
 import { siteConfig } from '../../config/site';
-import { fetchPayloadLandingPages, type PayloadLandingPage } from '../../lib/payload';
+import { fetchPayloadLandingPages, fetchPayloadPages, type PayloadLandingPage } from '../../lib/payload';
 import '../../styles/global.css';
 
 export async function getStaticPaths() {
-  const cmsCampaigns = await fetchPayloadLandingPages();
+  const [cmsCampaigns, cmsPages] = await Promise.all([
+    fetchPayloadLandingPages(),
+    fetchPayloadPages(),
+  ]);
+
+  const landingFromPages: PayloadLandingPage[] = cmsPages
+    .filter((p) => (p as any).pageType === 'landing')
+    .map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      refCode: p.refCode || `LP-${p.slug.toUpperCase()}`,
+      activePixels: p.activePixels || ['meta', 'google'],
+      variant: p.variant || 'A',
+      layout: p.layout || [],
+      pageLayout: (p.pageLayout as any) || 'canvas',
+      active: true,
+    }));
 
   const fallbackCampaigns: PayloadLandingPage[] = [
     {
@@ -308,6 +325,7 @@ interface Props {
 }
 
 const { campaign } = Astro.props;
+const isCanvas = campaign.pageLayout === 'canvas';
 const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
 const metaDescription = campaign.subheadline || `${campaign.title} - Layanan perawatan dan pijat bayi homecare profesional oleh bidan bersertifikat di Surabaya dan Sidoarjo.`;
 ---
@@ -320,7 +338,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
     <meta name="robots" content="noindex, nofollow" />
     <title>{campaign.title}</title>
     <meta name="description" content={metaDescription} />
-    <link rel="canonical" href={`https://kalababyspa.com/lp/${campaign.slug}`} />
+    <link rel="canonical" href={`https://kalababyspa.com/sales/${campaign.slug}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -363,6 +381,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
   <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] pb-20 md:pb-0">
     
     <!-- Minimalist Header -->
+    {!isCanvas && (
     <header class="py-4 px-4 bg-white/90 backdrop-blur-md border-b border-[#F6DCCD] sticky top-0 z-30">
       <div class="max-w-4xl mx-auto flex items-center justify-between">
         <a href="/" class="flex items-center gap-2.5">
@@ -383,6 +402,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
         </div>
       </div>
     </header>
+    )}
 
     {campaign.layout && campaign.layout.length > 0 ? (
       <main>

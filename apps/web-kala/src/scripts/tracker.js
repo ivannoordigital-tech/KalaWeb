@@ -100,7 +100,7 @@
   let lpContext = null;
   try {
     const path = window.location.pathname;
-    const isLP = path.startsWith('/lp/') || path.startsWith('/preview/lp/');
+    const isLP = path.startsWith('/sales/') || path.startsWith('/preview/sales/') || path.startsWith('/lp/') || path.startsWith('/preview/lp/');
     if (isLP) {
       const metaSlug = document.querySelector('meta[name="kala:lp-slug"]');
       const metaVariant = document.querySelector('meta[name="kala:variant"]');

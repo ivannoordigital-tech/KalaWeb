@@ -17,14 +17,11 @@ export const LandingPages: CollectionConfig = {
     group: '📢 Pemasaran & Iklan',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'refCode', 'variant', 'seoScore', '_status', 'updatedAt'],
-    hidden: ({ user }) => {
-      const role = getUserRole(user);
-      return role === 'author' || role === 'midwife_coordinator';
-    },
+    hidden: () => true,
     preview: (doc) => {
       if (doc?.slug) {
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/lp/${doc.slug}/`;
+        return `${baseUrl}/preview/sales/${doc.slug}/`;
       }
       return null;
     },
@@ -32,7 +29,7 @@ export const LandingPages: CollectionConfig = {
       url: ({ data }) => {
         const slug = data?.slug || 'bayi-kolik';
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/lp/${slug}/`;
+        return `${baseUrl}/preview/sales/${slug}/`;
       },
       breakpoints: [
         {
@@ -153,10 +150,10 @@ export const LandingPages: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
-      label: 'Slug URL Iklan (/lp/[slug])',
+      label: 'Slug URL Halaman Sales (/sales/[slug])',
       admin: {
         position: 'sidebar',
-        description: 'Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/lp/bayi-kolik)',
+        description: 'Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/sales/bayi-kolik)',
         placeholder: 'bayi-kolik',
       },
     },
@@ -204,6 +201,34 @@ export const LandingPages: CollectionConfig = {
         position: 'sidebar',
         description: 'Contoh: KALA-LP-KOLIK. Digunakan untuk mengelompokkan laporan perbandingan varian.',
         placeholder: 'KALA-LP-KOLIK',
+      },
+    },
+    {
+      name: 'pageLayout',
+      type: 'radio',
+      label: 'Opsi Tampilan (Page Layout)',
+      defaultValue: 'canvas_minimal',
+      options: [
+        {
+          label: 'Elementor Canvas Minimal (Header Minimalis Khusus Iklan/Sales: Logo + STR)',
+          value: 'canvas_minimal',
+        },
+        {
+          label: 'Elementor Canvas Murni (Blank Canvas: 100% Kosong Tanpa Header Apapun)',
+          value: 'canvas',
+        },
+        {
+          label: 'Default / Bawaan Tema (Header Navbar & Footer Web Lengkap)',
+          value: 'default',
+        },
+        {
+          label: 'Elementor Full Width (Lebar Penuh dengan Header & Footer Bawaan)',
+          value: 'full_width',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Pilih tata letak seperti Elementor:\n• Canvas Minimal: Header sales ringkas tanpa menu keluar (standar iklan).\n• Canvas Murni: 100% kosong putih bersih tanpa elemen bawaan.\n• Default/Full Width: Menyertakan navbar & footer web utama.',
       },
     },
     {

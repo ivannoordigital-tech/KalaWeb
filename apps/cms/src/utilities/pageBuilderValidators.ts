@@ -2,7 +2,7 @@
  * Validation & Safeguards for KalaWeb Page Builder (Sprint 1: P3 & P5)
  * Enforces strict pre-publish checks for LandingPages and Pages:
  * - Single H1/HeroBlock
- * - Minimal 1 WhatsApp CTA
+ * - Minimal 1 WhatsApp CTA (required for Canvas / Landing Pages)
  * - Reserved & valid slug check
  * - Non-empty image alt text
  * - No circular template references (max depth 1)
@@ -17,6 +17,7 @@ export const RESERVED_PAGE_SLUGS = [
   'bidan',
   'blog',
   'lp',
+  'sales',
   'segera-hadir',
   'tentang-kami',
   'kebijakan-privasi',
@@ -57,6 +58,9 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     return { isValid: true, errors: [], warnings: [] };
   }
 
+  const isLanding = isLandingPage || doc.pageType === 'landing';
+  const isCanvas = doc.pageLayout === 'canvas';
+
   // 1. Slug Validation
   const slug = String(doc.slug || '').trim().toLowerCase();
   if (!slug) {
@@ -65,18 +69,18 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
       errors.push(`Format slug "${slug}" tidak valid. Hanya boleh menggunakan huruf kecil, angka, dan tanda hubung (-).`);
     }
-    if (!isLandingPage && RESERVED_PAGE_SLUGS.includes(slug)) {
+    if (!isLanding && RESERVED_PAGE_SLUGS.includes(slug)) {
       errors.push(`Slug "${slug}" adalah rute tetap sistem web dan tidak boleh digunakan untuk halaman kustom.`);
     }
   }
 
-  // 2. Ref Code Validation (for Landing Pages)
-  if (isLandingPage) {
+  // 2. Ref Code Validation (for Landing Pages / Ads Campaign)
+  if (isLanding) {
     const refCode = String(doc.refCode || '').trim();
     if (!refCode) {
-      errors.push('Kode pelacak WhatsApp (refCode) wajib diisi untuk halaman kampanye iklan.');
+      errors.push('Kode pelacak WhatsApp (refCode) wajib diisi untuk halaman kampanye iklan (landing page).');
     } else if (!/^[A-Z0-9_\-]+$/.test(refCode)) {
-      errors.push(`Format refCode "${refCode}" tidak valid. Gunakan huruf kapital, angka, dan tanda hubung (contoh: LP-KOLIK-ADS).`);
+      errors.push(`Format refCode "${refCode}" tidak valid. Gunakan huruf kapital, angka, dan tanda hubung (contoh: LP-KOLIK-ADS atau KALA-LP-PROMO-A).`);
     }
   }
 
@@ -84,41 +88,46 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
   const layout = Array.isArray(doc.layout) ? doc.layout : [];
 
   if (layout.length > 0) {
-    // Check HeroBlock (must have exactly 1 HeroBlock/H1)
+    // Check HeroBlock
     const heroBlocks = layout.filter((b: any) => b.blockType === 'hero');
-    if (heroBlocks.length === 0 && !doc.headline) {
-      errors.push('Halaman wajib memiliki tepat satu Hero Block (H1).');
-    } else if (heroBlocks.length > 1) {
-      errors.push(`Halaman hanya boleh memiliki tepat satu Hero Block (H1). Terdeteksi ${heroBlocks.length} Hero Block.`);
+    if (heroBlocks.length > 1) {
+      errors.push(`Halaman hanya boleh memiliki maksimal satu Hero Block (H1). Terdeteksi ${heroBlocks.length} Hero Block.`);
+    } else if (isCanvas && heroBlocks.length === 0 && !doc.headline) {
+      // Pada blank canvas, wajib punya minimal 1 Hero / headline H1 karena tidak ada header tema bawaan
+      errors.push('Halaman dengan layout Elementor Canvas wajib memiliki minimal satu Hero Block (H1).');
     }
 
     // Check Hero title length warning
     if (heroBlocks.length === 1) {
-      const heroTitle = String(heroBlocks[0].title || '');
+      const heroTitle = String(heroBlocks[0].title || heroBlocks[0].headline || '');
       if (heroTitle.length > 70) {
         warnings.push(`Judul Hero (${heroTitle.length} karakter) melebihi panjang ideal 70 karakter untuk kenyamanan layar mobile.`);
       }
     }
 
-    // Check WhatsApp CTA presence
+    // Check WhatsApp CTA presence for landing pages
     const hasCtaBlock = layout.some((b: any) =>
       b.blockType === 'hero' ||
       b.blockType === 'pricing' ||
       b.blockType === 'cta' ||
       b.blockType === 'solutions'
     );
-    if (!hasCtaBlock) {
-      errors.push('Halaman landing page wajib memiliki minimal satu blok CTA WhatsApp (Hero, Paket Harga, atau Banner CTA).');
+    const hasBuiltInCta = doc.showWhatsAppCta !== false;
+
+    if (isLanding && !hasCtaBlock && !hasBuiltInCta) {
+      errors.push('Halaman iklan (landing page) wajib memiliki minimal satu CTA WhatsApp (Hero, Paket Harga, atau Banner CTA).');
     }
 
-    // Check FAQ & Testimonials presence (warning)
-    const hasFaq = layout.some((b: any) => b.blockType === 'faq');
-    const hasTestimonials = layout.some((b: any) => b.blockType === 'testimonials');
-    if (!hasFaq) {
-      warnings.push('Halaman belum memiliki FAQ Accordion untuk menjawab keraguan calon Bunda.');
-    }
-    if (!hasTestimonials) {
-      warnings.push('Halaman belum memiliki Testimoni untuk memperkuat social proof.');
+    // Check FAQ & Testimonials presence (warning for landing pages)
+    if (isLanding) {
+      const hasFaq = layout.some((b: any) => b.blockType === 'faq');
+      const hasTestimonials = layout.some((b: any) => b.blockType === 'testimonials');
+      if (!hasFaq) {
+        warnings.push('Halaman belum memiliki FAQ Accordion untuk menjawab keraguan calon Bunda.');
+      }
+      if (!hasTestimonials) {
+        warnings.push('Halaman belum memiliki Testimoni untuk memperkuat social proof.');
+      }
     }
 
     // Check circular template references and image alt texts

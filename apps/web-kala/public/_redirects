@@ -1,2 +1,6 @@
 # Cloudflare Workers Static Assets Redirects
 # (Only relative URLs allowed. Domain canonical redirects are managed via Cloudflare Dashboard > Rules > Redirect Rules)
+
+# Redirect legacy /lp/ landing pages to new /sales/ format
+/lp/* /sales/:splat 301
+/preview/lp/* /preview/sales/:splat 302

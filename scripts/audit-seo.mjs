@@ -97,7 +97,7 @@ for (const filePath of htmlFiles) {
         totalErrors++;
       }
     }
-  } else if (!is404Page && !relativePath.startsWith('lp/')) {
+  } else if (!is404Page && !relativePath.startsWith('sales/') || relativePath.startsWith('lp/')) {
     pageReport.warnings.push('Missing JSON-LD structured data schema.');
     totalWarnings++;
   }
@@ -110,19 +110,19 @@ for (const filePath of htmlFiles) {
   }
 
   // 4b. Dedicated Landing Page (/lp/) checks (P10)
-  if (relativePath.startsWith('lp/')) {
+  if (relativePath.startsWith('sales/') || relativePath.startsWith('lp/')) {
     const hasNoindex = /<meta[^>]+name=["']robots["'][^>]+content=["'][^"']*noindex[^"']*["']/i.test(html);
     if (!hasNoindex) {
-      pageReport.warnings.push('Halaman kampanye /lp/ wajib memiliki meta robots "noindex" untuk mencegah duplikasi konten.');
+      pageReport.warnings.push('Halaman kampanye /sales/ wajib memiliki meta robots "noindex" untuk mencegah duplikasi konten.');
       totalErrors++;
     }
     if (pageReport.h1Count !== 1) {
-      pageReport.warnings.push(`Halaman kampanye /lp/ wajib memiliki tepat satu <h1> (terdeteksi: ${pageReport.h1Count}).`);
+      pageReport.warnings.push(`Halaman kampanye /sales/ wajib memiliki tepat satu <h1> (terdeteksi: ${pageReport.h1Count}).`);
       totalErrors++;
     }
     const hasWaCta = /https:\/\/wa\.me\//i.test(html) || /wa\.me/i.test(html);
     if (!hasWaCta) {
-      pageReport.warnings.push('Halaman kampanye /lp/ wajib memiliki minimal satu tautan CTA WhatsApp.');
+      pageReport.warnings.push('Halaman kampanye /sales/ wajib memiliki minimal satu tautan CTA WhatsApp.');
       totalErrors++;
     }
   }

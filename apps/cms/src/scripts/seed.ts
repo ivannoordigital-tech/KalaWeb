@@ -539,7 +539,7 @@ export async function seed() {
     }
   }
 
-  // 6. Seed Custom Pages
+  // 6. Seed Custom Pages (Unified: Theme & Canvas Sales Pages)
   const initialPages = [
     {
       title: 'Syarat dan Ketentuan Layanan',
@@ -547,6 +547,41 @@ export async function seed() {
       description: 'Ketentuan pemesanan, reservasi homecare, higienitas medis, dan pembatalan kunjungan bidan Kala Moms and Baby Spa.',
       showWhatsAppCta: true,
       whatsappCustomMessage: 'Halo Bidan Kala, saya mau tanya mengenai syarat dan ketentuan pemesanan',
+      pageType: 'standard' as const,
+      pageLayout: 'default' as const,
+      _status: 'published',
+    },
+    {
+      title: 'Solusi Tangis Kolik & Perut Kembung Bayi di Surabaya & Sidoarjo',
+      slug: 'bayi-kolik',
+      description: 'Perawatan homecare oleh bidan ber-STR resmi hadir langsung ke rumah Bunda. Terapi pijat ILU anatomi medis + evaluasi perlekatan menyusui untuk meredakan tangisan si kecil.',
+      refCode: 'KALA-LP-BAYI-KOLIK-A',
+      pageType: 'landing' as const,
+      pageLayout: 'canvas' as const,
+      showWhatsAppCta: true,
+      whatsappCustomMessage: 'Halo Bidan Kala, saya mau konsultasi keluhan kolik si kecil',
+      _status: 'published',
+    },
+    {
+      title: 'Pijat Ceria Newborn Homecare Surabaya & Sidoarjo | Bidan Ber-STR',
+      slug: 'pijat-newborn',
+      description: 'Sentuhan lembut pertama untuk kenyamanan tumbuh kembang si kecil. Perawatan homecare khusus bayi baru lahir (0-6 bulan) langsung di kamar Bunda.',
+      refCode: 'KALA-LP-PIJAT-NEWBORN-A',
+      pageType: 'landing' as const,
+      pageLayout: 'canvas' as const,
+      showWhatsAppCta: true,
+      whatsappCustomMessage: 'Halo Bidan Kala, saya mau reservasi pijat ceria newborn',
+      _status: 'published',
+    },
+    {
+      title: 'Reservasi Online Homecare Bidan Kala | Surabaya & Sidoarjo',
+      slug: 'reservasi-online',
+      description: 'Si kecil lebih tenang, tidur lebih nyenyak, tumbuh lebih optimal. Layanan pijat & perawatan profesional untuk bayi dan ibu nifas langsung di rumah Bunda.',
+      refCode: 'KALA-LP-RESERVASI-ONLINE-A',
+      pageType: 'landing' as const,
+      pageLayout: 'canvas' as const,
+      showWhatsAppCta: true,
+      whatsappCustomMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
       _status: 'published',
     },
   ]
@@ -562,6 +597,17 @@ export async function seed() {
         collection: 'pages',
         data: pg,
         draft: false,
+      })
+    } else {
+      console.log(`Updating custom page metadata: ${pg.title}`)
+      await (payload.update as any)({
+        collection: 'pages',
+        id: existing.docs[0].id,
+        data: {
+          pageType: pg.pageType,
+          pageLayout: pg.pageLayout,
+          refCode: pg.refCode,
+        },
       })
     }
   }

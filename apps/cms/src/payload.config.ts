@@ -121,7 +121,7 @@ export default buildConfig({
   db: postgresAdapter({
     push: true,
     pool: {
-      connectionString: process.env.DATABASE_URI || 'postgresql://kala_cms_user:postgres@127.0.0.1:5432/kala_cms_db',
+      connectionString: process.env.DATABASE_URI || 'postgresql://kala_cms_user:aDGmXtwqfYP4oAlrNB6vgpezj0LH529O@127.0.0.1:5432/kala_cms_db',
       connectionTimeoutMillis: 10000,
     },
   }),

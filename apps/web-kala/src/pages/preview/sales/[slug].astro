@@ -38,6 +38,7 @@ const PAYLOAD_URL = import.meta.env.PAYLOAD_URL || 'https://admin.kalababyspa.co
 const title = pageData?.title || `Pratinjau Draft: ${slug}`;
 const blocks = Array.isArray(pageData?.layout) ? pageData.layout : [];
 const hasBlocks = blocks.length > 0;
+const isCanvas = pageData?.pageLayout === 'canvas';
 ---
 
 <!DOCTYPE html>
@@ -76,6 +77,7 @@ const hasBlocks = blocks.length > 0;
     </aside>
 
     <!-- Minimalist Header -->
+    {!isCanvas && (
     <header class="py-4 px-4 bg-white/95 backdrop-blur-md border-b border-[#F6DCCD] sticky top-10 z-30">
       <div class="max-w-4xl mx-auto flex items-center justify-between">
         <a href="/" class="flex items-center gap-2.5">
@@ -96,6 +98,7 @@ const hasBlocks = blocks.length > 0;
         </div>
       </div>
     </header>
+    )}
 
     <main class="flex-grow">
       {hasBlocks ? (

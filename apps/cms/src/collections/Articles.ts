@@ -19,6 +19,13 @@ export const Articles: CollectionConfig = {
       const role = getUserRole(user);
       return role === 'midwife_coordinator';
     },
+    preview: (doc) => {
+      if (doc?.slug) {
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        return `${baseUrl}/blog/${doc.slug}/`;
+      }
+      return null;
+    },
   },
   access: {
     read: () => true,

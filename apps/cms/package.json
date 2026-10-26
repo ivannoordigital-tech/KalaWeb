@@ -8,8 +8,8 @@
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev -p 3005",
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start -p 3005",
-    "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed.ts",
-    "audit:backfill": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/audit-backfill.ts",
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/seed.ts",
+    "audit:backfill": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/audit-backfill.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
   },

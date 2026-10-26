@@ -193,7 +193,7 @@ export interface LandingPage {
    */
   title: string;
   /**
-   * Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/lp/bayi-kolik)
+   * Alamat URL halaman kampanye iklan. Contoh: bayi-kolik (akan beralamat di kalababyspa.com/sales/bayi-kolik)
    */
   slug: string;
   /**
@@ -209,6 +209,13 @@ export interface LandingPage {
    * Contoh: KALA-LP-KOLIK. Digunakan untuk mengelompokkan laporan perbandingan varian.
    */
   campaignBaseRef?: string | null;
+  /**
+   * Pilih tata letak seperti Elementor:
+   * • Canvas Minimal: Header sales ringkas tanpa menu keluar (standar iklan).
+   * • Canvas Murni: 100% kosong putih bersih tanpa elemen bawaan.
+   * • Default/Full Width: Menyertakan navbar & footer web utama.
+   */
+  pageLayout?: ('canvas_minimal' | 'canvas' | 'default' | 'full_width') | null;
   /**
    * Identifikasi varian untuk evaluasi conversion rate iklan.
    */
@@ -1213,13 +1220,38 @@ export interface PageTemplate {
 export interface Page {
   id: number;
   /**
-   * Judul utama halaman yang tampil di bagian atas. Contoh: Syarat dan Ketentuan Layanan
+   * Judul utama halaman. Contoh: Promo Paket Newborn atau Syarat & Ketentuan
    */
   title: string;
   /**
-   * Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: syarat-ketentuan
+   * Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: promo-newborn
    */
   slug: string;
+  /**
+   * Pilih tujuan fungsi halaman:
+   * • Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.
+   * • Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan konversi WhatsApp & Pixel.
+   */
+  pageType?: ('standard' | 'landing') | null;
+  /**
+   * Pilih tata letak visual halaman seperti di Elementor:
+   * • Default: Layout standar tema dengan navbar & footer.
+   * • Elementor Canvas: 100% blank canvas tanpa header/footer tema.
+   * • Full Width: Memenuhi lebar layar dengan header/footer bawaan.
+   */
+  pageLayout?: ('default' | 'canvas' | 'full_width') | null;
+  /**
+   * Kode unik otomatis pelacak pesan WA masuk. Contoh: KALA-LP-PROMO-A
+   */
+  refCode?: string | null;
+  /**
+   * Identifikasi varian untuk evaluasi conversion rate.
+   */
+  variant?: ('A' | 'B' | 'C') | null;
+  /**
+   * Pilih pixel pelacakan iklan yang aktif untuk halaman ini.
+   */
+  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
   /**
    * Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.
    */
@@ -1247,7 +1279,7 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   /**
-   * Gunakan blok ini untuk menyusun seksi halaman secara visual (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.
+   * Gunakan blok visual ini untuk menyusun halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.
    */
   layout?:
     | (
@@ -1491,7 +1523,7 @@ export interface Page {
    */
   showWhatsAppCta?: boolean | null;
   /**
-   * Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya soal kemitraan
+   * Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya promo ini
    */
   whatsappCustomMessage?: string | null;
   /**
@@ -2208,6 +2240,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
   active?: T;
   activePixels?: T;
   campaignBaseRef?: T;
+  pageLayout?: T;
   variant?: T;
   layout?:
     | T
@@ -2998,6 +3031,11 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  pageType?: T;
+  pageLayout?: T;
+  refCode?: T;
+  variant?: T;
+  activePixels?: T;
   description?: T;
   heroImage?: T;
   content?: T;

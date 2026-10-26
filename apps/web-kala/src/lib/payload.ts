@@ -146,6 +146,7 @@ export interface PayloadLandingPage {
   testimonial?: { quote: string; author: string; area: string };
   faqs?: Array<{ q: string; a: string }>;
   layout?: any[];
+  pageLayout?: 'canvas_minimal' | 'canvas' | 'default' | 'full_width';
   active?: boolean;
 }
 
@@ -153,6 +154,11 @@ export interface PayloadPage {
   id?: string;
   title: string;
   slug: string;
+  pageType?: 'standard' | 'landing';
+  pageLayout?: 'default' | 'canvas' | 'full_width';
+  refCode?: string;
+  variant?: string;
+  activePixels?: string[];
   description?: string;
   heroImage?: { url?: string; alt?: string };
   content?: any;

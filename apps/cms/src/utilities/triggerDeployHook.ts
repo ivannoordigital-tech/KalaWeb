@@ -103,7 +103,7 @@ async function executeDeploy(hookUrl: string, options: TriggerOptions, reason: s
   currentDeployStatus.lastReason = reason;
 
   const targetUrl = options.resource === 'LandingPages' && options.slug
-    ? `https://kalababyspa.com/lp/${options.slug}`
+    ? `https://kalababyspa.com/sales/${options.slug}`
     : options.resource === 'Pages' && options.slug
       ? `https://kalababyspa.com/${options.slug}`
       : 'https://kalababyspa.com';
@@ -129,7 +129,7 @@ async function executeDeploy(hookUrl: string, options: TriggerOptions, reason: s
       console.log(`[Deploy Hook] Cloudflare Pages build triggered successfully! Reason: ${reason} (Status ${response.status})`);
 
       const liveMessage = options.resource === 'LandingPages' && options.slug
-        ? `✅ <b>[KalaWeb Sudah Live]</b>\nLP <code>/lp/${options.slug}</code> sudah live!\n🌐 Kunjungi: ${targetUrl}`
+        ? `✅ <b>[KalaWeb Sudah Live]</b>\nSales <code>/sales/${options.slug}</code> sudah live!\n🌐 Kunjungi: ${targetUrl}`
         : `✅ <b>[KalaWeb Sudah Live]</b>\nPerubahan <code>${reason}</code> berhasil diproses oleh Cloudflare Pages!\n🌐 Kunjungi: ${targetUrl}`;
 
       await sendTelegramAlert(liveMessage);

@@ -8,7 +8,7 @@ export const HelpCenter: CollectionConfig = {
     plural: '📖 Pusat Bantuan & SOP',
   },
   admin: {
-    group: '📢 Pemasaran & Iklan',
+    group: '⚙️ Pengaturan Website',
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'order', 'updatedAt'],
     description: 'Pusat panduan kerja operasional admin KalaWeb. Baca panduan di bawah ini untuk mempelajari cara membuat landing page, etika bahasa iklan kesehatan, dan format foto.',

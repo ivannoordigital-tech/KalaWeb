@@ -20,6 +20,7 @@ export async function getStaticPaths() {
     'bidan',
     'blog',
     'lp',
+    'sales',
   ]);
 
   const fallbackPages: PayloadPage[] = [
@@ -33,7 +34,7 @@ export async function getStaticPaths() {
   ];
 
   const rawList = cmsPages.length > 0 ? cmsPages : fallbackPages;
-  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug));
+  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug) && (p as any).pageType !== 'landing');
 
   return validPages.map((page) => ({
     params: { slug: page.slug },
@@ -80,6 +81,8 @@ function renderRichText(content: any): string {
 }
 
 const renderedHtml = renderRichText(page.content);
+const isCanvas = page.pageLayout === 'canvas';
+const isFullWidth = page.pageLayout === 'full_width';
 ---
 
 <BaseLayout
@@ -88,17 +91,29 @@ const renderedHtml = renderRichText(page.content);
   canonical={resolvedCanonical}
   image={resolvedOgImage}
   noindex={page.seo?.noIndex || false}
-  breadcrumbs={breadcrumbs}
->
+  breadcrumbs={isCanvas ? undefined : breadcrumbs}
+  pageLayout={page.pageLayout || 'default'}>
   {page.layout && page.layout.length > 0 ? (
-    <main>
+    <div class={isFullWidth || isCanvas ? 'w-full' : ''}>
       {page.layout.map((block: any) => (
         <BlockRenderer block={block} />
       ))}
-    </main>
+    </div>
+  ) : isCanvas ? (
+    <div class="w-full">
+      {renderedHtml ? (
+        <article class="prose-kala max-w-none p-6 sm:p-12">
+          <div set:html={renderedHtml} />
+        </article>
+      ) : (
+        <div class="py-24 px-4 text-center text-[#86675A]">
+          <p class="text-lg">Canvas Kosong (Blank Canvas). Silakan tambahkan susunan blok di CMS.</p>
+        </div>
+      )}
+    </div>
   ) : (
-    <div class="py-12 md:py-20 bg-[#FFF9F4] min-h-[70vh]">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class={`py-12 md:py-20 bg-[#FFF9F4] min-h-[70vh] ${isFullWidth ? 'w-full px-4 sm:px-8' : ''}`}>
+      <div class={isFullWidth ? 'w-full' : 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'}>
         
         <!-- Breadcrumbs -->
         <nav class="flex items-center gap-2 text-xs text-[#86675A] mb-8 overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">

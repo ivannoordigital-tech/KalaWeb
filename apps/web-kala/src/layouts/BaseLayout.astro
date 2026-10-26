@@ -48,6 +48,9 @@ interface Props {
   };
   breadcrumbs?: Array<{ name: string; url: string }>;
   showFloatingWa?: boolean;
+  pageLayout?: 'default' | 'canvas' | 'full_width';
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 
 const {
@@ -67,6 +70,9 @@ const {
   personData,
   breadcrumbs,
   showFloatingWa = true,
+  pageLayout = 'default',
+  hideHeader = false,
+  hideFooter = false,
 } = Astro.props;
 
 // Fetch dynamic global site settings at build time (falls back gracefully to siteConfig)
@@ -84,6 +90,13 @@ const siteSettings = {
 };
 
 const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
+const isCanvas = pageLayout === 'canvas';
+const isFullWidth = pageLayout === 'full_width';
+const showNavbar = !isCanvas && !hideHeader;
+const showFooter = !isCanvas && !hideFooter;
+const showAnnouncement = !isCanvas && Boolean(siteSettings.announcementBanner);
+const showFloating = !isCanvas && showFloatingWa;
+const showMobileBar = !isCanvas;
 ---
 
 <!DOCTYPE html>
@@ -153,13 +166,15 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
       breadcrumbs={breadcrumbs}
     />
   </head>
-  <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22] pb-16 md:pb-0">
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#4B2E22] focus:shadow-lg focus:ring-2 focus:ring-[#C2552B]"
-    >
-      Lewati ke konten utama
-    </a>
+  <body class={`bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22] ${isCanvas ? 'p-0 m-0' : 'pb-16 md:pb-0'}`}>
+    {showNavbar && (
+      <a
+        href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#4B2E22] focus:shadow-lg focus:ring-2 focus:ring-[#C2552B]"
+      >
+        Lewati ke konten utama
+      </a>
+    )}
     <!-- Google Tag Manager (noscript) -->
     <noscript>
       <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
@@ -167,21 +182,22 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    {siteSettings.announcementBanner && (
+    {showAnnouncement && (
       <aside class="bg-[#C2552B] text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center">
         {siteSettings.announcementBanner}
       </aside>
     )}
 
-    <Navbar siteSettings={siteSettings} />
+    {showNavbar && <Navbar siteSettings={siteSettings} />}
 
-    <main id="main-content" tabindex="-1" class="flex-grow focus:outline-none">
+    <main id="main-content" tabindex="-1" class={`flex-grow focus:outline-none ${isFullWidth || isCanvas ? 'w-full' : ''}`}>
+
       <slot />
     </main>
 
-    <Footer siteSettings={siteSettings} />
+    {showFooter && <Footer siteSettings={siteSettings} />}
 
-    {showFloatingWa && (
+    {showFloating && (
       <div id="desktop-floating-wa" class="hidden md:block fixed bottom-6 right-6 z-50 transition-all duration-300 ease-in-out transform translate-y-6 opacity-0 pointer-events-none">
         <WhatsAppButton
           refCode="KALA-FLOAT"
@@ -194,7 +210,7 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
     )}
 
     <!-- Mobile Sticky Bottom CTA Bar -->
-    <MobileStickyBar phone={siteSettings.whatsappNumber} />
+    {showMobileBar && <MobileStickyBar phone={siteSettings.whatsappNumber} />}
 
 
     <!-- Attribution and WhatsApp Click Script -->

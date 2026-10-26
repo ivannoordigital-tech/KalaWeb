@@ -81,7 +81,7 @@ Skrip `tracker.js` otomatis:
    - **Halaman Layanan Individual:** `/layanan/[slug]` lengkap dengan Schema `Service` & `Offer`, transparansi biaya, dan alur prosedur 4 langkah.
    - **Halaman Area Spesifik:** `/area/[slug]` (Surabaya Timur, Barat, Selatan, Pusat, Utara, Sidoarjo) dengan landmark lokal dan estimasi waktu tempuh.
    - **Halaman Otoritas Klinis:** `/tentang-kami` dan `/tim-bidan` dengan nomor STR terverifikasi dan Schema `Person`.
-   - **Landing Page Kampanye Ads:** `/lp/[slug]` (`/lp/bayi-kolik`, `/lp/pijat-newborn`) bebas distraksi navigasi, single CTA, dan `noindex: true`.
+   - **Landing Page Kampanye Ads:** `/sales/[slug]` (`/sales/bayi-kolik`, `/sales/pijat-newborn`) bebas distraksi navigasi, single CTA, dan `noindex: true`.
    - **RSS Feed & Breadcrumbs:** `/rss.xml` terintegrasi `@astrojs/rss`.
 4. **Fase 3 & 4 — Atribusi Multi-Touch 30 Hari, Kepatuhan & Performa:**
    - **Atribusi Tahan Lama:** Pelacakan First-Touch & Last-Touch (`utm_source`, `utm_campaign`, `fbclid`, `gclid`) bertahan 30 hari via Cookie & localStorage.

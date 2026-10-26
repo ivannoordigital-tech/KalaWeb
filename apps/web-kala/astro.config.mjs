@@ -39,12 +39,16 @@ function payloadRedirectsIntegration() {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://kalababyspa.com',
+  server: {
+    host: true, // Listen on all network interfaces (IPv4 0.0.0.0 & IPv6 ::)
+    port: 4321,
+  },
   integrations: [
     tailwind({
       applyBaseStyles: false,
     }),
     sitemap({
-      filter: (page) => !page.includes('/segera-hadir') && !page.includes('/404') && !page.includes('/lp/') && !page.includes('/preview/') && !page.includes('/_blocks'),
+      filter: (page) => !page.includes('/segera-hadir') && !page.includes('/404') && !page.includes('/sales/') && !page.includes('/lp/') && !page.includes('/preview/') && !page.includes('/_blocks'),
       changefreq: 'weekly',
       priority: 0.8,
       lastmod: new Date('2026-10-20'),

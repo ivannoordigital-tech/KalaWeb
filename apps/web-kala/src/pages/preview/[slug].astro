@@ -30,13 +30,15 @@ const { pageData } = Astro.props;
 const title = pageData?.title || `Pratinjau Draft: ${slug}`;
 const blocks = Array.isArray(pageData?.layout) ? pageData.layout : [];
 const hasBlocks = blocks.length > 0;
+const isCanvas = pageData?.pageLayout === 'canvas';
+const isFullWidth = pageData?.pageLayout === 'full_width';
 ---
 
 <BaseLayout
   title={`[PRATINJAU DRAFT] ${title}`}
   description="Mode pratinjau halaman kustom draft editor CMS."
   noindex={true}
->
+  pageLayout={pageData?.pageLayout || 'default'}>
   <!-- Prominent Draft Preview Banner (Sticky) -->
   <aside class="bg-amber-500 text-slate-950 font-bold px-4 py-3 text-center text-xs sm:text-sm sticky top-20 z-50 flex flex-wrap items-center justify-center gap-2 shadow-md">
     <span class="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[11px] font-mono tracking-wider uppercase">
@@ -53,11 +55,12 @@ const hasBlocks = blocks.length > 0;
     </a>
   </aside>
 
-  <main class="flex-grow">
-    {hasBlocks ? (
-      blocks.map((block: any) => (
-        <BlockRenderer block={block} />
-      ))
+  {hasBlocks ? (
+      <div class={isFullWidth || isCanvas ? 'w-full' : ''}>
+        {blocks.map((block: any) => (
+          <BlockRenderer block={block} />
+        ))}
+      </div>
     ) : (
       <div class="py-16 px-4 text-center max-w-2xl mx-auto">
         <h1 class="text-3xl font-brand font-bold text-[#4B2E22] mb-3">{title}</h1>
@@ -66,7 +69,6 @@ const hasBlocks = blocks.length > 0;
         </p>
       </div>
     )}
-  </main>
 
   <!-- Payload CMS Side-by-Side Live Preview Message Listener -->
   <script is:inline>

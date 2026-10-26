@@ -15,6 +15,7 @@ const RESERVED_SLUGS = [
   'bidan',
   'blog',
   'lp',
+  'sales',
   'segera-hadir',
   'tentang-kami',
   'kebijakan-privasi',
@@ -28,13 +29,13 @@ const RESERVED_SLUGS = [
 export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: {
-    singular: 'Halaman Kustom (Page)',
-    plural: 'Halaman Kustom (Pages)',
+    singular: 'Halaman',
+    plural: 'Halaman (Pages)',
   },
   admin: {
-    group: '📢 Pemasaran & Iklan',
+    group: '📢 Pemasaran & Halaman',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'seoScore', 'updatedAt', '_status'],
+    defaultColumns: ['title', 'slug', 'pageType', 'pageLayout', 'seoScore', 'updatedAt', '_status'],
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
@@ -42,7 +43,8 @@ export const Pages: CollectionConfig = {
     preview: (doc) => {
       if (doc?.slug) {
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/${doc.slug}/`;
+        const prefix = doc.pageType === 'landing' ? '/preview/sales' : '/preview';
+        return `${baseUrl}${prefix}/${doc.slug}/`;
       }
       return null;
     },
@@ -50,7 +52,8 @@ export const Pages: CollectionConfig = {
       url: ({ data }) => {
         const slug = data?.slug || 'syarat-ketentuan';
         const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/${slug}/`;
+        const prefix = data?.pageType === 'landing' ? '/preview/sales' : '/preview';
+        return `${baseUrl}${prefix}/${slug}/`;
       },
       breakpoints: [
         {
@@ -92,6 +95,7 @@ export const Pages: CollectionConfig = {
               args.data.title = `${args.data.title} (Salinan Duplikat)`;
             }
             args.data.slug = '';
+            args.data.refCode = '';
             args.data._status = 'draft';
           }
         }
@@ -100,7 +104,15 @@ export const Pages: CollectionConfig = {
     ],
     beforeChange: [
       async ({ data, req }) => {
-        const { isValid, errors, warnings } = validatePageBuilderDoc(data, false);
+        const isLanding = data.pageType === 'landing';
+        // Auto-generate refCode if empty for landing pages
+        if (isLanding && !data.refCode && data.slug) {
+          const cleanSlug = String(data.slug).toUpperCase().replace(/[^A-Z0-9]/g, '-');
+          const variant = data.variant || 'A';
+          data.refCode = `KALA-LP-${cleanSlug}-${variant}`;
+        }
+
+        const { isValid, errors, warnings } = validatePageBuilderDoc(data, isLanding);
         if (!isValid) {
           throw new APIError(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`, 400);
         }
@@ -154,8 +166,8 @@ export const Pages: CollectionConfig = {
       required: true,
       label: 'Judul Halaman',
       admin: {
-        description: 'Judul utama halaman yang tampil di bagian atas. Contoh: Syarat dan Ketentuan Layanan',
-        placeholder: 'Syarat dan Ketentuan Layanan Homecare Kala',
+        description: 'Judul utama halaman. Contoh: Promo Paket Newborn atau Syarat & Ketentuan',
+        placeholder: 'Promo Spesial Pijat Newborn Homecare Surabaya',
       },
     },
     {
@@ -166,8 +178,8 @@ export const Pages: CollectionConfig = {
       label: 'Slug URL (kalababyspa.com/[slug])',
       admin: {
         position: 'sidebar',
-        description: 'Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: syarat-ketentuan',
-        placeholder: 'syarat-ketentuan',
+        description: 'Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: promo-newborn',
+        placeholder: 'promo-newborn',
       },
       validate: (val: any) => {
         if (!val) return 'Slug URL wajib diisi.'
@@ -179,6 +191,95 @@ export const Pages: CollectionConfig = {
           return 'Slug hanya boleh menggunakan huruf kecil, angka, dan tanda hubung (-).'
         }
         return true
+      },
+    },
+    {
+      name: 'pageType',
+      type: 'radio',
+      label: '📌 Tipe Halaman (Page Type)',
+      defaultValue: 'standard',
+      options: [
+        {
+          label: 'Halaman Biasa (Website Umum: kalababyspa.com/[slug])',
+          value: 'standard',
+        },
+        {
+          label: 'Halaman Iklan (Landing Page / Sales Page: kalababyspa.com/sales/[slug])',
+          value: 'landing',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Pilih tujuan fungsi halaman:\n• Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.\n• Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan konversi WhatsApp & Pixel.',
+      },
+    },
+    {
+      name: 'pageLayout',
+      type: 'radio',
+      label: '🎨 Opsi Tampilan (Page Layout)',
+      defaultValue: 'default',
+      options: [
+        {
+          label: 'Default (Standar tema bawaan dengan header & footer)',
+          value: 'default',
+        },
+        {
+          label: 'Elementor Canvas (Blank Canvas: 100% kosong tanpa header & footer)',
+          value: 'canvas',
+        },
+        {
+          label: 'Elementor Full Width (Lebar penuh dengan header & footer bawaan)',
+          value: 'full_width',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Pilih tata letak visual halaman seperti di Elementor:\n• Default: Layout standar tema dengan navbar & footer.\n• Elementor Canvas: 100% blank canvas tanpa header/footer tema.\n• Full Width: Memenuhi lebar layar dengan header/footer bawaan.',
+      },
+    },
+    // Konfigurasi Iklan & Konversi (Sidebar - Khusus Halaman Iklan)
+    {
+      name: 'refCode',
+      type: 'text',
+      label: 'Kode Pelacak WhatsApp (Ref Code)',
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.pageType === 'landing',
+        description: 'Kode unik otomatis pelacak pesan WA masuk. Contoh: KALA-LP-PROMO-A',
+        placeholder: 'Otomatis dibuat jika kosong',
+      },
+    },
+    {
+      name: 'variant',
+      type: 'select',
+      label: 'Varian Halaman (A/B Test)',
+      defaultValue: 'A',
+      options: [
+        { label: 'Varian A (Kontrol)', value: 'A' },
+        { label: 'Varian B (Uji)', value: 'B' },
+        { label: 'Varian C (Eksperimen)', value: 'C' },
+      ],
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.pageType === 'landing',
+        description: 'Identifikasi varian untuk evaluasi conversion rate.',
+      },
+    },
+    {
+      name: 'activePixels',
+      type: 'select',
+      hasMany: true,
+      label: 'Pixel Iklan Aktif',
+      defaultValue: ['meta', 'google'],
+      options: [
+        { label: 'Meta Pixel (Facebook/Instagram Ads)', value: 'meta' },
+        { label: 'Google Ads Tag (GTM/AdWords)', value: 'google' },
+        { label: 'TikTok Pixel', value: 'tiktok' },
+      ],
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.pageType === 'landing',
+        description: 'Pilih pixel pelacakan iklan yang aktif untuk halaman ini.',
       },
     },
     {
@@ -201,7 +302,7 @@ export const Pages: CollectionConfig = {
     {
       name: 'content',
       type: 'richText',
-      label: 'Isi Konten Halaman Lengkap',
+      label: 'Isi Konten Artikel / Teks Lengkap (Opsional)',
       admin: {
         description: 'Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.',
       },
@@ -212,7 +313,7 @@ export const Pages: CollectionConfig = {
       type: 'blocks',
       label: '🧱 Susunan Blok Halaman (Drag & Drop Page Builder)',
       admin: {
-        description: 'Gunakan blok ini untuk menyusun seksi halaman secara visual (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.',
+        description: 'Gunakan blok visual ini untuk menyusun halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.',
       },
       blocks: allBlocks,
     },
@@ -233,7 +334,7 @@ export const Pages: CollectionConfig = {
       label: 'Pesan Kustom WhatsApp (Opsional)',
       admin: {
         position: 'sidebar',
-        description: 'Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya soal kemitraan',
+        description: 'Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya promo ini',
       },
     },
     // Reusable SEO Fields & Audit Scoring

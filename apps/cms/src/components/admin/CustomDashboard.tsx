@@ -62,8 +62,16 @@ export async function CustomDashboard(props: CustomDashboardProps) {
   // Combine and sort recent documents
   const allDocs = [
     ...articles.map((d) => ({ ...d, _type: 'Artikel', _collSlug: 'articles' })),
-    ...pages.map((d) => ({ ...d, _type: 'Halaman', _collSlug: 'pages' })),
-    ...landingPages.map((d) => ({ ...d, _type: 'Halaman landing', _collSlug: 'landing-pages' })),
+    ...pages.map((d) => {
+      const typeLabel = d.pageType === 'landing' ? 'Halaman Iklan' : 'Halaman Biasa';
+      const layoutLabel = d.pageLayout === 'canvas' ? ' (Canvas)' : d.pageLayout === 'full_width' ? ' (Full Width)' : '';
+      return {
+        ...d,
+        _type: `${typeLabel}${layoutLabel}`,
+        _collSlug: 'pages',
+      };
+    }),
+    ...landingPages.map((d) => ({ ...d, _type: 'Halaman Iklan (Canvas)', _collSlug: 'landing-pages' })),
   ]
 
   allDocs.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
@@ -125,7 +133,7 @@ export async function CustomDashboard(props: CustomDashboardProps) {
       {
         id: '1',
         title: 'Promo Awal Bulan Homecare',
-        collSlug: 'landing-pages',
+        collSlug: 'pages',
         issueMessage: 'Meta description belum diisi.',
         severity: 'critical',
       },
@@ -187,7 +195,7 @@ export async function CustomDashboard(props: CustomDashboardProps) {
       >
         {/* Card 1: Halaman Landing */}
         <Link
-          href="/admin/collections/landing-pages/create"
+          href="/admin/collections/pages/create"
           style={{
             display: 'flex',
             alignItems: 'flex-start',
@@ -216,14 +224,14 @@ export async function CustomDashboard(props: CustomDashboardProps) {
               flexShrink: 0,
             }}
           >
-            🗂️
+            📄
           </div>
           <div>
             <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
-              Buat Halaman Landing
+              Buat Halaman Baru
             </h3>
             <p style={{ margin: 0, fontSize: '13px', color: '#64748b', lineHeight: 1.4 }}>
-              Susun dari blok siap pakai. Panel SEO sudah terpasang.
+              Susun halaman standar tema atau blank canvas sales page.
             </p>
           </div>
         </Link>
@@ -594,7 +602,7 @@ export async function CustomDashboard(props: CustomDashboardProps) {
           </div>
         </div>
 
-        {/* Pindah dari WordPress? */}
+        {/* Akses Cepat Pengelolaan */}
         <div
           style={{
             backgroundColor: '#ffffff',
@@ -605,18 +613,43 @@ export async function CustomDashboard(props: CustomDashboardProps) {
           }}
         >
           <h2 style={{ margin: '0 0 4px 0', fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
-            Pindah dari WordPress?
+            Akses Cepat Pengelolaan
           </h2>
           <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#64748b' }}>
-            Padanan istilah yang biasa Anda pakai:
+            Pintasan cepat ke modul utama website:
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <MappingRow wp="Halaman (Pages)" kala="Halaman" />
-            <MappingRow wp="Elementor / Gutenberg" kala="Blok" />
-            <MappingRow wp="Yoast / Rank Math" kala="Panel SEO di editor" />
-            <MappingRow wp="Permalink" kala="Slug URL" />
-            <MappingRow wp="Pustaka Media" kala="Media" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <QuickLinkRow
+              icon="📄"
+              title="Semua Halaman"
+              desc="Kelola halaman tema & blank canvas"
+              href="/admin/collections/pages"
+            />
+            <QuickLinkRow
+              icon="💆"
+              title="Katalog Layanan & Spa"
+              desc="Tarif, durasi & paket homecare"
+              href="/admin/collections/services"
+            />
+            <QuickLinkRow
+              icon="✍️"
+              title="Artikel Edukasi"
+              desc="Panduan kesehatan ibu & bayi"
+              href="/admin/collections/articles"
+            />
+            <QuickLinkRow
+              icon="👩‍⚕️"
+              title="Bidan & Tenaga Medis"
+              desc="Profil nakes ber-STR aktif"
+              href="/admin/collections/midwives"
+            />
+            <QuickLinkRow
+              icon="💬"
+              title="Testimoni Bunda"
+              desc="Ulasan asli pasien Surabaya & Sidoarjo"
+              href="/admin/collections/testimonials"
+            />
           </div>
         </div>
       </div>
@@ -660,9 +693,10 @@ function ProgressBar({ label, percent, barColor }: { label: string; percent: num
   )
 }
 
-function MappingRow({ wp, kala }: { wp: string; kala: string }) {
+function QuickLinkRow({ icon, title, desc, href }: { icon: string; title: string; desc: string; href: string }) {
   return (
-    <div
+    <Link
+      href={href}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -672,11 +706,19 @@ function MappingRow({ wp, kala }: { wp: string; kala: string }) {
         borderRadius: '8px',
         fontSize: '13px',
         border: '1px solid #f1f5f9',
+        textDecoration: 'none',
+        color: 'inherit',
       }}
     >
-      <span style={{ color: '#64748b' }}>{wp}</span>
-      <span style={{ color: '#0f172a', fontWeight: 600 }}>→ {kala}</span>
-    </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '18px' }}>{icon}</span>
+        <div>
+          <div style={{ color: '#0f172a', fontWeight: 600, fontSize: '13px' }}>{title}</div>
+          <div style={{ color: '#64748b', fontSize: '11px' }}>{desc}</div>
+        </div>
+      </div>
+      <span style={{ color: '#94a3b8', fontSize: '14px' }}>→</span>
+    </Link>
   )
 }
 

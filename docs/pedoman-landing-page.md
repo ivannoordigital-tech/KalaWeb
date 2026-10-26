@@ -1,6 +1,6 @@
 # Pedoman Pembuatan Landing Page & Etika Iklan Kesehatan KalaWeb
 
-Dokumen ini adalah panduan standar bagi tim **Marketing**, **Copywriter**, dan **Admin Operasional** dalam menyusun halaman kampanye iklan (`/lp/[slug]`) dan halaman kustom (`/[slug]`) di Kala Moms and Baby Spa.
+Dokumen ini adalah panduan standar bagi tim **Marketing**, **Copywriter**, dan **Admin Operasional** dalam menyusun halaman kampanye iklan (`/sales/[slug]`) dan halaman kustom (`/[slug]`) di Kala Moms and Baby Spa.
 
 ---
 
@@ -65,9 +65,9 @@ Sistem CMS memiliki validasi otomatis (`beforeChange`), namun pastikan poin-poin
 ## 4. Panduan Uji Variasi (A/B Testing)
 
 Untuk membandingkan performa 2 copywriting atau tawaran:
-1. Buat LP Varian A: `/lp/bayi-kolik-a` dengan Ref Code: `LP-KOLIK-A` (pilih Varian: A).
+1. Buat LP Varian A: `/sales/bayi-kolik-a` dengan Ref Code: `LP-KOLIK-A` (pilih Varian: A).
 2. Klik tombol **Duplicate** pada Varian A untuk membuat Varian B.
 3. Beri slug baru: `bayi-kolik-b` dan Ref Code: `LP-KOLIK-B` (pilih Varian: B).
 4. Ubah variabel yang diuji (misal: judul headline atau paket harga).
-5. Pada dashboard iklan Meta/Google, bagi budget 50:50 ke URL `/lp/bayi-kolik-a` dan `/lp/bayi-kolik-b`.
+5. Pada dashboard iklan Meta/Google, bagi budget 50:50 ke URL `/sales/bayi-kolik-a` dan `/sales/bayi-kolik-b`.
 6. Evaluasi performa berdasarkan jumlah chat WhatsApp yang masuk dengan kode ref masing-masing.
