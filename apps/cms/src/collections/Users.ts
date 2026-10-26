@@ -5,10 +5,10 @@ export const Users: CollectionConfig = {
   slug: 'users',
   labels: {
     singular: 'Pengguna & Tim',
-    plural: 'Pengguna & Tim',
+    plural: 'Pengguna & Hak Akses',
   },
   admin: {
-    group: '⚙️ Pengaturan Website',
+    group: 'Pengaturan & Bantuan',
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'role'],
     hidden: ({ user }) => getUserRole(user) !== 'superadmin',

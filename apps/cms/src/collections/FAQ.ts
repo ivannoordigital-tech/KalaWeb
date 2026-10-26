@@ -5,11 +5,11 @@ import { canManageFAQ, getUserRole } from '../access/roles'
 export const FAQ: CollectionConfig = {
   slug: 'faq',
   labels: {
-    singular: 'Tanya Jawab (FAQ)',
+    singular: 'Tanya Jawab',
     plural: 'Tanya Jawab (FAQ)',
   },
   admin: {
-    group: '🏥 Data Layanan & Klinik',
+    group: 'Layanan & Klinik',
     useAsTitle: 'question',
     defaultColumns: ['question', 'category', 'order', 'active'],
     hidden: ({ user }) => {

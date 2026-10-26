@@ -5,9 +5,9 @@ import { canManageSiteSettings, getUserRole } from '../access/roles'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
-  label: 'Pengaturan Situs & Kontak',
+  label: 'Pengaturan Situs',
   admin: {
-    group: '⚙️ Pengaturan Website',
+    group: 'Pengaturan & Bantuan',
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator' || role === 'seo';

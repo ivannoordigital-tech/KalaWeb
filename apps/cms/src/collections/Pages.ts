@@ -30,10 +30,10 @@ export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: {
     singular: 'Halaman',
-    plural: 'Halaman (Pages)',
+    plural: 'Semua Halaman',
   },
   admin: {
-    group: '📢 Pemasaran & Halaman',
+    group: 'Halaman Website',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'pageType', 'pageLayout', 'seoScore', 'updatedAt', '_status'],
     hidden: ({ user }) => {
@@ -196,15 +196,15 @@ export const Pages: CollectionConfig = {
     {
       name: 'pageType',
       type: 'radio',
-      label: '📌 Tipe Halaman (Page Type)',
+      label: '📌 Tipe Halaman',
       defaultValue: 'standard',
       options: [
         {
-          label: 'Halaman Biasa (Website Umum: kalababyspa.com/[slug])',
+          label: 'Halaman Informasi Umum (kalababyspa.com/[slug])',
           value: 'standard',
         },
         {
-          label: 'Halaman Iklan (Landing Page / Sales Page: kalababyspa.com/sales/[slug])',
+          label: 'Halaman Penawaran Iklan / Sales Page (kalababyspa.com/sales/[slug])',
           value: 'landing',
         },
       ],
@@ -216,19 +216,19 @@ export const Pages: CollectionConfig = {
     {
       name: 'pageLayout',
       type: 'radio',
-      label: '🎨 Opsi Tampilan (Page Layout)',
+      label: '🎨 Opsi Tata Letak (Layout)',
       defaultValue: 'default',
       options: [
         {
-          label: 'Default (Standar tema bawaan dengan header & footer)',
+          label: 'Standar Tema (Lengkap dengan navigasi & footer)',
           value: 'default',
         },
         {
-          label: 'Elementor Canvas (Blank Canvas: 100% kosong tanpa header & footer)',
+          label: 'Kanvas Kosong (100% Bersih tanpa navigasi & footer)',
           value: 'canvas',
         },
         {
-          label: 'Elementor Full Width (Lebar penuh dengan header & footer bawaan)',
+          label: 'Lebar Penuh Tema (Memenuhi layar dengan navigasi & footer)',
           value: 'full_width',
         },
       ],

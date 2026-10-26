@@ -10,11 +10,11 @@ import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
 export const LandingPages: CollectionConfig = {
   slug: 'landing-pages',
   labels: {
-    singular: 'Halaman Iklan (Landing Page)',
-    plural: 'Halaman Iklan (Landing Pages)',
+    singular: 'Landing Page Iklan',
+    plural: 'Landing Page Iklan',
   },
   admin: {
-    group: '📢 Pemasaran & Iklan',
+    group: 'Halaman Website',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'refCode', 'variant', 'seoScore', '_status', 'updatedAt'],
     hidden: () => true,

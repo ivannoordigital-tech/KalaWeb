@@ -2,3 +2,74 @@
 :root {
   --theme-success-500: #10b981;
 }
+
+/* 1. Sidebar Nav Hierarchy, High Contrast, & Visual Indentation */
+.nav-group {
+  margin-bottom: 1.25rem !important;
+
+  &__toggle {
+    color: #0f172a !important; /* High contrast dark slate */
+    font-size: 0.76rem !important;
+    font-weight: 750 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 0.4rem 0.5rem !important;
+    border-radius: 6px !important;
+    transition: all 0.15s ease !important;
+
+    &:hover {
+      color: #0284c7 !important;
+      background-color: #f1f5f9 !important;
+    }
+
+    .nav-group__indicator svg .stroke {
+      stroke: #64748b !important;
+    }
+  }
+
+  &__content {
+    padding-left: 0.85rem !important;
+    margin-top: 0.25rem !important;
+    margin-left: 0.65rem !important;
+    border-left: 2px solid #e2e8f0 !important; /* Hierarchy guide line */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+
+    a {
+      font-size: 0.875rem !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      padding: 0.45rem 0.65rem !important;
+      border-radius: 6px !important;
+      transition: all 0.15s ease !important;
+
+      &:hover {
+        color: #0f172a !important;
+        background-color: #f8fafc !important;
+        font-weight: 600 !important;
+      }
+
+      &.active,
+      &[aria-current="page"] {
+        color: #0284c7 !important;
+        background-color: #f0f9ff !important;
+        font-weight: 600 !important;
+      }
+    }
+  }
+}
+
+/* 2. Hide Default Redundant Payload Dashboard Cards/Modules */
+.dashboard__modules,
+.modular-dashboard,
+.dashboard__collections,
+.collection-list {
+  display: none !important;
+}
+
+/* 3. Global Admin Polish */
+.step-nav {
+  font-size: 0.875rem !important;
+  color: #475569 !important;
+}

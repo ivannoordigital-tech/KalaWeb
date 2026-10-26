@@ -7,11 +7,11 @@ import { canManageServices, getUserRole } from '../access/roles'
 export const Services: CollectionConfig = {
   slug: 'services',
   labels: {
-    singular: 'Layanan & Paket Spa',
-    plural: 'Layanan & Paket Spa',
+    singular: 'Layanan',
+    plural: 'Paket Layanan & Spa',
   },
   admin: {
-    group: '🏥 Data Layanan & Klinik',
+    group: 'Layanan & Klinik',
     useAsTitle: 'name',
     defaultColumns: ['name', 'numericPrice', 'durationMinutes', 'recommended', 'active', 'order'],
     hidden: ({ user }) => {

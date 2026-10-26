@@ -6,10 +6,10 @@ export const BlockTemplates: CollectionConfig = {
   slug: 'block-templates',
   labels: {
     singular: 'Template Blok Tersimpan',
-    plural: '📁 Pustaka Template Blok',
+    plural: 'Template Blok',
   },
   admin: {
-    group: '📢 Pemasaran & Halaman',
+    group: 'Halaman Website',
     useAsTitle: 'name',
     defaultColumns: ['name', 'slug', 'category', 'updatedAt'],
     hidden: ({ user }) => {

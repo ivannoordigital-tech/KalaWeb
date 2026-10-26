@@ -1,3 +1,4 @@
+import { id } from '@payloadcms/translations/languages/id'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
@@ -52,7 +53,11 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeDashboard: ['/components/admin/CustomDashboard#CustomDashboard'],
+      views: {
+        dashboard: {
+          Component: '/components/admin/CustomDashboard#CustomDashboard',
+        },
+      },
     },
     meta: {
       titleSuffix: ' — Kala Moms and Baby Spa Admin',
@@ -96,22 +101,33 @@ export default buildConfig({
     },
   ],
   collections: [
-    HelpCenter,
+    // 1. Konten & Blog (Paling sering digunakan harian)
+    Articles,
+    Media,
+
+    // 2. Halaman Website & Penawaran
+    Pages,
     LandingPages,
     PageTemplates,
     BlockTemplates,
-    Pages,
+
+    // 3. Layanan & Klinik
     Services,
     Midwives,
     ServiceAreas,
     Testimonials,
     FAQ,
-    Articles,
-    Media,
+
+    // 4. Pengaturan & Bantuan
     Redirects,
+    HelpCenter,
     Users,
   ],
   globals: [SiteSettings],
+  i18n: {
+    fallbackLanguage: 'id',
+    supportedLanguages: { id },
+  },
   editor: lexicalEditor(),
   secret: payloadSecret as string,
   typescript: {

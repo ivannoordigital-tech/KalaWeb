@@ -5,11 +5,11 @@ import { allBlocks } from '../blocks'
 export const PageTemplates: CollectionConfig = {
   slug: 'page-templates',
   labels: {
-    singular: 'Template Halaman Utuh',
-    plural: '📑 Pustaka Template Halaman',
+    singular: 'Template Halaman',
+    plural: 'Template Halaman',
   },
   admin: {
-    group: '📢 Pemasaran & Halaman',
+    group: 'Halaman Website',
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'updatedAt'],
     hidden: ({ user }) => {

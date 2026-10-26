@@ -8,11 +8,11 @@ import { canManageArticles, getUserRole } from '../access/roles'
 export const Articles: CollectionConfig = {
   slug: 'articles',
   labels: {
-    singular: 'Artikel Edukasi & Blog',
-    plural: 'Artikel Edukasi & Blog',
+    singular: 'Artikel Edukasi',
+    plural: 'Artikel Edukasi',
   },
   admin: {
-    group: '✍️ Edukasi & Blog',
+    group: 'Konten & Blog',
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'seoScore', 'pubDate', '_status'],
     hidden: ({ user }) => {

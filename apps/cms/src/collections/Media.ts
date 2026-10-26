@@ -9,11 +9,11 @@ const dirname = path.dirname(filename)
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: {
-    singular: 'Foto & Gambar Media',
-    plural: 'Galeri Foto & Media',
+    singular: 'Media',
+    plural: 'Pustaka Media',
   },
   admin: {
-    group: '⚙️ Pengaturan Website',
+    group: 'Konten & Blog',
     useAsTitle: 'alt',
     defaultColumns: ['alt', 'filename', 'filesize', 'createdAt'],
   },

@@ -5,10 +5,10 @@ export const HelpCenter: CollectionConfig = {
   slug: 'help-center',
   labels: {
     singular: 'Panduan SOP',
-    plural: '📖 Pusat Bantuan & SOP',
+    plural: 'Pusat Bantuan Admin',
   },
   admin: {
-    group: '⚙️ Pengaturan Website',
+    group: 'Pengaturan & Bantuan',
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'order', 'updatedAt'],
     description: 'Pusat panduan kerja operasional admin KalaWeb. Baca panduan di bawah ini untuk mempelajari cara membuat landing page, etika bahasa iklan kesehatan, dan format foto.',

@@ -9,7 +9,7 @@ export const Testimonials: CollectionConfig = {
     plural: 'Testimoni Bunda',
   },
   admin: {
-    group: '🏥 Data Layanan & Klinik',
+    group: 'Layanan & Klinik',
     useAsTitle: 'author',
     defaultColumns: ['author', 'area', 'service', 'permissionGranted', 'active', 'externalRef', 'order'],
     hidden: ({ user }) => {

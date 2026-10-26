@@ -7,10 +7,10 @@ export const ServiceAreas: CollectionConfig = {
   slug: 'service-areas',
   labels: {
     singular: 'Wilayah Layanan',
-    plural: 'Wilayah Layanan',
+    plural: 'Area Jangkauan',
   },
   admin: {
-    group: '🏥 Data Layanan & Klinik',
+    group: 'Layanan & Klinik',
     useAsTitle: 'name',
     defaultColumns: ['name', 'city', 'estimatedArrivalMinutes', 'active'],
     hidden: ({ user }) => {

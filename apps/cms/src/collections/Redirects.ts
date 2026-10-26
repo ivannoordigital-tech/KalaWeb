@@ -6,10 +6,10 @@ export const Redirects: CollectionConfig = {
   slug: 'redirects',
   labels: {
     singular: 'Peralihan URL (Redirect)',
-    plural: 'Manajemen Redirects',
+    plural: 'Pengalihan URL',
   },
   admin: {
-    group: '⚙️ Pengaturan Website',
+    group: 'Pengaturan & Bantuan',
     useAsTitle: 'from',
     defaultColumns: ['from', 'to', 'type', 'active'],
     hidden: ({ user }) => {
