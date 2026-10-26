@@ -152,7 +152,7 @@ const procedureSteps = [
         <div class="flex-shrink-0">
           <WhatsAppButton
             refCode={service.refCode || 'KALA-SRV'}
-            message={service.message || `Halo Bidan Kala, saya mau reservasi ${service.name} [ref: ${service.refCode || 'KALA-SRV'}]`}
+            message={service.message || `Halo Bu Bidan, saya mau reservasi ${service.name}`}
             text="Jadwalkan Kunjungan Bidan"
             variant="hero"
           />
@@ -226,7 +226,7 @@ const procedureSteps = [
         <div class="flex-shrink-0">
           <WhatsAppButton
             refCode={`KALA-ASK-${service.refCode || 'SRV'}`}
-            message={`Halo Bidan Kala, saya mau tanya-tanya dulu tentang ${service.name} [ref: KALA-ASK]`}
+            message={`Halo Bu Bidan, saya mau tanya-tanya dulu tentang ${service.name}`}
             text="Tanya Bidan Dulu"
             variant="outline"
           />

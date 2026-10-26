@@ -21,7 +21,7 @@ const {
   phone = siteConfig.whatsappNumber,
 } = Astro.props;
 
-const defaultMessage = message || `Halo Bidan Kala, saya mau reservasi homecare [ref: ${refCode}]`;
+const defaultMessage = message || 'Halo Bu Bidan, saya mau reservasi homecare';
 const baseWaUrl = `https://wa.me/${phone}?text=${encodeURIComponent(defaultMessage)}`;
 
 const variantStyles = {

@@ -151,7 +151,7 @@ export async function getStaticPaths() {
           price: 'Mulai Rp60.000',
           duration: '40 - 100 Menit',
           ctaText: 'Konsultasi Gratis via WhatsApp',
-          ctaMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
+          ctaMessage: 'Halo Bu Bidan, saya mau reservasi homecare untuk si kecil',
           bgStyle: 'gradient',
         },
         {
@@ -293,7 +293,7 @@ export async function getStaticPaths() {
           headline: 'Berikan Sentuhan Terbaik untuk Tumbuh Kembang Buah Hati',
           description: 'Konsultasikan kebutuhan perawatan si kecil bersama Bidan Kala sekarang juga via WhatsApp.',
           buttonText: 'Chat Bidan Kala via WhatsApp',
-          buttonMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
+          buttonMessage: 'Halo Bu Bidan, saya mau reservasi homecare untuk si kecil',
           footnote: '⚡ Balas cepat dalam 5 menit · Bebas mom-shaming',
         },
       ],
@@ -441,7 +441,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
               </div>
               <WhatsAppButton
                 refCode={campaign.refCode}
-                message={`Halo Bidan Kala, saya mau pesan sesi ${campaign.headline} [ref: ${campaign.refCode}]`}
+                message={`Promo [${campaign.refCode || 'HI-21'}]\nHalo Bu Bidan, saya mau pesan sesi ${campaign.headline}`}
                 text="Hubungi Bidan Kala Sekarang"
                 variant="hero"
               />
@@ -570,7 +570,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
             </p>
             <WhatsAppButton
               refCode={campaign.refCode}
-              message={`Halo Bidan Kala, saya mau reservasi kunjungan ${campaign.headline} [ref: ${campaign.refCode}]`}
+              message={`Promo [${campaign.refCode || 'HI-21'}]\nHalo Bu Bidan, saya mau reservasi kunjungan ${campaign.headline}`}
               text="Jadwalkan Kunjungan Sekarang"
               variant="hero"
             />

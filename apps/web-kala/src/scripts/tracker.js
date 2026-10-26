@@ -155,31 +155,16 @@
     setTimeout(() => { isClickProcessing = false; }, 1500);
 
     const refCode = btn.getAttribute('data-ref-code') || (lpContext?.refCode) || 'KALA-GEN';
-    let baseMsg = btn.getAttribute('data-base-msg') || 'Halo Bidan Kala, saya mau reservasi homecare';
+    let baseMsg = btn.getAttribute('data-base-msg') || 'Halo Bu Bidan, saya mau reservasi homecare';
     const phone = btn.getAttribute('data-phone') || '6285794210526';
 
     try {
       const stored = loadStoredAttribution();
       const activeAttr = stored ? (stored.lastTouch || stored.firstTouch) : null;
-      const attributionTags = [];
 
-      if (activeAttr) {
-        if (activeAttr.utm_source) attributionTags.push(`src:${activeAttr.utm_source}`);
-        if (activeAttr.utm_campaign) attributionTags.push(`cmp:${activeAttr.utm_campaign}`);
-        if (activeAttr.fbclid) attributionTags.push(`fb:${activeAttr.fbclid.substring(0, 8)}`);
-        if (activeAttr.gclid) attributionTags.push(`g:${activeAttr.gclid.substring(0, 8)}`);
-      }
-
-      if (lpContext?.variant) {
-        attributionTags.push(`var:${lpContext.variant}`);
-      }
-
-      if (attributionTags.length > 0 && !baseMsg.includes('|')) {
-        baseMsg = baseMsg.replace(
-          new RegExp(`\\[ref:\\s*${refCode}\\]`, 'g'),
-          `[ref: ${refCode} | ${attributionTags.join(' ')}]`
-        );
-      }
+      // Clean message: human-friendly greeting & remove robotic tracking tags from visible WhatsApp text
+      baseMsg = baseMsg.replace(/^Halo Bidan Kala/i, 'Halo Bu Bidan');
+      baseMsg = baseMsg.replace(/\s*\[ref:\s*[^\]]+\]/gi, '').trim();
 
       // Microsoft Clarity Event
       if (typeof window.clarity === 'function') {
@@ -198,10 +183,10 @@
         })
       );
 
-      // Google Tag Manager dataLayer push
+      // Google Tag Manager dataLayer push (Analytics & Meta Pixel track invisibly in background)
       window.dataLayer = window.dataLayer || [];
 
-      // Event 1: whatsapp_lead (standard GA4 lead event with A/B variant breakdown)
+      // Event 1: whatsapp_lead (standard GA4 lead event with campaign & A/B variant breakdown)
       window.dataLayer.push({
         event: 'whatsapp_lead',
         event_category: 'Conversion',
@@ -210,6 +195,11 @@
         lp_slug: lpContext?.lpSlug || undefined,
         variant: lpContext?.variant || undefined,
         page_location: window.location.href,
+        utm_source: activeAttr?.utm_source || undefined,
+        utm_medium: activeAttr?.utm_medium || undefined,
+        utm_campaign: activeAttr?.utm_campaign || undefined,
+        fbclid: activeAttr?.fbclid || undefined,
+        gclid: activeAttr?.gclid || undefined,
       });
 
       // Event 2: whatsapp_contact (Meta Pixel InitiateContact / Contact)
@@ -221,7 +211,7 @@
         variant: lpContext?.variant || undefined,
       });
 
-      // Dynamically attach final wa.me url
+      // Dynamically attach final wa.me url with clean human message
       const finalUrl = `https://wa.me/${phone}?text=${encodeURIComponent(baseMsg)}`;
       btn.setAttribute('href', finalUrl);
     } catch (err) {

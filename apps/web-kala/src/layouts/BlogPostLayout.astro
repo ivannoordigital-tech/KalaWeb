@@ -33,17 +33,17 @@ const { data, slug } = entry;
 
 // Determine specific refCode and message per article
 let artRefCode = 'KALA-ART';
-let artWaMessage = `Halo Bidan Kala, saya membaca artikel ${data.title} dan mau konsultasi [ref: KALA-ART]`;
+let artWaMessage = `Halo Bu Bidan, saya membaca artikel "${data.title}" dan mau konsultasi`;
 
 if (slug.includes('kolik')) {
   artRefCode = 'KALA-ART-KOLIK';
-  artWaMessage = 'Halo Bidan Kala, saya baca artikel kolik dan mau konsultasi [ref: KALA-ART-KOLIK]';
+  artWaMessage = 'Halo Bu Bidan, saya baru membaca artikel tentang kolik dan mau konsultasi';
 } else if (slug.includes('oksitosin')) {
   artRefCode = 'KALA-ART-OKSITOSIN';
-  artWaMessage = 'Halo Bidan Kala, saya mau tanya soal pijat oksitosin [ref: KALA-ART-OKSITOSIN]';
+  artWaMessage = 'Halo Bu Bidan, saya mau tanya soal layanan pijat oksitosin';
 } else if (slug.includes('homecare') || slug.includes('surabaya')) {
   artRefCode = 'KALA-ART-HOMECARE';
-  artWaMessage = 'Halo Bidan Kala, saya mau reservasi pijat bayi homecare [ref: KALA-ART-HOMECARE]';
+  artWaMessage = 'Halo Bu Bidan, saya mau reservasi pijat bayi homecare';
 }
 
 const formattedPubDate = new Intl.DateTimeFormat('id-ID', {

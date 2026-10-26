@@ -29,7 +29,7 @@ export async function getStaticPaths() {
       slug: 'syarat-ketentuan',
       description: 'Ketentuan pemesanan, reservasi homecare, higienitas medis, dan pembatalan kunjungan bidan Kala Moms and Baby Spa di Surabaya & Sidoarjo.',
       showWhatsAppCta: true,
-      whatsappCustomMessage: 'Halo Bidan Kala, saya ingin berkonsultasi mengenai ketentuan layanan',
+      whatsappCustomMessage: 'Halo Bu Bidan, saya ingin berkonsultasi mengenai ketentuan layanan',
     },
   ];
 
@@ -170,7 +170,7 @@ const isFullWidth = page.pageLayout === 'full_width';
             </p>
             <WhatsAppButton
               refCode={`PAGE-${page.slug.toUpperCase()}`}
-              message={page.whatsappCustomMessage || `Halo Bidan Kala, saya membaca halaman ${page.title} dan ingin bertanya [ref: PAGE-${page.slug.toUpperCase()}]`}
+              message={page.whatsappCustomMessage || `Halo Bu Bidan, saya membaca halaman ${page.title} dan ingin bertanya`}
               text="Hubungi Bidan via WhatsApp"
               variant="hero"
             />

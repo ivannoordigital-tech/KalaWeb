@@ -23,7 +23,7 @@ const rawServices = cmsServices.length > 0
       badge: s.badge,
       popular: s.recommended || s.popular,
       refCode: s.refCode,
-      message: s.message || `Halo Bidan Kala, saya mau reservasi ${s.name} ${s.price} [ref: ${s.refCode}]`,
+      message: s.message || `Halo Bu Bidan, saya mau reservasi ${s.name} ${s.price}`,
     }))
   : siteConfig.featuredServices;
 
@@ -128,7 +128,7 @@ const servicesList = [...rawServices].sort((a, b) => {
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
         <WhatsAppButton
           refCode="KALA-KATALOG"
-          message="Halo Bidan Kala, boleh minta pricelist dan katalog lengkap 39 layanan Kala? [ref: KALA-KATALOG]"
+          message="Halo Bu Bidan, boleh minta pricelist dan katalog lengkap 39 layanan Kala?"
           text="Minta Katalog Lengkap 39 Menu via WhatsApp"
           variant="secondary"
           phone={phone}

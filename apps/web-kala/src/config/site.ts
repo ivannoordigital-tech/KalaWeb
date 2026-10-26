@@ -32,7 +32,7 @@ export const siteConfig = {
     capacityPerDay: 5,
     capacityNote: 'Kuota harian maksimal 5 sesi agar setiap kunjungan tetap fokus dan higienis.',
     refCode: 'KALA-PROMO-INTRO',
-    message: 'Halo Bidan Kala, saya mau ambil promo treatment Kala Baby Pijat Ceria Newborn Rp60.000 [ref: KALA-PROMO-INTRO]',
+    message: 'Promo [HI-21]\nHalo Bu Bidan, saya mau konsultasi homecare dan ambil promo Kala Baby: Pijat Ceria Newborn Rp60.000',
   },
   geo: {
     region: 'ID-JI',
@@ -53,7 +53,7 @@ export const siteConfig = {
       badge: 'Best Entry Baru Lahir',
       popular: false,
       refCode: 'KALA-SRV-NEWBORN',
-      message: 'Halo Bidan Kala, saya mau reservasi Kala Baby Pijat Ceria Newborn Rp60.000 [ref: KALA-SRV-NEWBORN]',
+      message: 'Halo Bu Bidan, saya mau reservasi Kala Baby Pijat Ceria Newborn Rp60.000',
     },
     {
       id: 'bundle-duo',
@@ -67,7 +67,7 @@ export const siteConfig = {
       badge: 'Paling Diminati Bunda',
       popular: true,
       refCode: 'KALA-SRV-DUO',
-      message: 'Halo Bidan Kala, saya mau reservasi Kala Bundle Duo (Mom & Baby Ceria) Rp150.000 [ref: KALA-SRV-DUO]',
+      message: 'Halo Bu Bidan, saya mau reservasi Kala Bundle Duo (Mom & Baby Ceria) Rp150.000',
     },
     {
       id: 'bundle-selapan',
@@ -81,7 +81,7 @@ export const siteConfig = {
       badge: 'Tradisi Praktis Steril',
       popular: false,
       refCode: 'KALA-SRV-SELAPAN',
-      message: 'Halo Bidan Kala, saya mau reservasi Kala Bundle Selapan Full Rp100.000 [ref: KALA-SRV-SELAPAN]',
+      message: 'Halo Bu Bidan, saya mau reservasi Kala Bundle Selapan Full Rp100.000',
     },
   ],
   differentiators: [
@@ -175,7 +175,7 @@ export const siteConfig = {
 };
 
 export function buildWhatsAppUrl(refCode: string, customMessage?: string, phoneNumber?: string): string {
-  const baseMessage = customMessage || `Halo Bidan Kala, saya mau reservasi homecare [ref: ${refCode}]`;
+  const baseMessage = customMessage || 'Halo Bu Bidan, saya mau reservasi homecare';
   const phone = phoneNumber || siteConfig.whatsappNumber;
   return `https://wa.me/${phone}?text=${encodeURIComponent(baseMessage)}`;
 }
