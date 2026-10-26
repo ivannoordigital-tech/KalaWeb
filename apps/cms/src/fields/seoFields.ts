@@ -1,8 +1,10 @@
 import type { Field } from 'payload'
+import { SEO_THRESHOLDS } from '../lib/seo-engine/constants'
 
 export interface SeoFieldOptions {
-  titleSourceField?: string;
-  descriptionSourceField?: string;
+  titleSourceField?: string
+  descriptionSourceField?: string
+  position?: 'sidebar' | 'main'
 }
 
 /**
@@ -11,22 +13,27 @@ export interface SeoFieldOptions {
  * Dilengkapi dengan Interactive Real-time SEO Panel & Google Search Result Preview.
  */
 export function buildSeoFields(options: SeoFieldOptions = {}): Field {
-  const titleHint = options.titleSourceField 
-    ? `Kosongkan untuk otomatis menggunakan isi dari "${options.titleSourceField}".` 
-    : 'Judul yang tampil di tab browser dan hasil pencarian Google.';
+  const titleHint = options.titleSourceField
+    ? `Kosongkan untuk otomatis menggunakan isi dari "${options.titleSourceField}".`
+    : 'Judul yang tampil di tab browser dan hasil pencarian Google.'
 
-  const descHint = options.descriptionSourceField 
-    ? `Kosongkan untuk otomatis menggunakan isi dari "${options.descriptionSourceField}".` 
-    : 'Cuplikan deskripsi di hasil pencarian Google.';
+  const descHint = options.descriptionSourceField
+    ? `Kosongkan untuk otomatis menggunakan isi dari "${options.descriptionSourceField}".`
+    : 'Cuplikan deskripsi di hasil pencarian Google.'
+
+  const adminConfig: any = {
+    description: 'Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.',
+  }
+
+  if (options.position === 'sidebar') {
+    adminConfig.position = 'sidebar'
+  }
 
   return {
     name: 'seo',
     type: 'group',
-    label: '🔍 Panel Optimasi SEO & Social Share',
-    admin: {
-      position: 'sidebar',
-      description: 'Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.',
-    },
+    label: '🔍 Optimasi SEO & Social Share',
+    admin: adminConfig,
     fields: [
       {
         name: 'seoPanelLive',
@@ -42,14 +49,14 @@ export function buildSeoFields(options: SeoFieldOptions = {}): Field {
         type: 'text',
         label: 'Judul di Google (Meta Title)',
         admin: {
-          description: `Panjang ideal: 30–60 karakter. ${titleHint}`,
+          description: `Panjang ideal: ${SEO_THRESHOLDS.TITLE_MIN_OPTIMAL}–${SEO_THRESHOLDS.TITLE_MAX_OPTIMAL} karakter. ${titleHint}`,
           placeholder: 'Contoh: Pijat Bayi Homecare Surabaya & Sidoarjo | Bidan Kala',
         },
         validate: (val: any) => {
-          if (val && String(val).length > 70) {
-            return `Judul terlalu panjang (${String(val).length} karakter). Google memotong judul di atas 60–70 karakter.`;
+          if (val && String(val).length > SEO_THRESHOLDS.TITLE_MAX_ACCEPTABLE) {
+            return `Judul terlalu panjang (${String(val).length} karakter). Google memotong judul di atas ${SEO_THRESHOLDS.TITLE_MAX_OPTIMAL}–${SEO_THRESHOLDS.TITLE_MAX_ACCEPTABLE} karakter.`
           }
-          return true;
+          return true
         },
       },
       {
@@ -57,14 +64,14 @@ export function buildSeoFields(options: SeoFieldOptions = {}): Field {
         type: 'textarea',
         label: 'Deskripsi di Google (Meta Description)',
         admin: {
-          description: `Panjang ideal: 120–155 karakter. ${descHint}`,
+          description: `Panjang ideal: ${SEO_THRESHOLDS.DESC_MIN_OPTIMAL}–${SEO_THRESHOLDS.DESC_MAX_OPTIMAL} karakter. ${descHint}`,
           placeholder: 'Deskripsi ringkas yang menarik perhatian orang tua saat melihat di Google...',
         },
         validate: (val: any) => {
-          if (val && String(val).length > 165) {
-            return `Deskripsi terlalu panjang (${String(val).length} karakter). Google biasanya memotong di atas 155–160 karakter.`;
+          if (val && String(val).length > SEO_THRESHOLDS.DESC_MAX_ACCEPTABLE) {
+            return `Deskripsi terlalu panjang (${String(val).length} karakter). Google biasanya memotong di atas ${SEO_THRESHOLDS.DESC_MAX_OPTIMAL} karakter.`
           }
-          return true;
+          return true
         },
       },
       {
@@ -113,5 +120,5 @@ export function buildSeoFields(options: SeoFieldOptions = {}): Field {
         },
       },
     ],
-  };
+  }
 }

@@ -5,9 +5,14 @@ export const seoScoreField: Field = {
   type: 'number',
   label: 'Skor SEO',
   defaultValue: 0,
+  access: {
+    // Sembunyikan field audit dari API publik, hanya user terotentikasi yang boleh membaca
+    read: ({ req: { user } }) => Boolean(user),
+  },
   admin: {
     position: 'sidebar',
     readOnly: true,
+    hidden: true, // Disembunyikan dari form edit artikel/halaman agar rapi, tetap aktif di list tabel
     description: 'Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.',
     components: {
       Cell: '/components/admin/SeoScoreCell#SeoScoreCell',
@@ -19,8 +24,13 @@ export const seoAuditFields: Field = {
   name: 'seoAudit',
   type: 'group',
   label: 'Hasil Audit SEO Otomatis',
+  access: {
+    // Sembunyikan data audit mentah dari API publik
+    read: ({ req: { user } }) => Boolean(user),
+  },
   admin: {
     position: 'sidebar',
+    hidden: true, // Disembunyikan dari form isian karena sudah ada visual panel interaktif
     description: 'Data skor kesehatan SEO dan daftar masalah yang dihasilkan otomatis oleh mesin audit.',
   },
   fields: [

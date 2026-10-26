@@ -3,8 +3,8 @@ import type { Block } from 'payload'
 export const PainPointsBlock: Block = {
   slug: 'painPoints',
   labels: {
-    singular: 'Blok Masalah Bunda (Pain Points)',
-    plural: 'Blok Masalah Bunda (Pain Points)',
+    singular: '😟 Masalah Bunda & Bayi (Pain Points)',
+    plural: '😟 Masalah Bunda & Bayi (Pain Points)',
   },
   fields: [
     {

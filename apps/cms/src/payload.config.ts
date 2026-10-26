@@ -127,8 +127,24 @@ export default buildConfig({
   i18n: {
     fallbackLanguage: 'id',
     supportedLanguages: { id },
+    translations: {
+      id: {
+        version: {
+          publishChanges: 'Terbitkan',
+          publish: 'Terbitkan',
+          publishing: 'Menerbitkan...',
+          draftSavedSuccessfully: 'Draf berhasil disimpan.',
+          autosavedSuccessfully: 'Otomatis tersimpan.',
+        } as any,
+      },
+    },
   },
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    admin: {
+      placeholder:
+        'Mulai menulis konten di sini... (Tekan "/" untuk opsi format teks, subjudul, daftar poin, atau kutipan)',
+    },
+  }),
   secret: payloadSecret as string,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -137,7 +153,9 @@ export default buildConfig({
   db: postgresAdapter({
     push: true,
     pool: {
-      connectionString: process.env.DATABASE_URI || 'postgresql://kala_cms_user:aDGmXtwqfYP4oAlrNB6vgpezj0LH529O@127.0.0.1:5432/kala_cms_db',
+      connectionString:
+        process.env.DATABASE_URI ||
+        'postgresql://kala_cms_user:aDGmXtwqfYP4oAlrNB6vgpezj0LH529O@127.0.0.1:5432/kala_cms_db',
       connectionTimeoutMillis: 10000,
     },
   }),

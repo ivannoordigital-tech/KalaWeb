@@ -3,8 +3,8 @@ import type { Block } from 'payload'
 export const PricingPackagesBlock: Block = {
   slug: 'pricing',
   labels: {
-    singular: 'Blok Tabel Paket & Harga (Pricing)',
-    plural: 'Blok Tabel Paket & Harga (Pricing)',
+    singular: '🏷️ Pilihan Paket & Harga Promo',
+    plural: '🏷️ Pilihan Paket & Harga Promo',
   },
   fields: [
     {

@@ -9,7 +9,7 @@
 
   &__toggle {
     color: #0f172a !important; /* High contrast dark slate */
-    font-size: 0.76rem !important;
+    font-size: 0.78rem !important;
     font-weight: 750 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
@@ -67,8 +67,37 @@
   display: none !important;
 }
 
-/* 3. Global Admin Polish */
+/* 3. Global Admin Polish & Form Readability */
 .step-nav {
   font-size: 0.875rem !important;
   color: #475569 !important;
+}
+
+/* High contrast & clear required asterisk */
+.field-label {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+
+  .required,
+  span[aria-hidden="true"] {
+    color: #dc2626 !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    margin-left: 3px !important;
+  }
+}
+
+/* Legible field descriptions with good contrast */
+.field-description {
+  font-size: 0.8125rem !important;
+  color: #475569 !important;
+  line-height: 1.45 !important;
+  margin-top: 4px !important;
+}
+
+/* Tab Bar Visual Polish */
+.tabs-field__tabs-wrapper {
+  margin-bottom: 1.5rem !important;
+  border-bottom: 2px solid #e2e8f0 !important;
 }

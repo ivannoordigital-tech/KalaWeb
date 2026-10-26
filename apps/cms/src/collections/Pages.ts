@@ -6,6 +6,7 @@ import { pageSeoAdapter, calculateSeoScore } from '../lib/seo-engine'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
 import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
+import { formatSlug } from '../utilities/formatSlug'
 
 const RESERVED_SLUGS = [
   'admin',
@@ -37,23 +38,23 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'pageType', 'pageLayout', 'seoScore', 'updatedAt', '_status'],
     hidden: ({ user }) => {
-      const role = getUserRole(user);
-      return role === 'author' || role === 'midwife_coordinator';
+      const role = getUserRole(user)
+      return role === 'author' || role === 'midwife_coordinator'
     },
     preview: (doc) => {
       if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        const prefix = doc.pageType === 'landing' ? '/preview/sales' : '/preview';
-        return `${baseUrl}${prefix}/${doc.slug}/`;
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
+        const prefix = doc.pageType === 'landing' ? '/preview/sales' : '/preview'
+        return `${baseUrl}${prefix}/${doc.slug}/`
       }
-      return null;
+      return null
     },
     livePreview: {
       url: ({ data }) => {
-        const slug = data?.slug || 'syarat-ketentuan';
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        const prefix = data?.pageType === 'landing' ? '/preview/sales' : '/preview';
-        return `${baseUrl}${prefix}/${slug}/`;
+        const slug = data?.slug || 'syarat-ketentuan'
+        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
+        const prefix = data?.pageType === 'landing' ? '/preview/sales' : '/preview'
+        return `${baseUrl}${prefix}/${slug}/`
       },
       breakpoints: [
         {
@@ -92,84 +93,241 @@ export const Pages: CollectionConfig = {
         if (operation === 'create' && (args as any)?.duplicateFromID) {
           if (args.data) {
             if (args.data.title) {
-              args.data.title = `${args.data.title} (Salinan Duplikat)`;
+              args.data.title = `${args.data.title} (Salinan Duplikat)`
             }
-            args.data.slug = '';
-            args.data.refCode = '';
-            args.data._status = 'draft';
+            args.data.slug = ''
+            args.data.refCode = ''
+            args.data._status = 'draft'
           }
         }
-        return args;
+        return args
+      },
+    ],
+    beforeValidate: [
+      ({ data }) => {
+        // Otomatis buat slug dari judul jika masih kosong
+        if (data && !data.slug && data.title) {
+          data.slug = formatSlug(data.title)
+        }
+        return data
       },
     ],
     beforeChange: [
       async ({ data, req }) => {
-        const isLanding = data.pageType === 'landing';
+        const isLanding = data.pageType === 'landing'
         // Auto-generate refCode if empty for landing pages
         if (isLanding && !data.refCode && data.slug) {
-          const cleanSlug = String(data.slug).toUpperCase().replace(/[^A-Z0-9]/g, '-');
-          const variant = data.variant || 'A';
-          data.refCode = `KALA-LP-${cleanSlug}-${variant}`;
+          const cleanSlug = String(data.slug).toUpperCase().replace(/[^A-Z0-9]/g, '-')
+          const variant = data.variant || 'A'
+          data.refCode = `KALA-LP-${cleanSlug}-${variant}`
         }
 
-        const { isValid, errors, warnings } = validatePageBuilderDoc(data, isLanding);
+        const { isValid, errors, warnings } = validatePageBuilderDoc(data, isLanding)
         if (!isValid) {
-          throw new APIError(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`, 400);
+          throw new APIError(`[Validasi Publikasi Gagal]:\n• ${errors.join('\n• ')}`, 400)
         }
         if (warnings.length > 0) {
-          console.warn('[Pages Validation Warnings]:', warnings);
+          console.warn('[Pages Validation Warnings]:', warnings)
         }
 
         try {
-          const normalized = pageSeoAdapter(data);
-          const audit = calculateSeoScore(normalized);
-          data.seoScore = audit.score;
+          const normalized = pageSeoAdapter(data)
+          const audit = calculateSeoScore(normalized)
+          data.seoScore = audit.score
           data.seoAudit = {
             score: audit.score,
             grade: audit.grade,
             issues: audit.issues,
             lastAuditedAt: new Date().toISOString(),
-          };
+          }
         } catch (err) {
-          req.payload.logger.error({ err }, 'Error auditing SEO for page');
+          req.payload.logger.error({ err }, 'Error auditing SEO for page')
         }
 
-        return data;
+        return data
       },
     ],
     afterChange: [
       async ({ doc, previousDoc }) => {
-        const isNowPublished = doc._status === 'published';
-        const wasPublished = previousDoc?._status === 'published';
+        const isNowPublished = doc._status === 'published'
+        const wasPublished = previousDoc?._status === 'published'
 
         if (isNowPublished && !wasPublished) {
-          triggerCloudflareDeploy({ resource: 'Pages', action: 'publish', slug: doc.slug });
+          triggerCloudflareDeploy({ resource: 'Pages', action: 'publish', slug: doc.slug })
         } else if (!isNowPublished && wasPublished) {
-          triggerCloudflareDeploy({ resource: 'Pages', action: 'unpublish', slug: doc.slug });
+          triggerCloudflareDeploy({ resource: 'Pages', action: 'unpublish', slug: doc.slug })
         } else if (isNowPublished && wasPublished) {
-          triggerCloudflareDeploy({ resource: 'Pages', action: 'publish', slug: doc.slug });
+          triggerCloudflareDeploy({ resource: 'Pages', action: 'publish', slug: doc.slug })
         }
       },
     ],
     afterDelete: [
       async ({ doc }) => {
         if (doc._status === 'published') {
-          triggerCloudflareDeploy({ resource: 'Pages', action: 'delete', slug: doc.slug });
+          triggerCloudflareDeploy({ resource: 'Pages', action: 'delete', slug: doc.slug })
         }
       },
     ],
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      label: 'Judul Halaman',
-      admin: {
-        description: 'Judul utama halaman. Contoh: Promo Paket Newborn atau Syarat & Ketentuan',
-        placeholder: 'Promo Spesial Pijat Newborn Homecare Surabaya',
-      },
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Konten Halaman',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Judul Halaman',
+              admin: {
+                description: 'Judul utama halaman. Contoh: Promo Spesial Pijat Newborn atau Syarat & Ketentuan.',
+                placeholder: 'Promo Spesial Pijat Newborn Homecare Surabaya',
+              },
+            },
+            {
+              name: 'description',
+              type: 'textarea',
+              label: 'Ringkasan Deskripsi Halaman (Opsional)',
+              admin: {
+                description: 'Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.',
+              },
+            },
+            {
+              name: 'heroImage',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Foto / Banner Utama Halaman (Opsional)',
+              admin: {
+                description: 'Unggah foto banner atas halaman (format WebP/JPG/PNG).',
+              },
+            },
+            // Pilihan Cara Mengisi Konten (Blok atau Teks Bebas)
+            {
+              name: 'content',
+              type: 'richText',
+              label: 'Isi Dokumen / Konten Teks Bebas',
+              admin: {
+                description:
+                  'Gunakan untuk halaman informasi umum yang membutuhkan format teks bebas (paragraf, poin daftar, dan subjudul). Jika blok di bawah diisi, susunan blok akan diprioritaskan.',
+              },
+            },
+            // 🧱 Flexible Block-Based Page Builder
+            {
+              name: 'layout',
+              type: 'blocks',
+              label: 'Susunan Blok Halaman (Page Builder Visual)',
+              admin: {
+                description:
+                  'Gunakan blok visual ini untuk menyusun halaman promo dan penawaran (Banner Utama, Masalah Bunda, Solusi, Paket Harga, Testimoni, FAQ).',
+              },
+              blocks: allBlocks,
+            },
+          ],
+        },
+        {
+          label: 'Optimasi SEO',
+          fields: [
+            buildSeoFields({
+              titleSourceField: 'title',
+              descriptionSourceField: 'description',
+              position: 'main',
+            }),
+          ],
+        },
+        {
+          label: 'Tata Letak & Pelacakan',
+          fields: [
+            {
+              name: 'pageLayout',
+              type: 'radio',
+              label: 'Pilihan Tata Letak Halaman (Layout)',
+              defaultValue: 'default',
+              options: [
+                {
+                  label: 'Standar Website (Lengkap dengan navigasi atas dan footer bawaan)',
+                  value: 'default',
+                },
+                {
+                  label: 'Kanvas Bersih (100% Kosong tanpa navigasi & footer — cocok untuk penawaran iklan)',
+                  value: 'canvas',
+                },
+                {
+                  label: 'Lebar Penuh Layar (Memenuhi layar dengan navigasi atas dan footer)',
+                  value: 'full_width',
+                },
+              ],
+              admin: {
+                description:
+                  '• Standar: Layout bawaan web dengan navbar & footer.\n• Kanvas Bersih: 100% blank canvas tanpa header/footer untuk fokus konversi.\n• Lebar Penuh: Konten melebar penuh dengan header/footer tema.',
+              },
+            },
+            {
+              name: 'showWhatsAppCta',
+              type: 'checkbox',
+              defaultValue: true,
+              label: 'Tampilkan Tombol Konsultasi WhatsApp di Bawah Halaman',
+              admin: {
+                description: 'Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.',
+              },
+            },
+            {
+              name: 'whatsappCustomMessage',
+              type: 'text',
+              label: 'Pesan Otomatis WhatsApp (Opsional)',
+              admin: {
+                description:
+                  'Teks pesan otomatis saat pasien menekan tombol WA. Contoh: Halo Bidan Kala, saya mau tanya promo newborn',
+              },
+            },
+            // Pelacakan Khusus Iklan
+            {
+              name: 'refCode',
+              type: 'text',
+              label: 'Kode Pelacak WhatsApp (Ref Code)',
+              admin: {
+                condition: (data) => data?.pageType === 'landing',
+                description: 'Kode unik otomatis pelacak pesan WA masuk. Contoh: KALA-LP-PROMO-A',
+                placeholder: 'Otomatis dibuat jika kosong',
+              },
+            },
+            {
+              name: 'variant',
+              type: 'select',
+              label: 'Varian Halaman (A/B Test)',
+              defaultValue: 'A',
+              options: [
+                { label: 'Varian A (Kontrol Utama)', value: 'A' },
+                { label: 'Varian B (Uji)', value: 'B' },
+                { label: 'Varian C (Eksperimen)', value: 'C' },
+              ],
+              admin: {
+                condition: (data) => data?.pageType === 'landing',
+                description: 'Identifikasi varian untuk evaluasi efektivitas iklan.',
+              },
+            },
+            {
+              name: 'activePixels',
+              type: 'select',
+              hasMany: true,
+              label: 'Pelacak Iklan Aktif (Pixels)',
+              defaultValue: ['meta', 'google'],
+              options: [
+                { label: 'Meta Ads (Facebook & Instagram)', value: 'meta' },
+                { label: 'Google Ads (Tag GTM / Search)', value: 'google' },
+                { label: 'TikTok Ads', value: 'tiktok' },
+              ],
+              admin: {
+                condition: (data) => data?.pageType === 'landing',
+                description: 'Pilih sistem analitik iklan yang aktif untuk halaman ini.',
+              },
+            },
+          ],
+        },
+      ],
     },
+    // Sidebar fields (Selalu terlihat di sisi kanan)
     {
       name: 'slug',
       type: 'text',
@@ -178,7 +336,7 @@ export const Pages: CollectionConfig = {
       label: 'Slug URL (kalababyspa.com/[slug])',
       admin: {
         position: 'sidebar',
-        description: 'Alamat URL halaman (huruf kecil dan tanda hubung). Contoh: promo-newborn',
+        description: 'Alamat URL halaman (huruf kecil dan tanda hubung). Otomatis dibuat dari judul jika kosong.',
         placeholder: 'promo-newborn',
       },
       validate: (val: any) => {
@@ -196,7 +354,7 @@ export const Pages: CollectionConfig = {
     {
       name: 'pageType',
       type: 'radio',
-      label: '📌 Tipe Halaman',
+      label: 'Tujuan Halaman',
       defaultValue: 'standard',
       options: [
         {
@@ -204,141 +362,16 @@ export const Pages: CollectionConfig = {
           value: 'standard',
         },
         {
-          label: 'Halaman Penawaran Iklan / Sales Page (kalababyspa.com/sales/[slug])',
+          label: 'Halaman Penawaran Khusus / Iklan (kalababyspa.com/sales/[slug])',
           value: 'landing',
         },
       ],
       admin: {
         position: 'sidebar',
-        description: 'Pilih tujuan fungsi halaman:\n• Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.\n• Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan konversi WhatsApp & Pixel.',
+        description:
+          '• Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.\n• Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan WhatsApp & Pixel.',
       },
     },
-    {
-      name: 'pageLayout',
-      type: 'radio',
-      label: '🎨 Opsi Tata Letak (Layout)',
-      defaultValue: 'default',
-      options: [
-        {
-          label: 'Standar Tema (Lengkap dengan navigasi & footer)',
-          value: 'default',
-        },
-        {
-          label: 'Kanvas Kosong (100% Bersih tanpa navigasi & footer)',
-          value: 'canvas',
-        },
-        {
-          label: 'Lebar Penuh Tema (Memenuhi layar dengan navigasi & footer)',
-          value: 'full_width',
-        },
-      ],
-      admin: {
-        position: 'sidebar',
-        description: 'Pilih tata letak visual halaman seperti di Elementor:\n• Default: Layout standar tema dengan navbar & footer.\n• Elementor Canvas: 100% blank canvas tanpa header/footer tema.\n• Full Width: Memenuhi lebar layar dengan header/footer bawaan.',
-      },
-    },
-    // Konfigurasi Iklan & Konversi (Sidebar - Khusus Halaman Iklan)
-    {
-      name: 'refCode',
-      type: 'text',
-      label: 'Kode Pelacak WhatsApp (Ref Code)',
-      admin: {
-        position: 'sidebar',
-        condition: (data) => data?.pageType === 'landing',
-        description: 'Kode unik otomatis pelacak pesan WA masuk. Contoh: KALA-LP-PROMO-A',
-        placeholder: 'Otomatis dibuat jika kosong',
-      },
-    },
-    {
-      name: 'variant',
-      type: 'select',
-      label: 'Varian Halaman (A/B Test)',
-      defaultValue: 'A',
-      options: [
-        { label: 'Varian A (Kontrol)', value: 'A' },
-        { label: 'Varian B (Uji)', value: 'B' },
-        { label: 'Varian C (Eksperimen)', value: 'C' },
-      ],
-      admin: {
-        position: 'sidebar',
-        condition: (data) => data?.pageType === 'landing',
-        description: 'Identifikasi varian untuk evaluasi conversion rate.',
-      },
-    },
-    {
-      name: 'activePixels',
-      type: 'select',
-      hasMany: true,
-      label: 'Pixel Iklan Aktif',
-      defaultValue: ['meta', 'google'],
-      options: [
-        { label: 'Meta Pixel (Facebook/Instagram Ads)', value: 'meta' },
-        { label: 'Google Ads Tag (GTM/AdWords)', value: 'google' },
-        { label: 'TikTok Pixel', value: 'tiktok' },
-      ],
-      admin: {
-        position: 'sidebar',
-        condition: (data) => data?.pageType === 'landing',
-        description: 'Pilih pixel pelacakan iklan yang aktif untuk halaman ini.',
-      },
-    },
-    {
-      name: 'description',
-      type: 'textarea',
-      label: 'Ringkasan Deskripsi Halaman (Opsional)',
-      admin: {
-        description: 'Penjelasan singkat isi halaman untuk pembuka dan cuplikan mesin pencari.',
-      },
-    },
-    {
-      name: 'heroImage',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Foto / Banner Utama Halaman (Opsional)',
-      admin: {
-        description: 'Unggah foto banner atas halaman (format WebP/JPG/PNG).',
-      },
-    },
-    {
-      name: 'content',
-      type: 'richText',
-      label: 'Isi Konten Artikel / Teks Lengkap (Opsional)',
-      admin: {
-        description: 'Tulis isi halaman bebas: judul bab (H2/H3), teks paragraf, poin daftar, kutipan, dan link.',
-      },
-    },
-    // 🧱 Flexible Block-Based Page Builder
-    {
-      name: 'layout',
-      type: 'blocks',
-      label: '🧱 Susunan Blok Halaman (Drag & Drop Page Builder)',
-      admin: {
-        description: 'Gunakan blok visual ini untuk menyusun halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, FAQ, dll.). Jika diisi, susunan blok ini akan diprioritaskan tampil.',
-      },
-      blocks: allBlocks,
-    },
-    // Pengaturan CTA WhatsApp
-    {
-      name: 'showWhatsAppCta',
-      type: 'checkbox',
-      defaultValue: true,
-      label: 'Tampilkan Kotak Banner Konsultasi WhatsApp di Bawah Halaman',
-      admin: {
-        position: 'sidebar',
-        description: 'Centang jika ingin menyertakan tombol WhatsApp resmi di bagian akhir halaman.',
-      },
-    },
-    {
-      name: 'whatsappCustomMessage',
-      type: 'text',
-      label: 'Pesan Kustom WhatsApp (Opsional)',
-      admin: {
-        position: 'sidebar',
-        description: 'Teks pesan otomatis saat tombol WA ditekan. Contoh: Halo Bidan Kala, saya mau tanya promo ini',
-      },
-    },
-    // Reusable SEO Fields & Audit Scoring
-    buildSeoFields({ titleSourceField: 'title', descriptionSourceField: 'description' }),
     seoScoreField,
     seoAuditFields,
   ],

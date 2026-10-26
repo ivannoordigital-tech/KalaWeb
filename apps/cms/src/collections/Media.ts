@@ -22,8 +22,8 @@ export const Media: CollectionConfig = {
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => {
-      const role = getUserRole(user);
-      return role === 'superadmin' || role === 'operator';
+      const role = getUserRole(user)
+      return role === 'superadmin' || role === 'operator'
     },
   },
   upload: {
@@ -68,10 +68,11 @@ export const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
       required: true,
-      label: 'Teks Alternatif (Alt Text Wajib untuk Aksesibilitas & SEO)',
+      label: 'Teks Alternatif (Alt Text — Wajib)',
       admin: {
-        description: 'Jelaskan isi visual gambar kepada pengguna tunanetra dan perayap Google. Contoh: Bidan mengoleskan minyak pijat food-grade pada punggung bayi.',
-        placeholder: 'Deskripsi gambar untuk Google...',
+        description:
+          'Wajib diisi untuk aksesibilitas pembaca layar dan perayap Google Images. Jelaskan apa yang terlihat di gambar.',
+        placeholder: 'Contoh: Bidan Annisa memijat lembut bayi newborn di atas matras klinik...',
       },
     },
     {
@@ -79,7 +80,7 @@ export const Media: CollectionConfig = {
       type: 'text',
       label: 'Keterangan Gambar (Caption Opsional)',
       admin: {
-        description: 'Keterangan singkat yang tampil di bawah foto jika ditampilkan di artikel.',
+        description: 'Keterangan singkat yang tampil di bawah foto jika disematkan dalam artikel.',
       },
     },
   ],

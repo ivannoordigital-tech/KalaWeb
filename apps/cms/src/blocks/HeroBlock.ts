@@ -3,8 +3,8 @@ import type { Block } from 'payload'
 export const HeroBlock: Block = {
   slug: 'hero',
   labels: {
-    singular: 'Blok Hero (Headline & Penawaran)',
-    plural: 'Blok Hero (Headline & Penawaran)',
+    singular: '🌟 Banner Utama (Hero & Penawaran)',
+    plural: '🌟 Banner Utama (Hero & Penawaran)',
   },
   fields: [
     {

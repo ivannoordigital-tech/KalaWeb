@@ -1,11 +1,32 @@
 import type { NormalizedSeoInput, SeoAuditResult, SeoIssue } from './types'
+import { SEO_THRESHOLDS } from './constants'
 
 export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
-  const issues: SeoIssue[] = []
   const effectiveTitle = (input.metaTitle || input.title || '').trim()
   const effectiveDesc = (input.metaDescription || '').trim()
   const keyword = (input.focusKeyword || '').trim().toLowerCase()
   const slug = (input.slug || '').trim().toLowerCase()
+
+  // 0. Deteksi Dokumen Baru / Kosong (Belum Dinilai)
+  if (effectiveTitle.length === 0 && effectiveDesc.length === 0 && !keyword) {
+    return {
+      score: 0,
+      grade: 'poor',
+      isUnrated: true,
+      issues: [],
+      metrics: {
+        titleScore: 0,
+        descScore: 0,
+        keywordScore: 0,
+        h1Score: 0,
+        altScore: 0,
+        slugScore: 0,
+        ogScore: 0,
+      },
+    }
+  }
+
+  const issues: SeoIssue[] = []
 
   // 1. Meta Title (Bobot: 20 Poin)
   let titleScore = 0
@@ -17,22 +38,30 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
       message: 'Judul SEO (Meta Title) belum diisi.',
       targetField: 'metaTitle',
     })
-  } else if (titleLen >= 30 && titleLen <= 60) {
+  } else if (
+    titleLen >= SEO_THRESHOLDS.TITLE_MIN_OPTIMAL &&
+    titleLen <= SEO_THRESHOLDS.TITLE_MAX_OPTIMAL
+  ) {
     titleScore = 20
-  } else if ((titleLen >= 20 && titleLen < 30) || (titleLen > 60 && titleLen <= 70)) {
+  } else if (
+    (titleLen >= SEO_THRESHOLDS.TITLE_MIN_ACCEPTABLE &&
+      titleLen < SEO_THRESHOLDS.TITLE_MIN_OPTIMAL) ||
+    (titleLen > SEO_THRESHOLDS.TITLE_MAX_OPTIMAL &&
+      titleLen <= SEO_THRESHOLDS.TITLE_MAX_ACCEPTABLE)
+  ) {
     titleScore = 10
-    if (titleLen > 60) {
+    if (titleLen > SEO_THRESHOLDS.TITLE_MAX_OPTIMAL) {
       issues.push({
         code: 'TITLE_TOO_LONG',
         severity: 'warning',
-        message: `Judul SEO (${titleLen} karakter) idealnya maksimal 60 karakter agar tidak terpotong di Google.`,
+        message: `Judul SEO (${titleLen} karakter) idealnya ${SEO_THRESHOLDS.TITLE_MIN_OPTIMAL}–${SEO_THRESHOLDS.TITLE_MAX_OPTIMAL} karakter agar tidak terpotong di Google.`,
         targetField: 'metaTitle',
       })
     } else {
       issues.push({
         code: 'TITLE_TOO_SHORT',
         severity: 'warning',
-        message: `Judul SEO (${titleLen} karakter) sedikit pendek. Idealnya 30–60 karakter.`,
+        message: `Judul SEO (${titleLen} karakter) sedikit pendek. Idealnya ${SEO_THRESHOLDS.TITLE_MIN_OPTIMAL}–${SEO_THRESHOLDS.TITLE_MAX_OPTIMAL} karakter.`,
         targetField: 'metaTitle',
       })
     }
@@ -41,9 +70,10 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
     issues.push({
       code: 'TITLE_SUBOPTIMAL',
       severity: 'critical',
-      message: titleLen > 70 
-        ? `Judul SEO (${titleLen} karakter) terlalu panjang. Google akan memotong judul ini.` 
-        : `Judul SEO (${titleLen} karakter) terlalu pendek (minimal 20 karakter).`,
+      message:
+        titleLen > SEO_THRESHOLDS.TITLE_MAX_ACCEPTABLE
+          ? `Judul SEO (${titleLen} karakter) terlalu panjang. Google akan memotong judul ini.`
+          : `Judul SEO (${titleLen} karakter) terlalu pendek (minimal ${SEO_THRESHOLDS.TITLE_MIN_ACCEPTABLE} karakter).`,
       targetField: 'metaTitle',
     })
   }
@@ -58,22 +88,30 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
       message: 'Meta description belum diisi. Google akan memilih potongan teks sendiri.',
       targetField: 'metaDescription',
     })
-  } else if (descLen >= 120 && descLen <= 155) {
+  } else if (
+    descLen >= SEO_THRESHOLDS.DESC_MIN_OPTIMAL &&
+    descLen <= SEO_THRESHOLDS.DESC_MAX_OPTIMAL
+  ) {
     descScore = 20
-  } else if ((descLen >= 80 && descLen < 120) || (descLen > 155 && descLen <= 165)) {
+  } else if (
+    (descLen >= SEO_THRESHOLDS.DESC_MIN_ACCEPTABLE &&
+      descLen < SEO_THRESHOLDS.DESC_MIN_OPTIMAL) ||
+    (descLen > SEO_THRESHOLDS.DESC_MAX_OPTIMAL &&
+      descLen <= SEO_THRESHOLDS.DESC_MAX_ACCEPTABLE)
+  ) {
     descScore = 10
-    if (descLen > 155) {
+    if (descLen > SEO_THRESHOLDS.DESC_MAX_OPTIMAL) {
       issues.push({
         code: 'DESC_TOO_LONG',
         severity: 'warning',
-        message: `Deskripsi (${descLen} karakter) melebihi panjang ideal 155 karakter.`,
+        message: `Deskripsi (${descLen} karakter) melebihi panjang ideal ${SEO_THRESHOLDS.DESC_MAX_OPTIMAL} karakter.`,
         targetField: 'metaDescription',
       })
     } else {
       issues.push({
         code: 'DESC_A_BIT_SHORT',
         severity: 'warning',
-        message: `Deskripsi (${descLen} karakter) agak singkat. Idealnya 120–155 karakter.`,
+        message: `Deskripsi (${descLen} karakter) agak singkat. Idealnya ${SEO_THRESHOLDS.DESC_MIN_OPTIMAL}–${SEO_THRESHOLDS.DESC_MAX_OPTIMAL} karakter.`,
         targetField: 'metaDescription',
       })
     }
@@ -82,9 +120,10 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
     issues.push({
       code: 'DESC_SUBOPTIMAL',
       severity: 'critical',
-      message: descLen > 165 
-        ? `Deskripsi (${descLen} karakter) terlalu panjang dan berisiko dipotong Google.` 
-        : `Deskripsi (${descLen} karakter) terlalu pendek (minimal 80 karakter).`,
+      message:
+        descLen > SEO_THRESHOLDS.DESC_MAX_ACCEPTABLE
+          ? `Deskripsi (${descLen} karakter) terlalu panjang dan berisiko dipotong Google.`
+          : `Deskripsi (${descLen} karakter) terlalu pendek (minimal ${SEO_THRESHOLDS.DESC_MIN_ACCEPTABLE} karakter).`,
       targetField: 'metaDescription',
     })
   }
@@ -227,16 +266,24 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
     })
   }
 
-  const totalScore = Math.min(100, Math.max(0, 
-    titleScore + descScore + keywordScore + h1Score + altScore + slugScore + ogScore
-  ))
+  const totalScore = Math.min(
+    100,
+    Math.max(
+      0,
+      titleScore + descScore + keywordScore + h1Score + altScore + slugScore + ogScore
+    )
+  )
 
-  const grade: 'good' | 'fair' | 'poor' = 
+  const grade: 'good' | 'fair' | 'poor' =
     totalScore >= 80 ? 'good' : totalScore >= 60 ? 'fair' : 'poor'
+
+  // Urutkan masalah: Critical (Penting/Merah) di atas, Warning (Saran/Kuning) berikutnya
+  issues.sort((a, b) => (a.severity === 'critical' ? -1 : 1) - (b.severity === 'critical' ? -1 : 1))
 
   return {
     score: totalScore,
     grade,
+    isUnrated: false,
     issues,
     metrics: {
       titleScore,
