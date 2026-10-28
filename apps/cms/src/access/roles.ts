@@ -55,5 +55,5 @@ export const canManageFAQ: Access = ({ req: { user } }: AccessArgs) => {
 
 export const canManageSiteSettings = ({ req: { user } }: { req: { user?: any } }) => {
   const role = getUserRole(user);
-  return role === 'superadmin' || role === 'operator';
+  return role === 'superadmin' || role === 'operator' || role === 'marketing';
 };
