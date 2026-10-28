@@ -23,6 +23,14 @@ export const SiteSettings: GlobalConfig = {
         if (data.whatsappNumber) {
           data.whatsappNumber = normalizeWhatsAppNumber(data.whatsappNumber);
         }
+        if (data.analytics) {
+          if (typeof data.analytics.gtmId === 'string') data.analytics.gtmId = data.analytics.gtmId.trim();
+          if (typeof data.analytics.metaPixelId === 'string') data.analytics.metaPixelId = data.analytics.metaPixelId.trim();
+          if (typeof data.analytics.ga4MeasurementId === 'string') data.analytics.ga4MeasurementId = data.analytics.ga4MeasurementId.trim();
+          if (typeof data.analytics.gadsConversionId === 'string') data.analytics.gadsConversionId = data.analytics.gadsConversionId.trim();
+          if (typeof data.analytics.tiktokPixelId === 'string') data.analytics.tiktokPixelId = data.analytics.tiktokPixelId.trim();
+          if (typeof data.analytics.clarityProjectId === 'string') data.analytics.clarityProjectId = data.analytics.clarityProjectId.trim();
+        }
         return data;
       },
     ],
