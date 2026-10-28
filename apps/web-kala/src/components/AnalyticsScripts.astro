@@ -36,13 +36,30 @@ const isClarityActive = Boolean(clarityProjectId) && (!activePixels || activePix
 
 {placement === 'head' && (
   <>
-    <!-- Google Tag Manager -->
+    <!-- Google Tag Manager (Deferred to preserve Core Web Vitals) -->
     {isGtmActive && (
       <script is:inline define:vars={{ gtmId }}>
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        (function(w,d,s,l,i){
+          w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+          function loadGtm(){
+            if (w.__gtm_loaded) return;
+            w.__gtm_loaded = true;
+            var f=d.getElementsByTagName(s)[0], j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
+            j.async=true; j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+            f.parentNode.insertBefore(j,f);
+          }
+          if (d.readyState === 'complete') {
+            loadGtm();
+          } else {
+            w.addEventListener('load', function() {
+              if ('requestIdleCallback' in w) {
+                w.requestIdleCallback(loadGtm);
+              } else {
+                setTimeout(loadGtm, 600);
+              }
+            }, { once: true });
+          }
         })(window,document,'script','dataLayer',gtmId);
       </script>
     )}
@@ -60,11 +77,26 @@ const isClarityActive = Boolean(clarityProjectId) && (!activePixels || activePix
           n.loaded = !0;
           n.version = '2.0';
           n.queue = [];
-          t = b.createElement(e);
-          t.async = !0;
-          t.src = v;
-          s = b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t, s);
+          function loadFb() {
+            if (f.__fb_loaded) return;
+            f.__fb_loaded = true;
+            t = b.createElement(e);
+            t.async = !0;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          }
+          if (b.readyState === 'complete') {
+            loadFb();
+          } else {
+            f.addEventListener('load', function() {
+              if ('requestIdleCallback' in f) {
+                f.requestIdleCallback(loadFb);
+              } else {
+                setTimeout(loadFb, 600);
+              }
+            }, { once: true });
+          }
         })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
 
         window.__KALA_PV_EVENT_ID__ = 'pv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
@@ -81,9 +113,26 @@ const isClarityActive = Boolean(clarityProjectId) && (!activePixels || activePix
     {isTiktokActive && (
       <script is:inline define:vars={{ tiktokPixelId }}>
         !function (w, d, t) {
-          w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=r+"?sdkid="+e+"&lib="+t;var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(a,c)};
-          ttq.load(tiktokPixelId);
-          ttq.page();
+          w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};
+          function loadTtq() {
+            if (w.__ttq_loaded) return;
+            w.__ttq_loaded = true;
+            var a=d.createElement("script");a.type="text/javascript",a.async=!0,a.src=r+"?sdkid="+e+"&lib="+t;var c=d.getElementsByTagName("script")[0];c.parentNode.insertBefore(a,c);
+          }
+          if (d.readyState === 'complete') {
+            loadTtq();
+          } else {
+            w.addEventListener('load', function() {
+              if ('requestIdleCallback' in w) {
+                w.requestIdleCallback(loadTtq);
+              } else {
+                setTimeout(loadTtq, 800);
+              }
+            }, { once: true });
+          }
+        };
+        ttq.load(tiktokPixelId);
+        ttq.page();
         }(window, document, 'ttq');
       </script>
     )}
@@ -107,8 +156,23 @@ const isClarityActive = Boolean(clarityProjectId) && (!activePixels || activePix
       <script is:inline define:vars={{ clarityProjectId }}>
         (function(c,l,a,r,i,t,y){
           c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          function loadClarity() {
+            if (c.__clarity_loaded) return;
+            c.__clarity_loaded = true;
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          }
+          if (l.readyState === 'complete') {
+            loadClarity();
+          } else {
+            c.addEventListener('load', function() {
+              if ('requestIdleCallback' in c) {
+                c.requestIdleCallback(loadClarity);
+              } else {
+                setTimeout(loadClarity, 800);
+              }
+            }, { once: true });
+          }
         })(window, document, "clarity", "script", clarityProjectId);
       </script>
     )}
