@@ -1,0 +1,146 @@
+---
+interface Props {
+  analytics?: {
+    gtmId?: string;
+    metaPixelId?: string;
+    ga4MeasurementId?: string;
+    gadsConversionId?: string;
+    tiktokPixelId?: string;
+    clarityProjectId?: string;
+  };
+  activePixels?: string[]; // e.g. ['meta', 'google', 'tiktok', 'ga4', 'clarity']
+  placement?: 'head' | 'body';
+}
+
+const {
+  analytics,
+  activePixels,
+  placement = 'head',
+} = Astro.props;
+
+const gtmId = analytics?.gtmId || import.meta.env.PUBLIC_GTM_ID || '';
+const metaPixelId = analytics?.metaPixelId || import.meta.env.PUBLIC_META_PIXEL_ID || '';
+const ga4MeasurementId = analytics?.ga4MeasurementId || import.meta.env.PUBLIC_GA4_ID || '';
+const gadsConversionId = analytics?.gadsConversionId || import.meta.env.PUBLIC_GADS_ID || '';
+const tiktokPixelId = analytics?.tiktokPixelId || import.meta.env.PUBLIC_TIKTOK_PIXEL_ID || '';
+const clarityProjectId = analytics?.clarityProjectId || import.meta.env.PUBLIC_CLARITY_ID || '';
+
+// If activePixels is provided, respect it; otherwise enable all configured IDs
+const isGtmActive = Boolean(gtmId) && (!activePixels || activePixels.includes('google') || activePixels.includes('gtm'));
+const isMetaActive = Boolean(metaPixelId) && (!activePixels || activePixels.includes('meta'));
+const isTiktokActive = Boolean(tiktokPixelId) && (!activePixels || activePixels.includes('tiktok'));
+const isGa4Active = Boolean(ga4MeasurementId) && (!activePixels || activePixels.includes('ga4') || activePixels.includes('google'));
+const isGadsActive = Boolean(gadsConversionId) && (!activePixels || activePixels.includes('google') || activePixels.includes('gads'));
+const isClarityActive = Boolean(clarityProjectId) && (!activePixels || activePixels.includes('clarity'));
+---
+
+{placement === 'head' && (
+  <>
+    <!-- Google Tag Manager (Deferred until idle or interaction to protect LCP & INP) -->
+    {isGtmActive && (
+      <script is:inline define:vars={{ gtmId }}>
+        (function() {
+          var gtmLoaded = false;
+          function loadGTM() {
+            if (gtmLoaded) return;
+            gtmLoaded = true;
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+            j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+            f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer',gtmId);
+          }
+
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(function() { setTimeout(loadGTM, 1800); }, { timeout: 3500 });
+          } else {
+            setTimeout(loadGTM, 2200);
+          }
+
+          ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(evt) {
+            window.addEventListener(evt, loadGTM, { once: true, passive: true });
+          });
+        })();
+      </script>
+    )}
+
+    <!-- Meta Pixel (Deferred + Automatic Advanced Matching + Deduplication eventID) -->
+    {isMetaActive && (
+      <script is:inline define:vars={{ metaPixelId }}>
+        (function(f,b,e,v,n,t,s) {
+          if(f.fbq) return;
+          n = f.fbq = function() {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+          };
+          if(!f._fbq) f._fbq = n;
+          n.push = n;
+          n.loaded = !0;
+          n.version = '2.0';
+          n.queue = [];
+          t = b.createElement(e);
+          t.async = !0;
+          t.src = v;
+          s = b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t, s);
+        })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+
+        window.__KALA_PV_EVENT_ID__ = 'pv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+        fbq('init', metaPixelId, { country: 'id' });
+        fbq('track', 'PageView', {}, { eventID: window.__KALA_PV_EVENT_ID__ });
+      </script>
+      <noscript>
+        <img height="1" width="1" style="display:none"
+          src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} alt="" />
+      </noscript>
+    )}
+
+    <!-- TikTok Pixel (Deferred) -->
+    {isTiktokActive && (
+      <script is:inline define:vars={{ tiktokPixelId }}>
+        !function (w, d, t) {
+          w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=r+"?sdkid="+e+"&lib="+t;var c=document.getElementsByTagName("script")[0];c.parentNode.insertBefore(a,c)};
+          ttq.load(tiktokPixelId);
+          ttq.page();
+        }(window, document, 'ttq');
+      </script>
+    )}
+
+    <!-- Google Analytics 4 & Google Ads (gtag.js - active if not solely using GTM) -->
+    {(isGa4Active || isGadsActive) && !isGtmActive && (
+      <>
+        <script is:inline define:vars={{ ga4MeasurementId, gadsConversionId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          if (ga4MeasurementId) gtag('config', ga4MeasurementId);
+          if (gadsConversionId) gtag('config', gadsConversionId);
+        </script>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId || gadsConversionId}`}></script>
+      </>
+    )}
+
+    <!-- Microsoft Clarity -->
+    {isClarityActive && (
+      <script is:inline define:vars={{ clarityProjectId }}>
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", clarityProjectId);
+      </script>
+    )}
+  </>
+)}
+
+{placement === 'body' && (
+  <>
+    <!-- Google Tag Manager (noscript) -->
+    {isGtmActive && (
+      <noscript>
+        <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0" width="0" style="display:none;visibility:hidden"></iframe>
+      </noscript>
+    )}
+  </>
+)}

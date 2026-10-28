@@ -315,8 +315,10 @@ export const Pages: CollectionConfig = {
               defaultValue: ['meta', 'google'],
               options: [
                 { label: 'Meta Ads (Facebook & Instagram)', value: 'meta' },
-                { label: 'Google Ads (Tag GTM / Search)', value: 'google' },
+                { label: 'Google Ads & GTM (Tag Manager/AdWords)', value: 'google' },
                 { label: 'TikTok Ads', value: 'tiktok' },
+                { label: 'Google Analytics 4 (GA4)', value: 'ga4' },
+                { label: 'Microsoft Clarity', value: 'clarity' },
               ],
               admin: {
                 condition: (data) => data?.pageType === 'landing',

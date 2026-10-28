@@ -2,6 +2,8 @@
 import WhatsAppButton from '../../components/WhatsAppButton.astro';
 import MobileStickyBar from '../../components/MobileStickyBar.astro';
 import ConsentBanner from '../../components/ConsentBanner.astro';
+import AnalyticsScripts from '../../components/AnalyticsScripts.astro';
+import { fetchSiteSettings } from '../../lib/payload';
 import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
 import { siteConfig } from '../../config/site';
 import { fetchPayloadLandingPages, fetchPayloadPages, type PayloadLandingPage } from '../../lib/payload';
@@ -332,6 +334,11 @@ interface Props {
 
 const { campaign } = Astro.props;
 const isCanvas = campaign.pageLayout === 'canvas';
+const cmsSettings = await fetchSiteSettings();
+const analyticsConfig = {
+  ...siteConfig.analytics,
+  ...(cmsSettings?.analytics || {}),
+};
 const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
 const metaDescription = campaign.subheadline || `${campaign.title} - Layanan perawatan dan pijat bayi homecare profesional oleh bidan bersertifikat di Surabaya dan Sidoarjo.`;
 ---
@@ -357,34 +364,12 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
     <meta name="kala:ref-code" content={campaign.refCode} />
     {campaign.campaignBaseRef && <meta name="kala:campaign-base-ref" content={campaign.campaignBaseRef} />}
 
-    <!-- Google Tag Manager (Deferred until idle or interaction) -->
-    <script is:inline define:vars={{ gtmId }}>
-      (function() {
-        var gtmLoaded = false;
-        function loadGTM() {
-          if (gtmLoaded) return;
-          gtmLoaded = true;
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
-          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-          f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer',gtmId);
-        }
-
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(function() { setTimeout(loadGTM, 1800); }, { timeout: 3500 });
-        } else {
-          setTimeout(loadGTM, 2200);
-        }
-
-        ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(evt) {
-          window.addEventListener(evt, loadGTM, { once: true, passive: true });
-        });
-      })();
-    </script>
+    <!-- Centralized Analytics & Pixels (GTM, Meta, TikTok, GA4, Clarity) -->
+    <AnalyticsScripts analytics={analyticsConfig} activePixels={campaign.activePixels} placement="head" />
   </head>
   <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] pb-20 md:pb-0">
+    <!-- Centralized Analytics Noscript (GTM) -->
+    <AnalyticsScripts analytics={analyticsConfig} activePixels={campaign.activePixels} placement="body" />
     
     <!-- Minimalist Header -->
     {!isCanvas && (

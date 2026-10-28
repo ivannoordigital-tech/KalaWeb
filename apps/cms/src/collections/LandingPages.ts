@@ -185,8 +185,10 @@ export const LandingPages: CollectionConfig = {
       defaultValue: ['meta', 'google'],
       options: [
         { label: 'Meta Pixel (Facebook/Instagram Ads)', value: 'meta' },
-        { label: 'Google Ads Tag (GTM/AdWords)', value: 'google' },
+        { label: 'Google Ads & GTM (Tag Manager/AdWords)', value: 'google' },
         { label: 'TikTok Pixel', value: 'tiktok' },
+        { label: 'Google Analytics 4 (GA4)', value: 'ga4' },
+        { label: 'Microsoft Clarity', value: 'clarity' },
       ],
       admin: {
         position: 'sidebar',

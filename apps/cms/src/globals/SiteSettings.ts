@@ -197,6 +197,94 @@ export const SiteSettings: GlobalConfig = {
         },
       ],
     },
+    // ========================================================
+    // 📊 Pelacakan, Pixel & Analitik Iklan (GTM, Meta, TikTok, GA4, GAds, Clarity)
+    // ========================================================
+    {
+      name: 'analytics',
+      type: 'group',
+      label: '📊 Pelacakan, Pixel & Analitik Iklan Terpusat',
+      admin: {
+        description: 'Kelola seluruh ID pelacak iklan dan analitik website secara terpusat. Kosongkan platform yang belum digunakan. Perubahan otomatis memicu deploy ulang (~2 menit).',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'gtmId',
+              type: 'text',
+              label: 'Google Tag Manager (GTM) Container ID',
+              admin: {
+                width: '50%',
+                placeholder: 'GTM-5J7NM8BG',
+                description: 'Format: GTM-XXXXXXX',
+              },
+            },
+            {
+              name: 'metaPixelId',
+              type: 'text',
+              label: 'Meta Pixel ID (Facebook & Instagram Ads)',
+              admin: {
+                width: '50%',
+                placeholder: '1382300863013984',
+                description: 'Format: 15-16 digit angka Pixel resmi',
+              },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'ga4MeasurementId',
+              type: 'text',
+              label: 'Google Analytics 4 (GA4) Measurement ID',
+              admin: {
+                width: '50%',
+                placeholder: 'G-XXXXXXXXXX',
+                description: 'Format: G-XXXXXXXXXX (Opsional bila di-handle via GTM)',
+              },
+            },
+            {
+              name: 'gadsConversionId',
+              type: 'text',
+              label: 'Google Ads (AdWords) Conversion ID',
+              admin: {
+                width: '50%',
+                placeholder: 'AW-XXXXXXXXXX',
+                description: 'Format: AW-XXXXXXXXXX',
+              },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'tiktokPixelId',
+              type: 'text',
+              label: 'TikTok Pixel ID',
+              admin: {
+                width: '50%',
+                placeholder: 'CXXXXXXXXXXXXXXXXX',
+                description: 'ID Pixel dari TikTok Ads Manager',
+              },
+            },
+            {
+              name: 'clarityProjectId',
+              type: 'text',
+              label: 'Microsoft Clarity Project ID',
+              admin: {
+                width: '50%',
+                placeholder: 'XXXXXXXXXX',
+                description: 'Project ID dari Microsoft Clarity dashboard (heatmaps & session recordings)',
+              },
+            },
+          ],
+        },
+      ],
+    },
     // Area Layanan
     {
       name: 'coverageAreas',

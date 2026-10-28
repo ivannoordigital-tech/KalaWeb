@@ -211,6 +211,29 @@
         variant: lpContext?.variant || undefined,
       });
 
+      // Native Direct Pixel Events (in addition to or fallback if GTM tag is unconfigured)
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', 'Contact', {
+          content_name: 'WhatsApp Contact',
+          content_category: refCode,
+          variant: lpContext?.variant || undefined,
+        });
+      }
+
+      if (typeof window.ttq === 'object' && typeof window.ttq.track === 'function') {
+        window.ttq.track('Contact', {
+          content_name: 'WhatsApp Contact',
+          content_id: refCode,
+        });
+      }
+
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'generate_lead', {
+          event_category: 'Contact',
+          event_label: refCode,
+        });
+      }
+
       // Dynamically attach final wa.me url with clean human message
       const finalUrl = `https://wa.me/${phone}?text=${encodeURIComponent(baseMsg)}`;
       btn.setAttribute('href', finalUrl);

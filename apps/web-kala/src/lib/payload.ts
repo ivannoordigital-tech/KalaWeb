@@ -178,6 +178,14 @@ export interface SiteSettingsData {
   whatsappNumberFormatted?: string;
   instagram?: string;
   operationalHours?: string;
+  analytics?: {
+    gtmId?: string;
+    metaPixelId?: string;
+    ga4MeasurementId?: string;
+    gadsConversionId?: string;
+    tiktokPixelId?: string;
+    clarityProjectId?: string;
+  };
   operationalSchedule?: {
     timezone?: string;
     days?: Array<{

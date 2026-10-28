@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import MobileStickyBar from '../components/MobileStickyBar.astro';
 import { fetchSiteSettings } from '../lib/payload';
+import AnalyticsScripts from '../components/AnalyticsScripts.astro';
 import { siteConfig } from '../config/site';
 import '../styles/global.css';
 
@@ -87,6 +88,10 @@ const siteSettings = {
   heroBadgeText: cmsSettings?.heroBadgeText || 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo',
   announcementBanner: cmsSettings?.announcementBanner || '',
   coverageAreas: cmsSettings?.coverageAreas?.length ? cmsSettings.coverageAreas.map((c) => c.area) : siteConfig.coverageAreas,
+  analytics: {
+    ...siteConfig.analytics,
+    ...(cmsSettings?.analytics || {}),
+  },
 };
 
 const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
@@ -115,33 +120,8 @@ const showMobileBar = !isCanvas;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Google Tag Manager (Deferred until idle or interaction to protect LCP & INP) -->
-    <script is:inline define:vars={{ gtmId }}>
-      (function() {
-        var gtmLoaded = false;
-        function loadGTM() {
-          if (gtmLoaded) return;
-          gtmLoaded = true;
-          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
-          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-          f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer',gtmId);
-        }
-
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(function() { setTimeout(loadGTM, 1800); }, { timeout: 3500 });
-        } else {
-          setTimeout(loadGTM, 2200);
-        }
-
-        ['scroll', 'touchstart', 'mousemove', 'click', 'keydown'].forEach(function(evt) {
-          window.addEventListener(evt, loadGTM, { once: true, passive: true });
-        });
-      })();
-    </script>
-    <!-- End Google Tag Manager -->
+    <!-- Centralized Analytics & Pixels (GTM, Meta, TikTok, GA4, Clarity) -->
+    <AnalyticsScripts analytics={siteSettings.analytics} placement="head" />
 
     <!-- SEO Meta Tags & Open Graph -->
     <SEO
@@ -175,12 +155,8 @@ const showMobileBar = !isCanvas;
         Lewati ke konten utama
       </a>
     )}
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-      <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-        height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    <!-- Centralized Analytics Noscript (GTM) -->
+    <AnalyticsScripts analytics={siteSettings.analytics} placement="body" />
 
     {showAnnouncement && (
       <aside class="bg-[#C2552B] text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center">
