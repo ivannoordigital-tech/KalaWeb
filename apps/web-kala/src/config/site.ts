@@ -10,8 +10,8 @@ export const siteConfig = {
   instagramUrl: 'https://instagram.com/kala.babyspa',
   operationalHours: 'Senin - Minggu: 08.00 - 17.00 WIB',
   analytics: {
-    gtmId: 'GTM-5J7NM8BG',
-    metaPixelId: '1382300863013984',
+    gtmId: '',
+    metaPixelId: '',
     ga4MeasurementId: '',
     gadsConversionId: '',
     tiktokPixelId: '',

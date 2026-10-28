@@ -18,12 +18,12 @@ const {
   placement = 'head',
 } = Astro.props;
 
-const gtmId = analytics?.gtmId || import.meta.env.PUBLIC_GTM_ID || '';
-const metaPixelId = analytics?.metaPixelId || import.meta.env.PUBLIC_META_PIXEL_ID || '';
-const ga4MeasurementId = analytics?.ga4MeasurementId || import.meta.env.PUBLIC_GA4_ID || '';
-const gadsConversionId = analytics?.gadsConversionId || import.meta.env.PUBLIC_GADS_ID || '';
-const tiktokPixelId = analytics?.tiktokPixelId || import.meta.env.PUBLIC_TIKTOK_PIXEL_ID || '';
-const clarityProjectId = analytics?.clarityProjectId || import.meta.env.PUBLIC_CLARITY_ID || '';
+const gtmId = analytics?.gtmId || '';
+const metaPixelId = analytics?.metaPixelId || '';
+const ga4MeasurementId = analytics?.ga4MeasurementId || '';
+const gadsConversionId = analytics?.gadsConversionId || '';
+const tiktokPixelId = analytics?.tiktokPixelId || '';
+const clarityProjectId = analytics?.clarityProjectId || '';
 
 // If activePixels is provided, respect it; otherwise enable all configured IDs
 const isGtmActive = Boolean(gtmId) && (!activePixels || activePixels.includes('google') || activePixels.includes('gtm'));
