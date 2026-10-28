@@ -1,0 +1,217 @@
+---
+interface BenefitItem {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface StatBox {
+  num: string;
+  lbl: string;
+}
+
+interface Props {
+  tag?: string;
+  title?: string;
+  subtitle?: string;
+  benefits?: BenefitItem[];
+  quote?: string;
+  quoteAuthor?: string;
+  stats?: StatBox[];
+}
+
+const {
+  tag = "Solusi untuk Si Kecil",
+  title = "Apa yang Berubah Setelah Baby Massage?",
+  subtitle = "Massage bukan sekadar pijat biasa. Ini adalah terapi holistik yang didukung riset untuk mendukung tumbuh kembang optimal bayi Anda.",
+  benefits = [
+    {
+      icon: "😴",
+      title: "Tidur Lebih Nyenyak & Teratur",
+      description: "Pijat bayi merangsang produksi melatonin alami — 87% bayi yang kami tangani tidur lebih lama setelah sesi pertama.",
+    },
+    {
+      icon: "🌱",
+      title: "Stimulasi Motorik & Sensorik",
+      description: "Pijat dengan teknik yang tepat membantu perkembangan otot, koordinasi, dan kepercayaan diri si kecil sejak dini.",
+    },
+    {
+      icon: "💆",
+      title: "Mengurangi Kolik & Gas",
+      description: "Teknik pijat perut khusus membantu memperlancar pencernaan bayi dan meredakan ketidaknyamanan kolik secara alami.",
+    },
+    {
+      icon: "❤️",
+      title: "Perkuat Bonding Mama & Bayi",
+      description: "Sentuhan terapeutik meningkatkan produksi oksitosin — hormon cinta — pada mama dan bayi sekaligus.",
+    },
+  ],
+  quote = '"Setelah massage, bayi saya yang dulu kolik berat sekarang jarang rewel!"',
+  quoteAuthor = "— Bunda Risa, Mama dari Baby Keenan 2 bulan",
+  stats = [
+    { num: "3 x", lbl: "Lebih cepat atasi rewel & kolik" },
+    { num: "96%", lbl: "Orang tua puas" },
+    { num: "0–5", lbl: "tahun usia dilayani" },
+    { num: "100%", lbl: "Terapis bersertifikat" },
+  ],
+} = Astro.props;
+---
+
+<section class="lb-benefits">
+  <div class="lb-benefits__layout">
+    <div>
+      <div class="lb-benefits__tag">{tag}</div>
+      <h2 class="lb-benefits__title">{title}</h2>
+      <p class="lb-benefits__sub">{subtitle}</p>
+      <div class="lb-benefit-list">
+        {benefits.map((item) => (
+          <div class="lb-benefit-item reveal">
+            <div class="lb-benefit-icon">{item.icon}</div>
+            <div>
+              <h4>{item.title}</h4>
+              <p>{item.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="lb-benefits__visual reveal">
+      <div class="lb-visual-quote">{quote}</div>
+      <div class="lb-visual-author">{quoteAuthor}</div>
+      <div class="lb-visual-stats">
+        {stats.map((stat) => (
+          <div class="lb-stat-box">
+            <div class="num">{stat.num}</div>
+            <div class="lbl">{stat.lbl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lb-benefits {
+    padding: 100px 48px;
+    background: #FDF8F2;
+  }
+  .lb-benefits__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C4714A;
+    margin-bottom: 16px;
+  }
+  .lb-benefits__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #3D2314;
+    margin-bottom: 20px;
+  }
+  .lb-benefits__sub {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #7a5840;
+    max-width: 560px;
+  }
+  .lb-benefits__layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .lb-benefit-list {
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .lb-benefit-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .lb-benefit-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #F5D9C8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .lb-benefit-item h4 {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #3D2314;
+  }
+  .lb-benefit-item p {
+    font-size: 0.88rem;
+    color: #8a6450;
+    line-height: 1.65;
+  }
+  .lb-benefits__visual {
+    background: linear-gradient(145deg, #F5D9C8, #D6E4CF);
+    border-radius: 32px;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .lb-visual-quote {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    color: #3D2314;
+    line-height: 1.5;
+  }
+  .lb-visual-author {
+    font-size: 0.85rem;
+    color: #C4714A;
+    font-weight: 600;
+  }
+  .lb-visual-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .lb-stat-box {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .lb-stat-box .num {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #C4714A;
+  }
+  .lb-stat-box .lbl {
+    font-size: 0.75rem;
+    color: #9a7060;
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+  @media (max-width: 768px) {
+    .lb-benefits {
+      padding: 72px 24px;
+    }
+    .lb-benefits__layout {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+  }
+</style>

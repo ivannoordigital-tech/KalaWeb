@@ -1,0 +1,223 @@
+---
+interface Props {
+  badge?: string;
+  titleHtml?: string;
+  description?: string;
+  bookingUrl?: string;
+  servicesUrl?: string;
+  trustStats?: Array<{ number: string; label: string }>;
+}
+
+const {
+  badge = "Dipercaya 500+ Orang Tua <br>di Surabaya & Sidoarjo",
+  bookingUrl = "#booking",
+  servicesUrl = "#layanan",
+  description = "Layanan pijat & perawatan profesional untuk bayi, anak, dan ibu nifas. Membantu stimulasi tumbuh kembang, mengurangi kolik, dan mempercepat pemulihan pasca melahirkan. Ditangani terapis bersertifikat, home visit available.",
+  trustStats = [
+    { number: "500+", label: "Bayi sudah dilayani" },
+    { number: "4.9★", label: "Rating rata-rata" },
+    { number: "3 Thn", label: "Berpengalaman" },
+  ],
+} = Astro.props;
+---
+
+<section class="lb-hero">
+  <div class="lb-hero__blob1"></div>
+  <div class="lb-hero__blob2"></div>
+  <div class="lb-hero__content">
+    <div class="lb-hero__badge" set:html={badge} />
+    <h1 class="lb-hero__titles">
+      <slot name="title">
+        Si Kecil Lebih <em>Tenang,</em><br />
+        Tidur Lebih <em>Nyenyak,</em><br />
+        Tumbuh Lebih <em>Optimal</em>
+      </slot>
+    </h1>
+    <p class="lb-hero__sub">
+      {description}
+    </p>
+    <div class="lb-hero__actions">
+      <a href={bookingUrl} class="lb-btn-primary" style="color: white;">📅 Booking Gratis Konsultasi</a>
+      <a href={servicesUrl} class="lb-btn-secondary" style="color: #C4714A;">Lihat Paket →</a>
+    </div>
+    <div class="lb-hero__trust">
+      {trustStats.map((stat) => (
+        <div class="lb-trust-item">
+          <span class="lb-trust-num">{stat.number}</span>
+          <span class="lb-trust-label">{stat.label}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .lb-hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+    background: #FDF8F2;
+  }
+  .lb-hero__blob1 {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(ellipse, #F5D9C8 0%, transparent 70%);
+    border-radius: 50%;
+    animation: lb-float 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .lb-hero__blob2 {
+    position: absolute;
+    left: -120px;
+    bottom: -80px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(ellipse, #D6E4CF 0%, transparent 70%);
+    border-radius: 50%;
+    animation: lb-float 10s ease-in-out infinite reverse;
+    pointer-events: none;
+  }
+  @keyframes lb-float {
+    0%, 100% {
+      transform: translateY(-50%) scale(1);
+    }
+    50% {
+      transform: translateY(-52%) scale(1.04);
+    }
+  }
+  .lb-hero__content {
+    max-width: 620px;
+    position: relative;
+    z-index: 2;
+  }
+  .lb-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #D6E4CF;
+    color: #5a7a52;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    line-height: 1.35;
+    animation: lb-fadeUp 0.6s ease both;
+  }
+  .lb-hero__badge::before {
+    content: '✦';
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .lb-hero__titles {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.15;
+    font-weight: 600;
+    color: #3D2314;
+    margin-bottom: 24px;
+    animation: lb-fadeUp 0.6s 0.1s ease both;
+  }
+  .lb-hero__titles :global(em) {
+    color: #C4714A;
+    font-style: italic;
+  }
+  .lb-hero__sub {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    color: #6b4c35;
+    max-width: 500px;
+    margin-bottom: 40px;
+    animation: lb-fadeUp 0.6s 0.2s ease both;
+  }
+  .lb-hero__actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: lb-fadeUp 0.6s 0.3s ease both;
+  }
+  .lb-btn-primary {
+    background: #C4714A;
+    color: white !important;
+    padding: 16px 36px;
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s;
+    box-shadow: 0 8px 32px rgba(196, 113, 74, 0.35);
+    display: inline-block;
+  }
+  .lb-btn-primary:hover {
+    background: #3D2314;
+    transform: translateY(-2px);
+  }
+  .lb-btn-secondary {
+    background: transparent;
+    color: #C4714A !important;
+    padding: 16px 36px;
+    border-radius: 100px;
+    border: 1.5px solid #C4714A;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s;
+    display: inline-block;
+  }
+  .lb-btn-secondary:hover {
+    background: #F5D9C8;
+  }
+  .lb-hero__trust {
+    margin-top: 56px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    animation: lb-fadeUp 0.6s 0.4s ease both;
+  }
+  .lb-trust-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .lb-trust-num {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C4714A;
+  }
+  .lb-trust-label {
+    font-size: 0.78rem;
+    color: #9a7060;
+    letter-spacing: 0.04em;
+  }
+  @keyframes lb-fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (max-width: 768px) {
+    .lb-hero {
+      padding: 100px 24px 60px;
+    }
+    .lb-hero__blob1,
+    .lb-hero__blob2 {
+      display: none;
+    }
+    .lb-hero__titles {
+      font-size: 1.75rem;
+    }
+  }
+</style>

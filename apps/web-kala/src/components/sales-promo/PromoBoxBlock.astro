@@ -1,0 +1,295 @@
+---
+interface Props {
+  tagText?: string;
+  titleHtml?: string;
+  subtitle?: string;
+  priceLabel?: string;
+  oldPrice?: string;
+  newPrice?: string;
+  discountBadge?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  footerNote?: string;
+}
+
+const {
+  tagText = "Khusus Surabaya & Sidoarjo",
+  titleHtml = "Promo Treatment Pertama<br><span>Hanya untuk Bunda & Si Kecil</span>",
+  subtitle = "Nikmati pengalaman home service profesional dengan harga spesial khusus untuk warga Surabaya dan Sidoarjo.",
+  priceLabel = "Harga spesial pertama kali",
+  oldPrice = "Rp 120.000",
+  newPrice = "Rp 60.000",
+  discountBadge = "HEMAT 50%",
+  ctaText = "Ambil Promo Sekarang →",
+  ctaUrl = "https://app.kalababyspa.online/cta?divisi=iklan-utama",
+  footerNote = "* Berlaku untuk reservasi pertama kali · Kuota terbatas setiap harinya",
+} = Astro.props;
+---
+
+<div class="lb-wrap">
+  <div class="lb-box reveal">
+    <div class="lb-inner">
+      <div class="lb-tag">
+        <span class="lb-tag-dot"></span>
+        {tagText}
+      </div>
+
+      <h2 class="lb-title" set:html={titleHtml} />
+
+      <div class="lb-ornament">
+        <div class="lb-ornament-line"></div>
+        <div class="lb-ornament-diamond"></div>
+        <div class="lb-ornament-line"></div>
+      </div>
+
+      <p class="lb-sub">
+        {subtitle}
+      </p>
+
+      <div class="lb-price-wrap">
+        <span class="lb-price-label">{priceLabel}</span>
+        <div class="lb-price-row">
+          <span class="lb-price-old">{oldPrice}</span>
+          <span class="lb-price-arrow">→</span>
+          <span class="lb-price-new">{newPrice}</span>
+        </div>
+        <span class="lb-price-badge">{discountBadge}</span>
+      </div>
+
+      <div>
+        <a
+          href={ctaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="lb-btn"
+        >
+          {ctaText}
+        </a>
+      </div>
+
+      <p class="lb-footer">
+        {footerNote}
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .lb-wrap {
+    padding: 60px 20px;
+    background: transparent;
+  }
+
+  .lb-box {
+    max-width: 820px;
+    margin: 0 auto;
+    background: #3D2314;
+    border-radius: 28px;
+    padding: 56px 48px;
+    color: #F5D9C8;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(61, 35, 20, 0.2);
+  }
+
+  .lb-box::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 260px;
+    height: 260px;
+    background: rgba(196, 113, 74, 0.12);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .lb-box::after {
+    content: "";
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 200px;
+    height: 200px;
+    background: rgba(196, 113, 74, 0.07);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .lb-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .lb-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(196, 113, 74, 0.25);
+    border: 1px solid rgba(196, 113, 74, 0.5);
+    color: #E8A98A;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .lb-tag-dot {
+    width: 6px;
+    height: 6px;
+    background: #C4714A;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .lb-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #ffffff;
+    margin: 0 0 14px;
+  }
+
+  .lb-title :global(span) {
+    color: #E8A98A;
+  }
+
+  .lb-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 18px;
+  }
+
+  .lb-ornament-line {
+    width: 48px;
+    height: 1px;
+    background: rgba(232, 169, 138, 0.35);
+  }
+
+  .lb-ornament-diamond {
+    width: 6px;
+    height: 6px;
+    background: #C4714A;
+    transform: rotate(45deg);
+  }
+
+  .lb-sub {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(245, 217, 200, 0.85);
+    max-width: 520px;
+    margin: 0 auto 36px;
+  }
+
+  .lb-price-wrap {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(196, 113, 74, 0.3);
+    border-radius: 16px;
+    padding: 24px 32px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 36px;
+  }
+
+  .lb-price-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245, 217, 200, 0.65);
+    font-weight: 600;
+  }
+
+  .lb-price-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .lb-price-old {
+    font-size: 1.15rem;
+    text-decoration: line-through;
+    color: rgba(245, 217, 200, 0.5);
+  }
+
+  .lb-price-arrow {
+    color: #C4714A;
+    font-size: 1.1rem;
+  }
+
+  .lb-price-new {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .lb-price-badge {
+    background: #C4714A;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+
+  .lb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #3D2314 !important;
+    padding: 17px 44px;
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .lb-btn:hover {
+    background: #F5D9C8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .lb-footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: rgba(245, 217, 200, 0.55);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 600px) {
+    .lb-box {
+      padding: 36px 20px;
+    }
+
+    .lb-price-new {
+      font-size: 2rem;
+    }
+
+    .lb-price-wrap {
+      padding: 18px 24px;
+    }
+
+    .lb-btn {
+      padding: 15px 32px;
+      font-size: 0.95rem;
+    }
+  }
+</style>

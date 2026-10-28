@@ -1,0 +1,269 @@
+---
+interface ServiceCard {
+  name: string;
+  emoji: string;
+  description: string;
+  image: string;
+  duration: string;
+  isFeatured?: boolean;
+  popularTag?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+}
+
+interface Props {
+  tag?: string;
+  title?: string;
+  subtitle?: string;
+  services?: ServiceCard[];
+  defaultCtaUrl?: string;
+}
+
+const {
+  tag = "Layanan Kami",
+  title = "Perawatan Holistik untuk<br>Buah Hati & Bunda",
+  subtitle = "Semua layanan ditangani terapis bersertifikat menggunakan produk organic & hypoallergenic.",
+  defaultCtaUrl = "https://app.kalababyspa.online/cta?divisi=iklan-utama",
+  services = [
+    {
+      name: "Baby Massage",
+      emoji: "🤲",
+      description: "Pijat lembut khusus untuk bayi dengan gerakan menenangkan. Mengurangi kolik dan membantu si kecil tidur lebih nyenyak.",
+      image: "https://cdn.scalev.id/uploads/1776315708/fIN9QqX_mIILL-SS4XMgYQ/1776315708285-treatment-(2).webp",
+      duration: "± 40 menit",
+      isFeatured: true,
+      popularTag: "⭐ Terpopuler",
+    },
+    {
+      name: "Perawatan Newborn",
+      emoji: "🌸",
+      description: "Paket lengkap memandikan, menjemur, hingga perawatan tali pusar yang dilakukan dengan penuh kasih sayang.",
+      image: "https://cdn.scalev.id/uploads/1776315719/xPQC66-V1X17Z7rTb7zKAw/1776315719436-treatment-(1).webp",
+      duration: "7 Hari",
+      isFeatured: false,
+    },
+    {
+      name: "Kids Massage Terapi",
+      emoji: "👶",
+      description: "Pijat terapeutik untuk anak hingga usia 7 tahun guna mengatasi ketegangan otot serta mendukung perkembangan motorik.",
+      image: "https://cdn.scalev.id/uploads/1776316178/hIDdPXrJnTx3PcYzQnBBTA/1776316177526-treatement5.webp",
+      duration: "± 40 menit",
+      isFeatured: false,
+    },
+    {
+      name: "Terapi Sinar Moksa",
+      emoji: "🔥",
+      description: "Menggunakan sinar inframerah untuk melancarkan sirkulasi darah dan daya tahan tubuh si kecil secara aman.",
+      image: "https://cdn.scalev.id/uploads/1776315701/VMe8O-othS5YViKALdowVQ/1776315701108-treatment-(3).webp",
+      duration: "± 40 menit",
+      isFeatured: false,
+    },
+    {
+      name: "Perawatan Ibu Nifas",
+      emoji: "💆‍♀️",
+      description: "Pijat pemulihan pasca melahirkan untuk memperlancar ASI dan mengembalikan kebugaran tubuh Bunda.",
+      image: "https://cdn.scalev.id/uploads/1776315694/gR_alBNnbmFYp7rqJxPtuQ/1776315693856-treatment-(4).webp",
+      duration: "± 60 menit",
+      isFeatured: false,
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="lb-services" id="layanan">
+  <div class="lb-services__head">
+    <div class="lb-services__tag">{tag}</div>
+    <h2 class="lb-services__title" set:html={title} />
+    <p class="lb-services__sub">{subtitle}</p>
+  </div>
+
+  <div class="lb-services__grid">
+    {services.map((item) => (
+      <div class={`lb-svc-card ${item.isFeatured ? 'lb-svc-card--featured' : ''} reveal`}>
+        <div class="lb-svc-card__img">
+          <img src={item.image} alt={item.name} loading="lazy" />
+        </div>
+        <div class="lb-svc-card__header">
+          <span class="lb-svc-card__emoji">{item.emoji}</span>
+          <div class="lb-svc-card__name">{item.name}</div>
+          <p class="lb-svc-card__desc">{item.description}</p>
+        </div>
+        <div class="lb-svc-card__footer">
+          <div>
+            <a
+              href={item.ctaUrl || defaultCtaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="lb-svc-card__price"
+            >
+              {item.ctaText || "Hubungi Kami"}
+            </a>
+            <div class="lb-svc-card__duration">{item.duration}</div>
+          </div>
+          {item.popularTag && (
+            <span class="lb-tag-popular">{item.popularTag}</span>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .lb-services {
+    padding: 100px 48px;
+    background: #FEF5EE;
+  }
+  .lb-services__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C4714A;
+    margin-bottom: 16px;
+  }
+  .lb-services__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #3D2314;
+    margin-bottom: 20px;
+  }
+  .lb-services__sub {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #7a5840;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .lb-services__head {
+    text-align: center;
+  }
+  .lb-services__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px;
+    margin-top: 60px;
+  }
+  .lb-svc-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(196, 113, 74, 0.08);
+    transition: transform 0.25s, box-shadow 0.25s;
+    display: flex;
+    flex-direction: column;
+  }
+  .lb-svc-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(196, 113, 74, 0.15);
+  }
+  .lb-svc-card--featured {
+    background: #3D2314;
+    box-shadow: 0 8px 40px rgba(61, 35, 20, 0.25);
+  }
+
+  .lb-svc-card__img {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+  }
+  .lb-svc-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .lb-svc-card:hover .lb-svc-card__img img {
+    transform: scale(1.05);
+  }
+
+  .lb-svc-card__header {
+    padding: 24px 32px 0;
+    flex-grow: 1;
+  }
+  .lb-svc-card__emoji {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    display: block;
+    opacity: 0.85;
+  }
+  .lb-svc-card__name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #3D2314;
+    margin-bottom: 10px;
+  }
+  .lb-svc-card--featured .lb-svc-card__name {
+    color: #F5D9C8;
+  }
+  .lb-svc-card__desc {
+    font-size: 0.88rem;
+    color: #8a6450;
+    line-height: 1.7;
+  }
+  .lb-svc-card--featured .lb-svc-card__desc {
+    color: #c4a090;
+  }
+
+  .lb-svc-card__footer {
+    padding: 24px 32px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(196, 113, 74, 0.1);
+    margin-top: 24px;
+  }
+  .lb-svc-card--featured .lb-svc-card__footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .lb-svc-card__price {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    transition: color 0.2s;
+  }
+  .lb-svc-card__price:hover {
+    color: #C4714A;
+  }
+  .lb-svc-card--featured .lb-svc-card__price {
+    color: #F5D9C8;
+  }
+  .lb-svc-card--featured .lb-svc-card__price:hover {
+    color: #E8A98A;
+  }
+
+  .lb-svc-card__duration {
+    font-size: 0.78rem;
+    color: #b08070;
+  }
+  .lb-svc-card--featured .lb-svc-card__duration {
+    color: #c4a090;
+  }
+
+  .lb-tag-popular {
+    background: #C4714A;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 100px;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 768px) {
+    .lb-services {
+      padding: 72px 24px;
+    }
+  }
+</style>

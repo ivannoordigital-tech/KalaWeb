@@ -1,0 +1,147 @@
+---
+interface ProblemItem {
+  image: string;
+  alt: string;
+  icon: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  tag?: string;
+  title?: string;
+  problems?: ProblemItem[];
+}
+
+const {
+  tag = "Apakah ini yang Bunda rasakan?",
+  title = "Kekhawatiran yang Sering Dirasakan<br>Orang Tua Baru",
+  problems = [
+    {
+      image: "https://cdn.scalev.id/uploads/1776313752/gAZHNvEDgVXJPVTxPFv2cw/1776313751969-Kala-(3).webp",
+      alt: "Bayi Menangis",
+      icon: "😭",
+      title: "Bayi sering rewel & susah tidur",
+      description: "Si kecil menangis terus tanpa sebab jelas, tengah malam pun tidak mau tidur. Mama & Papa kelelahan dan khawatir.",
+    },
+    {
+      image: "https://cdn.scalev.id/uploads/1776314021/TocFo6Ao7mQzx52YGuH7OA/1776314021285-kala4.webp",
+      alt: "Stimulasi Bayi",
+      icon: "🤷‍♀️",
+      title: "Bingung cara stimulasi yang benar",
+      description: "Banyak informasi di internet, tapi mana yang benar untuk usia si kecil? Takut salah langkah malah menghambat perkembangan.",
+    },
+    {
+      image: "https://cdn.scalev.id/uploads/1776313763/IDvzjWBfncERRV9U1_xfmw/1776313762625-Kala-(1).webp",
+      alt: "Bayi Kolik",
+      icon: "😣",
+      title: "Kolik & perut kembung",
+      description: "Bayi menangis keras sambil menarik kaki ke perut — melihatnya kesakitan membuat hati hancur, tapi tidak tahu harus apa.",
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="lb-problem">
+  <div class="lb-problem__tag">{tag}</div>
+  <h2 class="lb-problem__title" set:html={title} />
+  
+  <div class="lb-problem__grid">
+    {problems.map((item) => (
+      <div class="lb-problem__card reveal">
+        <div class="lb-problem__img-wrapper">
+          <img src={item.image} alt={item.alt} loading="lazy" />
+        </div>
+        <div class="lb-problem__content">
+          <div class="lb-problem__icon">{item.icon}</div>
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .lb-problem {
+    padding: 100px 48px;
+    background: #3D2314;
+  }
+  .lb-problem__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #E8A98A;
+    margin-bottom: 16px;
+  }
+  .lb-problem__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #F5D9C8;
+    margin-bottom: 20px;
+  }
+  .lb-problem__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 32px;
+    margin-top: 56px;
+  }
+  .lb-problem__card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 0;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  .lb-problem__card:hover {
+    transform: translateY(-5px);
+  }
+  .lb-problem__img-wrapper {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+  }
+  .lb-problem__img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: transform 0.5s ease;
+  }
+  .lb-problem__card:hover .lb-problem__img-wrapper img {
+    transform: scale(1.05);
+    opacity: 0.95;
+  }
+  .lb-problem__content {
+    padding: 24px 32px 32px 32px;
+  }
+  .lb-problem__icon {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  .lb-problem__card h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    color: #F5D9C8;
+    margin-bottom: 10px;
+  }
+  .lb-problem__card p {
+    font-size: 0.9rem;
+    color: #c4a090;
+    line-height: 1.7;
+  }
+  
+  @media (max-width: 768px) { 
+    .lb-problem {
+      padding: 72px 24px;
+    }
+    .lb-problem__img-wrapper {
+      height: 150px;
+    }
+  }
+</style>

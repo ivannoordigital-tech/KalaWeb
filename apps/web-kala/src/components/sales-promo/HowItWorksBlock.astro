@@ -1,0 +1,132 @@
+---
+interface StepItem {
+  num: string | number;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  tag?: string;
+  title?: string;
+  steps?: StepItem[];
+}
+
+const {
+  title = "Mudah & Nyaman dari Rumah",
+  steps = [
+    {
+      num: 1,
+      title: "Konsultasi Gratis",
+      description: "Ceritakan kondisi & kebutuhan si kecil. Kami rekomendasikan paket paling tepat untuk usianya.",
+    },
+    {
+      num: 2,
+      title: "Pilih Jadwal",
+      description: "Booking via WhatsApp, pilih hari & jam yang sesuai. Tersedia 7 hari seminggu, termasuk weekend.",
+    },
+    {
+      num: 3,
+      title: "Terapis Datang ke Rumah",
+      description: "Terapis bersertifikat hadir tepat waktu dengan membawa semua perlengkapan. Home visit available!",
+    },
+    {
+      num: 4,
+      title: "Pantau Perkembangan",
+      description: "Terapis memberikan laporan & panduan lanjutan agar Mama bisa melanjutkan stimulasi di rumah.",
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="lb-how">
+  <h2 class="lb-how__title">{title}</h2>
+  <div class="lb-steps">
+    {steps.map((step) => (
+      <div class="lb-step reveal">
+        <div class="lb-step__num">{step.num}</div>
+        <h3>{step.title}</h3>
+        <p>{step.description}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .lb-how {
+    padding: 100px 48px;
+    background: #FDF8F2;
+    text-align: center;
+  }
+  .lb-how__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C4714A;
+    margin-bottom: 16px;
+  }
+  .lb-how__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #3D2314;
+  }
+  .lb-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 64px;
+    position: relative;
+    gap: 32px 0;
+  }
+  .lb-steps::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, #F5D9C8, #E8A98A, #F5D9C8);
+  }
+  .lb-step {
+    padding: 0 24px;
+    position: relative;
+  }
+  .lb-step__num {
+    width: 80px;
+    height: 80px;
+    background: #FDF8F2;
+    border: 3px solid #E8A98A;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #C4714A;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+  .lb-step h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    color: #3D2314;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .lb-step p {
+    font-size: 0.88rem;
+    color: #8a6450;
+    line-height: 1.7;
+  }
+  @media (max-width: 768px) {
+    .lb-how {
+      padding: 72px 24px;
+    }
+    .lb-steps::before {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,75 @@
+---
+interface Props {
+  icon?: string;
+  tag?: string;
+  title?: string;
+  description?: string;
+}
+
+const {
+  icon = "🛡️",
+  tag = "Jaminan Kami",
+  title = "Puas 100% atau<br>Sesi Pengganti Gratis",
+  description = "Kami percaya pada kualitas layanan kami. Jika setelah sesi pertama Anda tidak puas dengan hasilnya, kami berikan sesi pengganti gratis*. Kepercayaan Anda adalah prioritas kami.",
+} = Astro.props;
+---
+
+<section class="lb-guarantee">
+  <div class="lb-guarantee__box reveal">
+    <div class="lb-guarantee__icon">{icon}</div>
+    <div class="lb-guarantee__tag">{tag}</div>
+    <h2 class="lb-guarantee__title" set:html={title} />
+    <p class="lb-guarantee__text">{description}</p>
+  </div>
+</section>
+
+<style>
+  .lb-guarantee {
+    padding: 100px 48px;
+    background: #3D2314;
+    text-align: center;
+  }
+  .lb-guarantee__box {
+    max-width: 640px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    padding: 60px;
+  }
+  .lb-guarantee__icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    line-height: 1;
+  }
+  .lb-guarantee__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #E8A98A;
+    margin-bottom: 16px;
+  }
+  .lb-guarantee__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #F5D9C8;
+  }
+  .lb-guarantee__text {
+    color: #c4a090;
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-top: 16px;
+  }
+  @media (max-width: 768px) {
+    .lb-guarantee {
+      padding: 72px 24px;
+    }
+    .lb-guarantee__box {
+      padding: 40px 28px;
+    }
+  }
+</style>

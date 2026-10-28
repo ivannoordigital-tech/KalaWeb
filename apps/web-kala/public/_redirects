@@ -4,3 +4,7 @@
 # Redirect legacy /lp/ landing pages to new /sales/ format
 /lp/* /sales/:splat 301
 /preview/lp/* /preview/sales/:splat 302
+
+# Aliases for Baby Massage Sales Page
+/sales/baby-massage /sales/babyMassage 301
+/sales/babymassage /sales/babyMassage 301

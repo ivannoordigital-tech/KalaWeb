@@ -1,0 +1,144 @@
+---
+interface TestiItem {
+  stars?: string;
+  quote: string;
+  avatar: string;
+  name: string;
+  role: string;
+}
+
+interface Props {
+  tag?: string;
+  title?: string;
+  testimonials?: TestiItem[];
+}
+
+const {
+  tag = "Kata Mereka",
+  title = "Orang Tua yang Sudah<br>Merasakan Manfaatnya",
+  testimonials = [
+    {
+      stars: "★★★★★",
+      quote: "Saya sangat skeptis awalnya, tapi setelah sesi pertama baby massage, putri saya yang 2 bulan langsung tidur lebih nyenyak dan tidak rewel lagi. Benar-benar perubahan luar biasa untuk keluarga kami.",
+      avatar: "👩",
+      name: "Bunda Maharani",
+      role: "Mama Baby Zahra, 2 bulan",
+    },
+    {
+      stars: "★★★★★",
+      quote: "Anak saya kolik parah sampai 3 bulan. Setelah 4 kali baby massage, koliknya berkurang drastis. Terapisnya sabar banget dan profesional.",
+      avatar: "👨",
+      name: "Papa Dimas",
+      role: "Ayah Baby Raffa, 3 bulan",
+    },
+    {
+      stars: "★★★★★",
+      quote: "Yang bikin saya repeat order terus adalah laporan perkembangan yang diberikan setiap sesi. Saya jadi paham banget milestone apa yang perlu distimulasi untuk si kecil.",
+      avatar: "👩‍🦱",
+      name: "Bunda Clarisa",
+      role: "Mama Baby Elora, 5 bulan",
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="lb-testi">
+  <div class="lb-testi__tag">{tag}</div>
+  <h2 class="lb-testi__title" set:html={title} />
+  <div class="lb-testi__grid">
+    {testimonials.map((item) => (
+      <div class="lb-testi__card reveal">
+        <div class="lb-testi__stars">{item.stars || "★★★★★"}</div>
+        <p class="lb-testi__text">"{item.quote}"</p>
+        <div class="lb-testi__author">
+          <div class="lb-testi__avatar">{item.avatar}</div>
+          <div>
+            <div class="lb-testi__name">{item.name}</div>
+            <div class="lb-testi__role">{item.role}</div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .lb-testi {
+    padding: 100px 48px;
+    background: #F5D9C8;
+    text-align: center;
+  }
+  .lb-testi__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C4714A;
+    margin-bottom: 16px;
+  }
+  .lb-testi__title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    line-height: 1.25;
+    font-weight: 700;
+    color: #3D2314;
+  }
+  .lb-testi__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px;
+    margin-top: 60px;
+    text-align: left;
+  }
+  .lb-testi__card {
+    background: white;
+    border-radius: 24px;
+    padding: 36px;
+    box-shadow: 0 4px 20px rgba(196, 113, 74, 0.08);
+  }
+  .lb-testi__stars {
+    color: #F5A623;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+  .lb-testi__text {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #3D2314;
+    margin-bottom: 24px;
+  }
+  .lb-testi__author {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .lb-testi__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #F5D9C8, #E8A98A);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .lb-testi__name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #3D2314;
+  }
+  .lb-testi__role {
+    font-size: 0.78rem;
+    color: #9a7060;
+  }
+  @media (max-width: 768px) {
+    .lb-testi {
+      padding: 72px 24px;
+    }
+  }
+</style>
