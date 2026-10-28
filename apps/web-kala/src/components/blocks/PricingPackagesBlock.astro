@@ -52,7 +52,7 @@ const py = pyClasses[block.spacing || 'normal'] || 'py-14 md:py-20';
     <!-- Header -->
     <div class="text-center mb-12 sm:mb-16">
       {block.badge && (
-        <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+        <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
           {block.badge}
         </span>
       )}
@@ -71,11 +71,11 @@ const py = pyClasses[block.spacing || 'normal'] || 'py-14 md:py-20';
       {packages.map((pkg) => {
         const isPop = Boolean(pkg.isPopular);
         return (
-          <div class={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${isPop ? 'bg-[#FFF9F4] border-2 border-[#C2552B] shadow-xl scale-[1.02]' : 'bg-white border border-[#F6DCCD] shadow-sm hover:shadow-md'}`}>
+          <div class={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 ${isPop ? 'bg-[#FFF9F4] border-2 border-[#B3471E] shadow-xl scale-[1.02]' : 'bg-white border border-[#F6DCCD] shadow-sm hover:shadow-md'}`}>
             
             {isPop && (
               <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span class="bg-[#C2552B] text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-md">
+                <span class="bg-[#B3471E] text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-md">
                   {pkg.popularBadge || 'Pilihan Terpopuler ⭐'}
                 </span>
               </div>
@@ -99,7 +99,7 @@ const py = pyClasses[block.spacing || 'normal'] || 'py-14 md:py-20';
               <!-- Price Box -->
               <div class="mb-5 pb-5 border-b border-[#F6DCCD]">
                 <div class="flex items-baseline gap-2">
-                  <span class="text-3xl sm:text-4xl font-brand font-bold text-[#C2552B]">
+                  <span class="text-3xl sm:text-4xl font-brand font-bold text-[#B3471E]">
                     {pkg.price}
                   </span>
                   {pkg.originalPrice && (
@@ -131,7 +131,7 @@ const py = pyClasses[block.spacing || 'normal'] || 'py-14 md:py-20';
                   <ul class="space-y-2.5">
                     {pkg.features.map((feat) => (
                       <li class="flex items-start gap-2.5 text-xs sm:text-sm text-[#4B2E22]">
-                        <span class="w-4 h-4 rounded-full bg-[#E8F8EE] text-[#128C4A] flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                        <span class="w-4 h-4 rounded-full bg-[#E8F8EE] text-[#0E733D] flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
                           ✓
                         </span>
                         <span>{feat.feature}</span>

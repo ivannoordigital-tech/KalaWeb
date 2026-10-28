@@ -2,7 +2,7 @@
   <rect width="800" height="450" fill="#FFF9F4"/>
   <circle cx="400" cy="225" r="180" fill="#FFEFE5"/>
   <circle cx="400" cy="225" r="130" fill="#FFD9C4" opacity="0.6"/>
-  <text x="400" y="210" font-family="'Fredoka', sans-serif" font-size="72" text-anchor="middle" fill="#C2552B">🏡🩺</text>
+  <text x="400" y="210" font-family="'Fredoka', sans-serif" font-size="72" text-anchor="middle" fill="#B3471E">🏡🩺</text>
   <text x="400" y="275" font-family="'Fredoka', sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#4B2E22">Panduan Bidan Homecare Surabaya</text>
   <text x="400" y="315" font-family="'Nunito', sans-serif" font-size="16" font-weight="600" text-anchor="middle" fill="#86675A">Standar Higienitas Medis, STR Resmi &amp; Keamanan Bayi</text>
 </svg>

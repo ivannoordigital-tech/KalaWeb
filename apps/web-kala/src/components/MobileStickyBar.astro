@@ -43,13 +43,18 @@ const {
       var ticking = false;
 
       function checkScroll() {
-        var doc = document.documentElement;
-        var total = doc.scrollHeight - window.innerHeight;
-        var scrollPercent = total > 0 ? (window.scrollY / total) * 100 : 0;
+        var scrollY = window.scrollY || window.pageYOffset || 0;
+        var shouldShowMobile = false;
+        var shouldShowDesktop = false;
 
-        // Mobile: 10%, Desktop: 20%
-        var shouldShowMobile = scrollPercent >= 10;
-        var shouldShowDesktop = scrollPercent >= 20;
+        // Fast-path: If near top, avoid reading layout properties to prevent forced reflow
+        if (scrollY > 50) {
+          var doc = document.documentElement;
+          var total = doc.scrollHeight - window.innerHeight;
+          var scrollPercent = total > 0 ? (scrollY / total) * 100 : 0;
+          shouldShowMobile = scrollPercent >= 10;
+          shouldShowDesktop = scrollPercent >= 20;
+        }
 
         if (mobileBar && shouldShowMobile !== isMobileVisible) {
           isMobileVisible = shouldShowMobile;
@@ -83,13 +88,18 @@ const {
         }
       }, { passive: true });
 
-      checkScroll();
+      // Defer initial check until after first paint
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(checkScroll);
+      } else {
+        setTimeout(checkScroll, 200);
+      }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupStickyScroll);
-    } else {
+    if (document.readyState === 'complete') {
       setupStickyScroll();
+    } else {
+      window.addEventListener('load', setupStickyScroll, { once: true });
     }
   })();
 </script>

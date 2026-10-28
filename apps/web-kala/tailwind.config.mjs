@@ -11,10 +11,10 @@ export default {
           cream: '#FFF9F4',
           ink: '#4B2E22',
           muted: '#86675A',
-          accent: '#C2552B',
+          accent: '#B3471E',
           line: '#F6DCCD',
-          wa: '#128C4A',
-          'wa-dark': '#0E6C38',
+          wa: '#0E733D',
+          'wa-dark': '#0B582F',
         },
       },
       fontFamily: {

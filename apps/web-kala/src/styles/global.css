@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
+@import '@fontsource/fredoka/500.css';
+@import '@fontsource/fredoka/600.css';
+@import '@fontsource/fredoka/700.css';
+@import '@fontsource/nunito/400.css';
+@import '@fontsource/nunito/500.css';
+@import '@fontsource/nunito/600.css';
+@import '@fontsource/nunito/700.css';
+@import '@fontsource/nunito/800.css';
 
 @tailwind base;
 @tailwind components;
@@ -11,9 +18,9 @@
   --color-kala-cream: #FFF9F4;
   --color-kala-ink: #4B2E22;
   --color-kala-muted: #86675A;
-  --color-kala-accent: #C2552B;
+  --color-kala-accent: #B3471E;
   --color-kala-line: #F6DCCD;
-  --color-kala-wa: #128C4A;
+  --color-kala-wa: #0E733D;
 }
 
 html {
@@ -56,7 +63,7 @@ h1, h2, h3, .font-brand {
 
 .prose-kala h3 {
   font-family: 'Fredoka', sans-serif;
-  color: #C2552B;
+  color: #B3471E;
   font-size: 1.25rem;
   font-weight: 600;
   margin-top: 1.5rem;
@@ -111,7 +118,7 @@ h1, h2, h3, .font-brand {
 }
 
 .prose-kala a {
-  color: #C2552B;
+  color: #B3471E;
   text-decoration: underline;
   font-weight: 600;
 }

@@ -242,28 +242,38 @@
     }
   });
 
-  // 3. Scroll Depth Tracking (25%, 50%, 75%, 90%)
+  // 3. Scroll Depth Tracking (25%, 50%, 75%, 90%) with rAF throttling
   const scrollMilestones = [25, 50, 75, 90];
   const trackedMilestones = new Set();
+  let scrollTicking = false;
 
   window.addEventListener('scroll', () => {
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    if (scrollHeight <= 0) return;
-    const scrollPercent = Math.round((window.scrollY / scrollHeight) * 100);
-
-    scrollMilestones.forEach((milestone) => {
-      if (scrollPercent >= milestone && !trackedMilestones.has(milestone)) {
-        trackedMilestones.add(milestone);
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: 'scroll_depth',
-          scroll_depth_threshold: milestone,
-          page_path: window.location.pathname,
-          lp_slug: lpContext?.lpSlug || undefined,
-          variant: lpContext?.variant || undefined,
-        });
-      }
-    });
+    if (!scrollTicking) {
+      window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        if (scrollY > 50) {
+          const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+          if (scrollHeight > 0) {
+            const scrollPercent = Math.round((scrollY / scrollHeight) * 100);
+            scrollMilestones.forEach((milestone) => {
+              if (scrollPercent >= milestone && !trackedMilestones.has(milestone)) {
+                trackedMilestones.add(milestone);
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                  event: 'scroll_depth',
+                  scroll_depth_threshold: milestone,
+                  page_path: window.location.pathname,
+                  lp_slug: lpContext?.lpSlug || undefined,
+                  variant: lpContext?.variant || undefined,
+                });
+              }
+            });
+          }
+        }
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
   }, { passive: true });
 
   // 4. FAQ / Accordion Interaction Tracking

@@ -37,7 +37,7 @@ const servicesList = [...rawServices].sort((a, b) => {
 <section id="layanan" class="py-16 md:py-24 bg-[#FFF9F4]">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-14">
-      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+      <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
         Menu Layanan Terfavorit
       </span>
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
@@ -53,18 +53,18 @@ const servicesList = [...rawServices].sort((a, b) => {
       {servicesList.map((service) => (
         <div class={`relative rounded-3xl border-2 transition-all duration-300 flex flex-col justify-between overflow-hidden bg-white ${
           service.popular 
-            ? 'border-[#C2552B] shadow-kala-hover md:-translate-y-2' 
+            ? 'border-[#B3471E] shadow-kala-hover md:-translate-y-2' 
             : 'border-[#F6DCCD] shadow-kala hover:shadow-kala-hover'
         }`}>
           {service.popular && (
-            <div class="bg-[#C2552B] text-white text-xs font-bold py-1.5 px-4 text-center tracking-wide uppercase">
+            <div class="bg-[#B3471E] text-white text-xs font-bold py-1.5 px-4 text-center tracking-wide uppercase">
               ★ Rekomendasi Terfavorit
             </div>
           )}
           
           <div class="p-7">
             <div class="flex items-center justify-between text-xs font-semibold text-[#86675A] mb-3">
-              <span class="px-2.5 py-1 bg-[#FFEFE5] text-[#C2552B] rounded-lg border border-[#F6DCCD]">
+              <span class="px-2.5 py-1 bg-[#FFEFE5] text-[#B3471E] rounded-lg border border-[#F6DCCD]">
                 {service.target}
               </span>
               <span class="flex items-center gap-1">
@@ -73,7 +73,7 @@ const servicesList = [...rawServices].sort((a, b) => {
             </div>
 
             <h3 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug">
-              <a href={`/layanan/${service.id}`} class="hover:text-[#C2552B] transition-colors">
+              <a href={`/layanan/${service.id}`} class="hover:text-[#B3471E] transition-colors">
                 {service.name}
               </a>
             </h3>
@@ -87,7 +87,7 @@ const servicesList = [...rawServices].sort((a, b) => {
                 {service.originalPrice}
               </div>
               <div class="flex items-baseline gap-1.5">
-                <span class="text-2xl sm:text-3xl font-brand font-bold text-[#C2552B]">
+                <span class="text-2xl sm:text-3xl font-brand font-bold text-[#B3471E]">
                   {service.price}
                 </span>
                 <span class="text-xs font-semibold text-[#86675A]">/ sesi</span>
@@ -98,7 +98,7 @@ const servicesList = [...rawServices].sort((a, b) => {
           <div class="p-7 pt-0 space-y-3">
             <a
               href={`/layanan/${service.id}`}
-              class="block text-center text-xs font-bold text-[#C2552B] hover:underline py-1"
+              class="block text-center text-xs font-bold text-[#B3471E] hover:underline py-1"
             >
               Detail Prosedur & Manfaat Medis →
             </a>
@@ -116,7 +116,7 @@ const servicesList = [...rawServices].sort((a, b) => {
 
     <!-- WhatsApp Full Catalog Callout -->
     <div class="bg-gradient-to-r from-[#FFEFE5] via-[#FFF9F4] to-[#FFEFE5] border-2 border-[#F6DCCD] rounded-3xl p-8 sm:p-10 text-center max-w-3xl mx-auto shadow-sm">
-      <div class="w-12 h-12 rounded-full bg-[#128C4A]/10 text-[#128C4A] mx-auto flex items-center justify-center text-2xl mb-4">
+      <div class="w-12 h-12 rounded-full bg-[#0E733D]/10 text-[#0E733D] mx-auto flex items-center justify-center text-2xl mb-4">
         📋
       </div>
       <h3 class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22] mb-3">

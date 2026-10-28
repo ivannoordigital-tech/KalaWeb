@@ -116,10 +116,6 @@ const showMobileBar = !isCanvas;
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
     <!-- Centralized Analytics & Pixels (GTM, Meta, TikTok, GA4, Clarity) -->
     <AnalyticsScripts analytics={siteSettings.analytics} placement="head" />
 
@@ -150,7 +146,7 @@ const showMobileBar = !isCanvas;
     {showNavbar && (
       <a
         href="#main-content"
-        class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#4B2E22] focus:shadow-lg focus:ring-2 focus:ring-[#C2552B]"
+        class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-bold focus:text-[#4B2E22] focus:shadow-lg focus:ring-2 focus:ring-[#B3471E]"
       >
         Lewati ke konten utama
       </a>
@@ -159,7 +155,7 @@ const showMobileBar = !isCanvas;
     <AnalyticsScripts analytics={siteSettings.analytics} placement="body" />
 
     {showAnnouncement && (
-      <aside class="bg-[#C2552B] text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center">
+      <aside class="bg-[#B3471E] text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center">
         {siteSettings.announcementBanner}
       </aside>
     )}

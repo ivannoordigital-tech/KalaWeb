@@ -110,7 +110,7 @@ const personSchema = {
         <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
           
           <!-- Avatar Icon -->
-          <div class="w-32 h-32 rounded-2xl bg-[#FFEFE5] border-2 border-[#C2552B]/30 flex items-center justify-center text-5xl flex-shrink-0 shadow-inner">
+          <div class="w-32 h-32 rounded-2xl bg-[#FFEFE5] border-2 border-[#B3471E]/30 flex items-center justify-center text-5xl flex-shrink-0 shadow-inner">
             👩‍⚕️
           </div>
 
@@ -125,14 +125,14 @@ const personSchema = {
               {midwife.name}
             </h1>
             
-            <p class="text-sm font-semibold text-[#C2552B] mb-3">
+            <p class="text-sm font-semibold text-[#B3471E] mb-3">
               {midwife.title}
             </p>
 
             <!-- Verified STR Card -->
             <div class="inline-block bg-[#FBF5F0] border border-[#F6DCCD] rounded-xl px-4 py-2 text-xs text-[#86675A] mb-6">
               <span class="font-bold text-[#4B2E22]">Nomor Registrasi Medis (STR):</span>{' '}
-              <span class="font-mono text-[#C2552B] font-bold">{midwife.strNumber}</span>
+              <span class="font-mono text-[#B3471E] font-bold">{midwife.strNumber}</span>
               {midwife.experienceYears && (
                 <span class="ml-2 pl-2 border-l border-[#F6DCCD]">
                   Pengalaman: <strong>{midwife.experienceYears} Tahun</strong>
@@ -152,7 +152,7 @@ const personSchema = {
                 </span>
                 <div class="flex flex-wrap gap-2 justify-center md:justify-start">
                   {midwife.specialties.map((s: any) => (
-                    <span class="text-xs bg-[#FFEFE5] text-[#C2552B] font-bold px-3 py-1.5 rounded-lg border border-[#F6DCCD]">
+                    <span class="text-xs bg-[#FFEFE5] text-[#B3471E] font-bold px-3 py-1.5 rounded-lg border border-[#F6DCCD]">
                       ✓ {typeof s === 'string' ? s : s.specialty}
                     </span>
                   ))}

@@ -78,7 +78,7 @@ const primaryMidwife = midwivesList[0];
   <!-- Page Header -->
   <section class="py-14 md:py-20 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4] border-b border-[#F6DCCD]">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <span class="text-xs font-bold tracking-wider text-[#C2552B] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-4">
+      <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-4">
         Tenaga Kesehatan Terverifikasi
       </span>
       <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] mb-6 leading-tight">
@@ -100,12 +100,12 @@ const primaryMidwife = midwivesList[0];
             <div class="p-8">
               <!-- Midwife Avatar Monogram / Badge -->
               <div class="flex items-center gap-4 mb-6">
-                <div class="w-16 h-16 rounded-2xl bg-[#FFEFE5] border-2 border-[#F6DCCD] text-[#C2552B] flex items-center justify-center font-brand font-bold text-2xl flex-shrink-0">
+                <div class="w-16 h-16 rounded-2xl bg-[#FFEFE5] border-2 border-[#F6DCCD] text-[#B3471E] flex items-center justify-center font-brand font-bold text-2xl flex-shrink-0">
                   {midwife.name.split(' ')[1]?.[0] || 'B'}
                 </div>
                 <div>
-                  <h2 class="font-brand font-bold text-lg text-[#4B2E22] leading-snug hover:text-[#C2552B] transition-colors"><a href={`/bidan/${midwife.slug}`}>{midwife.name}</a></h2>
-                  <p class="text-xs text-[#C2552B] font-semibold">
+                  <h2 class="font-brand font-bold text-lg text-[#4B2E22] leading-snug hover:text-[#B3471E] transition-colors"><a href={`/bidan/${midwife.slug}`}>{midwife.name}</a></h2>
+                  <p class="text-xs text-[#B3471E] font-semibold">
                     {midwife.title}
                   </p>
                 </div>
@@ -114,7 +114,7 @@ const primaryMidwife = midwivesList[0];
               <!-- STR Verification Box -->
               <div class="bg-white p-3.5 rounded-xl border border-[#F6DCCD] mb-6 text-xs text-[#4B2E22] flex items-center justify-between">
                 <span class="text-[#86675A]">Surat Tanda Registrasi:</span>
-                <span class="font-mono font-bold text-[#128C4A] text-[11px] bg-[#E8F8EE] px-2 py-0.5 rounded border border-[#C5ECD2]">
+                <span class="font-mono font-bold text-[#0E733D] text-[11px] bg-[#E8F8EE] px-2 py-0.5 rounded border border-[#C5ECD2]">
                   ✓ {midwife.strNumber}
                 </span>
               </div>
@@ -132,7 +132,7 @@ const primaryMidwife = midwivesList[0];
                 <ul class="space-y-1.5">
                   {midwife.specialties?.map((spec: any) => (
                     <li class="flex items-center gap-2 text-xs text-[#86675A]">
-                      <span class="text-[#C2552B] font-bold">✓</span>
+                      <span class="text-[#B3471E] font-bold">✓</span>
                       <span>{typeof spec === 'string' ? spec : spec.specialty}</span>
                     </li>
                   ))}

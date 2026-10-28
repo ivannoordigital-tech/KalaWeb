@@ -25,7 +25,7 @@ function renderLexicalNode(node: any): string {
     const url = node.fields?.url || '#';
     const newTab = node.fields?.newTab ? ' target="_blank" rel="noopener noreferrer"' : '';
     const inner = (node.children || []).map(renderLexicalNode).join('');
-    return `<a href="${url}" class="text-[#C2552B] underline font-semibold hover:text-[#A3431F]"${newTab}>${inner}</a>`;
+    return `<a href="${url}" class="text-[#B3471E] underline font-semibold hover:text-[#A3431F]"${newTab}>${inner}</a>`;
   }
 
   const inner = (node.children || []).map(renderLexicalNode).join('');
@@ -58,7 +58,7 @@ function renderLexicalNode(node: any): string {
   }
 
   if (node.type === 'quote') {
-    return `<blockquote class="border-l-4 border-[#C2552B] pl-4 py-2 italic text-[#86675A] bg-[#FFEFE5]/40 rounded-r-xl my-6">${inner}</blockquote>`;
+    return `<blockquote class="border-l-4 border-[#B3471E] pl-4 py-2 italic text-[#86675A] bg-[#FFEFE5]/40 rounded-r-xl my-6">${inner}</blockquote>`;
   }
 
   return inner;
