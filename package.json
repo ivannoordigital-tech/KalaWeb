@@ -12,6 +12,7 @@
     "convert:images": "node scripts/convert-webp.mjs",
     "build": "npm run build --workspace=web-kala",
     "build:cms": "npm run build --workspace=cms-kala",
+    "set:superadmin": "npm run set:superadmin --workspace=cms-kala",
     "audit:seo": "node scripts/audit-seo.mjs",
     "preview": "npm run preview --workspace=web-kala"
   }

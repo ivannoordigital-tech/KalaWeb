@@ -9,6 +9,7 @@
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start -p 3005",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/seed.ts",
+    "set:superadmin": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/set-superadmin.ts",
     "audit:backfill": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/audit-backfill.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
