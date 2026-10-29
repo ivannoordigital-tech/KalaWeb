@@ -584,6 +584,17 @@ export async function seed() {
       whatsappCustomMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
       _status: 'published',
     },
+    {
+      title: 'Pijat Bayi Homecare Surabaya & Sidoarjo | Baby Massage Bidan Ber-STR',
+      slug: 'babyMassage',
+      description: 'Layanan pijat & perawatan profesional untuk bayi, anak, dan ibu nifas di Surabaya & Sidoarjo. Ditangani bidan bersertifikat Kemenkes RI, home visit available.',
+      refCode: 'LP-BABYMASSAGE-PROMO',
+      pageType: 'landing' as const,
+      pageLayout: 'canvas' as const,
+      showWhatsAppCta: true,
+      whatsappCustomMessage: 'Halo Bu Bidan, saya mau pesan sesi Baby Massage untuk si kecil',
+      _status: 'published',
+    },
   ]
 
   for (const pg of initialPages) {
