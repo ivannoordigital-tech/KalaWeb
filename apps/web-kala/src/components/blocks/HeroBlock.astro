@@ -28,7 +28,14 @@ const bgStyles = {
 };
 
 const currentBg = bgStyles[block.bgStyle || 'gradient'] || bgStyles.gradient;
-const imageUrl = typeof block.image === 'string' ? block.image : block.image?.url;
+const rawImageUrl = typeof block.image === 'string' ? block.image : block.image?.url;
+const imageUrl = rawImageUrl
+  ? rawImageUrl.startsWith('http') || rawImageUrl.startsWith('//')
+    ? rawImageUrl
+    : rawImageUrl.startsWith('/images/')
+      ? rawImageUrl
+      : `https://admin.kalababyspa.com${rawImageUrl.startsWith('/') ? '' : '/'}${rawImageUrl}`
+  : null;
 const imageAlt = block.imageAlt || (typeof block.image === 'object' ? block.image?.alt : null) || block.headline;
 
 const isLeft = block.align === 'left' || Boolean(imageUrl);

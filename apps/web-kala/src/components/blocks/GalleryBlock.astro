@@ -54,7 +54,14 @@ const isWarm = block.bgStyle === 'warm';
     <div class={`grid gap-4 sm:gap-6 ${currentCols}`}>
       {images.map((item, idx) => {
         const rawUrl = typeof item.image === 'string' ? item.image : item.image?.url;
-        const finalUrl = rawUrl || item.imageUrlFallback || '/images/hero-baby.jpg';
+        const normalizedUrl = rawUrl
+          ? rawUrl.startsWith('http') || rawUrl.startsWith('//')
+            ? rawUrl
+            : rawUrl.startsWith('/images/')
+              ? rawUrl
+              : `https://admin.kalababyspa.com${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`
+          : null;
+        const finalUrl = normalizedUrl || item.imageUrlFallback || '/images/hero-baby.jpg';
         const altText = typeof item.image === 'object' ? item.image?.alt : item.caption || block.title;
 
         return (
