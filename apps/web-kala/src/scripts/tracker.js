@@ -138,6 +138,142 @@
     console.debug('[KalaTracker] LP view tracking error:', err);
   }
 
+  // Helper to get raw browser cookie (for _fbp, _fbc)
+  function getRawCookie(name) {
+    try {
+      const match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // 1c. Server-Side PageView Beacon (CAPI Deduplication with twin eventID)
+  function sendPageViewBeacon(lpCtx, activeAttr) {
+    if (window.__KALA_PAGEVIEW_BEACON_SENT__) return;
+    window.__KALA_PAGEVIEW_BEACON_SENT__ = true;
+
+    try {
+      const pvEventId = window.__KALA_PV_EVENT_ID__ || ('pv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8));
+      window.__KALA_PV_EVENT_ID__ = pvEventId;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const fbclid = urlParams.get('fbclid') || activeAttr?.fbclid || null;
+      const fbp = urlParams.get('fbp') || getRawCookie('_fbp') || null;
+      const fbc = urlParams.get('fbc') || getRawCookie('_fbc') || null;
+
+      const payload = {
+        eventID: pvEventId,
+        tenantId: 'default-tenant',
+        landingUrl: window.location.href,
+        referrer: document.referrer || null,
+        fbclid,
+        fbp,
+        fbc,
+        utm_source: urlParams.get('utm_source') || activeAttr?.utm_source || null,
+        utm_medium: urlParams.get('utm_medium') || activeAttr?.utm_medium || null,
+        utm_campaign: urlParams.get('utm_campaign') || activeAttr?.utm_campaign || null,
+        utm_content: urlParams.get('utm_content') || activeAttr?.utm_content || null,
+        utm_term: urlParams.get('utm_term') || activeAttr?.utm_term || null,
+        utm_id: urlParams.get('utm_id') || activeAttr?.utm_id || null,
+      };
+
+      const endpoint = 'https://app.kalababyspa.online/api/tracking/pageview';
+      const jsonStr = JSON.stringify(payload);
+      if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+        const blob = new Blob([jsonStr], { type: 'text/plain;charset=UTF-8' });
+        navigator.sendBeacon(endpoint, blob);
+      } else if (typeof fetch === 'function') {
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: jsonStr,
+          keepalive: true,
+          mode: 'cors',
+        }).catch(() => {});
+      }
+    } catch (e) {
+      console.debug('[KalaTracker] PageView beacon error:', e);
+    }
+  }
+
+  if (lpContext) {
+    const stored = loadStoredAttribution();
+    const activeAttr = stored ? (stored.lastTouch || stored.firstTouch) : null;
+    sendPageViewBeacon(lpContext, activeAttr);
+  }
+
+  // 1d. CTA Gateway URL Builder (Bridges to wa-clinic-bot /cta & Meta CAPI)
+  function buildCtaGatewayUrl(btn, lpCtx, activeAttr) {
+    const refCode = btn.getAttribute('data-ref-code') || (lpCtx?.refCode) || 'LP-BABYMASSAGE-PROMO';
+    let lpSlug = btn.getAttribute('data-cta-slug') || (lpCtx?.lpSlug) || 'baby-massage';
+    if (lpSlug === 'babyMassage') lpSlug = 'baby-massage';
+
+    let baseMsg = btn.getAttribute('data-base-msg') || 'Halo Bu Bidan, saya mau reservasi homecare';
+    baseMsg = baseMsg.replace(/^Halo Bidan Kala/i, 'Halo Bu Bidan');
+    baseMsg = baseMsg.replace(/\s*\[ref:\s*[^\]]+\]/gi, '').trim();
+
+    try {
+      const ctaUrl = new URL('https://app.kalababyspa.online/cta');
+      ctaUrl.searchParams.set('slug', lpSlug);
+      ctaUrl.searchParams.set('msg', baseMsg);
+      ctaUrl.searchParams.set('refCode', refCode);
+      ctaUrl.searchParams.set('landing_url', window.location.href);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const fbclid = urlParams.get('fbclid') || activeAttr?.fbclid;
+      if (fbclid) ctaUrl.searchParams.set('fbclid', fbclid);
+
+      const fbp = urlParams.get('fbp') || getRawCookie('_fbp');
+      if (fbp) ctaUrl.searchParams.set('fbp', fbp);
+
+      const fbc = urlParams.get('fbc') || getRawCookie('_fbc');
+      if (fbc) ctaUrl.searchParams.set('fbc', fbc);
+
+      const trackedKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'ttclid'];
+      trackedKeys.forEach((key) => {
+        const val = urlParams.get(key) || activeAttr?.[key];
+        if (val) ctaUrl.searchParams.set(key, val);
+      });
+
+      return ctaUrl.toString();
+    } catch (_) {
+      const phone = btn.getAttribute('data-phone') || '6285794210526';
+      return `https://wa.me/${phone}?text=${encodeURIComponent(baseMsg)}`;
+    }
+  }
+
+  function updateAllCtaButtons() {
+    try {
+      const stored = loadStoredAttribution();
+      const activeAttr = stored ? (stored.lastTouch || stored.firstTouch) : null;
+      const buttons = document.querySelectorAll('.kala-wa-btn');
+      buttons.forEach((btn) => {
+        const gatewayUrl = buildCtaGatewayUrl(btn, lpContext, activeAttr);
+        btn.setAttribute('href', gatewayUrl);
+        btn.setAttribute('data-cta-gateway-applied', '1');
+      });
+    } catch (_) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateAllCtaButtons);
+  } else {
+    updateAllCtaButtons();
+  }
+
+  if (typeof window.MutationObserver === 'function') {
+    let obsTimer = null;
+    const observer = new MutationObserver(() => {
+      if (obsTimer) return;
+      obsTimer = setTimeout(() => {
+        obsTimer = null;
+        updateAllCtaButtons();
+      }, 250);
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   // 2. Delegate WhatsApp button clicks with debounce and conversion tracking
   let isClickProcessing = false;
 
@@ -234,8 +370,8 @@
         });
       }
 
-      // Dynamically attach final wa.me url with clean human message
-      const finalUrl = `https://wa.me/${phone}?text=${encodeURIComponent(baseMsg)}`;
+      // Dynamically attach final CTA URL (Routes via bot /cta gateway for Meta CAPI attribution)
+      const finalUrl = buildCtaGatewayUrl(btn, lpContext, activeAttr);
       btn.setAttribute('href', finalUrl);
     } catch (err) {
       console.debug('[KalaTracker] Click handler error:', err);

@@ -5,10 +5,11 @@ interface Props {
   refCode?: string;
   message?: string;
   text?: string;
-  variant?: 'primary' | 'secondary' | 'accent' | 'nav' | 'floating' | 'card';
+  variant?: 'primary' | 'secondary' | 'accent' | 'nav' | 'floating' | 'card' | 'promo' | 'hero';
   className?: string;
   showIcon?: boolean;
   phone?: string;
+  ctaSlug?: string;
 }
 
 const {
@@ -19,10 +20,12 @@ const {
   className = '',
   showIcon = true,
   phone = siteConfig.whatsappNumber,
+  ctaSlug = 'baby-massage',
 } = Astro.props;
 
 const defaultMessage = message || 'Halo Bu Bidan, saya mau reservasi homecare';
-const baseWaUrl = `https://wa.me/${phone}?text=${encodeURIComponent(defaultMessage)}`;
+// Gateway URL to wa-clinic-bot for Meta CAPI AdClick attribution
+const baseCtaUrl = `https://app.kalababyspa.online/cta?slug=${encodeURIComponent(ctaSlug)}&msg=${encodeURIComponent(defaultMessage)}&refCode=${encodeURIComponent(refCode)}`;
 
 const variantStyles = {
   primary: 'bg-[#0E733D] hover:bg-[#0B582F] text-white font-bold py-3.5 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2.5 text-base',
@@ -32,19 +35,21 @@ const variantStyles = {
   floating: 'bg-[#0E733D] hover:bg-[#0B582F] text-white font-semibold py-3 px-5 rounded-full shadow-2xl hover:shadow-[0_8px_30px_rgba(18,140,74,0.35)] transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2 text-sm',
   card: 'w-full bg-[#0E733D] hover:bg-[#0B582F] text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm text-center',
   promo: 'bg-[#F5C24E] hover:bg-[#F7CE6A] text-[#3A2A00] font-extrabold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2.5 text-base',
+  hero: 'bg-[#0E733D] hover:bg-[#0B582F] text-white font-extrabold py-4 px-8 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-3 text-lg',
 };
 
 const focusStyles = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3471E] focus-visible:ring-offset-2';
 ---
 
 <a
-  href={baseWaUrl}
+  href={baseCtaUrl}
   target="_blank"
   rel="noopener noreferrer"
-  class={`kala-wa-btn ${variantStyles[variant]} ${focusStyles} ${className}`}
+  class={`kala-wa-btn ${variantStyles[variant] || variantStyles.primary} ${focusStyles} ${className}`}
   data-ref-code={refCode}
   data-base-msg={defaultMessage}
   data-phone={phone}
+  data-cta-slug={ctaSlug}
   aria-label={text}
 >
   {showIcon && (
