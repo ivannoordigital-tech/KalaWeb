@@ -10,6 +10,7 @@ interface Props {
   showIcon?: boolean;
   phone?: string;
   ctaSlug?: string;
+  useCapi?: boolean;
 }
 
 const {
@@ -21,11 +22,15 @@ const {
   showIcon = true,
   phone = siteConfig.whatsappNumber,
   ctaSlug = 'baby-massage',
+  useCapi = false,
 } = Astro.props;
 
 const defaultMessage = message || 'Halo Bu Bidan, saya mau reservasi homecare';
-// Gateway URL to wa-clinic-bot for Meta CAPI AdClick attribution
+const cleanPhone = phone.replace(/\D/g, '');
+const directWaUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(defaultMessage)}`;
+// Gateway URL to wa-clinic-bot for Meta CAPI AdClick attribution (only used when explicitly requested or dynamically upgraded for campaigns)
 const baseCtaUrl = `https://app.kalababyspa.online/cta?slug=${encodeURIComponent(ctaSlug)}&msg=${encodeURIComponent(defaultMessage)}&refCode=${encodeURIComponent(refCode)}`;
+const initialHref = useCapi ? baseCtaUrl : directWaUrl;
 
 const variantStyles = {
   primary: 'bg-[#0E733D] hover:bg-[#0B582F] text-white font-bold py-3.5 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 inline-flex items-center justify-center gap-2.5 text-base',
@@ -42,7 +47,7 @@ const focusStyles = 'focus-visible:outline-none focus-visible:ring-2 focus-visib
 ---
 
 <a
-  href={baseCtaUrl}
+  href={initialHref}
   target="_blank"
   rel="noopener noreferrer"
   class={`kala-wa-btn ${variantStyles[variant] || variantStyles.primary} ${focusStyles} ${className}`}
@@ -50,6 +55,7 @@ const focusStyles = 'focus-visible:outline-none focus-visible:ring-2 focus-visib
   data-base-msg={defaultMessage}
   data-phone={phone}
   data-cta-slug={ctaSlug}
+  data-use-capi={useCapi ? 'true' : 'false'}
   aria-label={text}
 >
   {showIcon && (

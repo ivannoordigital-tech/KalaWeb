@@ -1,31 +1,47 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
-import { fetchPayloadPages } from '../../lib/payload';
+import { verifyPreviewToken, fetchPreviewDraft, type PreviewTokenPayload } from '../../lib/preview';
 
-export async function getStaticPaths() {
-  const cmsPages = await fetchPayloadPages();
+const { slug } = Astro.params;
+const token = Astro.url.searchParams.get('token');
 
-  const fallbackPages = [
-    { slug: 'syarat-ketentuan', title: 'Syarat & Ketentuan Layanan' },
-  ];
-
-  const allSlugs = new Set([
-    ...cmsPages.map((p) => p.slug),
-    ...fallbackPages.map((f) => f.slug),
-  ]);
-
-  return Array.from(allSlugs).map((slug) => {
-    const pageData = cmsPages.find((p) => p.slug === slug);
-    return {
-      params: { slug },
-      props: { pageData },
-    };
+// Security Check: Token is mandatory
+if (!token) {
+  return new Response('Akses pratinjau ditolak: Token tidak disertakan. Buka pratinjau melalui tombol Preview di CMS Admin.', {
+    status: 401,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   });
 }
 
-const { slug } = Astro.params;
-const { pageData } = Astro.props;
+const runtimeEnv = (Astro.locals as any)?.runtime?.env || import.meta.env;
+const previewSecret = runtimeEnv.PREVIEW_SECRET || import.meta.env.PREVIEW_SECRET || 'kala_preview_secret_fallback_key_2026';
+
+let tokenData: PreviewTokenPayload;
+try {
+  tokenData = await verifyPreviewToken(token, previewSecret);
+} catch (err) {
+  return new Response('Akses pratinjau ditolak: Token tanda tangan digital tidak valid atau sudah kedaluwarsa.', {
+    status: 401,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+let pageData: any;
+try {
+  pageData = await fetchPreviewDraft(tokenData.collection || 'pages', tokenData.sub, runtimeEnv);
+} catch (err) {
+  return new Response(`Gagal mengambil dokumen draft dari CMS: ${(err as Error).message}`, {
+    status: 502,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
 
 const title = pageData?.title || `Pratinjau Draft: ${slug}`;
 const blocks = Array.isArray(pageData?.layout) ? pageData.layout : [];
@@ -38,6 +54,7 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
   title={`[PRATINJAU DRAFT] ${title}`}
   description="Mode pratinjau halaman kustom draft editor CMS."
   noindex={true}
+  disableAnalytics={true}
   pageLayout={pageData?.pageLayout || 'default'}>
   <!-- Prominent Draft Preview Banner (Sticky) -->
   <aside class="bg-amber-500 text-slate-950 font-bold px-4 py-3 text-center text-xs sm:text-sm sticky top-20 z-50 flex flex-wrap items-center justify-center gap-2 shadow-md">
@@ -58,7 +75,7 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
   {hasBlocks ? (
       <div class={isFullWidth || isCanvas ? 'w-full' : ''}>
         {blocks.map((block: any) => (
-          <BlockRenderer block={block} />
+          <BlockRenderer block={block} isPreview={true} />
         ))}
       </div>
     ) : (
@@ -83,10 +100,6 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
               if (updated.title) {
                 document.title = '[PRATINJAU DRAFT] ' + updated.title;
               }
-              const mainH1 = document.querySelector('main h1');
-              if (mainH1 && updated.title) {
-                mainH1.textContent = updated.title;
-              }
             }
           }
         });
@@ -96,4 +109,6 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
       }
     })();
   </script>
+  <!-- Builder Canvas Inspector Overlay (Sprint 3) -->
+  <script src="../../scripts/preview-inspector.js"></script>
 </BaseLayout>

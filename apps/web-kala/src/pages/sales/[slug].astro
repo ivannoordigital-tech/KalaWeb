@@ -612,7 +612,8 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
               </div>
               <WhatsAppButton
                 refCode={campaign.refCode}
-                message={`Promo [${campaign.refCode || 'HI-21'}]\nHalo Bu Bidan, saya mau pesan sesi ${campaign.headline}`}
+                message={`Halo Bu Bidan, saya mau pesan sesi ${campaign.headline}`}
+                useCapi={true}
                 text="Hubungi Bidan Kala Sekarang"
                 variant="hero"
               />
@@ -744,6 +745,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
               message={`Halo Bu Bidan, saya mau reservasi kunjungan ${campaign.headline}`}
               text="Jadwalkan Kunjungan Sekarang"
               variant="hero"
+              useCapi={true}
             />
           </div>
         </section>

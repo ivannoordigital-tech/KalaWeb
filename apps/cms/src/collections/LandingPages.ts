@@ -17,11 +17,14 @@ export const LandingPages: CollectionConfig = {
     group: 'Halaman Website',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'refCode', 'variant', 'seoScore', '_status', 'updatedAt'],
-    hidden: () => true,
+    hidden: ({ user }) => {
+      const role = getUserRole(user);
+      return role === 'author' || role === 'midwife_coordinator';
+    },
     preview: (doc) => {
-      if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-        return `${baseUrl}/preview/sales/${doc.slug}/`;
+      if (doc?.id) {
+        const cmsUrl = process.env.CMS_PUBLIC_URL || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+        return `${cmsUrl}/api/preview-redirect?collection=landing-pages&id=${doc.id}`;
       }
       return null;
     },
@@ -113,14 +116,31 @@ export const LandingPages: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      async ({ doc, previousDoc, req }) => {
         const isNowPublished = doc._status === 'published';
         const wasPublished = previousDoc?._status === 'published';
 
         if (isNowPublished && !wasPublished) {
           triggerCloudflareDeploy({ resource: 'LandingPages', action: 'publish', slug: doc.slug });
         } else if (!isNowPublished && wasPublished) {
-          triggerCloudflareDeploy({ resource: 'LandingPages', action: 'unpublish', slug: doc.slug });
+          try {
+            const publishedVersions = await req.payload.findVersions({
+              collection: 'landing-pages',
+              where: {
+                parent: { equals: doc.id },
+                'version._status': { equals: 'published' },
+              },
+              limit: 1,
+            });
+
+            if (publishedVersions.totalDocs === 0) {
+              triggerCloudflareDeploy({ resource: 'LandingPages', action: 'unpublish', slug: doc.slug });
+            } else {
+              console.log(`[Deploy Hook] Dilewati: LandingPages (${doc.slug}) disimpan sebagai draft, versi live published tetap aktif.`);
+            }
+          } catch (err) {
+            console.warn(`[Deploy Hook] Gagal memverifikasi versi published LandingPages (${doc.slug}):`, (err as Error).message);
+          }
         } else if (isNowPublished && wasPublished) {
           triggerCloudflareDeploy({ resource: 'LandingPages', action: 'publish', slug: doc.slug });
         }
@@ -248,12 +268,37 @@ export const LandingPages: CollectionConfig = {
         description: 'Identifikasi varian untuk evaluasi conversion rate iklan.',
       },
     },
+    {
+      name: 'editorMode',
+      type: 'select',
+      label: 'Mode Editor Halaman',
+      defaultValue: 'builder',
+      options: [
+        { label: '✨ Shopify-Style Visual Builder', value: 'builder' },
+        { label: '📝 Formulir Blok Klasik', value: 'form' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Pilih builder visual dengan live preview atau formulir blok standar.',
+      },
+    },
     // 🧱 Flexible Block-Based Page Builder
+    {
+      name: 'builder',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '/components/admin/builder/BuilderField#BuilderField',
+        },
+        condition: (data) => data?.editorMode !== 'form',
+      },
+    },
     {
       name: 'layout',
       type: 'blocks',
       label: '🧱 Susunan Blok Halaman (Drag & Drop Page Builder)',
       admin: {
+        condition: (data) => data?.editorMode === 'form',
         description: 'Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.',
       },
       blocks: allBlocks,

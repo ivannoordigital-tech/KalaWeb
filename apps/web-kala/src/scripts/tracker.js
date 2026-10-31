@@ -11,6 +11,9 @@
 (function initKalaTracker() {
   if (typeof window === 'undefined') return;
 
+  // Strict Preview Guard: Never execute attribution or track CAPI/GTM on preview routes (Sprint 0 - S0-01)
+  if (window.location.pathname.startsWith('/preview/')) return;
+
   const STORAGE_KEY = 'kala_attribution_30d';
   const COOKIE_NAME = 'kala_attr_v2';
   const EXPIRY_DAYS = 30;
@@ -203,15 +206,64 @@
     sendPageViewBeacon(lpContext, activeAttr);
   }
 
-  // 1d. CTA Gateway URL Builder (Bridges to wa-clinic-bot /cta & Meta CAPI)
+  // 1d. Evaluasi apakah tombol WhatsApp dialihkan ke Meta CAPI Gateway (/cta) atau langsung Direct WA
+  function shouldRouteViaCta(btn, lpCtx, activeAttr) {
+    // 1. Pengaturan eksplisit pada komponen tombol (data-use-capi="true" atau "false")
+    const explicitCapi = btn.getAttribute('data-use-capi');
+    if (explicitCapi === 'false' || explicitCapi === '0') return false;
+    if (explicitCapi === 'true' || explicitCapi === '1') return true;
+
+    // 2. Landing Page iklan (/sales/*, /lp/*) selalu menggunakan CAPI gateway
+    if (lpCtx) return true;
+
+    // 3. Pengaturan meta level halaman (<meta name="kala:use-capi" content="true">)
+    const metaCapi = document.querySelector('meta[name="kala:use-capi"]');
+    if (metaCapi && metaCapi.getAttribute('content') === 'true') return true;
+
+    // 4. Enrich data: pengunjung yang memiliki parameter kampanye / ad click / bio IG (fbclid, gclid, utm_source, utm_campaign)
+    // Tetap ditangkap via gateway untuk memperkaya analitik atribusi
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasIncomingAttr = !!(
+        urlParams.get('fbclid') ||
+        urlParams.get('gclid') ||
+        urlParams.get('utm_source') ||
+        urlParams.get('utm_campaign') ||
+        activeAttr?.fbclid ||
+        activeAttr?.gclid ||
+        activeAttr?.utm_source ||
+        activeAttr?.utm_campaign
+      );
+      if (hasIncomingAttr) return true;
+    } catch (_) {}
+
+    // Default: langsung ke Direct WhatsApp (bukan via gateway) untuk pengunjung organik umum
+    return false;
+  }
+
+  function cleanLeadMessage(rawMsg) {
+    let msg = rawMsg || 'Halo Bu Bidan, saya mau reservasi homecare';
+    msg = msg.replace(/^Halo Bidan Kala/i, 'Halo Bu Bidan');
+    msg = msg.replace(/\s*\[ref:\s*[^\]]+\]/gi, '').trim();
+    // Sanitasi tag promo lama/statis agar tidak bertumpuk
+    msg = msg.replace(/^(?:Promo\s*)?\[\s*[\w\s-]{2,32}?\s*\]\s*/i, '').trim();
+    return msg;
+  }
+
+  function buildDirectWaUrl(btn) {
+    const phone = btn.getAttribute('data-phone') || '6285794210526';
+    const cleanPhone = phone.replace(/\D/g, '');
+    const baseMsg = cleanLeadMessage(btn.getAttribute('data-base-msg'));
+    return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(baseMsg)}`;
+  }
+
+  // CTA Gateway URL Builder (Bridges to wa-clinic-bot /cta & Meta CAPI)
   function buildCtaGatewayUrl(btn, lpCtx, activeAttr) {
     const refCode = btn.getAttribute('data-ref-code') || (lpCtx?.refCode) || 'LP-BABYMASSAGE-PROMO';
     let lpSlug = btn.getAttribute('data-cta-slug') || (lpCtx?.lpSlug) || 'baby-massage';
     if (lpSlug === 'babyMassage') lpSlug = 'baby-massage';
 
-    let baseMsg = btn.getAttribute('data-base-msg') || 'Halo Bu Bidan, saya mau reservasi homecare';
-    baseMsg = baseMsg.replace(/^Halo Bidan Kala/i, 'Halo Bu Bidan');
-    baseMsg = baseMsg.replace(/\s*\[ref:\s*[^\]]+\]/gi, '').trim();
+    const baseMsg = cleanLeadMessage(btn.getAttribute('data-base-msg'));
 
     try {
       const ctaUrl = new URL('https://app.kalababyspa.online/cta');
@@ -238,8 +290,7 @@
 
       return ctaUrl.toString();
     } catch (_) {
-      const phone = btn.getAttribute('data-phone') || '6285794210526';
-      return `https://wa.me/${phone}?text=${encodeURIComponent(baseMsg)}`;
+      return buildDirectWaUrl(btn);
     }
   }
 
@@ -249,9 +300,15 @@
       const activeAttr = stored ? (stored.lastTouch || stored.firstTouch) : null;
       const buttons = document.querySelectorAll('.kala-wa-btn');
       buttons.forEach((btn) => {
-        const gatewayUrl = buildCtaGatewayUrl(btn, lpContext, activeAttr);
-        btn.setAttribute('href', gatewayUrl);
-        btn.setAttribute('data-cta-gateway-applied', '1');
+        if (shouldRouteViaCta(btn, lpContext, activeAttr)) {
+          const gatewayUrl = buildCtaGatewayUrl(btn, lpContext, activeAttr);
+          btn.setAttribute('href', gatewayUrl);
+          btn.setAttribute('data-cta-gateway-applied', '1');
+        } else {
+          const directUrl = buildDirectWaUrl(btn);
+          btn.setAttribute('href', directUrl);
+          btn.setAttribute('data-cta-gateway-applied', '0');
+        }
       });
     } catch (_) {}
   }
@@ -299,8 +356,7 @@
       const activeAttr = stored ? (stored.lastTouch || stored.firstTouch) : null;
 
       // Clean message: human-friendly greeting & remove robotic tracking tags from visible WhatsApp text
-      baseMsg = baseMsg.replace(/^Halo Bidan Kala/i, 'Halo Bu Bidan');
-      baseMsg = baseMsg.replace(/\s*\[ref:\s*[^\]]+\]/gi, '').trim();
+      baseMsg = cleanLeadMessage(baseMsg);
 
       // Microsoft Clarity Event
       if (typeof window.clarity === 'function') {

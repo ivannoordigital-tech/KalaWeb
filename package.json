@@ -14,6 +14,7 @@
     "build:cms": "npm run build --workspace=cms-kala",
     "set:superadmin": "npm run set:superadmin --workspace=cms-kala",
     "audit:seo": "node scripts/audit-seo.mjs",
-    "preview": "npm run preview --workspace=web-kala"
+    "preview": "npm run preview --workspace=web-kala",
+    "sync:builder": "npm run sync:builder --workspace=cms-kala"
   }
 }

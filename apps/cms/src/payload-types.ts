@@ -587,6 +587,10 @@ export interface Page {
   layout?:
     | (
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             /**
              * Pemicu minat pertama pengunjung.
@@ -614,6 +618,10 @@ export interface Page {
             blockType: 'hero';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             columns?: ('2' | '3') | null;
@@ -630,6 +638,10 @@ export interface Page {
             blockType: 'painPoints';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             items: {
@@ -647,6 +659,10 @@ export interface Page {
             blockType: 'solutions';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             title: string;
             subtitle?: string | null;
@@ -677,6 +693,10 @@ export interface Page {
             blockType: 'pricing';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             kalaLabel?: string | null;
@@ -692,6 +712,10 @@ export interface Page {
             blockType: 'comparison';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             steps: {
@@ -705,6 +729,10 @@ export interface Page {
             blockType: 'steps';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             items: {
@@ -719,6 +747,10 @@ export interface Page {
             blockType: 'testimonials';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             title: string;
             description: string;
@@ -728,6 +760,10 @@ export interface Page {
             blockType: 'guarantee';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             faqs: {
@@ -740,6 +776,10 @@ export interface Page {
             blockType: 'faq';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Tulis paragraf, judul, kutipan, dan link secara bebas.
              */
@@ -764,6 +804,10 @@ export interface Page {
             blockType: 'richText';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             headline: string;
             description?: string | null;
@@ -775,6 +819,10 @@ export interface Page {
             blockType: 'cta';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             title: string;
             subtitle?: string | null;
@@ -792,6 +840,10 @@ export interface Page {
             blockType: 'gallery';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
              */
@@ -811,6 +863,10 @@ export interface Page {
             blockType: 'midwifeSpotlight';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
              */
@@ -879,7 +935,7 @@ export interface Page {
   /**
    * Pilih sistem analitik iklan yang aktif untuk halaman ini.
    */
-  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
+  activePixels?: ('meta' | 'google' | 'tiktok' | 'ga4' | 'clarity')[] | null;
   /**
    * Alamat URL halaman (huruf kecil dan tanda hubung). Otomatis dibuat dari judul jika kosong.
    */
@@ -1020,6 +1076,10 @@ export interface BlockTemplate {
    */
   layout: (
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         /**
          * Pemicu minat pertama pengunjung.
@@ -1047,6 +1107,10 @@ export interface BlockTemplate {
         blockType: 'hero';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         columns?: ('2' | '3') | null;
@@ -1063,6 +1127,10 @@ export interface BlockTemplate {
         blockType: 'painPoints';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         items: {
@@ -1080,6 +1148,10 @@ export interface BlockTemplate {
         blockType: 'solutions';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         title: string;
         subtitle?: string | null;
@@ -1110,6 +1182,10 @@ export interface BlockTemplate {
         blockType: 'pricing';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         kalaLabel?: string | null;
@@ -1125,6 +1201,10 @@ export interface BlockTemplate {
         blockType: 'comparison';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         steps: {
@@ -1138,6 +1218,10 @@ export interface BlockTemplate {
         blockType: 'steps';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         items: {
@@ -1152,6 +1236,10 @@ export interface BlockTemplate {
         blockType: 'testimonials';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         title: string;
         description: string;
@@ -1161,6 +1249,10 @@ export interface BlockTemplate {
         blockType: 'guarantee';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         faqs: {
@@ -1173,6 +1265,10 @@ export interface BlockTemplate {
         blockType: 'faq';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         /**
          * Tulis paragraf, judul, kutipan, dan link secara bebas.
          */
@@ -1197,6 +1293,10 @@ export interface BlockTemplate {
         blockType: 'richText';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         headline: string;
         description?: string | null;
@@ -1208,6 +1308,10 @@ export interface BlockTemplate {
         blockType: 'cta';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         title: string;
         subtitle?: string | null;
@@ -1225,6 +1329,10 @@ export interface BlockTemplate {
         blockType: 'gallery';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         /**
          * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
          */
@@ -1270,7 +1378,7 @@ export interface LandingPage {
   /**
    * Pilih pixel pelacakan konversi yang aktif. ID pixel dikonfigurasi terpusat di Site Settings.
    */
-  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
+  activePixels?: ('meta' | 'google' | 'tiktok' | 'ga4' | 'clarity')[] | null;
   /**
    * Contoh: KALA-LP-KOLIK. Digunakan untuk mengelompokkan laporan perbandingan varian.
    */
@@ -1292,6 +1400,10 @@ export interface LandingPage {
   layout?:
     | (
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             /**
              * Pemicu minat pertama pengunjung.
@@ -1319,6 +1431,10 @@ export interface LandingPage {
             blockType: 'hero';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             columns?: ('2' | '3') | null;
@@ -1335,6 +1451,10 @@ export interface LandingPage {
             blockType: 'painPoints';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             items: {
@@ -1352,6 +1472,10 @@ export interface LandingPage {
             blockType: 'solutions';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             title: string;
             subtitle?: string | null;
@@ -1382,6 +1506,10 @@ export interface LandingPage {
             blockType: 'pricing';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             kalaLabel?: string | null;
@@ -1397,6 +1525,10 @@ export interface LandingPage {
             blockType: 'comparison';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             steps: {
@@ -1410,6 +1542,10 @@ export interface LandingPage {
             blockType: 'steps';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             items: {
@@ -1424,6 +1560,10 @@ export interface LandingPage {
             blockType: 'testimonials';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             title: string;
             description: string;
@@ -1433,6 +1573,10 @@ export interface LandingPage {
             blockType: 'guarantee';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             title: string;
             subtitle?: string | null;
             faqs: {
@@ -1445,6 +1589,10 @@ export interface LandingPage {
             blockType: 'faq';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Tulis paragraf, judul, kutipan, dan link secara bebas.
              */
@@ -1469,6 +1617,10 @@ export interface LandingPage {
             blockType: 'richText';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             headline: string;
             description?: string | null;
@@ -1480,6 +1632,10 @@ export interface LandingPage {
             blockType: 'cta';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             badge?: string | null;
             title: string;
             subtitle?: string | null;
@@ -1497,6 +1653,10 @@ export interface LandingPage {
             blockType: 'gallery';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
              */
@@ -1516,6 +1676,10 @@ export interface LandingPage {
             blockType: 'midwifeSpotlight';
           }
         | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
              */
@@ -1665,6 +1829,10 @@ export interface PageTemplate {
    */
   layout: (
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         /**
          * Pemicu minat pertama pengunjung.
@@ -1692,6 +1860,10 @@ export interface PageTemplate {
         blockType: 'hero';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         columns?: ('2' | '3') | null;
@@ -1708,6 +1880,10 @@ export interface PageTemplate {
         blockType: 'painPoints';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         items: {
@@ -1725,6 +1901,10 @@ export interface PageTemplate {
         blockType: 'solutions';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         title: string;
         subtitle?: string | null;
@@ -1755,6 +1935,10 @@ export interface PageTemplate {
         blockType: 'pricing';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         kalaLabel?: string | null;
@@ -1770,6 +1954,10 @@ export interface PageTemplate {
         blockType: 'comparison';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         steps: {
@@ -1783,6 +1971,10 @@ export interface PageTemplate {
         blockType: 'steps';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         items: {
@@ -1797,6 +1989,10 @@ export interface PageTemplate {
         blockType: 'testimonials';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         title: string;
         description: string;
@@ -1806,6 +2002,10 @@ export interface PageTemplate {
         blockType: 'guarantee';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         title: string;
         subtitle?: string | null;
         faqs: {
@@ -1818,6 +2018,10 @@ export interface PageTemplate {
         blockType: 'faq';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         /**
          * Tulis paragraf, judul, kutipan, dan link secara bebas.
          */
@@ -1842,6 +2046,10 @@ export interface PageTemplate {
         blockType: 'richText';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         headline: string;
         description?: string | null;
@@ -1853,6 +2061,10 @@ export interface PageTemplate {
         blockType: 'cta';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         badge?: string | null;
         title: string;
         subtitle?: string | null;
@@ -1870,6 +2082,10 @@ export interface PageTemplate {
         blockType: 'gallery';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         /**
          * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
          */
@@ -1889,6 +2105,10 @@ export interface PageTemplate {
         blockType: 'midwifeSpotlight';
       }
     | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         /**
          * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
          */
@@ -2320,6 +2540,7 @@ export interface PagesSelect<T extends boolean = true> {
         hero?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               subheadline?: T;
@@ -2339,6 +2560,7 @@ export interface PagesSelect<T extends boolean = true> {
         painPoints?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               columns?: T;
@@ -2358,6 +2580,7 @@ export interface PagesSelect<T extends boolean = true> {
         solutions?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -2380,6 +2603,7 @@ export interface PagesSelect<T extends boolean = true> {
         pricing?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -2413,6 +2637,7 @@ export interface PagesSelect<T extends boolean = true> {
         comparison?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               kalaLabel?: T;
@@ -2431,6 +2656,7 @@ export interface PagesSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               steps?:
@@ -2447,6 +2673,7 @@ export interface PagesSelect<T extends boolean = true> {
         testimonials?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -2464,6 +2691,7 @@ export interface PagesSelect<T extends boolean = true> {
         guarantee?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               description?: T;
@@ -2474,6 +2702,7 @@ export interface PagesSelect<T extends boolean = true> {
         faq?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               faqs?:
@@ -2489,6 +2718,7 @@ export interface PagesSelect<T extends boolean = true> {
         richText?:
           | T
           | {
+              disabled?: T;
               content?: T;
               containerWidth?: T;
               id?: T;
@@ -2497,6 +2727,7 @@ export interface PagesSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               description?: T;
@@ -2509,6 +2740,7 @@ export interface PagesSelect<T extends boolean = true> {
         gallery?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -2529,6 +2761,7 @@ export interface PagesSelect<T extends boolean = true> {
         midwifeSpotlight?:
           | T
           | {
+              disabled?: T;
               heading?: T;
               subheading?: T;
               midwives?: T;
@@ -2540,6 +2773,7 @@ export interface PagesSelect<T extends boolean = true> {
         templateRef?:
           | T
           | {
+              disabled?: T;
               template?: T;
               id?: T;
               blockName?: T;
@@ -2604,6 +2838,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         hero?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               subheadline?: T;
@@ -2623,6 +2858,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         painPoints?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               columns?: T;
@@ -2642,6 +2878,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         solutions?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -2664,6 +2901,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         pricing?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -2697,6 +2935,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         comparison?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               kalaLabel?: T;
@@ -2715,6 +2954,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               steps?:
@@ -2731,6 +2971,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         testimonials?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -2748,6 +2989,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         guarantee?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               description?: T;
@@ -2758,6 +3000,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         faq?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               faqs?:
@@ -2773,6 +3016,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         richText?:
           | T
           | {
+              disabled?: T;
               content?: T;
               containerWidth?: T;
               id?: T;
@@ -2781,6 +3025,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               description?: T;
@@ -2793,6 +3038,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         gallery?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -2813,6 +3059,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         midwifeSpotlight?:
           | T
           | {
+              disabled?: T;
               heading?: T;
               subheading?: T;
               midwives?: T;
@@ -2824,6 +3071,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
         templateRef?:
           | T
           | {
+              disabled?: T;
               template?: T;
               id?: T;
               blockName?: T;
@@ -2915,6 +3163,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         hero?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               subheadline?: T;
@@ -2934,6 +3183,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         painPoints?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               columns?: T;
@@ -2953,6 +3203,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         solutions?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -2975,6 +3226,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         pricing?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -3008,6 +3260,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         comparison?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               kalaLabel?: T;
@@ -3026,6 +3279,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               steps?:
@@ -3042,6 +3296,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         testimonials?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -3059,6 +3314,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         guarantee?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               description?: T;
@@ -3069,6 +3325,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         faq?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               faqs?:
@@ -3084,6 +3341,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         richText?:
           | T
           | {
+              disabled?: T;
               content?: T;
               containerWidth?: T;
               id?: T;
@@ -3092,6 +3350,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               description?: T;
@@ -3104,6 +3363,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         gallery?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -3124,6 +3384,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         midwifeSpotlight?:
           | T
           | {
+              disabled?: T;
               heading?: T;
               subheading?: T;
               midwives?: T;
@@ -3135,6 +3396,7 @@ export interface PageTemplatesSelect<T extends boolean = true> {
         templateRef?:
           | T
           | {
+              disabled?: T;
               template?: T;
               id?: T;
               blockName?: T;
@@ -3158,6 +3420,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         hero?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               subheadline?: T;
@@ -3177,6 +3440,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         painPoints?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               columns?: T;
@@ -3196,6 +3460,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         solutions?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -3218,6 +3483,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         pricing?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -3251,6 +3517,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         comparison?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               kalaLabel?: T;
@@ -3269,6 +3536,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         steps?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               steps?:
@@ -3285,6 +3553,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         testimonials?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               items?:
@@ -3302,6 +3571,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         guarantee?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               description?: T;
@@ -3312,6 +3582,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         faq?:
           | T
           | {
+              disabled?: T;
               title?: T;
               subtitle?: T;
               faqs?:
@@ -3327,6 +3598,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         richText?:
           | T
           | {
+              disabled?: T;
               content?: T;
               containerWidth?: T;
               id?: T;
@@ -3335,6 +3607,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         cta?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               headline?: T;
               description?: T;
@@ -3347,6 +3620,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         gallery?:
           | T
           | {
+              disabled?: T;
               badge?: T;
               title?: T;
               subtitle?: T;
@@ -3367,6 +3641,7 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
         midwifeSpotlight?:
           | T
           | {
+              disabled?: T;
               heading?: T;
               subheading?: T;
               midwives?: T;
@@ -3652,8 +3927,34 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
+  analytics?: {
+    /**
+     * Format: GTM-XXXXXXX
+     */
+    gtmId?: string | null;
+    /**
+     * Format: 15-16 digit angka Pixel resmi
+     */
+    metaPixelId?: string | null;
+    /**
+     * Format: G-XXXXXXXXXX (Opsional bila di-handle via GTM)
+     */
+    ga4MeasurementId?: string | null;
+    /**
+     * Format: AW-XXXXXXXXXX
+     */
+    gadsConversionId?: string | null;
+    /**
+     * ID Pixel dari TikTok Ads Manager
+     */
+    tiktokPixelId?: string | null;
+    /**
+     * Project ID dari Microsoft Clarity dashboard (heatmaps & session recordings)
+     */
+    clarityProjectId?: string | null;
+  };
   /**
-   * Format baku nomor WA. Contoh: 6281234567890. Sistem otomatis membersihkan spasi, tanda +, atau angka 0. (Setelah Simpan, situs live Cloudflare ter-update ~2 menit).
+   * Format baku nomor WA. Contoh: 6281234567890. Sistem otomatis membersihkan spasi, tanda +, atau angka 0.
    */
   whatsappNumber: string;
   /**
@@ -3668,33 +3969,6 @@ export interface SiteSetting {
    * Jadwal pelayanan homecare yang tampil di footer web. Contoh: Senin - Minggu: 08.00 - 17.00 WIB
    */
   operationalHours?: string | null;
-  /**
-   * Jadwal terstruktur yang dibaca langsung oleh Kala Clinic Bot untuk kalkulasi ketersediaan live CS vs antrean luar jam kerja.
-   */
-  operationalSchedule?: {
-    timezone?: string | null;
-    days?:
-      | {
-          day: '0' | '1' | '2' | '3' | '4' | '5' | '6';
-          closed?: boolean | null;
-          open?: string | null;
-          close?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Pesan otomatis yang dikirimkan oleh Bot WA jika pasien chat di luar jam kerja.
-     */
-    afterHoursAnnouncement?: string | null;
-  };
-  /**
-   * Badge penanda di atas judul beranda (contoh: ✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes)
-   */
-  heroBadgeText?: string | null;
-  /**
-   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Bunda di Surabaya & Sidoarjo sejak 2020)
-   */
-  socialProofText?: string | null;
   bannerGroup?: {
     /**
      * Kosongkan jika tidak ada promo aktif. Jika diisi, akan tampil di bar paling atas website.
@@ -3710,17 +3984,13 @@ export interface SiteSetting {
     bannerEndDate?: string | null;
   };
   /**
-   * Kecamatan / wilayah kota yang dilayani di Surabaya dan Sidoarjo.
+   * Badge penanda di atas judul beranda (contoh: ✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes)
    */
-  coverageAreas?:
-    | {
-        area: string;
-        id?: string | null;
-      }[]
-    | null;
+  heroBadgeText?: string | null;
   /**
-   * Kelola seluruh teks judul, keluhan, manfaat, promo, dan langkah reservasi di halaman depan (kalababyspa.com). Kosongkan untuk memakai teks default standar.
+   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Bunda di Surabaya & Sidoarjo sejak 2020)
    */
+  socialProofText?: string | null;
   homepage?: {
     heroHeadline?: string | null;
     heroTagline?: string | null;
@@ -3747,8 +4017,8 @@ export interface SiteSetting {
       | null;
     promotion?: {
       title?: string | null;
-      description?: string | null;
       serviceName?: string | null;
+      description?: string | null;
       price?: string | null;
       originalPrice?: string | null;
       badge?: string | null;
@@ -3773,27 +4043,20 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  analytics?:
+    | T
+    | {
+        gtmId?: T;
+        metaPixelId?: T;
+        ga4MeasurementId?: T;
+        gadsConversionId?: T;
+        tiktokPixelId?: T;
+        clarityProjectId?: T;
+      };
   whatsappNumber?: T;
   whatsappNumberFormatted?: T;
   instagram?: T;
   operationalHours?: T;
-  operationalSchedule?:
-    | T
-    | {
-        timezone?: T;
-        days?:
-          | T
-          | {
-              day?: T;
-              closed?: T;
-              open?: T;
-              close?: T;
-              id?: T;
-            };
-        afterHoursAnnouncement?: T;
-      };
-  heroBadgeText?: T;
-  socialProofText?: T;
   bannerGroup?:
     | T
     | {
@@ -3801,12 +4064,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         bannerStartDate?: T;
         bannerEndDate?: T;
       };
-  coverageAreas?:
-    | T
-    | {
-        area?: T;
-        id?: T;
-      };
+  heroBadgeText?: T;
+  socialProofText?: T;
   homepage?:
     | T
     | {
@@ -3831,8 +4090,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
           | T
           | {
               title?: T;
-              description?: T;
               serviceName?: T;
+              description?: T;
               price?: T;
               originalPrice?: T;
               badge?: T;

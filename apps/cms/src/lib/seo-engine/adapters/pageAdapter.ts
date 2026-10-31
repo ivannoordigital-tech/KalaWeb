@@ -9,7 +9,7 @@ export function pageSeoAdapter(doc: any): NormalizedSeoInput {
   const slug = String(doc.slug || '').trim()
   const hasOgImage = Boolean(seo.ogImage || doc.heroImage)
 
-  const layout = Array.isArray(doc.layout) ? doc.layout : []
+  const layout = (Array.isArray(doc.layout) ? doc.layout : []).filter((b: any) => !b.disabled)
   const heroBlocks = layout.filter((b: any) => b.blockType === 'hero')
 
   // H1: jika ada hero block di layout pakai hero, jika tidak pakai title halaman

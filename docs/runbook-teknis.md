@@ -167,3 +167,89 @@ Bot WA memanggil CMS via internal Docker URL:
 | **Ops Admin** | Jadwal Bidan, Verifikasi Order WA | Grup WA Operasional |
 | **Bidan Koordinator** | Validasi Konten Medis & STR | WA Medis |
 | **Marketing Lead** | Kampanye Ads, GTM, Meta Pixel | WA Marketing |
+
+---
+
+## 8. Arsitektur Visual Builder, Environment & Akun Layanan Preview (Sprint 0)
+
+### 8.1 Environment Variables
+Untuk mendukung SSR Preview aman dengan Signed JWT dan fetching draft terisolasi:
+
+**CMS (`apps/cms/.env`):**
+- `PREVIEW_SECRET`: Kunci rahasia minimal 32 karakter untuk menandatangani JWT preview (wajib identik dengan web).
+- `PREVIEW_BASE_URL`: URL website publik (default: `https://kalababyspa.com` atau `http://localhost:4321` di dev).
+- `CMS_PUBLIC_URL`: URL admin CMS (default: `https://admin.kalababyspa.com`).
+- `PREVIEW_API_KEY`: API Key akun `preview-bot`.
+
+**Web (`apps/web-kala` / Cloudflare Pages):**
+- `PREVIEW_SECRET`: Kunci JWT yang sama dengan CMS untuk verifikasi token.
+- `PREVIEW_API_URL`: URL CMS untuk fetch draft (`https://admin.kalababyspa.com`).
+- `PREVIEW_API_KEY`: API Key `preview-bot` (hanya digunakan server-side SSR, tidak pernah diexpose ke browser client).
+- `PREVIEW_CF_ACCESS_CLIENT_ID` & `PREVIEW_CF_ACCESS_CLIENT_SECRET`: Service token Cloudflare Access untuk bypass auth Zero Trust khusus request preview internal.
+
+### 8.2 Akun Service `preview-bot`
+- **Email:** `preview-bot@kalababyspa.com`
+- **Role:** `marketing` (Least Privilege: hanya membaca LandingPages & Pages draft, tidak memiliki hak delete/admin).
+- **API Key:** Dikelola via field `apiKey` di koleksi `users`.
+
+---
+
+## 9. Matriks Semantik Deploy Hook vs Draft Save (Sprint 0 - S0-03)
+
+Mekanisme `afterChange` di `LandingPages.ts` dan `Pages.ts` memiliki proteksi khusus agar penyimpanan draft pada dokumen yang sudah published **TIDAK memicu unpublish deploy tak sengaja** ke Cloudflare:
+
+| Kondisi `previousDoc` | Kondisi `doc` (Baru) | Versi Published di DB | Aksi Admin di CMS | Pemicu Deploy Cloudflare | Keterangan & Dampak |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `draft` | `draft` | Tidak ada | Edit / Simpan Draft | **TIDAK** | Perubahan internal; hanya dilihat via `/preview/*`. |
+| `draft` | `published` | Ada (baru terbit) | Klik "Publish" | **YA (action: 'publish')** | Memicu build Cloudflare untuk merilis halaman live. |
+| `published` | `published` | Ada | Klik "Publish Changes" | **YA (action: 'publish')** | Memicu build Cloudflare untuk memperbarui konten publik. |
+| `published` | `draft` | **ADA (masih aktif)** | Klik "Save Draft" | **TIDAK (Dilewati)** | Live site tetap menyajikan versi live; draft baru siap dipreview privat. |
+| `published` | `draft` | **TIDAK ADA** | Klik "Unpublish" | **YA (action: 'unpublish')** | Menghapus halaman dari produksi publik. |
+| (apa saja) | (deleted) | Was published | Klik "Delete" | **YA (action: 'delete')** | Menghapus rute dari produksi publik. |
+
+---
+
+## 10. Panduan Penggunaan Visual Builder (Shopify-Style Customizer)
+
+### 10.1 Membuka Visual Builder
+1. Masuk ke Payload CMS Admin di `/admin`.
+2. Buka menu **Landing Page Iklan** (`LandingPages`) atau **Halaman Website** (`Pages`).
+3. Di panel formulir, klik tombol **"Buka Visual Page Builder"** (atau ikon ✨ di header card blok).
+4. Editor layar penuh (full-screen customizer) akan terbuka dengan tata letak split 2 kolom:
+   - **Sisi Kiri (360px):** Pohon susunan seksi (*Section Tree*), pengaturan detail seksi (*Section Settings*), dan katalog blok/template.
+   - **Sisi Kanan:** Kanvas *Live Preview* responsif Astro SSR.
+
+### 10.2 Navigasi & Fitur Utama Builder
+- **Pohon Seksi & Drag & Drop:**
+  - Urutkan ulang seksi sesuka hati dengan menarik gagang drag (ikon 6 titik).
+  - Sembunyikan seksi tanpa menghapusnya menggunakan tombol mata (*Hide/Show Toggle*).
+  - Duplikasi seksi dengan tombol duplikat (*Duplicate*).
+  - Hapus seksi dengan tombol tempat sampah (*Delete*).
+- **Sinkronisasi Dua Arah (Canvas ↔ Sidebar):**
+  - Mengarahkan kursor ke item sidebar akan menandai seksi di kanvas preview.
+  - Mengklik seksi mana saja di dalam kanvas preview langsung membuka pengaturan seksi tersebut di sidebar.
+- **Pustaka Media Terintegrasi:**
+  - Pada field gambar/foto (misal Foto Hero Utama atau Foto Galeri), klik *"Pilih Foto dari Media..."*.
+  - Cari foto di pustaka media atau unggah foto WebP baru langsung dari modal.
+- **Template Halaman Siap Pakai:**
+  - Klik **"+ Tambah Seksi"** lalu pilih tab **"Template Halaman Siap Pakai"**.
+  - Tersedia pilihan template:
+    1. *Landing Page Penawaran Lengkap (Standar Konversi)*: Hero, Masalah, Solusi, Paket Harga, Testimoni, FAQ, dan Call to Action.
+    2. *Landing Page Promo Kilat (Flash Sale / Singkat)*: Hero Promo Kilat, Solusi, Garansi Kepuasan, dan CTA WhatsApp.
+  - Klik *"Terapkan Template Ini"* untuk langsung menyusun seluruh seksi dalam 1 klik.
+- **Breakpoint Switcher:**
+  - Di bilah atas kanvas preview, pilih mode tampilan:
+    - **Desktop:** Lebar 100% fluida
+    - **Tablet:** Lebar 768px
+    - **Mobile:** Lebar 375px (standar perangkat smartphone pengunjung iklan)
+- **Riwayat Undo / Redo & Pintasan Keyboard:**
+  - `Ctrl + Z` (atau `Cmd + Z` di Mac): Membatalkan perubahan terakhir (*Undo*).
+  - `Ctrl + Shift + Z` (atau `Cmd + Shift + Z` di Mac): Mengulangi perubahan (*Redo*).
+  - `Escape`: Menutup modal katalog, kembali ke pohon seksi, atau menutup builder.
+  - Builder menyimpan hingga 20 langkah riwayat perubahan lokal tanpa memicu build Cloudflare prematur.
+
+### 10.3 Mode Formulir Blok Klasik (Fallback)
+Jika editor menginginkan tampilan formulir isian Payload CMS tradisional:
+1. Pada sidebar kanan halaman dokumen di CMS, cari field **"Mode Editor Halaman"**.
+2. Ubah pilihan dari **"✨ Shopify-Style Visual Builder"** menjadi **"📝 Formulir Blok Klasik"**.
+3. Sistem secara otomatis menyembunyikan customizer visual dan menampilkan accordion blok standar bawaan Payload. Semua data blok 100% identik dan tidak ada data yang hilang.

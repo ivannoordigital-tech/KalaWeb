@@ -22,6 +22,7 @@ import { PageTemplates } from './collections/PageTemplates'
 import { HelpCenter } from './collections/HelpCenter'
 import { SiteSettings } from './globals/SiteSettings'
 import { getDeployStatus } from './utilities/triggerDeployHook'
+import { previewEndpoints } from './endpoints/preview'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -92,6 +93,7 @@ export default buildConfig({
     },
   },
   endpoints: [
+    ...previewEndpoints,
     {
       path: '/deploy-status',
       method: 'get',

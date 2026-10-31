@@ -15,12 +15,20 @@ import MidwifeSpotlightBlock from './MidwifeSpotlightBlock.astro';
 
 interface Props {
   block: {
+    id?: string;
     blockType: string;
+    disabled?: boolean;
     [key: string]: any;
   };
+  isPreview?: boolean;
 }
 
-const { block } = Astro.props;
+const { block, isPreview = Astro.url.pathname.startsWith('/preview/') } = Astro.props;
+
+// If section is disabled and this is public production, DO NOT RENDER
+if (!isPreview && block?.disabled) {
+  return;
+}
 
 const KNOWN_BLOCK_TYPES = [
   'hero',
@@ -40,11 +48,11 @@ const KNOWN_BLOCK_TYPES = [
 ];
 
 if (!block || !block.blockType) {
-  if (import.meta.env.PROD) {
+  if (import.meta.env.PROD && !isPreview) {
     throw new Error('[BlockRenderer] Fatal: Ditemukan blok tanpa tipe (blockType) yang valid pada build produksi.');
   }
 } else if (!KNOWN_BLOCK_TYPES.includes(block.blockType)) {
-  if (import.meta.env.PROD) {
+  if (import.meta.env.PROD && !isPreview) {
     throw new Error(`[BlockRenderer] Fatal: Blok tidak dikenal "${block.blockType}". Halaman berisiko kehilangan bagian penting.`);
   } else {
     console.warn(`[BlockRenderer] Peringatan: Blok tidak dikenal "${block.blockType}".`);
@@ -52,26 +60,41 @@ if (!block || !block.blockType) {
 }
 
 // Ekstrak layout jika blok ini adalah TemplateRef
-const templateLayout = block.blockType === 'templateRef' && typeof block.template === 'object' && Array.isArray(block.template?.layout)
+const templateLayout = block?.blockType === 'templateRef' && typeof block.template === 'object' && Array.isArray(block.template?.layout)
   ? block.template.layout
   : [];
 ---
 
-{block.blockType === 'hero' && <HeroBlock block={block as any} />}
-{block.blockType === 'painPoints' && <PainPointsBlock block={block as any} />}
-{block.blockType === 'solutions' && <SolutionsBlock block={block as any} />}
-{block.blockType === 'pricing' && <PricingPackagesBlock block={block as any} />}
-{block.blockType === 'comparison' && <ComparisonTableBlock block={block as any} />}
-{block.blockType === 'steps' && <StepsFlowBlock block={block as any} />}
-{block.blockType === 'testimonials' && <TestimonialsBlock block={block as any} />}
-{block.blockType === 'guarantee' && <GuaranteeBlock block={block as any} />}
-{block.blockType === 'faq' && <FaqAccordionBlock block={block as any} />}
-{block.blockType === 'richText' && <RichTextBlock block={block as any} />}
-{block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
-{block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
-{block.blockType === 'midwifeSpotlight' && <MidwifeSpotlightBlock block={block as any} />}
+{block && (
+  <div
+    class={isPreview && block.disabled ? 'opacity-45 relative group my-2' : undefined}
+    data-kala-section-id={block.id}
+    data-kala-block-type={block.blockType}
+    data-kala-disabled={block.disabled ? 'true' : undefined}
+  >
+    {isPreview && block.disabled && (
+      <div class="bg-amber-500 text-slate-950 text-xs font-bold px-2.5 py-0.5 rounded absolute top-2 right-2 z-40 shadow pointer-events-none uppercase tracking-wide">
+        Disembunyikan
+      </div>
+    )}
 
-<!-- Render template tersimpan secara modular -->
-{block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
-  <Astro.self block={innerBlock} />
-))}
+    {block.blockType === 'hero' && <HeroBlock block={block as any} />}
+    {block.blockType === 'painPoints' && <PainPointsBlock block={block as any} />}
+    {block.blockType === 'solutions' && <SolutionsBlock block={block as any} />}
+    {block.blockType === 'pricing' && <PricingPackagesBlock block={block as any} />}
+    {block.blockType === 'comparison' && <ComparisonTableBlock block={block as any} />}
+    {block.blockType === 'steps' && <StepsFlowBlock block={block as any} />}
+    {block.blockType === 'testimonials' && <TestimonialsBlock block={block as any} />}
+    {block.blockType === 'guarantee' && <GuaranteeBlock block={block as any} />}
+    {block.blockType === 'faq' && <FaqAccordionBlock block={block as any} />}
+    {block.blockType === 'richText' && <RichTextBlock block={block as any} />}
+    {block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
+    {block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
+    {block.blockType === 'midwifeSpotlight' && <MidwifeSpotlightBlock block={block as any} />}
+
+    <!-- Render template tersimpan secara modular -->
+    {block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
+      <Astro.self block={innerBlock} isPreview={isPreview} />
+    ))}
+  </div>
+)}

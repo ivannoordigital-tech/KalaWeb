@@ -1,39 +1,50 @@
 ---
+export const prerender = false;
+
 import BlockRenderer from '../../../components/blocks/BlockRenderer.astro';
 import WhatsAppButton from '../../../components/WhatsAppButton.astro';
 import MobileStickyBar from '../../../components/MobileStickyBar.astro';
-import ConsentBanner from '../../../components/ConsentBanner.astro';
 import { siteConfig } from '../../../config/site';
-import { fetchPayloadLandingPages } from '../../../lib/payload';
+import { verifyPreviewToken, fetchPreviewDraft, type PreviewTokenPayload } from '../../../lib/preview';
 import '../../../styles/global.css';
 
-export async function getStaticPaths() {
-  const cmsLps = await fetchPayloadLandingPages();
+const { slug } = Astro.params;
+const token = Astro.url.searchParams.get('token');
 
-  const fallbackCampaigns = [
-    { slug: 'bayi-kolik', title: 'Solusi Tangis Kolik & Perut Kembung Bayi di Surabaya & Sidoarjo' },
-    { slug: 'pijat-newborn', title: 'Pijat Ceria Newborn Homecare Surabaya & Sidoarjo' },
-    { slug: 'reservasi-online', title: 'Reservasi Homecare Bidan Kala' },
-  ];
-
-  const allSlugs = new Set([
-    ...cmsLps.map((lp) => lp.slug),
-    ...fallbackCampaigns.map((f) => f.slug),
-  ]);
-
-  return Array.from(allSlugs).map((slug) => {
-    const pageData = cmsLps.find((lp) => lp.slug === slug);
-    return {
-      params: { slug },
-      props: { pageData },
-    };
+// Security Check: Token is mandatory
+if (!token) {
+  return new Response('Akses pratinjau ditolak: Token tidak disertakan. Buka pratinjau melalui tombol Preview di CMS Admin.', {
+    status: 401,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
   });
 }
 
-const { slug } = Astro.params;
-const { pageData } = Astro.props;
+const runtimeEnv = (Astro.locals as any)?.runtime?.env || import.meta.env;
+const previewSecret = runtimeEnv.PREVIEW_SECRET || import.meta.env.PREVIEW_SECRET || 'kala_preview_secret_fallback_key_2026';
 
-const PAYLOAD_URL = import.meta.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
+let tokenData: PreviewTokenPayload;
+try {
+  tokenData = await verifyPreviewToken(token, previewSecret);
+} catch (err) {
+  return new Response('Akses pratinjau ditolak: Token tanda tangan digital tidak valid atau sudah kedaluwarsa.', {
+    status: 401,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+let pageData: any;
+try {
+  pageData = await fetchPreviewDraft(tokenData.collection || 'landing-pages', tokenData.sub, runtimeEnv);
+} catch (err) {
+  return new Response(`Gagal mengambil dokumen draft dari CMS: ${(err as Error).message}`, {
+    status: 502,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
 
 const title = pageData?.title || `Pratinjau Draft: ${slug}`;
 const blocks = Array.isArray(pageData?.layout) ? pageData.layout : [];
@@ -47,6 +58,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <title>[PRATINJAU DRAFT] {title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -55,7 +67,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <meta name="kala:lp-slug" content={slug} />
-    <meta name="kala:variant" content={pageData?.variant || (slug.endsWith('-b') ? 'B' : slug.endsWith('-c') ? 'C' : 'A')} />
+    <meta name="kala:variant" content={pageData?.variant || (slug && slug.endsWith('-b') ? 'B' : slug && slug.endsWith('-c') ? 'C' : 'A')} />
     <meta name="kala:ref-code" content={pageData?.refCode || 'PREVIEW-DRAFT'} />
   </head>
   <body class="bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] pb-24 md:pb-0">
@@ -67,7 +79,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
       </span>
       <span>Halaman ini adalah mode pratinjau editor CMS. Perubahan belum terbit ke pengunjung publik.</span>
       <a
-        href={`https://admin.kalababyspa.com/admin/collections/landing-pages`}
+        href="https://admin.kalababyspa.com/admin/collections/landing-pages"
         target="_blank"
         rel="noopener noreferrer"
         class="underline hover:text-white transition-colors ml-2"
@@ -103,7 +115,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
     <main class="flex-grow">
       {hasBlocks ? (
         blocks.map((block: any) => (
-          <BlockRenderer block={block} />
+          <BlockRenderer block={block} isPreview={true} />
         ))
       ) : (
         <div class="py-16 px-4 text-center max-w-2xl mx-auto">
@@ -129,11 +141,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
     <!-- Sticky Mobile CTA Bar -->
     <MobileStickyBar phone={siteConfig.whatsappNumber} />
 
-    <!-- Privacy Consent Banner -->
-    <ConsentBanner />
-
-    <!-- Tracker Script -->
-    <script src="../../../scripts/tracker.js"></script>
+    <!-- Analytics & Consent banners are strictly excluded in preview (Sprint 0 - S0-02) -->
 
     <!-- Payload CMS Side-by-Side Live Preview Message Listener -->
     <script is:inline>
@@ -149,14 +157,6 @@ const isCanvas = pageData?.pageLayout === 'canvas';
                 if (updated.title) {
                   document.title = '[PRATINJAU DRAFT] ' + updated.title;
                 }
-                const heroH1 = document.querySelector('section h1, main h1');
-                if (heroH1 && (updated.headline || updated.title)) {
-                  heroH1.textContent = updated.headline || updated.title;
-                }
-                const heroSub = document.querySelector('section p.text-base, main p.text-base');
-                if (heroSub && updated.subheadline) {
-                  heroSub.textContent = updated.subheadline;
-                }
               }
             }
           });
@@ -166,5 +166,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
         }
       })();
     </script>
+    <!-- Builder Canvas Inspector Overlay (Sprint 3) -->
+    <script src="../../../scripts/preview-inspector.js"></script>
   </body>
 </html>

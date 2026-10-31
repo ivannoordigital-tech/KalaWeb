@@ -12,6 +12,7 @@ import { CallToActionBlock } from './CallToActionBlock'
 import { GalleryBlock } from './GalleryBlock'
 import { TemplateRefBlock } from './TemplateRefBlock'
 import { MidwifeSpotlightBlock } from './MidwifeSpotlightBlock'
+import { withDisabled } from './withDisabled'
 
 export const baseBlocks = [
   HeroBlock,
@@ -27,11 +28,11 @@ export const baseBlocks = [
   CallToActionBlock,
   GalleryBlock,
   MidwifeSpotlightBlock,
-]
+].map(withDisabled)
 
 export const allBlocks = [
   ...baseBlocks,
-  TemplateRefBlock,
+  withDisabled(TemplateRefBlock),
 ]
 
 export {

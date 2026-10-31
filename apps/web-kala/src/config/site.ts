@@ -40,7 +40,7 @@ export const siteConfig = {
     capacityPerDay: 5,
     capacityNote: 'Kuota harian maksimal 5 sesi agar setiap kunjungan tetap fokus dan higienis.',
     refCode: 'KALA-PROMO-INTRO',
-    message: 'Promo [HI-21]\nHalo Bu Bidan, saya mau konsultasi homecare dan ambil promo Kala Baby: Pijat Ceria Newborn Rp60.000',
+    message: 'Halo Bu Bidan, saya mau konsultasi homecare dan ambil promo Kala Baby: Pijat Ceria Newborn Rp60.000',
   },
   geo: {
     region: 'ID-JI',

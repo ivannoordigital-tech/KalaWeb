@@ -14,6 +14,7 @@ services:
       - PAYLOAD_SECRET=${PAYLOAD_SECRET}
       - NEXT_PUBLIC_SERVER_URL=https://admin.kalababyspa.com
       - PREVIEW_BASE_URL=https://kalababyspa.com
+      - PREVIEW_SECRET=${PREVIEW_SECRET:-${PAYLOAD_SECRET}}
       - NODE_ENV=production
     volumes:
       - cms_media:/app/public/media

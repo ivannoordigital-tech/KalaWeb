@@ -42,12 +42,11 @@ export const Pages: CollectionConfig = {
       return role === 'author' || role === 'midwife_coordinator'
     },
     preview: (doc) => {
-      if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
-        const prefix = doc.pageType === 'landing' ? '/preview/sales' : '/preview'
-        return `${baseUrl}${prefix}/${doc.slug}/`
+      if (doc?.id) {
+        const cmsUrl = process.env.CMS_PUBLIC_URL || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+        return `${cmsUrl}/api/preview-redirect?collection=pages&id=${doc.id}`;
       }
-      return null
+      return null;
     },
     livePreview: {
       url: ({ data }) => {
@@ -148,14 +147,31 @@ export const Pages: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      async ({ doc, previousDoc, req }) => {
         const isNowPublished = doc._status === 'published'
         const wasPublished = previousDoc?._status === 'published'
 
         if (isNowPublished && !wasPublished) {
           triggerCloudflareDeploy({ resource: 'Pages', action: 'publish', slug: doc.slug })
         } else if (!isNowPublished && wasPublished) {
-          triggerCloudflareDeploy({ resource: 'Pages', action: 'unpublish', slug: doc.slug })
+          try {
+            const publishedVersions = await req.payload.findVersions({
+              collection: 'pages',
+              where: {
+                parent: { equals: doc.id },
+                'version._status': { equals: 'published' },
+              },
+              limit: 1,
+            });
+
+            if (publishedVersions.totalDocs === 0) {
+              triggerCloudflareDeploy({ resource: 'Pages', action: 'unpublish', slug: doc.slug });
+            } else {
+              console.log(`[Deploy Hook] Dilewati: Pages (${doc.slug}) disimpan sebagai draft, versi live published tetap aktif.`);
+            }
+          } catch (err) {
+            console.warn(`[Deploy Hook] Gagal memverifikasi versi published Pages (${doc.slug}):`, (err as Error).message);
+          }
         } else if (isNowPublished && wasPublished) {
           triggerCloudflareDeploy({ resource: 'Pages', action: 'publish', slug: doc.slug })
         }
@@ -215,10 +231,21 @@ export const Pages: CollectionConfig = {
             },
             // 🧱 Flexible Block-Based Page Builder
             {
+              name: 'builder',
+              type: 'ui',
+              admin: {
+                components: {
+                  Field: '/components/admin/builder/BuilderField#BuilderField',
+                },
+                condition: (data) => data?.editorMode !== 'form',
+              },
+            },
+            {
               name: 'layout',
               type: 'blocks',
               label: 'Susunan Blok Halaman (Page Builder Visual)',
               admin: {
+                condition: (data) => data?.editorMode === 'form',
                 description:
                   'Gunakan blok visual ini untuk menyusun halaman promo dan penawaran (Banner Utama, Masalah Bunda, Solusi, Paket Harga, Testimoni, FAQ).',
               },
@@ -372,6 +399,20 @@ export const Pages: CollectionConfig = {
         position: 'sidebar',
         description:
           '• Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.\n• Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan WhatsApp & Pixel.',
+      },
+    },
+    {
+      name: 'editorMode',
+      type: 'select',
+      label: 'Mode Editor Halaman',
+      defaultValue: 'builder',
+      options: [
+        { label: '✨ Shopify-Style Visual Builder', value: 'builder' },
+        { label: '📝 Formulir Blok Klasik', value: 'form' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Pilih builder visual dengan live preview atau formulir blok standar.',
       },
     },
     seoScoreField,

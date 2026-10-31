@@ -85,7 +85,8 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
   }
 
   // 3. Layout Blocks Validation
-  const layout = Array.isArray(doc.layout) ? doc.layout : [];
+  const allLayoutBlocks = Array.isArray(doc.layout) ? doc.layout : [];
+  const layout = allLayoutBlocks.filter((b: any) => !b.disabled);
 
   if (layout.length > 0) {
     // Check HeroBlock

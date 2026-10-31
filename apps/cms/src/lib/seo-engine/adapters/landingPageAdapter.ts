@@ -9,7 +9,7 @@ export function landingPageSeoAdapter(doc: any): NormalizedSeoInput {
   const slug = String(doc.slug || '').trim()
   const hasOgImage = Boolean(seo.ogImage || doc.heroImage)
 
-  const layout = Array.isArray(doc.layout) ? doc.layout : []
+  const layout = (Array.isArray(doc.layout) ? doc.layout : []).filter((b: any) => !b.disabled)
 
   // H1: Menghitung blok bertipe 'hero'
   const heroBlocks = layout.filter((b: any) => b.blockType === 'hero')

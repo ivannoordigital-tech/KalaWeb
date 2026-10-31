@@ -69,6 +69,40 @@ export async function seed() {
     }
   }
 
+  // 1c. Create Preview Bot user with API Key if not exists (Sprint 0 - S0-04)
+  const existingPreviewBot = await payload.find({
+    collection: 'users',
+    where: {
+      email: {
+        equals: 'preview-bot@kalababyspa.com',
+      },
+    },
+  });
+
+  if (existingPreviewBot.totalDocs === 0) {
+    const previewApiKey = process.env.PREVIEW_API_KEY;
+    const previewPassword = process.env.PREVIEW_BOT_PASSWORD;
+
+    console.log('Creating preview bot user: preview-bot@kalababyspa.com');
+    const previewUser = await (payload.create as any)({
+      collection: 'users',
+      data: {
+        email: 'preview-bot@kalababyspa.com',
+        password: previewPassword || 'KalaPreviewBotSecPass2026!',
+        name: 'Kala Preview Bot Service',
+        role: 'marketing',
+        enableAPIKey: true,
+        apiKey: previewApiKey || 'kala_preview_bot_api_key_secure_2026_super_random_token',
+      },
+    });
+
+    if (previewApiKey && previewUser?.apiKey && previewUser.apiKey !== previewApiKey) {
+      console.warn(
+        'PERINGATAN: API key akun preview-bot berbeda dari PREVIEW_API_KEY. Salin nilai api_key ke env web/Cloudflare Pages.',
+      );
+    }
+  }
+
   // 2. Seed Services
   const initialServices = [
     {

@@ -52,6 +52,8 @@ interface Props {
   pageLayout?: 'default' | 'canvas' | 'full_width';
   hideHeader?: boolean;
   hideFooter?: boolean;
+  useCapi?: boolean;
+  disableAnalytics?: boolean;
 }
 
 const {
@@ -74,7 +76,12 @@ const {
   pageLayout = 'default',
   hideHeader = false,
   hideFooter = false,
+  useCapi = false,
+  disableAnalytics: propDisableAnalytics,
 } = Astro.props;
+
+const isPreviewRoute = Astro.url.pathname.startsWith('/preview/');
+const disableAnalytics = propDisableAnalytics ?? isPreviewRoute;
 
 // Fetch dynamic global site settings at build time (falls back gracefully to siteConfig)
 const cmsSettings = await fetchSiteSettings();
@@ -128,7 +135,7 @@ const showMobileBar = !isCanvas;
     </noscript>
 
     <!-- Centralized Analytics & Pixels (GTM, Meta, TikTok, GA4, Clarity) -->
-    <AnalyticsScripts analytics={siteSettings.analytics} placement="head" />
+    {!disableAnalytics && <AnalyticsScripts analytics={siteSettings.analytics} placement="head" />}
 
     <!-- SEO Meta Tags & Open Graph -->
     <SEO
@@ -152,6 +159,9 @@ const showMobileBar = !isCanvas;
       personData={personData}
       breadcrumbs={breadcrumbs}
     />
+      {useCapi && <meta name="kala:use-capi" content="true" />}
+      {disableAnalytics && <meta name="referrer" content="no-referrer" />}
+      {disableAnalytics && <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />}
   </head>
   <body class={`bg-[#FFF9F4] text-[#4B2E22] min-h-screen flex flex-col font-sans selection:bg-[#FFD9C4] selection:text-[#4B2E22] ${isCanvas ? 'p-0 m-0' : 'pb-16 md:pb-0'}`}>
     {showNavbar && (
@@ -163,7 +173,7 @@ const showMobileBar = !isCanvas;
       </a>
     )}
     <!-- Centralized Analytics Noscript (GTM) -->
-    <AnalyticsScripts analytics={siteSettings.analytics} placement="body" />
+    {!disableAnalytics && <AnalyticsScripts analytics={siteSettings.analytics} placement="body" />}
 
     {showAnnouncement && (
       <aside class="bg-[#B3471E] text-white text-xs sm:text-sm font-semibold py-2 px-4 text-center">
@@ -197,6 +207,6 @@ const showMobileBar = !isCanvas;
 
 
     <!-- Attribution and WhatsApp Click Script -->
-    <script src="../scripts/tracker.js"></script>
+    {!disableAnalytics && <script src="../scripts/tracker.js"></script>}
   </body>
 </html>
