@@ -8,11 +8,19 @@ const ALLOWED_ROLES = ['superadmin', 'operator', 'marketing', 'seo'];
  * Helper to generate signed preview token and redirect URL
  */
 async function generatePreviewData(req: any) {
-  if (!req.user) {
+  let user = req.user;
+  if (!user && req.payload?.auth) {
+    try {
+      const authResult = await req.payload.auth({ headers: req.headers });
+      user = authResult?.user || null;
+    } catch {}
+  }
+
+  if (!user) {
     return { error: 'Unauthorized: Sesi login CMS diperlukan.', status: 401 };
   }
 
-  const role = getUserRole(req.user);
+  const role = getUserRole(user);
   if (!role || !ALLOWED_ROLES.includes(role)) {
     return { error: 'Forbidden: Peran Anda tidak memiliki hak akses preview.', status: 403 };
   }
