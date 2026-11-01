@@ -1,4 +1,5 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "kalaweb",
   "main": "./apps/web-kala/dist/_worker.js/index.js",
   "compatibility_date": "2026-10-20",
@@ -9,5 +10,8 @@
   "assets": {
     "directory": "./apps/web-kala/dist",
     "run_worker_first": ["/preview/*", "/_image", "/_server-islands/*"]
+  },
+  "observability": {
+    "enabled": true
   }
 }

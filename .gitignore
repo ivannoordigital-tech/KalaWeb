@@ -10,6 +10,9 @@ build/
 public/media/
 apps/cms/public/media/
 
+# Wrangler local state (dev/build artifacts)
+.wrangler/
+
 # Environment files
 .env
 .env.local
