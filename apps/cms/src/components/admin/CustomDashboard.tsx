@@ -22,46 +22,62 @@ interface CustomDashboardProps {
   }
 }
 
+const HIDDEN_TEST_TITLE_PREFIXES = ['test ads', 'test1'];
+
 export async function CustomDashboard(props?: CustomDashboardProps) {
   // Use payload instance with fallback
   const req = props?.initPageResult?.req
   const payload = props?.payload || req?.payload || (await getPayload({ config: configPromise }))
 
-  // Fetch recent items across collections with overrideAccess: true for dashboard aggregation
-  let articles: any[] = []
-  let pages: any[] = []
-  let landingPages: any[] = []
+  // Dashboard query respects logged-in user permissions
+  const user = props?.user ?? req?.user;
+
+  let articles: any[] = [];
+  let pages: any[] = [];
+  let landingPages: any[] = [];
+  let totals = { articles: 0, pages: 0, landingPages: 0 };
 
   try {
-    const [articlesRes, pagesRes, lpRes] = await Promise.all([
-      payload.find({
-        collection: 'articles',
-        depth: 1,
-        limit: 50,
-        sort: '-updatedAt',
-        overrideAccess: true,
-      }),
-      payload.find({
-        collection: 'pages',
-        depth: 1,
-        limit: 50,
-        sort: '-updatedAt',
-        overrideAccess: true,
-      }),
-      payload.find({
-        collection: 'landing-pages',
-        depth: 1,
-        limit: 50,
-        sort: '-updatedAt',
-        overrideAccess: true,
-      }),
-    ])
+    if (user) {
+      const [articlesRes, pagesRes, lpRes] = await Promise.all([
+        payload.find({
+          collection: 'articles',
+          depth: 1,
+          limit: 50,
+          sort: '-updatedAt',
+          overrideAccess: false,
+          user,
+        }),
+        payload.find({
+          collection: 'pages',
+          depth: 1,
+          limit: 50,
+          sort: '-updatedAt',
+          overrideAccess: false,
+          user,
+        }),
+        payload.find({
+          collection: 'landing-pages',
+          depth: 1,
+          limit: 50,
+          sort: '-updatedAt',
+          overrideAccess: false,
+          user,
+        }),
+      ]);
 
-    articles = articlesRes?.docs || []
-    pages = pagesRes?.docs || []
-    landingPages = lpRes?.docs || []
+      articles = articlesRes?.docs || [];
+      pages = pagesRes?.docs || [];
+      landingPages = lpRes?.docs || [];
+
+      totals = {
+        articles: articlesRes?.totalDocs ?? articles.length,
+        pages: pagesRes?.totalDocs ?? pages.length,
+        landingPages: lpRes?.totalDocs ?? landingPages.length,
+      };
+    }
   } catch (err) {
-    console.error('Error fetching dashboard items:', err)
+    console.error('Error fetching dashboard items:', err);
   }
 
   // Combine and sort recent documents, filtering out test artifacts
@@ -95,10 +111,10 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
     })),
   ]
 
-  // Filter out any leftover test documents
+  // Filter out any leftover test documents using centralized constant
   const allDocs = rawDocs.filter((d: any) => {
     const title = (d.title || d.name || '').toLowerCase()
-    return !title.startsWith('test ads') && !title.startsWith('test1')
+    return !HIDDEN_TEST_TITLE_PREFIXES.some((prefix) => title.startsWith(prefix))
   })
 
   // Sort recent activities by updatedAt descending
@@ -163,6 +179,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
   })
 
   const totalContentCount = auditedItems.length
+  const auditedCount = totalContentCount
+  const totalDocuments = totals.articles + totals.pages + totals.landingPages
+  const isAuditTruncated = totalDocuments > auditedCount
   const publishedItems = auditedItems.filter((i) => i.isPublished)
   const draftItems = auditedItems.filter((i) => !i.isPublished)
 
@@ -277,12 +296,13 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
 
   return (
     <div
+      className="kala-dashboard"
       style={{
         padding: '24px 32px 48px 32px',
         maxWidth: '1280px',
         margin: '0 auto',
         fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        color: '#0f172a',
+        color: 'var(--kala-text, #0f172a)',
       }}
     >
       {/* 1. Header Dasbor & Status Situs */}
@@ -587,8 +607,8 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               Perlu perhatian SEO
             </h2>
             <span style={{ fontSize: '13px', color: '#475569', fontWeight: 500 }}>
-              {totalContentCount > 0
-                ? `${totalAttentionCount} dari ${totalContentCount} konten`
+              {auditedCount > 0
+                ? `${totalAttentionCount} dari ${auditedCount} konten terbaru`
                 : 'Belum ada dokumen'}
             </span>
           </div>
@@ -684,17 +704,15 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
 
               {/* Tautan Lihat Semua jika lebih dari 3 isu */}
               {totalAttentionCount > 3 && (
-                <div style={{ paddingTop: '8px', textAlign: 'right' }}>
-                  <Link
-                    href="/admin/collections/articles"
-                    style={{
-                      fontSize: '13px',
-                      color: '#0284c7',
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    Lihat semua {totalAttentionCount} isu SEO selengkapnya →
+                <div style={{ paddingTop: '8px', display: 'flex', gap: '16px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                  <Link href="/admin/collections/articles" style={{ fontSize: '13px', color: 'var(--kala-link, #0284c7)', fontWeight: 600, textDecoration: 'none' }}>
+                    Artikel →
+                  </Link>
+                  <Link href="/admin/collections/pages" style={{ fontSize: '13px', color: 'var(--kala-link, #0284c7)', fontWeight: 600, textDecoration: 'none' }}>
+                    Halaman →
+                  </Link>
+                  <Link href="/admin/collections/landing-pages" style={{ fontSize: '13px', color: 'var(--kala-link, #0284c7)', fontWeight: 600, textDecoration: 'none' }}>
+                    Landing page →
                   </Link>
                 </div>
               )}
@@ -737,7 +755,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                   lineHeight: 1.45,
                 }}
               >
-                Seluruh {totalContentCount} halaman dan artikel telah memiliki metadata lengkap dan
+                Seluruh {auditedCount} konten terbaru telah memiliki metadata lengkap dan
                 lolos standar Google.
               </p>
             </div>
@@ -897,7 +915,8 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               paddingTop: '12px',
             }}
           >
-            ⚡ Dihitung otomatis dari seluruh konten aktif di database.
+            ⚡ Skor dihitung dari {auditedCount} dokumen terbaru (maks. 50 per koleksi).
+            {isAuditTruncated && ` Total ${totalDocuments} dokumen di database.`}
           </p>
         </div>
       </div>
@@ -935,12 +954,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               href="/admin/collections/pages"
               style={{
                 fontSize: '13px',
-                color: '#0284c7',
+                color: 'var(--kala-link, #0284c7)',
                 fontWeight: 600,
                 textDecoration: 'none',
               }}
             >
-              Lihat semua dokumen →
+              Semua halaman →
             </Link>
           </div>
 

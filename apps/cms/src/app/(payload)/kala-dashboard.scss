@@ -1,0 +1,17 @@
+.kala-dashboard {
+  --kala-surface: var(--theme-elevation-0);
+  --kala-surface-muted: var(--theme-elevation-50);
+  --kala-surface-subtle: var(--theme-elevation-100);
+  --kala-border: var(--theme-elevation-150);
+  --kala-border-strong: var(--theme-elevation-250);
+  --kala-text: var(--theme-text);
+  --kala-text-muted: var(--theme-elevation-600);
+  --kala-link: var(--theme-success-600);
+  --kala-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  color: var(--kala-text);
+}
+
+[data-theme='dark'] .kala-dashboard {
+  --kala-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+}

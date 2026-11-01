@@ -50,6 +50,7 @@ if (!payloadSecret && process.env.NODE_ENV === 'production') {
 export default buildConfig({
   admin: {
     user: Users.slug,
+    theme: 'light',
     importMap: {
       baseDir: path.resolve(dirname),
     },
