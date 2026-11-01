@@ -326,10 +326,29 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
         }
         onSelect={(media: MediaItem) => {
           if (!activeMediaTarget) return;
-          if (activeMediaTarget.isInner && typeof activeMediaTarget.innerIndex === 'number' && activeMediaTarget.innerPath) {
-            onUpdateInnerItem(activeMediaTarget.innerPath, activeMediaTarget.innerIndex, {
-              [activeMediaTarget.fieldName]: media.id,
-            });
+
+          if (
+            activeMediaTarget.isInner &&
+            typeof activeMediaTarget.innerIndex === 'number' &&
+            activeMediaTarget.innerPath
+          ) {
+            const updates: Record<string, any> = { [activeMediaTarget.fieldName]: media.id };
+            const currentItem = innerItems[activeMediaTarget.innerIndex] || {};
+
+            // Isi alt dari media hanya bila item belum punya alt.
+            if (
+              inner?.fields?.some((f: any) => f.name === 'imageAlt') &&
+              !currentItem.imageAlt &&
+              media.alt
+            ) {
+              updates.imageAlt = media.alt;
+            }
+
+            onUpdateInnerItem(
+              activeMediaTarget.innerPath,
+              activeMediaTarget.innerIndex,
+              updates,
+            );
           } else {
             const updates: Record<string, any> = { [activeMediaTarget.fieldName]: media.id };
             if (meta?.fields?.some((f) => f.name === 'imageAlt') && !block.imageAlt && media.alt) {

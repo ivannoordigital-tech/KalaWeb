@@ -880,6 +880,12 @@
           "name": "tag",
           "label": "Label Kategori",
           "type": "text"
+        },
+        {
+          "name": "imageAlt",
+          "label": "Alt Text Foto",
+          "type": "text",
+          "placeholder": "Deskripsi foto untuk aksesibilitas"
         }
       ]
     }

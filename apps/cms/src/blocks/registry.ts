@@ -505,6 +505,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       fields: [
         { name: 'caption', label: 'Keterangan Foto', type: 'text' },
         { name: 'tag', label: 'Label Kategori', type: 'text' },
+        { name: 'imageAlt', label: 'Alt Text Foto', type: 'text', placeholder: 'Deskripsi foto untuk aksesibilitas' },
       ],
     },
   },
