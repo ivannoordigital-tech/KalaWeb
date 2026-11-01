@@ -63,6 +63,17 @@ export const BuilderField: React.FC = () => {
     }
   }, [docInfo?.id]);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen && typeof document !== 'undefined') {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   // Layout mutation methods
   const {
     addSection,
@@ -113,30 +124,62 @@ export const BuilderField: React.FC = () => {
 
   // Card displayed inside native Payload edit form
   const inFormCard = (
-    <div className="my-4 p-5 rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50/70 via-white to-amber-50/40 shadow-xs">
+    <div
+      className="kala-builder-in-card my-4 p-5 rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50/80 via-white to-amber-50/50 shadow-sm"
+      style={{
+        margin: '1.25rem 0',
+        padding: '1.25rem',
+        borderRadius: '0.75rem',
+        border: '1px solid #99f6e4',
+        background: 'linear-gradient(to right, rgba(240, 253, 250, 0.8), #ffffff, rgba(254, 243, 199, 0.4))',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+      }}
+    >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-teal-600 text-white shadow-xs">
+            <span
+              className="p-1.5 rounded-lg bg-teal-600 text-white shadow-xs inline-flex items-center justify-center"
+              style={{ padding: '0.4rem', borderRadius: '0.5rem', backgroundColor: '#0d9488', color: '#fff' }}
+            >
               <Sparkles size={18} />
             </span>
-            <h3 className="font-bold text-sm text-slate-900">Shopify-Style Visual Builder</h3>
-            <span className="text-xs bg-teal-100 text-teal-800 font-semibold px-2 py-0.5 rounded-full">
-              {layout.length} Seksi
+            <h3 className="font-bold text-sm text-slate-900" style={{ fontWeight: 700, fontSize: '0.95rem', margin: 0, color: '#0f172a' }}>
+              Shopify-Style Visual Builder
+            </h3>
+            <span
+              className="text-xs bg-teal-100 text-teal-800 font-semibold px-2 py-0.5 rounded-full"
+              style={{ fontSize: '0.75rem', backgroundColor: '#ccfbf1', color: '#115e59', padding: '0.15rem 0.5rem', borderRadius: '9999px', fontWeight: 600 }}
+            >
+              {layout.length} Seksi Tersusun
             </span>
           </div>
-          <p className="text-xs text-slate-600 mt-1 max-w-xl">
-            Susun halaman secara visual: drag-and-drop urutan seksi, atur teks, lihat pratinjau live instan tanpa reload.
+          <p className="text-xs text-slate-600 mt-1 max-w-xl" style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.35rem' }}>
+            Susun halaman secara visual: drag-and-drop urutan seksi, ubah teks & gambar, serta lihat pratinjau live instan tanpa reload browser.
           </p>
         </div>
 
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="w-full sm:w-auto px-5 py-2.5 bg-teal-700 hover:bg-teal-800 active:bg-teal-900 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-5 py-2.5 bg-teal-700 hover:bg-teal-800 active:bg-teal-900 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+          style={{
+            padding: '0.65rem 1.25rem',
+            backgroundColor: '#0f766e',
+            color: '#fff',
+            fontSize: '0.825rem',
+            fontWeight: 700,
+            borderRadius: '0.5rem',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            boxShadow: '0 2px 4px rgba(15, 118, 110, 0.25)',
+          }}
         >
           <Layers size={16} />
-          <span>Buka Visual Builder (Fullscreen)</span>
+          <span>Buka Visual Page Builder</span>
         </button>
       </div>
     </div>
@@ -144,7 +187,23 @@ export const BuilderField: React.FC = () => {
 
   // Fullscreen Portal Builder UI
   const portalModal = isOpen && typeof document !== 'undefined' && createPortal(
-    <div className="fixed inset-0 z-[9999] bg-slate-900 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-150">
+    <div
+      className="kala-builder-portal fixed inset-0 z-[99999] bg-slate-900 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-150"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 99999,
+        backgroundColor: '#0f172a',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
       {/* Top Navbar */}
       <header className="h-13 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">

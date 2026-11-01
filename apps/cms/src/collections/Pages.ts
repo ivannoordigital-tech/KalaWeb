@@ -223,10 +223,11 @@ export const Pages: CollectionConfig = {
             {
               name: 'content',
               type: 'richText',
-              label: 'Isi Dokumen / Konten Teks Bebas',
+              label: 'Isi Dokumen / Konten Teks Bebas (Mode Klasik)',
               admin: {
+                condition: (data) => data?.editorMode === 'form',
                 description:
-                  'Gunakan untuk halaman informasi umum yang membutuhkan format teks bebas (paragraf, poin daftar, dan subjudul). Jika blok di bawah diisi, susunan blok akan diprioritaskan.',
+                  'Gunakan untuk halaman informasi umum yang membutuhkan format teks bebas (paragraf, poin daftar, dan subjudul).',
               },
             },
             // 🧱 Flexible Block-Based Page Builder

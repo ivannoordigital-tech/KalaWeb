@@ -303,168 +303,180 @@ export const LandingPages: CollectionConfig = {
       },
       blocks: allBlocks,
     },
+        // Mode Klasik Legacy Fields (Accordion)
+    {
+      type: 'collapsible',
+      label: '📦 Field Konten Lama / Mode Klasik (Opsional)',
+      admin: {
+        initCollapsed: true,
+        condition: (data) => data?.editorMode === 'form',
+        description: 'Field legacy sebelum sistem Visual Builder digunakan.',
+      },
+      fields: [
     // Hero Box (Opsional bila menggunakan Block Builder)
-    {
-      type: 'row',
-      fields: [
         {
-          name: 'price',
+          type: 'row',
+          fields: [
+            {
+              name: 'price',
+              type: 'text',
+              label: 'Teks Harga Promo Tampilan (Mode Klasik)',
+              admin: {
+                width: '50%',
+                placeholder: 'Rp60.000',
+                description: 'Diabaikan jika Anda menggunakan Susunan Blok di atas.',
+              },
+            },
+            {
+              name: 'duration',
+              type: 'text',
+              label: 'Durasi Layanan (Mode Klasik)',
+              admin: {
+                width: '50%',
+                placeholder: '40 Menit',
+                description: 'Diabaikan jika Anda menggunakan Susunan Blok di atas.',
+              },
+            },
+          ],
+        },
+        {
+          name: 'headline',
           type: 'text',
-          label: 'Teks Harga Promo Tampilan (Mode Klasik)',
+          label: 'Judul Headline Utama (Hero H1 - Mode Klasik)',
           admin: {
-            width: '50%',
-            placeholder: 'Rp60.000',
-            description: 'Diabaikan jika Anda menggunakan Susunan Blok di atas.',
+            description: 'Kalimat pemikat utama di bagian atas (diabaikan jika menggunakan Blok Hero di Page Builder).',
           },
         },
         {
-          name: 'duration',
-          type: 'text',
-          label: 'Durasi Layanan (Mode Klasik)',
-          admin: {
-            width: '50%',
-            placeholder: '40 Menit',
-            description: 'Diabaikan jika Anda menggunakan Susunan Blok di atas.',
-          },
-        },
-      ],
-    },
-    {
-      name: 'headline',
-      type: 'text',
-      label: 'Judul Headline Utama (Hero H1 - Mode Klasik)',
-      admin: {
-        description: 'Kalimat pemikat utama di bagian atas (diabaikan jika menggunakan Blok Hero di Page Builder).',
-      },
-    },
-    {
-      name: 'subheadline',
-      type: 'textarea',
-      label: 'Subheadline / Kalimat Empati (Mode Klasik)',
-      admin: {
-        description: 'Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).',
-      },
-    },
-    // Pain Points
-    {
-      name: 'painPoints',
-      type: 'array',
-      label: 'Kecemasan / Masalah Bunda (Pain Points)',
-      admin: {
-        description: 'Daftar keluhan yang dialami calon pasien (tampil dengan tanda silang merah).',
-      },
-      fields: [
-        {
-          name: 'point',
-          type: 'text',
-          required: true,
-          label: 'Keluhan / Masalah',
-          admin: {
-            placeholder: 'Bayi menangis histeris di sore atau malam hari dengan kaki menekuk ke dada',
-          },
-        },
-      ],
-    },
-    // Solutions
-    {
-      name: 'solutions',
-      type: 'array',
-      label: 'Solusi Medis & Keunggulan Kala',
-      admin: {
-        description: '3 poin solusi klinis yang ditawarkan Bidan Kala.',
-      },
-      fields: [
-        {
-          name: 'title',
-          type: 'text',
-          required: true,
-          label: 'Judul Solusi',
-          admin: { placeholder: 'Teknik Pijat ILU Klinis & Gerakan Kayuh Sepeda' },
-        },
-        {
-          name: 'desc',
+          name: 'subheadline',
           type: 'textarea',
-          required: true,
-          label: 'Penjelasan Solusi',
-        },
-      ],
-    },
-    // 3 Steps
-    {
-      name: 'steps',
-      type: 'array',
-      label: '3 Langkah Alur Kerja Praktis',
-      fields: [
-        {
-          name: 'num',
-          type: 'text',
-          required: true,
-          label: 'Nomor Langkah (1, 2, 3)',
-          defaultValue: '1',
-        },
-        {
-          name: 'title',
-          type: 'text',
-          required: true,
-          label: 'Judul Langkah',
-        },
-        {
-          name: 'desc',
-          type: 'textarea',
-          required: true,
-          label: 'Deskripsi Langkah',
-        },
-      ],
-    },
-    // Testimonial
-    {
-      name: 'testimonial',
-      type: 'group',
-      label: 'Testimoni Pasien Khusus Iklan Ini (Mode Klasik)',
-      admin: {
-        description: 'Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.',
-      },
-      fields: [
-        {
-          name: 'quote',
-          type: 'textarea',
-          label: 'Kutipan Testimoni',
-        },
-        {
-          name: 'author',
-          type: 'text',
-          label: 'Nama Bunda & Anak',
+          label: 'Subheadline / Kalimat Empati (Mode Klasik)',
           admin: {
-            placeholder: 'Bunda Nadhira & Baby Zayn (3 minggu)',
+            description: 'Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).',
           },
         },
+        // Pain Points
         {
-          name: 'area',
-          type: 'text',
-          label: 'Wilayah Pasien',
+          name: 'painPoints',
+          type: 'array',
+          label: 'Kecemasan / Masalah Bunda (Pain Points)',
           admin: {
-            placeholder: 'Waru, Sidoarjo',
+            description: 'Daftar keluhan yang dialami calon pasien (tampil dengan tanda silang merah).',
           },
+          fields: [
+            {
+              name: 'point',
+              type: 'text',
+              required: true,
+              label: 'Keluhan / Masalah',
+              admin: {
+                placeholder: 'Bayi menangis histeris di sore atau malam hari dengan kaki menekuk ke dada',
+              },
+            },
+          ],
         },
-      ],
-    },
-    // FAQs
-    {
-      name: 'faqs',
-      type: 'array',
-      label: 'Tanya Jawab Singkat (FAQ Iklan)',
-      fields: [
+        // Solutions
         {
-          name: 'q',
-          type: 'text',
-          required: true,
-          label: 'Pertanyaan',
+          name: 'solutions',
+          type: 'array',
+          label: 'Solusi Medis & Keunggulan Kala',
+          admin: {
+            description: '3 poin solusi klinis yang ditawarkan Bidan Kala.',
+          },
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Judul Solusi',
+              admin: { placeholder: 'Teknik Pijat ILU Klinis & Gerakan Kayuh Sepeda' },
+            },
+            {
+              name: 'desc',
+              type: 'textarea',
+              required: true,
+              label: 'Penjelasan Solusi',
+            },
+          ],
         },
+        // 3 Steps
         {
-          name: 'a',
-          type: 'textarea',
-          required: true,
-          label: 'Jawaban Bidan',
+          name: 'steps',
+          type: 'array',
+          label: '3 Langkah Alur Kerja Praktis',
+          fields: [
+            {
+              name: 'num',
+              type: 'text',
+              required: true,
+              label: 'Nomor Langkah (1, 2, 3)',
+              defaultValue: '1',
+            },
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Judul Langkah',
+            },
+            {
+              name: 'desc',
+              type: 'textarea',
+              required: true,
+              label: 'Deskripsi Langkah',
+            },
+          ],
+        },
+        // Testimonial
+        {
+          name: 'testimonial',
+          type: 'group',
+          label: 'Testimoni Pasien Khusus Iklan Ini (Mode Klasik)',
+          admin: {
+            description: 'Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.',
+          },
+          fields: [
+            {
+              name: 'quote',
+              type: 'textarea',
+              label: 'Kutipan Testimoni',
+            },
+            {
+              name: 'author',
+              type: 'text',
+              label: 'Nama Bunda & Anak',
+              admin: {
+                placeholder: 'Bunda Nadhira & Baby Zayn (3 minggu)',
+              },
+            },
+            {
+              name: 'area',
+              type: 'text',
+              label: 'Wilayah Pasien',
+              admin: {
+                placeholder: 'Waru, Sidoarjo',
+              },
+            },
+          ],
+        },
+        // FAQs
+        {
+          name: 'faqs',
+          type: 'array',
+          label: 'Tanya Jawab Singkat (FAQ Iklan)',
+          fields: [
+            {
+              name: 'q',
+              type: 'text',
+              required: true,
+              label: 'Pertanyaan',
+            },
+            {
+              name: 'a',
+              type: 'textarea',
+              required: true,
+              label: 'Jawaban Bidan',
+            },
+          ],
         },
       ],
     },
