@@ -57,6 +57,17 @@ Sebelum mengubah status artikel menjadi **Published**, pastikan checklist beriku
 - Kolom WhatsApp nomor diisi dengan format angka baku diawali `628` (contoh: `6281234567890`).
 - Sistem otomatis menghapus karakter spasi, tanda plus `+`, tanda hubung `-`, atau angka `0` di depan.
 
+### 2.5 Panduan Memilih Jenis Koleksi Saat Membuat Halaman Baru (WP-4)
+Ketika ingin membuat halaman baru, pastikan memilih jenis koleksi yang tepat agar optimasi SEO dan pelacakan iklan berjalan maksimal:
+1. **Halaman Info (`/admin/collections/pages`):**
+   - **Tujuan:** Halaman tetap profil klinik, seperti *Tentang Kami*, *Profil Bidan*, *Layanan Lengkap*, atau *Kebijakan Privasi*.
+   - **Fokus:** SEO organik jangka panjang, kredibilitas medis, dan informasi umum tanpa pelacakan iklan berbayar.
+2. **Landing Page Iklan (`/admin/collections/landing-pages`):**
+   - **Tujuan:** Halaman kampanye promo berbayar (Meta Ads, Google Ads, TikTok Ads).
+   - **Fokus:** Tingkat konversi tinggi (CRO), dilengkapi kode referensi WhatsApp otomatis (`refCode`), dan integrasi sinyal Meta Conversions API (CAPI).
+3. **Mulai dari Template (`/admin/collections/page-templates`):**
+   - **Tujuan:** Mengambil susunan seksi yang sudah terbukti menghasilkan konversi tinggi (misal *Promo Kilat* atau *Paket Lengkap*) untuk diduplikasi tanpa perlu menyusun ulang dari nol.
+
 ### 2.4 Berapa Lama Perubahan Tampil di Website? (Status Build)
 - Setelah menekan tombol **Terbitkan**, sistem akan mengirim sinyal build ke Cloudflare Worker.
 - Perubahan biasanya aktif di website `https://kalababyspa.com` dalam waktu **1 hingga 2 menit**.
@@ -123,8 +134,9 @@ Visual Page Builder digunakan ketika Marketing Specialist atau Admin Operasional
 1. **Buka Dokumen:** Di CMS, buka halaman yang ingin diedit atau buat dokumen baru.
 2. **Buka Visual Builder:** Klik tombol *"Buka Visual Page Builder"*.
 3. **Susun Konten:** Tambah, edit, atau urutkan seksi di sidebar kiri. Perubahan langsung tercermin di kanvas kanan.
-4. **Simpan Draf:** Klik *"Tutup & Kembali"* lalu tekan *"Simpan Draf"* (Save Draft) pada CMS.
-   - Pratinjau otomatis diperbarui saat dokumen disimpan.
+4. **Simpan Draf Langsung:** Klik tombol *"Simpan Draf"* di bilah atas builder atau tekan `Ctrl+S` (`Cmd+S` di Mac).
+   - Dokumen langsung tersimpan tanpa perlu menutup builder.
+   - Pratinjau kanvas otomatis termuat ulang menampilkan versi tersimpan terbaru.
    - Pratinjau menggunakan tanda tangan digital aman (Signed JWT) dan bot terisolasi.
    - **Semua tracking (Meta Pixel, Google Tag Manager, Conversions API) dinonaktifkan total di mode pratinjau**, sehingga uji coba tim internal tidak akan merusak metrik iklan atau data konversi Meta/Google.
 5. **Publikasi Resmi:** Hanya klik tombol *"Terbitkan"* (Publish) jika draf halaman sudah disetujui untuk tayang ke publik. Ini akan memicu build otomatis Cloudflare Pages ke domain utama.

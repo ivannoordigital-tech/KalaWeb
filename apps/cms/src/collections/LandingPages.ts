@@ -15,8 +15,16 @@ export const LandingPages: CollectionConfig = {
   },
   admin: {
     group: 'Halaman Website',
+    description:
+      'Halaman kampanye iklan (Meta/Google Ads) dengan kode referensi, pelacakan WhatsApp, dan CAPI. Gunakan ini untuk promo berbayar.',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'refCode', 'variant', 'seoScore', '_status', 'updatedAt'],
+    components: {
+      beforeList: ['/components/admin/PageTypeGuide#PageTypeGuide'],
+      edit: {
+        beforeDocumentControls: ['/components/admin/DeployStatusPill#DeployStatusPill'],
+      },
+    },
     hidden: ({ user }) => {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
@@ -274,8 +282,8 @@ export const LandingPages: CollectionConfig = {
       label: 'Mode Editor Halaman',
       defaultValue: 'builder',
       options: [
-        { label: '✨ Shopify-Style Visual Builder', value: 'builder' },
-        { label: '📝 Formulir Blok Klasik', value: 'form' },
+        { label: 'Builder Visual (disarankan)', value: 'builder' },
+        { label: 'Formulir Blok Klasik', value: 'form' },
       ],
       admin: {
         position: 'sidebar',

@@ -30,13 +30,21 @@ const RESERVED_SLUGS = [
 export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: {
-    singular: 'Halaman',
-    plural: 'Semua Halaman',
+    singular: 'Halaman Info',
+    plural: 'Halaman Info',
   },
   admin: {
     group: 'Halaman Website',
+    description:
+      'Halaman tetap situs: Tentang Kami, Layanan, Area, Kebijakan Privasi. Gunakan ini untuk konten yang tidak beriklan.',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'pageType', 'pageLayout', 'seoScore', 'updatedAt', '_status'],
+    components: {
+      beforeList: ['/components/admin/PageTypeGuide#PageTypeGuide'],
+      edit: {
+        beforeDocumentControls: ['/components/admin/DeployStatusPill#DeployStatusPill'],
+      },
+    },
     hidden: ({ user }) => {
       const role = getUserRole(user)
       return role === 'author' || role === 'midwife_coordinator'
@@ -407,8 +415,8 @@ export const Pages: CollectionConfig = {
       label: 'Mode Editor Halaman',
       defaultValue: 'builder',
       options: [
-        { label: '✨ Shopify-Style Visual Builder', value: 'builder' },
-        { label: '📝 Formulir Blok Klasik', value: 'form' },
+        { label: 'Builder Visual (disarankan)', value: 'builder' },
+        { label: 'Formulir Blok Klasik', value: 'form' },
       ],
       admin: {
         position: 'sidebar',
