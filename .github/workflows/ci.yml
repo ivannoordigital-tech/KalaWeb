@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cms:
+    name: CMS — parity, type-check, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.node-version'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Regenerate builder registry + parity check
+        run: npm run sync:builder
+
+      - name: Fail if generated file is stale
+        run: |
+          if ! git diff --quiet -- apps/web-kala/src/components/blocks/registry.generated.json; then
+            echo "::error::registry.generated.json tidak sinkron. Jalankan 'npm run sync:builder' dan commit hasilnya."
+            git diff -- apps/web-kala/src/components/blocks/registry.generated.json
+            exit 1
+          fi
+
+      - name: Type-check CMS
+        working-directory: apps/cms
+        run: npx tsc --noEmit
+
+      - name: Unit tests CMS
+        run: npm test --workspace=cms-kala
+
+  web:
+    name: Web — production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # CI hanya memvalidasi kompilasi. Konten diambil dari CMS bila tersedia;
+      # bila tidak, fallback diizinkan supaya build tidak flaky karena jaringan.
+      ALLOW_FALLBACK: 'true'
+      PAYLOAD_URL: 'https://admin.kalababyspa.com'
+      PUBLIC_GTM_ID: ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.node-version'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web
+        run: npm run build --workspace=web-kala
+
+      - name: Assert SSR preview routes were generated
+        run: |
+          test -f apps/web-kala/dist/_worker.js/index.js \
+            || { echo "::error::dist/_worker.js/index.js tidak ada — output bukan SSR."; exit 1; }
+          test -f apps/web-kala/dist/_worker.js/pages/preview/_slug_.astro.mjs \
+            || { echo "::error::Route /preview/[slug] tidak ter-build."; exit 1; }
+
+      - name: Upload dist (debug)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist-debug
+          path: apps/web-kala/dist
+          retention-days: 3
