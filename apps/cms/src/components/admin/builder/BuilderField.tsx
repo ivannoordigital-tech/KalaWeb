@@ -31,6 +31,7 @@ export const BuilderField: React.FC = () => {
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const portalRef = useRef<HTMLDivElement>(null);
+  const confirmDialogRef = useRef<HTMLDivElement>(null);
 
   const { dispatchFields, setModified } = useForm();
   const docInfo = useDocumentInfo();
@@ -45,7 +46,8 @@ export const BuilderField: React.FC = () => {
     canPublish,
   } = useBuilderSave();
 
-  useFocusTrap(portalRef, isOpen);
+  useFocusTrap(portalRef, isOpen && !showCloseConfirm);
+  useFocusTrap(confirmDialogRef, showCloseConfirm);
 
   // Read current layout from Payload Form State
   const rawLayout = useFormFields(([fields]) => fields?.layout?.value);
@@ -493,6 +495,7 @@ export const BuilderField: React.FC = () => {
             }}
           >
             <div
+              ref={confirmDialogRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="kala-close-title"

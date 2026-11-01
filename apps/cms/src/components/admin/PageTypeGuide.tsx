@@ -47,7 +47,7 @@ export function PageTypeGuide() {
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-        <Link href="/admin/collections/pages/create?pageType=info" style={CARD_STYLE}>
+        <Link href="/admin/collections/pages/create" style={CARD_STYLE}>
           <span style={{ fontSize: 18 }} aria-hidden="true">📄</span>
           <h3 style={TITLE_STYLE}>Halaman Informasi</h3>
           <p style={BODY_STYLE}>

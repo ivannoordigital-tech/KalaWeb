@@ -57,6 +57,14 @@ Sebelum mengubah status artikel menjadi **Published**, pastikan checklist beriku
 - Kolom WhatsApp nomor diisi dengan format angka baku diawali `628` (contoh: `6281234567890`).
 - Sistem otomatis menghapus karakter spasi, tanda plus `+`, tanda hubung `-`, atau angka `0` di depan.
 
+### 2.4 Berapa Lama Perubahan Tampil di Website? (Status Build)
+- Setelah menekan tombol **Terbitkan**, sistem akan mengirim sinyal build ke Cloudflare Worker.
+- Perubahan biasanya aktif di website `https://kalababyspa.com` dalam waktu **1 hingga 2 menit**.
+- **Jika situs belum berubah setelah 10 menit:**
+  1. Bersihkan cache browser Bunda / buka via mode Incognito / Private Window.
+  2. Periksa bot Telegram Notifikasi Deployment Kala (akan ada laporan apakah build berhasil atau gagal).
+  3. Hubungi Lead Developer / Super Admin jika terdapat notifikasi error build.
+
 ### 2.5 Panduan Memilih Jenis Koleksi Saat Membuat Halaman Baru (WP-4)
 Ketika ingin membuat halaman baru, pastikan memilih jenis koleksi yang tepat agar optimasi SEO dan pelacakan iklan berjalan maksimal:
 1. **Halaman Info (`/admin/collections/pages`):**
@@ -67,14 +75,6 @@ Ketika ingin membuat halaman baru, pastikan memilih jenis koleksi yang tepat aga
    - **Fokus:** Tingkat konversi tinggi (CRO), dilengkapi kode referensi WhatsApp otomatis (`refCode`), dan integrasi sinyal Meta Conversions API (CAPI).
 3. **Mulai dari Template (`/admin/collections/page-templates`):**
    - **Tujuan:** Mengambil susunan seksi yang sudah terbukti menghasilkan konversi tinggi (misal *Promo Kilat* atau *Paket Lengkap*) untuk diduplikasi tanpa perlu menyusun ulang dari nol.
-
-### 2.4 Berapa Lama Perubahan Tampil di Website? (Status Build)
-- Setelah menekan tombol **Terbitkan**, sistem akan mengirim sinyal build ke Cloudflare Worker.
-- Perubahan biasanya aktif di website `https://kalababyspa.com` dalam waktu **1 hingga 2 menit**.
-- **Jika situs belum berubah setelah 10 menit:**
-  1. Bersihkan cache browser Bunda / buka via mode Incognito / Private Window.
-  2. Periksa bot Telegram Notifikasi Deployment Kala (akan ada laporan apakah build berhasil atau gagal).
-  3. Hubungi Lead Developer / Super Admin jika terdapat notifikasi error build.
 
 ---
 
@@ -139,4 +139,4 @@ Visual Page Builder digunakan ketika Marketing Specialist atau Admin Operasional
    - Pratinjau kanvas otomatis termuat ulang menampilkan versi tersimpan terbaru.
    - Pratinjau menggunakan tanda tangan digital aman (Signed JWT) dan bot terisolasi.
    - **Semua tracking (Meta Pixel, Google Tag Manager, Conversions API) dinonaktifkan total di mode pratinjau**, sehingga uji coba tim internal tidak akan merusak metrik iklan atau data konversi Meta/Google.
-5. **Publikasi Resmi:** Hanya klik tombol *"Terbitkan"* (Publish) jika draf halaman sudah disetujui untuk tayang ke publik. Ini akan memicu build otomatis Cloudflare Pages ke domain utama.
+5. **Publikasi Resmi:** Hanya klik tombol *"Terbitkan"* (Publish) jika draf halaman sudah disetujui untuk tayang ke publik. Ini akan memicu build otomatis Cloudflare Workers (Astro Hybrid SSR) ke domain utama.

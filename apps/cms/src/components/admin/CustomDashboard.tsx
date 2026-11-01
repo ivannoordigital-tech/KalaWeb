@@ -194,7 +194,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
 
   let avgGradeText = 'Belum Ada Data'
   let avgGradeBg = '#f1f5f9'
-  let avgGradeColor = '#475569'
+  let avgGradeColor = 'var(--kala-text-muted, #475569)'
 
   if (targetForScore.length > 0) {
     if (avgScore >= 80) {
@@ -325,12 +325,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               fontSize: '28px',
               fontWeight: 750,
               letterSpacing: '-0.02em',
-              color: '#0f172a',
+              color: 'var(--kala-text, #0f172a)',
             }}
           >
             Dasbor
           </h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#475569' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--kala-text-muted, #475569)' }}>
             Ringkasan performa situs dan hal yang perlu dikerjakan hari ini.
           </p>
         </div>
@@ -398,7 +398,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               borderRadius: '8px',
               fontSize: '13px',
               fontWeight: 600,
-              color: '#0f172a',
+              color: 'var(--kala-text, #0f172a)',
               backgroundColor: '#ffffff',
               border: '1px solid #cbd5e1',
               textDecoration: 'none',
@@ -407,7 +407,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
           >
             <span>🌐</span>
             <span>Lihat Website</span>
-            <span style={{ color: '#64748b', fontSize: '12px' }}>↗</span>
+            <span style={{ color: 'var(--kala-text-muted, #64748b)', fontSize: '12px' }}>↗</span>
           </a>
         </div>
       </div>
@@ -460,12 +460,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 margin: '0 0 4px 0',
                 fontSize: '16px',
                 fontWeight: 650,
-                color: '#0f172a',
+                color: 'var(--kala-text, #0f172a)',
               }}
             >
               Tulis Artikel Baru
             </h3>
-            <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--kala-text-muted, #475569)', lineHeight: 1.45 }}>
               Publikasikan panduan kesehatan ibu dan buah hati dengan checklist SEO otomatis.
             </p>
           </div>
@@ -510,12 +510,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 margin: '0 0 4px 0',
                 fontSize: '16px',
                 fontWeight: 650,
-                color: '#0f172a',
+                color: 'var(--kala-text, #0f172a)',
               }}
             >
               Buat Halaman Baru
             </h3>
-            <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--kala-text-muted, #475569)', lineHeight: 1.45 }}>
               Susun halaman informasi klinik atau halaman penawaran khusus kampanye iklan.
             </p>
           </div>
@@ -544,7 +544,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               height: '44px',
               borderRadius: '10px',
               backgroundColor: '#f8fafc',
-              color: '#475569',
+              color: 'var(--kala-text-muted, #475569)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -560,12 +560,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 margin: '0 0 4px 0',
                 fontSize: '16px',
                 fontWeight: 650,
-                color: '#0f172a',
+                color: 'var(--kala-text, #0f172a)',
               }}
             >
               Unggah Media
             </h3>
-            <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--kala-text-muted, #475569)', lineHeight: 1.45 }}>
               Kompresi format WebP otomatis dan verifikasi teks alt aksesibilitas.
             </p>
           </div>
@@ -603,10 +603,10 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               gap: '8px',
             }}
           >
-            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
+            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: 'var(--kala-text, #0f172a)' }}>
               Perlu perhatian SEO
             </h2>
-            <span style={{ fontSize: '13px', color: '#475569', fontWeight: 500 }}>
+            <span style={{ fontSize: '13px', color: 'var(--kala-text-muted, #475569)', fontWeight: 500 }}>
               {auditedCount > 0
                 ? `${totalAttentionCount} dari ${auditedCount} konten terbaru`
                 : 'Belum ada dokumen'}
@@ -660,7 +660,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                           margin: '0 0 3px 0',
                           fontSize: '14px',
                           fontWeight: 650,
-                          color: '#0f172a',
+                          color: 'var(--kala-text, #0f172a)',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -672,7 +672,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         style={{
                           margin: 0,
                           fontSize: '13px',
-                          color: '#475569',
+                          color: 'var(--kala-text-muted, #475569)',
                           lineHeight: 1.4,
                         }}
                       >
@@ -690,7 +690,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                       border: '1px solid #cbd5e1',
                       fontSize: '12px',
                       fontWeight: 600,
-                      color: '#0f172a',
+                      color: 'var(--kala-text, #0f172a)',
                       textDecoration: 'none',
                       whiteSpace: 'nowrap',
                       boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
@@ -783,7 +783,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                   margin: '0 0 6px 0',
                   fontSize: '15px',
                   fontWeight: 650,
-                  color: '#0f172a',
+                  color: 'var(--kala-text, #0f172a)',
                 }}
               >
                 Belum Ada Halaman atau Artikel
@@ -792,7 +792,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 style={{
                   margin: '0 0 16px 0',
                   fontSize: '13px',
-                  color: '#475569',
+                  color: 'var(--kala-text-muted, #475569)',
                   maxWidth: '380px',
                   lineHeight: 1.45,
                 }}
@@ -805,7 +805,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 style={{
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  backgroundColor: '#0284c7',
+                  backgroundColor: 'var(--kala-link, #0284c7)',
                   color: '#ffffff',
                   fontSize: '13px',
                   fontWeight: 600,
@@ -836,10 +836,10 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               marginBottom: '16px',
             }}
           >
-            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
+            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: 'var(--kala-text, #0f172a)' }}>
               Kesehatan SEO
             </h2>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>
+            <span style={{ fontSize: '12px', color: 'var(--kala-text-muted, #64748b)' }}>
               {publishedItems.length} Terbit • {draftItems.length} Draf
             </span>
           </div>
@@ -858,14 +858,14 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 style={{
                   fontSize: '44px',
                   fontWeight: 800,
-                  color: '#0f172a',
+                  color: 'var(--kala-text, #0f172a)',
                   lineHeight: 1,
                   letterSpacing: '-0.03em',
                 }}
               >
                 {avgScore}
               </span>
-              <span style={{ fontSize: '18px', color: '#64748b', fontWeight: 500 }}>/ 100</span>
+              <span style={{ fontSize: '18px', color: 'var(--kala-text-muted, #64748b)', fontWeight: 500 }}>/ 100</span>
             </div>
             <span
               style={{
@@ -909,7 +909,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
             style={{
               margin: '20px 0 0 0',
               fontSize: '12px',
-              color: '#64748b',
+              color: 'var(--kala-text-muted, #64748b)',
               lineHeight: 1.4,
               borderTop: '1px solid #f1f5f9',
               paddingTop: '12px',
@@ -947,7 +947,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               marginBottom: '16px',
             }}
           >
-            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
+            <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: 'var(--kala-text, #0f172a)' }}>
               Aktivitas terakhir
             </h2>
             <Link
@@ -973,7 +973,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         padding: '8px 10px',
                         fontSize: '12px',
                         fontWeight: 700,
-                        color: '#475569',
+                        color: 'var(--kala-text-muted, #475569)',
                       }}
                     >
                       JUDUL
@@ -983,7 +983,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         padding: '8px 10px',
                         fontSize: '12px',
                         fontWeight: 700,
-                        color: '#475569',
+                        color: 'var(--kala-text-muted, #475569)',
                       }}
                     >
                       JENIS
@@ -993,7 +993,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         padding: '8px 10px',
                         fontSize: '12px',
                         fontWeight: 700,
-                        color: '#475569',
+                        color: 'var(--kala-text-muted, #475569)',
                       }}
                     >
                       STATUS
@@ -1003,7 +1003,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         padding: '8px 10px',
                         fontSize: '12px',
                         fontWeight: 700,
-                        color: '#475569',
+                        color: 'var(--kala-text-muted, #475569)',
                       }}
                     >
                       DIPERBARUI
@@ -1020,7 +1020,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                     if (status === 'draft') {
                       statusLabel = 'Draf'
                       statusBg = '#f1f5f9'
-                      statusColor = '#475569'
+                      statusColor = 'var(--kala-text-muted, #475569)'
                     } else if (status === 'scheduled') {
                       statusLabel = 'Terjadwal'
                       statusBg = '#fef3c7'
@@ -1056,7 +1056,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         >
                           <Link
                             href={`/admin/collections/${doc._collSlug}/${doc.id}`}
-                            style={{ color: '#0f172a', textDecoration: 'none' }}
+                            style={{ color: 'var(--kala-text, #0f172a)', textDecoration: 'none' }}
                             title={doc.title || doc.name || 'Tanpa Judul'}
                           >
                             {doc.title || doc.name || 'Tanpa Judul'}
@@ -1065,7 +1065,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         <td
                           style={{
                             padding: '12px 10px',
-                            color: '#475569',
+                            color: 'var(--kala-text-muted, #475569)',
                             fontSize: '12px',
                             whiteSpace: 'nowrap',
                           }}
@@ -1089,7 +1089,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                         <td
                           style={{
                             padding: '12px 10px',
-                            color: '#475569',
+                            color: 'var(--kala-text-muted, #475569)',
                             fontSize: '12px',
                             whiteSpace: 'nowrap',
                           }}
@@ -1118,12 +1118,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                   margin: '0 0 4px 0',
                   fontSize: '14px',
                   fontWeight: 600,
-                  color: '#0f172a',
+                  color: 'var(--kala-text, #0f172a)',
                 }}
               >
                 Belum Ada Aktivitas Terbaru
               </h4>
-              <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
+              <p style={{ margin: 0, fontSize: '13px', color: 'var(--kala-text-muted, #475569)' }}>
                 Setiap perubahan atau pembuatan konten baru akan tercatat di sini secara otomatis.
               </p>
             </div>
@@ -1143,7 +1143,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
             gap: '16px',
           }}
         >
-          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: '#0f172a' }}>
+          <h2 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: 'var(--kala-text, #0f172a)' }}>
             Status Sistem & Panduan
           </h2>
 
@@ -1158,11 +1158,11 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <span style={{ fontSize: '16px' }}>⚡</span>
-              <strong style={{ fontSize: '13px', color: '#0f172a' }}>
-                Penerbitan Otomatis (Cloudflare Pages)
+              <strong style={{ fontSize: '13px', color: 'var(--kala-text, #0f172a)' }}>
+                Penerbitan Otomatis (Cloudflare Workers)
               </strong>
             </div>
-            <p style={{ margin: 0, fontSize: '12px', color: '#475569', lineHeight: 1.45 }}>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--kala-text-muted, #475569)', lineHeight: 1.45 }}>
               Saat Anda menekan <strong>Terbitkan</strong> pada artikel atau halaman, Cloudflare
               otomatis membangun ulang website statis dalam 60–90 detik tanpa perlu tindakan teknis
               manual.
@@ -1180,11 +1180,11 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
               <span style={{ fontSize: '16px' }}>💬</span>
-              <strong style={{ fontSize: '13px', color: '#0f172a' }}>
+              <strong style={{ fontSize: '13px', color: 'var(--kala-text, #0f172a)' }}>
                 Integrasi Chat Reservasi WhatsApp
               </strong>
             </div>
-            <p style={{ margin: 0, fontSize: '12px', color: '#475569', lineHeight: 1.45 }}>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--kala-text-muted, #475569)', lineHeight: 1.45 }}>
               Seluruh tombol WhatsApp pada halaman penawaran menyematkan kode referensi otomatis agar
               admin CS mengetahui sumber iklan pasien dengan tepat.
             </p>
@@ -1243,7 +1243,7 @@ function ProgressBar({
         }}
       >
         <span style={{ color: '#334155', fontWeight: 500 }}>{label}</span>
-        <span style={{ fontWeight: 700, color: '#0f172a' }}>{percent}%</span>
+        <span style={{ fontWeight: 700, color: 'var(--kala-text, #0f172a)' }}>{percent}%</span>
       </div>
       <div
         style={{

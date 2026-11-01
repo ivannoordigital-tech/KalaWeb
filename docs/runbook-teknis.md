@@ -223,7 +223,7 @@ Untuk mendukung SSR Preview aman dengan Signed JWT dan fetching draft terisolasi
 - `CMS_PUBLIC_URL`: URL admin CMS (default: `https://admin.kalababyspa.com`).
 - `PREVIEW_API_KEY`: API Key akun `preview-bot`.
 
-**Web (`apps/web-kala` / Cloudflare Pages):**
+**Web (`apps/web-kala` / Cloudflare Worker):**
 - `PREVIEW_SECRET`: Kunci JWT yang sama dengan CMS untuk verifikasi token.
 - `PREVIEW_API_URL`: URL CMS untuk fetch draft (`https://admin.kalababyspa.com`).
 - `PREVIEW_API_KEY`: API Key `preview-bot` (hanya digunakan server-side SSR, tidak pernah diexpose ke browser client).
