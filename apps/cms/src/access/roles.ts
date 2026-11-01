@@ -1,6 +1,13 @@
 import type { Access, AccessArgs } from 'payload'
 
-export type UserRole = 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing';
+export type UserRole =
+  | 'superadmin'
+  | 'operator'
+  | 'author'
+  | 'seo'
+  | 'midwife_coordinator'
+  | 'marketing'
+  | 'preview'; // mesin/integrasi: read-only, tidak boleh menulis apa pun
 
 export interface UserDoc {
   id: string;
@@ -57,3 +64,13 @@ export const canManageSiteSettings = ({ req: { user } }: { req: { user?: any } }
   const role = getUserRole(user);
   return role === 'superadmin' || role === 'operator' || role === 'marketing';
 };
+
+/**
+ * Role `preview` sengaja TIDAK dimasukkan ke access function mana pun.
+ * `read` pada Pages/LandingPages sudah `() => true`, sehingga preview-bot bisa
+ * mengambil draft, tetapi create/update/delete otomatis false.
+ *
+ * Jangan tambahkan `preview` ke canManagePagesAndLPs / canManageSiteSettings /
+ * canManageArticles — itu akan membatalkan least privilege.
+ */
+export const PREVIEW_MACHINE_ROLE = 'preview' as const;

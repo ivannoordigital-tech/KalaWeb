@@ -49,6 +49,7 @@ export const Users: CollectionConfig = {
         { label: 'SEO Specialist (Optimasi Metadata & Redirects)', value: 'seo' },
         { label: 'Koordinator Bidan (Data Tim Bidan & Ulasan)', value: 'midwife_coordinator' },
         { label: 'Marketing Specialist (Landing Pages, Pages & Templates)', value: 'marketing' },
+        { label: 'Preview Bot (Mesin — hanya baca, tanpa tulis)', value: 'preview' },
       ],
       required: true,
       label: 'Peran & Hak Akses (Role)',

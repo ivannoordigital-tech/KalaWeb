@@ -2,6 +2,7 @@ import type { Endpoint } from 'payload';
 import { SignJWT } from 'jose';
 import { getUserRole } from '../access/roles';
 
+// Role `preview` sengaja TIDAK ada di sini: akun mesin tidak boleh membuat token preview.
 const ALLOWED_ROLES = ['superadmin', 'operator', 'marketing', 'seo'];
 
 /**
