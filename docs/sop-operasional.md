@@ -41,7 +41,9 @@ Sebelum mengubah status artikel menjadi **Published**, pastikan checklist beriku
 5. **Proteksi Perubahan Harga Ekstrim (>30%):**
    - Jika harga berubah drastis lebih dari 30% (baik kenaikan maupun penurunan), sistem otomatis memblokir penyimpanan untuk mencegah salah ketik nol (misal Rp150.000 menjadi Rp15.000).
    - Untuk melanjutkan perubahan resmi, centang kotak **"Konfirmasi Perubahan Harga >30%"** di bagian bawah formulir.
-6. Klik **Save**. Perubahan akan memicu build otomatis Cloudflare Pages.
+6. Klik **Simpan Draf** untuk menyimpan tanpa menayangkan ke publik, atau **Terbitkan** untuk merilis.
+   - **Simpan Draf**: hanya terlihat di `/preview/*` dan CMS. **Tidak** memicu deploy web.
+   - **Terbitkan**: memicu deploy web (debounce 60 detik).
 
 ### 2.2 Memasang & Menghentikan Banner Pengumuman / Promo
 1. Buka menu **Pengaturan Situs (Site Settings)** di CMS.
@@ -56,7 +58,7 @@ Sebelum mengubah status artikel menjadi **Published**, pastikan checklist beriku
 - Sistem otomatis menghapus karakter spasi, tanda plus `+`, tanda hubung `-`, atau angka `0` di depan.
 
 ### 2.4 Berapa Lama Perubahan Tampil di Website? (Status Build)
-- Setelah menekan tombol **Save** / **Publish**, sistem akan mengirim sinyal build ke Cloudflare Pages.
+- Setelah menekan tombol **Terbitkan**, sistem akan mengirim sinyal build ke Cloudflare Worker.
 - Perubahan biasanya aktif di website `https://kalababyspa.com` dalam waktu **1 hingga 2 menit**.
 - **Jika situs belum berubah setelah 10 menit:**
   1. Bersihkan cache browser Bunda / buka via mode Incognito / Private Window.

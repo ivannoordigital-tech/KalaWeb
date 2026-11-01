@@ -1,4 +1,4 @@
-# Runbook Teknis KalaWeb (Astro SSG & Payload CMS)
+# Runbook Teknis KalaWeb (Astro Hybrid SSR & Payload CMS)
 
 Dokumen panduan operasional teknis, pemulihan bencana (disaster recovery), rotasi rahasia (*secrets*), dan prosedur *deployment* untuk platform Kala Moms and Baby Spa.
 
@@ -7,20 +7,24 @@ Dokumen panduan operasional teknis, pemulihan bencana (disaster recovery), rotas
 ## 1. Arsitektur Sistem
 
 ```
-[Pengunjung Web] ──> [Cloudflare Pages CDN] (Astro SSG - Statis Murni)
-                             ▲ (Build Hook saat Publish)
-[Admin/Bidan]    ──> [Cloudflare Access / HTTPS]
-                             │
-                             ▼
-                    [Payload CMS - VPS Ubuntu]
-                             │
-                  ┌──────────┴──────────┐
-                  ▼                     ▼
-          [PostgreSQL DB]       [Cloudflare R2]
-          (kala_cms_db)         (Media & Aset Gambar)
+[Pengunjung Web]
+        │
+        ▼
+[Cloudflare Worker "kalaweb" — Static Assets + SSR]
+   ├── Aset statis  : apps/web-kala/dist (HTML, CSS, JS, gambar)
+   ├── SSR on-demand: /preview/*, /_image, /_server-islands/*
+   └── Cache/Header : public/_headers
+        ▲
+        │ (deploy hook / Workers Builds)
+        │
+[Payload CMS 3.x — VPS Ubuntu / Docker]
+        │
+        ├── PostgreSQL (kala_cms_db)
+        └── Cloudflare R2 (media)
 ```
 
-- **Frontend:** Astro 5 SSG di Cloudflare Pages / Workers.
+- **Frontend:** Astro 5 dengan **output hybrid** (`output: 'static'` + halaman `prerender = false`) di-deploy sebagai **Cloudflare Worker** (`main` = `dist/_worker.js/index.js`, `assets.directory` = `dist`, `run_worker_first` = `/preview/*`, `/_image`, `/_server-islands/*`).
+- **Bukan lagi Pages-only.** Rollback harus lewat Worker versions/deployments.
 - **CMS:** Payload CMS 3.x (Next.js 15) di VPS Linux via Docker (`kala-cms-app`).
 - **Database:** PostgreSQL di VPS (`kala_cms_db` dengan user `kala_cms_user`).
 - **Media Storage:** Cloudflare R2 via S3 Storage Adapter.
@@ -96,11 +100,21 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
 2. Perbarui `PAYLOAD_SECRET` di `apps/cms/.env`.
 3. Restart CMS. *(Catatan: Sesi login admin aktif akan ter-logout otomatis).*
 
-### 3.3 Cloudflare Pages Deploy Hook
-1. Masuk ke Dashboard Cloudflare Pages > KalaWeb > Settings > Builds & Deployments > Deploy hooks.
-2. Buat deploy hook baru, catat URL-nya, lalu hapus hook lama.
+### 3.3 Deploy Web (Workers Builds / Deploy Hook)
+
+Ada dua jalur pemicu build web:
+
+1. **Workers Builds (disarankan):** push ke branch `main` → Cloudflare membangun & men-deploy Worker `kalaweb` otomatis.
+2. **Deploy Hook dari CMS:** CMS memanggil `CLOUDFLARE_DEPLOY_HOOK_URL` setelah publish/unpublish/delete (debounce 60 detik).
+
+Prosedur rotasi hook:
+1. Dashboard Cloudflare → **Workers & Pages** → `kalaweb` → Settings → Builds & Deployments → Deploy hooks.
+2. Buat hook baru, catat URL, hapus hook lama.
 3. Perbarui `CLOUDFLARE_DEPLOY_HOOK_URL` di `apps/cms/.env`.
-4. Uji publish artikel di CMS untuk memverifikasi pemicuan build baru.
+4. Restart CMS, lalu publish satu halaman uji.
+5. Verifikasi: `npm run verify:deploy`.
+
+> Jangan mengandalkan cron harian (`scheduled-build.yml`) sebagai jalur deploy utama.
 
 ---
 
@@ -110,12 +124,33 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
 - Pada `apps/web-kala/src/lib/payload.ts`, di mode production (`ALLOW_FALLBACK=false`), jika CMS mati/tidak bisa diakses saat build, proses build **sengaja digagalkan (exit 1)**.
 - **Hasil:** Cloudflare Pages otomatis mempertahankan versi situs sebelumnya yang masih sehat. Pengunjung tidak akan pernah melihat situs rusak (*white screen* / data kosong).
 
-### 4.2 Rollback Manual Cloudflare Pages
-1. Buka Cloudflare Dashboard > Pages > `kala-web`.
-2. Klik tab **Deployments**.
-3. Cari deployment sukses terakhir sebelum masalah terjadi.
-4. Klik tombol **Manage Deployment** > **Rollback to this deployment**.
-5. Situs langsung aktif kembali dalam hitungan detik.
+> **Pengecualian:** workflow CI (`ci.yml`) menjalankan build dengan `ALLOW_FALLBACK=true` karena tujuannya hanya memvalidasi kompilasi, bukan merilis konten. Deploy produksi **wajib** `ALLOW_FALLBACK=false`.
+
+### 4.2 Rollback Deployment Web (Worker)
+
+**Opsi A — Dashboard (tercepat):**
+1. Cloudflare Dashboard → Workers & Pages → `kalaweb` → **Deployments**.
+2. Pilih deployment sukses terakhir sebelum insiden.
+3. Klik **Rollback** / **Deploy this version**.
+
+**Opsi B — CLI:**
+```bash
+npx wrangler rollback --name kalaweb
+npx wrangler deployments list --name kalaweb
+```
+
+**Opsi C — Revert kode:**
+```bash
+git revert <commit>
+git push origin main
+```
+
+**Setelah rollback:**
+1. Purge cache: Dashboard → Caching → Purge Everything.
+2. Jalankan `npm run verify:deploy`.
+3. Pastikan `/preview/zzz` = 401, bukan 404.
+
+> Rollback versi Worker **tidak** menyentuh database CMS. Data yang sudah dipublish tetap ada.
 
 ---
 
@@ -189,8 +224,12 @@ Untuk mendukung SSR Preview aman dengan Signed JWT dan fetching draft terisolasi
 
 ### 8.2 Akun Service `preview-bot`
 - **Email:** `preview-bot@kalababyspa.com`
-- **Role:** `marketing` (Least Privilege: hanya membaca LandingPages & Pages draft, tidak memiliki hak delete/admin).
-- **API Key:** Dikelola via field `apiKey` di koleksi `users`.
+- **Role:** `preview` — role mesin **read-only**. Tidak termasuk `canManagePagesAndLPs`, `canManageSiteSettings`, maupun access function lain.
+- **Hak:** hanya `GET` pada koleksi yang `read: () => true` (Pages, LandingPages, Media). **Tidak bisa** create/update/delete.
+- **API Key:** dikelola via field `apiKey` di koleksi `users`.
+- **Rotasi:** minimal setiap 6 bulan atau segera setelah pergantian tim. Prosedur: regenerate `apiKey` → perbarui `PREVIEW_API_KEY` di `apps/cms/.env` dan secret Worker `kalaweb` → restart CMS → redeploy Worker → hapus key lama.
+
+> **Jangan** memberi role `marketing` pada akun ini. `marketing` memiliki create/update/delete halaman.
 
 ---
 
@@ -257,34 +296,25 @@ Jika editor menginginkan tampilan formulir isian Payload CMS tradisional:
 
 ---
 
-## 11. Prosedur Teknis Khusus SSR Preview & Workers
+## 11. Verifikasi Deploy (Wajib Setelah Setiap Deploy Web)
 
-### 11.1 Prosedur Rotasi PREVIEW_SECRET & PREVIEW_API_KEY
-Jika token preview diduga bocor atau rotasi berkala dilakukan:
-1. **Buat Secret Baru:**
-   ```bash
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   ```
-2. **Update CMS:**
-   - Ubah `PREVIEW_SECRET` di `apps/cms/.env`.
-   - Update user `preview-bot` di database PostgreSQL jika API key dirotasi:
-     ```sql
-     UPDATE users SET api_key = '<api_key_hash>' WHERE email = 'preview-bot@kalababyspa.com';
-     ```
-   - Restart container CMS: `docker compose up -d --no-deps cms`.
-3. **Update Cloudflare:**
-   - Buka Cloudflare Dashboard -> Workers & Pages -> project `kalaweb` -> Settings -> Variables and Secrets.
-   - Perbarui nilai `PREVIEW_SECRET` dan `PREVIEW_API_KEY`.
-   - Lakukan trigger deploy ulang agar Worker memuat environment baru.
-
-### 11.2 Prosedur Purge Cache Cloudflare
-Jika pratinjau menampilkan versi lama karena rule cache:
-1. Masuk ke Dashboard Cloudflare -> Domain `kalababyspa.com` -> Caching -> Configuration -> Purge Cache.
-2. Pilih **Custom Purge** untuk rute tertentu (`https://kalababyspa.com/preview/*`), atau **Purge Everything** saat rilis besar.
-
-### 11.3 Verifikasi Kesiapan SSR Worker di Produksi
-Untuk memastikan rute SSR Worker aktif dan tidak disajikan sebagai file statis 404:
 ```bash
-# Harus mengembalikan HTTP 401 Unauthorized (bukan 404 Not Found)
-curl -s -o /dev/null -w "%{http_code}\n" https://kalababyspa.com/preview/zzz
+npm run verify:deploy
 ```
+
+Pemeriksaan yang dijalankan:
+| Item | Ekspektasi | Arti bila gagal |
+|---|---|---|
+| `GET /` | 200 | Worker/domain tidak aktif |
+| `GET /preview/zzz` | 401 | **404 = build lama masih tayang** |
+| `GET /preview/zzz?token=invalid` | 401 | Verifikasi token bocor/rusak |
+| `Cache-Control` preview | mengandung `no-store` | Header `_headers` tidak terpasang |
+| Hash aset `_astro/*` | sama dengan `dist/index.html` | Build live ≠ build lokal |
+| `/api/preview-token` (CMS) | 401 | Endpoint publik / auth rusak |
+| `/api/deploy-status` (CMS) | 200 | CMS down |
+
+Tambahan:
+```bash
+npm run verify:deploy -- --capi-path /sales/babyMassage/
+```
+harus menemukan `data-use-capi` di HTML (penanda build ≥ 30 Okt 2026).
