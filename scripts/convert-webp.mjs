@@ -9,7 +9,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
+
+let sharp;
+try {
+  const sharpModule = await import('sharp');
+  sharp = sharpModule.default || sharpModule;
+} catch (err) {
+  console.log(`[KalaWeb] Notice: sharp not available in this environment. Skipping automated WebP conversion.`);
+  process.exit(0);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
