@@ -116,6 +116,13 @@ Prosedur rotasi hook:
 
 > Jangan mengandalkan cron harian (`scheduled-build.yml`) sebagai jalur deploy utama.
 
+### 3.4 Batasan Indikator Status Deploy (DeployStatusPill)
+Status proses build yang ditampilkan pada header dokumen CMS (`DeployStatusPill`) bersumber dari in-memory state CMS (`getDeployStatus()`).
+- **Restart container** mereset status kembali ke `idle`.
+- Jika CMS berjalan multi-replika, pill membaca status replika yang menangani request.
+- Status bersifat **indikatif** untuk memandu admin operasional (apakah deploy telah terpicu dan estimasi waktu selesai).
+- **Sumber kebenaran definitif** status build tetap berada pada Cloudflare Dashboard dan skrip verifikasi otomatis (`npm run verify:deploy`).
+
 ---
 
 ## 4. Rollback & Penanganan Kegagalan Build
@@ -281,16 +288,18 @@ Mekanisme `afterChange` di `LandingPages.ts` dan `Pages.ts` memiliki proteksi kh
     - **Desktop:** Lebar 100% fluida
     - **Tablet:** Lebar 768px
     - **Mobile:** Lebar 375px (standar perangkat smartphone pengunjung iklan)
-- **Riwayat Undo / Redo & Pintasan Keyboard:**
+- **Penyimpanan Langsung & Pintasan Keyboard:**
+  - `Ctrl + S` (atau `Cmd + S` di Mac): **Simpan Draf langsung di dalam builder** tanpa menutup layar.
+  - **Tombol Terbitkan:** Terbitkan halaman langsung dari bilah atas builder (hanya untuk pengguna dengan izin publish).
   - `Ctrl + Z` (atau `Cmd + Z` di Mac): Membatalkan perubahan terakhir (*Undo*).
   - `Ctrl + Shift + Z` (atau `Cmd + Shift + Z` di Mac): Mengulangi perubahan (*Redo*).
-  - `Escape`: Menutup modal katalog, kembali ke pohon seksi, atau menutup builder.
-  - Builder menyimpan hingga 20 langkah riwayat perubahan lokal tanpa memicu build Cloudflare prematur.
+  - `Escape`: Menutup modal katalog, membatalkan seleksi seksi, atau memicu dialog konfirmasi tutup jika ada draf yang belum disimpan.
+  - Dialog konfirmasi tutup mencegah data hilang tanpa sengaja saat keluar dari builder.
 
 ### 10.3 Mode Formulir Blok Klasik (Fallback)
 Jika editor menginginkan tampilan formulir isian Payload CMS tradisional:
 1. Pada sidebar kanan halaman dokumen di CMS, cari field **"Mode Editor Halaman"**.
-2. Ubah pilihan dari **"✨ Shopify-Style Visual Builder"** menjadi **"📝 Formulir Blok Klasik"**.
+2. Ubah pilihan dari **"Builder Visual (disarankan)"** menjadi **"Formulir Blok Klasik"**.
 3. Sistem secara otomatis menyembunyikan customizer visual dan menampilkan accordion blok standar bawaan Payload. Semua data blok 100% identik dan tidak ada data yang hilang.
 
 
