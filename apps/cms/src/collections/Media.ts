@@ -16,6 +16,7 @@ export const Media: CollectionConfig = {
     group: 'Konten & Blog',
     useAsTitle: 'alt',
     defaultColumns: ['alt', 'filename', 'filesize', 'createdAt'],
+    listSearchableFields: ['alt', 'filename', 'caption'],
   },
   access: {
     read: () => true,
