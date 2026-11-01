@@ -41,7 +41,9 @@ function payloadRedirectsIntegration() {
 export default defineConfig({
   site: 'https://kalababyspa.com',
   output: 'static',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: 'compile',
+  }),
   server: {
     host: true, // Listen on all network interfaces (IPv4 0.0.0.0 & IPv6 ::)
     port: 4321,
