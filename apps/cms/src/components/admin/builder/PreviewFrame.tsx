@@ -11,6 +11,9 @@ interface PreviewFrameProps {
   selectedSectionId?: string | null;
   onSelectFromIframe?: (sectionId: string) => void;
   lastSaved?: number;
+  onSaveDraft?: () => Promise<boolean>;
+  isSavingDraft?: boolean;
+  canSaveDraft?: boolean;
 }
 
 export const PreviewFrame: React.FC<PreviewFrameProps> = ({
@@ -21,6 +24,9 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   selectedSectionId,
   onSelectFromIframe,
   lastSaved,
+  onSaveDraft,
+  isSavingDraft,
+  canSaveDraft,
 }) => {
   const [device, setDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -42,7 +48,8 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   // Fetch signed preview token from CMS
   const fetchToken = useCallback(async () => {
     if (!docId) {
-      setError('Simpan draft terlebih dahulu untuk mengaktifkan preview visual.');
+      setPreviewUrl(null);
+      setError(null);
       return;
     }
 
@@ -157,9 +164,10 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={() => setDevice('desktop')}
             className={`p-1.5 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-              device === 'desktop' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-500 hover:text-slate-800'
+              device === 'desktop' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-600 hover:text-slate-800'
             }`}
             title="Desktop (100% Fluid)"
+            aria-label="Tampilan desktop"
           >
             <Monitor size={14} />
             <span className="hidden sm:inline text-[11px]">Desktop</span>
@@ -168,9 +176,10 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={() => setDevice('tablet')}
             className={`p-1.5 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-              device === 'tablet' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-500 hover:text-slate-800'
+              device === 'tablet' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-600 hover:text-slate-800'
             }`}
             title="Tablet (768px)"
+            aria-label="Tampilan tablet"
           >
             <Tablet size={14} />
             <span className="hidden sm:inline text-[11px]">Tablet</span>
@@ -179,9 +188,10 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={() => setDevice('mobile')}
             className={`p-1.5 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-              device === 'mobile' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-500 hover:text-slate-800'
+              device === 'mobile' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-600 hover:text-slate-800'
             }`}
             title="Mobile (375px)"
+            aria-label="Tampilan ponsel"
           >
             <Smartphone size={14} />
             <span className="hidden sm:inline text-[11px]">Mobile</span>
@@ -192,10 +202,10 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         <div className="flex items-center gap-2">
           {hasUnsavedChanges ? (
             <span className="text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
-              Preview = Versi Tersimpan
+              Pratinjau = versi tersimpan
             </span>
           ) : lastRefreshTime ? (
-            <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
+            <span className="text-[11px] text-slate-600 font-mono hidden sm:inline">
               Diperbarui {lastRefreshTime}
             </span>
           ) : null}
@@ -204,8 +214,9 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={fetchToken}
             disabled={isLoading || !docId}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 cursor-pointer"
-            title="Muat Ulang Preview"
+            className="p-1.5 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 cursor-pointer"
+            title="Muat Ulang Pratinjau"
+            aria-label="Muat ulang pratinjau"
           >
             <RotateCw size={14} className={isLoading ? 'animate-spin' : ''} />
           </button>
@@ -215,8 +226,9 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               href={previewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               title="Buka di Tab Baru"
+              aria-label="Buka pratinjau di tab baru"
             >
               <ExternalLink size={14} />
             </a>
@@ -226,13 +238,46 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
 
       {/* Canvas Viewport */}
       <div className="flex-1 overflow-auto flex items-center justify-center p-3">
-        {error ? (
+        {!docId ? (
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-md text-center">
+            <div className="w-10 h-10 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center mx-auto mb-3">
+              <Monitor size={18} />
+            </div>
+            <h3 className="text-sm font-bold text-slate-800">Pratinjau belum aktif</h3>
+            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              Halaman ini belum punya versi tersimpan, jadi belum ada yang bisa dipratinjau.
+              Simpan draf terlebih dahulu — halaman akan dimuat ulang, lalu buka builder kembali.
+            </p>
+
+            {canSaveDraft && (
+              <button
+                type="button"
+                disabled={isSavingDraft}
+                onClick={() => void onSaveDraft?.()}
+                className="mt-4 w-full rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white hover:bg-teal-800 disabled:opacity-60 cursor-pointer transition-all"
+              >
+                {isSavingDraft ? 'Menyimpan…' : 'Simpan Draf & Muat Ulang'}
+              </button>
+            )}
+
+            <p className="mt-2 text-[11px] text-slate-400">
+              Tidak ada autosave. Perubahan hanya tersimpan saat Anda menekan tombol simpan.
+            </p>
+          </div>
+        ) : error ? (
           <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-md text-center">
             <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3 text-lg font-bold">
               !
             </div>
-            <h3 className="text-sm font-bold text-slate-800">Pratinjau Belum Aktif</h3>
-            <p className="text-xs text-slate-500 mt-1">{error}</p>
+            <h3 className="text-sm font-bold text-slate-800">Pratinjau gagal dimuat</h3>
+            <p className="text-xs text-slate-600 mt-1">{error}</p>
+            <button
+              type="button"
+              onClick={fetchToken}
+              className="mt-4 rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+            >
+              Coba Lagi
+            </button>
           </div>
         ) : previewUrl ? (
           <div
@@ -249,7 +294,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         ) : (
           <div className="text-slate-400 text-xs flex items-center gap-2">
             <RotateCw size={16} className="animate-spin text-teal-600" />
-            <span>Menghubungkan ke server preview...</span>
+            <span>Menghubungkan ke pratinjau…</span>
           </div>
         )}
       </div>
