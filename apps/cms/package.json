@@ -15,7 +15,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "check:parity": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/check-builder-parity.ts",
     "sync:builder": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/sync-builder-registry.ts && npm run check:parity",
-    "test": "cross-env NODE_OPTIONS=--no-deprecation tsx --test tests/security-and-parity.test.ts"
+    "test": "cross-env NODE_OPTIONS=--no-deprecation tsx --test tests/security-and-parity.test.ts tests/ux-polish.test.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
