@@ -56,12 +56,13 @@ export const BuilderField: React.FC = () => {
   );
 
   // Reset unsaved changes flag when document is saved
+  const lastUpdateTime = (docInfo as any)?.lastUpdateTime;
   useEffect(() => {
     if (docInfo?.id) {
       setHasUnsavedChanges(false);
       resetHistory();
     }
-  }, [docInfo?.id]);
+  }, [docInfo?.id, lastUpdateTime]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -139,7 +140,7 @@ export const BuilderField: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <span
-              className="p-1.5 rounded-lg bg-teal-600 text-white shadow-xs inline-flex items-center justify-center"
+              className="p-1.5 rounded-lg bg-teal-600 text-white shadow-sm inline-flex items-center justify-center"
               style={{ padding: '0.4rem', borderRadius: '0.5rem', backgroundColor: '#0d9488', color: '#fff' }}
             >
               <Sparkles size={18} />
@@ -188,7 +189,7 @@ export const BuilderField: React.FC = () => {
   // Fullscreen Portal Builder UI
   const portalModal = isOpen && typeof document !== 'undefined' && createPortal(
     <div
-      className="kala-builder-portal fixed inset-0 z-[99999] bg-slate-900 flex flex-col font-sans select-none overflow-hidden animate-in fade-in duration-150"
+      className="kala-builder-portal fixed inset-0 z-[99999] bg-slate-900 flex flex-col font-sans select-none overflow-hidden transition-opacity duration-150"
       style={{
         position: 'fixed',
         top: 0,
@@ -205,7 +206,7 @@ export const BuilderField: React.FC = () => {
       }}
     >
       {/* Top Navbar */}
-      <header className="h-13 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+      <header className="h-[52px] bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse" />
@@ -297,6 +298,7 @@ export const BuilderField: React.FC = () => {
             hasUnsavedChanges={hasUnsavedChanges}
             selectedSectionId={selectedSectionId}
             onSelectFromIframe={(sectionId) => setSelectedSectionId(sectionId)}
+            lastSaved={lastUpdateTime}
           />
         </main>
       </div>

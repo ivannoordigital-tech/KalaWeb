@@ -8,24 +8,51 @@ interface Props {
 
 const { block } = Astro.props;
 
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function sanitizeUrl(url?: string): string {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('/') || trimmed.startsWith('#')) {
+    return escapeHtml(trimmed);
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol)) {
+      return escapeHtml(trimmed);
+    }
+  } catch {}
+  return '#';
+}
+
 function renderLexicalNode(node: any): string {
   if (!node) return '';
-  if (typeof node === 'string') return node;
+  if (typeof node === 'string') return escapeHtml(node);
 
   if (node.type === 'text') {
-    let text = node.text || '';
+    let text = escapeHtml(node.text || '');
     // Format bits: 1 = bold, 2 = italic, 4 = strikethrough, 8 = underline, 16 = code
     if (node.format & 1) text = `<strong>${text}</strong>`;
     if (node.format & 2) text = `<em>${text}</em>`;
+    if (node.format & 4) text = `<s>${text}</s>`;
     if (node.format & 8) text = `<u>${text}</u>`;
+    if (node.format & 16) text = `<code>${text}</code>`;
     return text;
   }
 
   if (node.type === 'link') {
-    const url = node.fields?.url || '#';
+    const safeUrl = sanitizeUrl(node.fields?.url);
     const newTab = node.fields?.newTab ? ' target="_blank" rel="noopener noreferrer"' : '';
     const inner = (node.children || []).map(renderLexicalNode).join('');
-    return `<a href="${url}" class="text-[#B3471E] underline font-semibold hover:text-[#A3431F]"${newTab}>${inner}</a>`;
+    return `<a href="${safeUrl}" class="text-[#B3471E] underline font-semibold hover:text-[#A3431F]"${newTab}>${inner}</a>`;
   }
 
   const inner = (node.children || []).map(renderLexicalNode).join('');
@@ -35,7 +62,8 @@ function renderLexicalNode(node: any): string {
   }
 
   if (node.type === 'heading') {
-    const tag = node.tag || 'h2';
+    const rawTag = String(node.tag || 'h2').toLowerCase();
+    const tag = ['h1', 'h2', 'h3', 'h4'].includes(rawTag) ? rawTag : 'h2';
     const headingStyles: Record<string, string> = {
       h1: 'text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22] mt-8 mb-4',
       h2: 'text-xl sm:text-2xl font-brand font-bold text-[#4B2E22] mt-8 mb-4',
@@ -66,7 +94,7 @@ function renderLexicalNode(node: any): string {
 
 function renderContent(content: any): string {
   if (!content) return '';
-  if (typeof content === 'string') return content;
+  if (typeof content === 'string') return escapeHtml(content);
   if (content.root && Array.isArray(content.root.children)) {
     return content.root.children.map(renderLexicalNode).join('');
   }

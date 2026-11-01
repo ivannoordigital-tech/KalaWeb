@@ -86,7 +86,7 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden transition-all duration-150">
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div>
@@ -154,9 +154,9 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
                             onSelectBlock(block.slug);
                             onClose();
                           }}
-                          className="flex items-start gap-3 p-3 text-left rounded-lg border border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 hover:shadow-xs transition-all group cursor-pointer"
+                          className="flex items-start gap-3 p-3 text-left rounded-lg border border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 hover:shadow-sm transition-all group cursor-pointer"
                         >
-                          <div className="p-2 rounded-md bg-slate-100 group-hover:bg-white group-hover:shadow-xs transition-colors shrink-0">
+                          <div className="p-2 rounded-md bg-slate-100 group-hover:bg-white group-hover:shadow-sm transition-colors shrink-0">
                             {getIcon(block.icon)}
                           </div>
                           <div className="min-w-0">
@@ -212,7 +212,7 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
                           onClose();
                         }
                       }}
-                      className="py-1.5 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                      className="py-1.5 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer"
                     >
                       Terapkan Template Ini (+{tmpl.blocks.length} Seksi)
                     </button>

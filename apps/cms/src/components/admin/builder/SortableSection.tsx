@@ -69,7 +69,7 @@ export const SortableSection: React.FC<SortableSectionProps> = ({
               {label}
             </span>
             {block.disabled && (
-              <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.2 rounded font-mono">
+              <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">
                 Off
               </span>
             )}

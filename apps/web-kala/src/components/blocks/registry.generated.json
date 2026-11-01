@@ -16,8 +16,8 @@
       "ctaText": "Pesan Kunjungan Bidan",
       "ctaMessage": "Halo Bidan Kala, saya ingin reservasi layanan homecare untuk si kecil...",
       "align": "left",
-      "btnColor": "primary",
-      "bgStyle": "default",
+      "btnColor": "terracotta",
+      "bgStyle": "gradient",
       "disabled": false
     },
     "presets": [
@@ -155,8 +155,8 @@
       "title": "Apakah Bunda Mengalami Kekhawatiran Ini?",
       "subtitle": "Bunda tidak sendirian, fase adaptasi kelahiran memang penuh tantangan.",
       "columns": "3",
-      "background": "soft",
-      "spacing": "normal",
+      "background": "cream",
+      "disabled": false,
       "points": [
         {
           "title": "Bayi Menangis Tanpa Henti",
@@ -170,8 +170,7 @@
           "title": "Cemas Merawat Tali Pusat",
           "description": "Masih ragu merawat tali pusat dan memandikan bayi baru lahir sendiri."
         }
-      ],
-      "disabled": false
+      ]
     },
     "fields": [
       {
@@ -895,8 +894,7 @@
       "blockType": "midwifeSpotlight",
       "heading": "Tim Bidan Berdedikasi Kala",
       "subheading": "Seluruh bidan berijazah kebidanan resmi dan memiliki STR aktif Kemenkes RI.",
-      "background": "soft",
-      "spacing": "normal",
+      "background": "cream",
       "disabled": false
     },
     "fields": [

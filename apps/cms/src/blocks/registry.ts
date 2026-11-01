@@ -57,8 +57,8 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       ctaText: 'Pesan Kunjungan Bidan',
       ctaMessage: 'Halo Bidan Kala, saya ingin reservasi layanan homecare untuk si kecil...',
       align: 'left',
-      btnColor: 'primary',
-      bgStyle: 'default',
+      btnColor: 'terracotta',
+      bgStyle: 'gradient',
       disabled: false,
     },
     presets: [
@@ -133,14 +133,13 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       title: 'Apakah Bunda Mengalami Kekhawatiran Ini?',
       subtitle: 'Bunda tidak sendirian, fase adaptasi kelahiran memang penuh tantangan.',
       columns: '3',
-      background: 'soft',
-      spacing: 'normal',
+      background: 'cream',
+      disabled: false,
       points: [
         { title: 'Bayi Menangis Tanpa Henti', description: 'Rewel tiap malam karena kembung atau kolik dan sulit ditenangkan.' },
         { title: 'Bunda Kelelahan Pasca Salin', description: 'Kurang tidur dan badan pegal tanpa bantuan pendamping yang terpercaya.' },
         { title: 'Cemas Merawat Tali Pusat', description: 'Masih ragu merawat tali pusat dan memandikan bayi baru lahir sendiri.' },
       ],
-      disabled: false,
     },
     fields: [
       { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
@@ -520,8 +519,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       blockType: 'midwifeSpotlight',
       heading: 'Tim Bidan Berdedikasi Kala',
       subheading: 'Seluruh bidan berijazah kebidanan resmi dan memiliki STR aktif Kemenkes RI.',
-      background: 'soft',
-      spacing: 'normal',
+      background: 'cream',
       disabled: false,
     },
     fields: [
@@ -594,14 +592,14 @@ export const builderTemplates: BuilderPageTemplate[] = [
         duration: '90 Menit',
         ctaText: 'Pesan Kunjungan Sekarang',
         align: 'left',
-        bgStyle: 'default',
+        bgStyle: 'gradient',
       },
       {
         blockType: 'painPoints',
         title: 'Kekhawatiran yang Sering Dialami Bunda',
         subtitle: 'Bunda tidak perlu menghadapinya sendirian, kami hadir mendampingi.',
         columns: '3',
-        background: 'soft',
+        background: 'cream',
         points: [
           { title: 'Bayi Sering Menangis & Kolik', description: 'Perut kembung yang membuat si kecil tidak nyaman sepanjang malam.' },
           { title: 'Kelelahan Pasca Melahirkan', description: 'Tubuh tegang dan butuh relaksasi stimulasi laktasi oksitosin.' },
@@ -612,7 +610,7 @@ export const builderTemplates: BuilderPageTemplate[] = [
         blockType: 'solutions',
         title: 'Solusi Medis Profesional dari Bidan Kala',
         subtitle: 'Standar pelayanan klinis terbaik langsung di kenyamanan rumah Bunda.',
-        solutions: [
+        items: [
           { title: 'Bidan Berlisensi STR Resmi', description: 'Bukan sekadar terapis umum, seluruh staf adalah tenaga kesehatan kebidanan terlatih.' },
           { title: 'Peralatan Steril & Higienis', description: 'Minyak organik food-grade dan perlengkapan higienis bersertifikasi.' },
           { title: 'Edukasi & Konsultasi Gratis', description: 'Bunda bebas berkonsultasi seputar ASI, menyusui, dan tumbuh kembang si kecil.' },
@@ -622,7 +620,6 @@ export const builderTemplates: BuilderPageTemplate[] = [
         blockType: 'pricing',
         title: 'Pilihan Paket Layanan Favorit',
         subtitle: 'Harga transparan tanpa biaya tersembunyi dengan jaminan pelayanan memuaskan.',
-        columns: '3',
         packages: [
           {
             name: 'Pijat Newborn Homecare',
@@ -661,7 +658,7 @@ export const builderTemplates: BuilderPageTemplate[] = [
         blockType: 'testimonials',
         title: 'Apa Kata Para Bunda di Surabaya?',
         subtitle: 'Ratusan testimoni asli dari keluarga yang telah merasakan kenyamanan Kala Homecare.',
-        testimonials: [
+        items: [
           {
             author: 'Bunda Sarah & Baby Ken',
             role: 'Ibu dari Bayi 2 Bulan',
@@ -723,7 +720,7 @@ export const builderTemplates: BuilderPageTemplate[] = [
         blockType: 'solutions',
         title: 'Mengapa Memilih Kala Baby Spa?',
         subtitle: 'Kualitas medis rumah sakit di ruang keluarga Anda.',
-        solutions: [
+        items: [
           { title: '100% Tenaga Bidan STR', description: 'Aman dan terstandar kesehatan.' },
           { title: 'Bahan Organik Hypoallergenic', description: 'Aman untuk kulit sensitif bayi.' },
           { title: 'Layanan Tepat Waktu', description: 'Bidan datang langsung ke rumah Anda.' },

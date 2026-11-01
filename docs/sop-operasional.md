@@ -104,3 +104,25 @@ Halo Bidan Kala, saya mau reservasi Pijat Bayi Homecare Rp125.000 [ref: KALA-SRV
    - Layanan & Ref Code (`KALA-SRV-BAYI`)
    - First Touch (`f=google_cpc`) dan Last Touch (`l=ig_bio`)
    - Status Reservasi (*Tanya Jawab -> Terjadwal -> Selesai -> Repeat Order*)
+
+
+---
+
+## 5. SOP Penggunaan Visual Page Builder & Pratinjau Draf
+
+### 5.1 Kapan Menggunakan Visual Builder?
+Visual Page Builder digunakan ketika Marketing Specialist atau Admin Operasional ingin membuat atau merombak landing page iklan (`LandingPages`) atau halaman umum (`Pages`) secara visual:
+- Menyusun seksi dengan drag-and-drop.
+- Menguji tampilan mobile (375px), tablet (768px), dan desktop secara real-time.
+- Memilih foto dari pustaka media tanpa membuka tab baru.
+- Menerapkan template siap pakai dalam 1 klik.
+
+### 5.2 Alur Pembuatan & Pratinjau Aman
+1. **Buka Dokumen:** Di CMS, buka halaman yang ingin diedit atau buat dokumen baru.
+2. **Buka Visual Builder:** Klik tombol *"Buka Visual Page Builder"*.
+3. **Susun Konten:** Tambah, edit, atau urutkan seksi di sidebar kiri. Perubahan langsung tercermin di kanvas kanan.
+4. **Simpan Draf:** Klik *"Tutup & Kembali"* lalu tekan *"Simpan Draf"* (Save Draft) pada CMS.
+   - Pratinjau otomatis diperbarui saat dokumen disimpan.
+   - Pratinjau menggunakan tanda tangan digital aman (Signed JWT) dan bot terisolasi.
+   - **Semua tracking (Meta Pixel, Google Tag Manager, Conversions API) dinonaktifkan total di mode pratinjau**, sehingga uji coba tim internal tidak akan merusak metrik iklan atau data konversi Meta/Google.
+5. **Publikasi Resmi:** Hanya klik tombol *"Terbitkan"* (Publish) jika draf halaman sudah disetujui untuk tayang ke publik. Ini akan memicu build otomatis Cloudflare Pages ke domain utama.

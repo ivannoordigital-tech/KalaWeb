@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Smartphone, Tablet, Monitor, RotateCw, ExternalLink } from 'lucide-react';
 
 interface PreviewFrameProps {
@@ -10,6 +10,7 @@ interface PreviewFrameProps {
   hasUnsavedChanges: boolean;
   selectedSectionId?: string | null;
   onSelectFromIframe?: (sectionId: string) => void;
+  lastSaved?: number;
 }
 
 export const PreviewFrame: React.FC<PreviewFrameProps> = ({
@@ -19,15 +20,27 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   hasUnsavedChanges,
   selectedSectionId,
   onSelectFromIframe,
+  lastSaved,
 }) => {
   const [device, setDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefreshTime, setLastRefreshTime] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Compute allowed origin from previewUrl
+  const previewOrigin = useMemo(() => {
+    if (!previewUrl) return null;
+    try {
+      return new URL(previewUrl).origin;
+    } catch {
+      return null;
+    }
+  }, [previewUrl]);
+
   // Fetch signed preview token from CMS
-  const fetchToken = async () => {
+  const fetchToken = useCallback(async () => {
     if (!docId) {
       setError('Simpan draft terlebih dahulu untuk mengaktifkan preview visual.');
       return;
@@ -43,16 +56,39 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
       }
       const data = await res.json();
       setPreviewUrl(`${data.url}&v=${Date.now()}`);
+
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      setLastRefreshTime(`${hh}:${mm}:${ss}`);
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [collection, docId]);
 
+  // Initial load
   useEffect(() => {
     fetchToken();
-  }, [docId, collection]);
+  }, [fetchToken]);
+
+  // Auto-refresh when document is saved in CMS
+  useEffect(() => {
+    if (lastSaved && docId) {
+      fetchToken();
+    }
+  }, [lastSaved, docId, fetchToken]);
+
+  // Auto-refresh before 15m JWT expires (at 14 minutes)
+  useEffect(() => {
+    if (!docId) return;
+    const interval = setInterval(() => {
+      fetchToken();
+    }, 14 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [docId, fetchToken]);
 
   // Notify iframe whenever selectedSectionId changes
   useEffect(() => {
@@ -64,15 +100,17 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
           sectionId: selectedSectionId,
           scroll: true,
         },
-        '*',
+        previewOrigin || '*',
       );
     } catch {}
-  }, [selectedSectionId]);
+  }, [selectedSectionId, previewOrigin]);
 
-  // Listen for messages from iframe inspector
+  // Listen for messages from iframe inspector with strict origin and source checks
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (!event.data || typeof event.data !== 'object') return;
+      if (iframeRef.current && event.source !== iframeRef.current.contentWindow) return;
+      if (previewOrigin && event.origin !== previewOrigin) return;
 
       if (event.data.type === 'KALA_INSPECTOR_READY') {
         if (selectedSectionId && iframeRef.current?.contentWindow) {
@@ -83,7 +121,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
                 sectionId: selectedSectionId,
                 scroll: false,
               },
-              '*',
+              previewOrigin || '*',
             );
           } catch {}
         }
@@ -96,7 +134,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onSelectFromIframe, selectedSectionId]);
+  }, [onSelectFromIframe, selectedSectionId, previewOrigin]);
 
   const getContainerWidth = () => {
     switch (device) {
@@ -119,7 +157,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={() => setDevice('desktop')}
             className={`p-1.5 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-              device === 'desktop' ? 'bg-white shadow-xs text-teal-800' : 'text-slate-500 hover:text-slate-800'
+              device === 'desktop' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-500 hover:text-slate-800'
             }`}
             title="Desktop (100% Fluid)"
           >
@@ -130,7 +168,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={() => setDevice('tablet')}
             className={`p-1.5 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-              device === 'tablet' ? 'bg-white shadow-xs text-teal-800' : 'text-slate-500 hover:text-slate-800'
+              device === 'tablet' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-500 hover:text-slate-800'
             }`}
             title="Tablet (768px)"
           >
@@ -141,7 +179,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             type="button"
             onClick={() => setDevice('mobile')}
             className={`p-1.5 rounded text-xs font-semibold flex items-center gap-1 transition-all ${
-              device === 'mobile' ? 'bg-white shadow-xs text-teal-800' : 'text-slate-500 hover:text-slate-800'
+              device === 'mobile' ? 'bg-white shadow-sm text-teal-800' : 'text-slate-500 hover:text-slate-800'
             }`}
             title="Mobile (375px)"
           >
@@ -152,17 +190,21 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
 
         {/* Status indicator & Refresh */}
         <div className="flex items-center gap-2">
-          {hasUnsavedChanges && (
+          {hasUnsavedChanges ? (
             <span className="text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
               Preview = Versi Tersimpan
             </span>
-          )}
+          ) : lastRefreshTime ? (
+            <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
+              Diperbarui {lastRefreshTime}
+            </span>
+          ) : null}
 
           <button
             type="button"
             onClick={fetchToken}
             disabled={isLoading || !docId}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40"
+            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 cursor-pointer"
             title="Muat Ulang Preview"
           >
             <RotateCw size={14} className={isLoading ? 'animate-spin' : ''} />
@@ -173,7 +215,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               href={previewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               title="Buka di Tab Baru"
             >
               <ExternalLink size={14} />

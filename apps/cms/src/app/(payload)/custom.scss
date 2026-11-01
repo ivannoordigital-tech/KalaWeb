@@ -107,6 +107,27 @@
 @tailwind utilities;
 
 /* 5. Bulletproof Fallback Styles for Shopify-Style Visual Builder */
+.kala-builder-portal,
+.kala-builder-in-card {
+  :where(*, ::before, ::after) {
+    border-style: solid;
+    border-width: 0;
+    box-sizing: border-box;
+  }
+  :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, blockquote, dl, dd) {
+    margin: 0;
+  }
+  :where(button, input, select, textarea) {
+    font: inherit;
+    color: inherit;
+  }
+  :where(input, select, textarea) {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #cbd5e1;
+  }
+}
+
 .kala-builder-portal {
   position: fixed !important;
   top: 0 !important;

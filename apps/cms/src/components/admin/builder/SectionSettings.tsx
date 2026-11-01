@@ -331,10 +331,11 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
               [activeMediaTarget.fieldName]: media.id,
             });
           } else {
-            handleFieldChange(activeMediaTarget.fieldName, media.id);
+            const updates: Record<string, any> = { [activeMediaTarget.fieldName]: media.id };
             if (meta?.fields?.some((f) => f.name === 'imageAlt') && !block.imageAlt && media.alt) {
-              handleFieldChange('imageAlt', media.alt);
+              updates.imageAlt = media.alt;
             }
+            onUpdate(updates);
           }
         }}
       />

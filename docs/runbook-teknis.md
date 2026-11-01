@@ -253,3 +253,38 @@ Jika editor menginginkan tampilan formulir isian Payload CMS tradisional:
 1. Pada sidebar kanan halaman dokumen di CMS, cari field **"Mode Editor Halaman"**.
 2. Ubah pilihan dari **"✨ Shopify-Style Visual Builder"** menjadi **"📝 Formulir Blok Klasik"**.
 3. Sistem secara otomatis menyembunyikan customizer visual dan menampilkan accordion blok standar bawaan Payload. Semua data blok 100% identik dan tidak ada data yang hilang.
+
+
+---
+
+## 11. Prosedur Teknis Khusus SSR Preview & Workers
+
+### 11.1 Prosedur Rotasi PREVIEW_SECRET & PREVIEW_API_KEY
+Jika token preview diduga bocor atau rotasi berkala dilakukan:
+1. **Buat Secret Baru:**
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   ```
+2. **Update CMS:**
+   - Ubah `PREVIEW_SECRET` di `apps/cms/.env`.
+   - Update user `preview-bot` di database PostgreSQL jika API key dirotasi:
+     ```sql
+     UPDATE users SET api_key = '<api_key_hash>' WHERE email = 'preview-bot@kalababyspa.com';
+     ```
+   - Restart container CMS: `docker compose up -d --no-deps cms`.
+3. **Update Cloudflare:**
+   - Buka Cloudflare Dashboard -> Workers & Pages -> project `kalaweb` -> Settings -> Variables and Secrets.
+   - Perbarui nilai `PREVIEW_SECRET` dan `PREVIEW_API_KEY`.
+   - Lakukan trigger deploy ulang agar Worker memuat environment baru.
+
+### 11.2 Prosedur Purge Cache Cloudflare
+Jika pratinjau menampilkan versi lama karena rule cache:
+1. Masuk ke Dashboard Cloudflare -> Domain `kalababyspa.com` -> Caching -> Configuration -> Purge Cache.
+2. Pilih **Custom Purge** untuk rute tertentu (`https://kalababyspa.com/preview/*`), atau **Purge Everything** saat rilis besar.
+
+### 11.3 Verifikasi Kesiapan SSR Worker di Produksi
+Untuk memastikan rute SSR Worker aktif dan tidak disajikan sebagai file statis 404:
+```bash
+# Harus mengembalikan HTTP 401 Unauthorized (bukan 404 Not Found)
+curl -s -o /dev/null -w "%{http_code}\n" https://kalababyspa.com/preview/zzz
+```

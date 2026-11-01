@@ -96,7 +96,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 transition-opacity duration-150">
       <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl flex flex-col max-h-[85vh] overflow-hidden">
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -127,7 +127,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             />
           </div>
 
-          <label className="flex items-center gap-1.5 py-1.5 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-xs">
+          <label className="flex items-center gap-1.5 py-1.5 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-sm">
             {isUploading ? (
               <Loader2 size={14} className="animate-spin" />
             ) : (
@@ -194,7 +194,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
                     )}
 
                     {isSelected && (
-                      <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center shadow-xs">
+                      <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center shadow-sm">
                         <Check size={12} strokeWidth={3} />
                       </div>
                     )}
@@ -237,7 +237,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
                 }
               }}
               disabled={!selectedItem}
-              className="py-1.5 px-4 bg-teal-600 hover:bg-teal-700 disabled:opacity-40 text-white rounded-lg text-xs font-bold transition-colors shadow-xs"
+              className="py-1.5 px-4 bg-teal-600 hover:bg-teal-700 disabled:opacity-40 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
             >
               Gunakan Foto Ini
             </button>

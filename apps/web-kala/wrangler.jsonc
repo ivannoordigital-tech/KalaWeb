@@ -1,7 +1,9 @@
 {
   "name": "kalaweb",
+  "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2026-10-20",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "run_worker_first": ["/preview/*", "/_image", "/_server-islands/*"]
   }
 }

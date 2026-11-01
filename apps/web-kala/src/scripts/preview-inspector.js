@@ -58,6 +58,14 @@
     document.head.appendChild(style);
   }
 
+  // Determine parent origin safely from document.referrer
+  let parentOrigin = '*';
+  try {
+    if (document.referrer) {
+      parentOrigin = new URL(document.referrer).origin;
+    }
+  } catch {}
+
   function clearSelection() {
     document.querySelectorAll('.kala-section-selected').forEach((el) => {
       el.classList.remove('kala-section-selected');
@@ -99,7 +107,7 @@
             sectionId,
             blockType,
           },
-          '*',
+          parentOrigin,
         );
       } catch (err) {
         console.warn('[Builder Inspector] Failed to postMessage:', err);
@@ -110,8 +118,10 @@
 
   // Listen for messages from builder parent window
   window.addEventListener('message', (event) => {
+    if (parentOrigin !== '*' && event.origin !== parentOrigin) return;
     const data = event.data;
     if (!data || typeof data !== 'object') return;
+    if (!['KALA_SELECT_SECTION', 'KALA_HOVER_SECTION'].includes(data.type)) return;
 
     if (data.type === 'KALA_SELECT_SECTION') {
       const { sectionId, scroll } = data;
@@ -140,6 +150,6 @@
 
   // Signal parent that inspector is initialized
   try {
-    window.parent.postMessage({ type: 'KALA_INSPECTOR_READY' }, '*');
+    window.parent.postMessage({ type: 'KALA_INSPECTOR_READY' }, parentOrigin);
   } catch {}
 })();

@@ -17,7 +17,7 @@ if (!token) {
 }
 
 const runtimeEnv = (Astro.locals as any)?.runtime?.env || import.meta.env;
-const previewSecret = runtimeEnv.PREVIEW_SECRET || import.meta.env.PREVIEW_SECRET || 'kala_preview_secret_fallback_key_2026';
+const previewSecret = runtimeEnv.PREVIEW_SECRET || import.meta.env.PREVIEW_SECRET;
 
 let tokenData: PreviewTokenPayload;
 try {

@@ -49,8 +49,14 @@ async function generatePreviewData(req: any) {
       return { error: 'Dokumen tidak ditemukan atau belum memiliki slug.', status: 404 };
     }
 
-    const secret = process.env.PREVIEW_SECRET || 'kala_preview_secret_fallback_key_2026';
-    const key = new TextEncoder().encode(secret);
+    const secret = process.env.PREVIEW_SECRET;
+    if (!secret || secret.trim().length < 32) {
+      return {
+        error: 'Konfigurasi server error: PREVIEW_SECRET wajib disetel minimal 32 karakter di environment CMS.',
+        status: 500,
+      };
+    }
+    const key = new TextEncoder().encode(secret.trim());
 
     const token = await new SignJWT({
       sub: String(doc.id),

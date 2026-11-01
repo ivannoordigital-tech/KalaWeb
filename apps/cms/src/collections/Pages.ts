@@ -50,10 +50,9 @@ export const Pages: CollectionConfig = {
     },
     livePreview: {
       url: ({ data }) => {
-        const slug = data?.slug || 'syarat-ketentuan'
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
-        const prefix = data?.pageType === 'landing' ? '/preview/sales' : '/preview'
-        return `${baseUrl}${prefix}/${slug}/`
+        if (!data?.id) return '';
+        const cmsUrl = process.env.CMS_PUBLIC_URL || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+        return `${cmsUrl}/api/preview-redirect?collection=pages&id=${data.id}`;
       },
       breakpoints: [
         {
