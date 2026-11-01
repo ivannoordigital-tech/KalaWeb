@@ -333,17 +333,6 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
             activeMediaTarget.innerPath
           ) {
             const updates: Record<string, any> = { [activeMediaTarget.fieldName]: media.id };
-            const currentItem = innerItems[activeMediaTarget.innerIndex] || {};
-
-            // Isi alt dari media hanya bila item belum punya alt.
-            if (
-              inner?.fields?.some((f: any) => f.name === 'imageAlt') &&
-              !currentItem.imageAlt &&
-              media.alt
-            ) {
-              updates.imageAlt = media.alt;
-            }
-
             onUpdateInnerItem(
               activeMediaTarget.innerPath,
               activeMediaTarget.innerIndex,

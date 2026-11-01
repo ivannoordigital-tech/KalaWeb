@@ -117,6 +117,53 @@ for (const tpl of builderTemplates) {
   }
 }
 
+// 4. Validate registry fields and innerBlocks against Payload Block definition
+for (const [slug, reg] of Object.entries(builderRegistry)) {
+  const block = blockMap.get(slug);
+  if (!block) continue;
+
+  const flat = flattenFields(block.fields);
+  const fieldMap = new Map<string, Field>();
+  for (const f of flat) {
+    if ('name' in f && typeof (f as any).name === 'string') {
+      fieldMap.set((f as any).name, f);
+    }
+  }
+
+  // Validate top-level registry fields
+  if (Array.isArray(reg.fields)) {
+    for (const f of reg.fields) {
+      if (!fieldMap.has(f.name)) {
+        logError(`[${slug}] Registry field '${f.name}' tidak ada di skema Payload Block!`);
+      }
+    }
+  }
+
+  // Validate innerBlocks
+  if (reg.innerBlocks) {
+    const arrayField = fieldMap.get(reg.innerBlocks.path);
+    if (!arrayField) {
+      logError(`[${slug}] Registry innerBlocks path '${reg.innerBlocks.path}' tidak ada di skema Payload Block!`);
+    } else if (arrayField.type !== 'array') {
+      logError(`[${slug}] Registry innerBlocks path '${reg.innerBlocks.path}' bukan bertipe 'array' di skema Payload Block!`);
+    } else {
+      const innerFlat = flattenFields((arrayField as any).fields || []);
+      const innerFieldMap = new Map<string, Field>();
+      for (const inf of innerFlat) {
+        if ('name' in inf && typeof (inf as any).name === 'string') {
+          innerFieldMap.set((inf as any).name, inf);
+        }
+      }
+
+      for (const inf of reg.innerBlocks.fields) {
+        if (!innerFieldMap.has(inf.name)) {
+          logError(`[${slug}] Registry innerBlocks '${reg.innerBlocks.path}' field '${inf.name}' tidak ada di skema array Payload Block!`);
+        }
+      }
+    }
+  }
+}
+
 if (errorsCount > 0) {
   console.error(`\n❌ Pengecekan paritas GAGAL dengan ${errorsCount} error! Perbaiki sebelum deploy.`);
   process.exit(1);
