@@ -899,9 +899,10 @@ Kesimpulan untuk Kala: blok HTML memang dibutuhkan sebagai "escape hatch", tetap
   - Event handler (`onclick` dll) dan URL `javascript:` dibuang.
   - Hanya skema `http`, `https`, `mailto`, dan `tel` yang diizinkan.
   - CSS berbahaya (`@import`, `expression(`, `behavior:`, `-moz-binding`) dibersihkan.
-  - Tag layout umum, tabel, gambar, video/audio, dan `<style>` diizinkan.
+  - Tag layout umum, tabel, gambar, dan video/audio diizinkan.
+  - Tag `<style>` sengaja **tidak** diizinkan (sanitize-html menandainya rentan XSS); styling memakai atribut `style` inline atau class Tailwind.
 - **Guard publikasi**: validator menolak publish bila blok HTML kosong atau mengandung `script`, `iframe`, `object`, `embed`, `form`, event handler, atau `javascript:`.
-- **Catatan admin**: CSS di dalam `<style>` bersifat global untuk halaman.
+- **Catatan admin**: gunakan atribut `style` inline atau class Tailwind untuk styling.
 
 ### C. Migrasi & verifikasi
 

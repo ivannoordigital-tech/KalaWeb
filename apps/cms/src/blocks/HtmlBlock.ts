@@ -25,7 +25,7 @@ export const HtmlBlock: Block = {
       admin: {
         language: 'html',
         description:
-          'Tempel HTML/CSS di sini. Demi keamanan, tag <script>, <iframe>, <form>, event handler (onclick dll), dan URL javascript: akan dibuang otomatis saat halaman dirender. CSS di dalam <style> bersifat global untuk halaman.',
+          'Tempel HTML/CSS di sini. Demi keamanan, tag <script>, <iframe>, <form>, <style>, event handler (onclick dll), dan URL javascript: akan dibuang otomatis saat halaman dirender. Gunakan atribut style inline atau class Tailwind untuk styling.',
       },
     },
     {

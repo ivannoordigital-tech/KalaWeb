@@ -1388,7 +1388,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         type: 'code',
         required: true,
         description:
-          'Script, iframe, form, event handler, dan URL javascript: dibuang otomatis. CSS di dalam <style> berlaku global.',
+          'Script, iframe, form, style, event handler, dan URL javascript: dibuang otomatis. Gunakan atribut style inline atau class Tailwind.',
       },
       {
         name: 'maxWidth',
