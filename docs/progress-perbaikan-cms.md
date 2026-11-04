@@ -772,23 +772,37 @@ Sesuai keputusan pemilik produk, visual builder dihidupkan kembali dan dilengkap
 | `npm run check:parity` | 28/28 blok, defaults, opsi select, dan relasi cocok |
 | `npm run sync:builder` | `registry.generated.json` diperbarui (28 blok) |
 | `tsc --noEmit` (CMS) | 0 error |
-| `npm run build:cms` | Next.js sukses (builder ter-bundle, +36 kB) |
+| `npm run build:cms` | Next.js sukses (builder ter-bundle, +37 kB) |
 | `npm run build` | Astro sukses, SSR preview `_worker.js` terbentuk |
 | `npm run test:validation` | 48/48 lulus |
 | `npm run test:role` | lulus, 0 regresi |
 | `npm run test:contract` | 17/17 lulus |
+| **Migrasi nyata** | `npx payload migrate` pada PostgreSQL 18 sementara: 2 migrasi lama + migrasi baru **berhasil diterapkan** |
+| **Builder E2E** | Login CMS lokal → buka builder → katalog menampilkan **Koleksi Blok (28)** → tambah Seksi & Kolom → tambah Tombol di kolom 1 → ubah teks → Simpan Draf |
+| **Data tersimpan** | API `GET /api/pages?draft=true&depth=3` mengembalikan `layout: [section]` dengan 2 kolom, kolom 1 berisi `heading` + `button` ("Tombol Uji Kolom") |
+| **Preview E2E** | `/api/preview-token` → 200 + token; route SSR `/preview/uji-visual-builder?token=…` merender banner draft dan teks "Tombol Uji Kolom" tanpa error |
+| **Layout kolom** | Di viewport 1000px, dua kolom terukur berdampingan (`left 24` dan `509`, `top` sama) setelah perbaikan grid 12 kolom |
 
-### F. Langkah deploy (VPS + Cloudflare)
+### F. Migrasi & deploy
+
+Migrasi resmi sudah dibuat dan diuji:
+
+```
+apps/cms/src/migrations/20261104_020403_add_visual_builder_and_basic_blocks.ts
+apps/cms/src/migrations/20261104_020403_add_visual_builder_and_basic_blocks.json
+```
+
+Isinya mencakup tabel 14 blok baru (untuk `pages`, `_pages_v`, `landing_pages`, `_landing_pages_v`, `block_templates`, `page_templates`), kolom/enum `editor_mode`, serta tabel kolom bertingkat.
+
+Langkah deploy di VPS:
 
 ```bash
 cd /var/www/kalaweb
 git pull origin main
 
-# 1. Migrasi (wajib, di host yang bisa mengakses PostgreSQL)
+# 1. Terapkan migrasi (WAJIB, di host yang bisa mengakses PostgreSQL)
 cd apps/cms
 npm install --legacy-peer-deps
-npm run migrate
-npm run migrate:create -- add_visual_builder_and_basic_blocks
 npm run migrate
 
 # 2. Rebuild CMS
@@ -799,10 +813,11 @@ docker compose up -d cms
 
 Di Cloudflare Pages, tambahkan `PREVIEW_SECRET` dan `PREVIEW_API_KEY` pada environment production, lalu deploy ulang web agar `_worker.js` aktif.
 
+Catatan: PostgreSQL memperingatkan beberapa nama index/constraint di `block_templates` melebihi 63 karakter dan dipotong otomatis. Migrasi tetap berhasil dan skema berjalan; ini hanya perlu diwaspadai bila menambah field baru pada blok yang sama di masa depan.
+
 ### G. Yang masih terbuka
 
-1. Migrasi belum dibuat/diuji karena PostgreSQL lokal dan Docker daemon tidak tersedia di mesin ini.
-2. Preview draft belum diuji end-to-end terhadap CMS+DB nyata (butuh `PREVIEW_SECRET` + `PREVIEW_API_KEY`).
-3. `pricing` dan `testimonials` masih manual (belum terhubung ke koleksi).
-4. Editor rich text di builder bersifat sederhana; format kompleks memakai Mode Formulir Klasik.
+1. Deploy ke VPS belum dilakukan dari mesin ini (butuh akses server); migrasi sudah siap dan teruji.
+2. `pricing` dan `testimonials` masih manual (belum terhubung ke koleksi).
+3. Editor rich text di builder bersifat sederhana; format kompleks memakai Mode Formulir Klasik.
 

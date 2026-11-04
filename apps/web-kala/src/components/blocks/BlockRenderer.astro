@@ -138,11 +138,11 @@ const sectionGap: Record<string, string> = {
   spacious: 'gap-8 md:gap-12',
 };
 const columnWidth: Record<string, string> = {
-  full: 'w-full',
-  half: 'w-full md:w-[calc(50%-0.75rem)]',
-  third: 'w-full md:w-[calc(33.333%-1rem)]',
-  twoThirds: 'w-full md:w-[calc(66.666%-0.5rem)]',
-  quarter: 'w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]',
+  full: 'md:col-span-12',
+  half: 'md:col-span-6',
+  third: 'md:col-span-4',
+  twoThirds: 'md:col-span-8',
+  quarter: 'md:col-span-3',
 };
 const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
 ---
@@ -192,7 +192,7 @@ const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
   {block.blockType === 'section' && (
     <section class={`${sectionBg[block.background] || sectionBg.white} ${sectionPadding[block.padding] || sectionPadding.normal}`}>
       <div class={`${sectionMaxWidth[block.maxWidth] || sectionMaxWidth.normal} mx-auto px-4 sm:px-6`}>
-        <div class={`flex flex-wrap items-start ${sectionGap[block.gap] || sectionGap.normal}`}>
+        <div class={`grid grid-cols-1 md:grid-cols-12 items-start ${sectionGap[block.gap] || sectionGap.normal}`}>
           {sectionColumns.map((column: any) => (
             <div class={`${columnWidth[column.width] || columnWidth.full} kala-column min-w-0`}>
               {Array.isArray(column.content) && column.content.map((innerBlock: any) => (
