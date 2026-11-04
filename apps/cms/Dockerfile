@@ -18,7 +18,9 @@ ENV NODE_ENV=production
 ENV PAYLOAD_SECRET="KALA_CMS_TEMPORARY_BUILD_SECRET_2026"
 
 RUN npm run generate:importmap
-RUN npm run build
+# `npm run build` memicu prebuild workspace automation yang tidak disalin ke
+# image CMS. Panggil Next langsung; automation tetap dibangun di host/CI.
+RUN npx next build
 
 FROM base AS runner
 WORKDIR /app
