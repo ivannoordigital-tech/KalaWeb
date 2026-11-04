@@ -378,6 +378,24 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
             'EMPTY_HTML_BLOCK',
             'Blok HTML Kustom tidak boleh kosong saat publikasi.'
           );
+        } else if (block.allowScripts) {
+          warnings.push(
+            `Blok ke-${i + 1} (HTML Kustom) menjalankan JavaScript di dalam iframe sandbox. Pastikan kode berasal dari sumber tepercaya.`
+          );
+          const containedMarkers: Array<{ pattern: RegExp; label: string }> = [
+            { pattern: /<iframe\b/i, label: '<iframe>' },
+            { pattern: /<object\b/i, label: '<object>' },
+            { pattern: /<embed\b/i, label: '<embed>' },
+            { pattern: /<form\b/i, label: '<form>' },
+          ];
+          const contained = containedMarkers
+            .filter((item) => item.pattern.test(rawHtml))
+            .map((item) => item.label);
+          if (contained.length > 0) {
+            warnings.push(
+              `Blok HTML Kustom mengandung ${contained.join(', ')}. Elemen tersebut tidak akan berfungsi karena sandbox memblokir frame/form.`
+            );
+          }
         } else {
           const unsafeMarkers: Array<{ pattern: RegExp; label: string }> = [
             { pattern: /<script\b/i, label: '<script>' },
@@ -393,7 +411,7 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
             addError(
               `layout.${i}.html`,
               'UNSAFE_HTML',
-              `HTML Kustom mengandung ${found.join(', ')}. Hapus kode tersebut sebelum publikasi; gunakan blok Video untuk embed dan blok Formulir untuk form.`
+              `HTML Kustom mengandung ${found.join(', ')}. Hapus kode tersebut sebelum publikasi, atau aktifkan mode "Jalankan JavaScript di dalam sandbox" bila memang diperlukan.`
             );
           }
         }

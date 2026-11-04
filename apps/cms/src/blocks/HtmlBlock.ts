@@ -29,6 +29,16 @@ export const HtmlBlock: Block = {
       },
     },
     {
+      name: 'allowScripts',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Jalankan JavaScript di dalam sandbox (Advanced)',
+      admin: {
+        description:
+          'Jika dicentang, HTML dirender di dalam iframe sandbox: script boleh berjalan, tetapi tidak bisa mengakses DOM halaman induk, cookie, localStorage, atau mengarahkan ulang halaman. Hanya aktifkan untuk kode yang Anda percaya.',
+      },
+    },
+    {
       type: 'row',
       fields: [
         {

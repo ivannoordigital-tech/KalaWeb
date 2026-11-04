@@ -1370,7 +1370,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
     label: 'HTML Kustom (Advanced)',
     icon: 'Code2',
     category: 'content',
-    description: 'Tempel HTML/CSS khusus. Script, iframe, form, dan event handler dibuang saat render.',
+    description: 'Tempel HTML/CSS khusus. Script hanya berjalan jika mode sandbox diaktifkan.',
     defaults: {
       blockType: 'html',
       label: 'HTML Kustom',
@@ -1378,6 +1378,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       maxWidth: 'normal',
       padding: 'normal',
       background: 'transparent',
+      allowScripts: false,
       disabled: false,
     },
     fields: [
@@ -1388,7 +1389,14 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         type: 'code',
         required: true,
         description:
-          'Script, iframe, form, style, event handler, dan URL javascript: dibuang otomatis. Gunakan atribut style inline atau class Tailwind.',
+          'Script, iframe, form, style, event handler, dan URL javascript: dibuang otomatis kecuali mode sandbox diaktifkan.',
+      },
+      {
+        name: 'allowScripts',
+        label: 'Jalankan JavaScript di dalam sandbox (Advanced)',
+        type: 'checkbox',
+        description:
+          'Script berjalan di iframe sandbox tanpa akses ke DOM induk, cookie, atau localStorage. Hanya untuk kode tepercaya.',
       },
       {
         name: 'maxWidth',

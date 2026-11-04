@@ -904,13 +904,34 @@ Kesimpulan untuk Kala: blok HTML memang dibutuhkan sebagai "escape hatch", tetap
 - **Guard publikasi**: validator menolak publish bila blok HTML kosong atau mengandung `script`, `iframe`, `object`, `embed`, `form`, event handler, atau `javascript:`.
 - **Catatan admin**: gunakan atribut `style` inline atau class Tailwind untuk styling.
 
-### C. Migrasi & verifikasi
+### C. Mode JavaScript dalam sandbox
 
-- Migrasi baru: `apps/cms/src/migrations/20261104_030141_add_html_block.ts` (+ snapshot), membuat tabel HTML untuk `pages`, versi, `landing_pages`, `block_templates`, dan `page_templates`.
+Karena sebagian kebutuhan (animasi, canvas, library GSAP/Lottie) memerlukan JavaScript, blok HTML menyediakan opsi **"Jalankan JavaScript di dalam sandbox (Advanced)"**:
+
+- Jika **nonaktif** (default): HTML disanitasi; `script`, `iframe`, `form`, `style`, event handler, dan `javascript:` dibuang.
+- Jika **aktif**:
+  - HTML dirender di `<iframe sandbox="allow-scripts">` **tanpa** `allow-same-origin`.
+  - Origin menjadi opaque: script tidak dapat membaca DOM halaman induk, cookie, localStorage, sessionStorage, atau mengarahkan ulang halaman.
+  - CSP di dalam iframe: `default-src 'none'`, `connect-src 'none'`, `frame-src 'none'`, `form-action 'none'`; hanya inline script/style, gambar/media HTTPS, serta library dari `cdn.jsdelivr.net` dan `unpkg.com` yang diizinkan.
+  - Tinggi iframe menyesuaikan konten lewat `postMessage` + `ResizeObserver`.
+- **Batasan yang perlu diketahui**:
+  - Script tidak bisa menganimasikan section lain atau seluruh halaman; animasi hanya di dalam kotak HTML tersebut.
+  - `fetch`/XHR diblokir, jadi Lottie yang memuat JSON eksternal tidak jalan kecuali JSON di-inline.
+  - `iframe`, `form`, `object`, dan `embed` di dalam blok tidak berfungsi.
+  - Konten di dalam iframe tidak diindeks sebagai konten halaman (kurang baik untuk SEO teks).
+  - Tetap hanya untuk admin tepercaya: script bisa membebani CPU atau menampilkan konten yang tidak diinginkan di dalam kotak.
+
+Untuk animasi section secara umum, pendekatan yang lebih aman adalah menambahkan kelas animasi CSS bawaan (fade/slide) di masa depan, bukan script bebas.
+
+### D. Migrasi & verifikasi
+
+- Migrasi blok: `apps/cms/src/migrations/20261104_030141_add_html_block.ts` (+ snapshot), membuat tabel HTML untuk `pages`, versi, `landing_pages`, `block_templates`, dan `page_templates`.
+- Migrasi sandbox: `apps/cms/src/migrations/20261104_031712_add_html_sandbox_flag.ts` (+ snapshot), menambahkan kolom `allow_scripts`.
 - `npm run check:parity`: 29/29 blok cocok.
-- `npm run test:validation`: **51/51 lulus**, termasuk penolakan HTML tidak aman dan penerimaan HTML aman.
+- `npm run test:validation`: **53/53 lulus**, termasuk penolakan HTML tidak aman, penerimaan HTML aman, dan penerimaan script hanya pada mode sandbox.
 - `tsc --noEmit`: 0 error.
 - `npm run build` (web) dan `npm run build:cms`: sukses.
+- Uji render: mode sandbox menghasilkan `<iframe sandbox="allow-scripts">` dengan script di dalam `srcdoc`; mode biasa membuang `onclick` dan `<script>`.
 
 
 

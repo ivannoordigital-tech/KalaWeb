@@ -530,6 +530,26 @@ assert(
   !res4E.isValid && res4E.fieldErrors.some((fe) => fe.code === 'UNSAFE_HTML'),
 );
 
+// HTML Kustom dengan mode sandbox: script diizinkan tetapi diberi peringatan.
+const pageWithSandboxedHtml = {
+  title: 'Halaman HTML Sandbox',
+  slug: 'halaman-html-sandbox',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'html',
+      allowScripts: true,
+      html: '<div id="anim">Animasi</div><script>document.getElementById("anim").style.opacity = "0.5";</script>',
+    },
+  ],
+};
+const res4E2 = validatePageBuilderDoc(pageWithSandboxedHtml);
+assert('HTML Kustom mode sandbox dengan script DITERIMA', res4E2.isValid, res4E2.errors.join(' | '));
+assert(
+  'HTML Kustom mode sandbox memberi peringatan keamanan',
+  res4E2.warnings.some((warning) => warning.includes('iframe sandbox')),
+);
+
 // HTML Kustom yang aman diterima.
 const pageWithSafeHtml = {
   title: 'Halaman HTML Aman',

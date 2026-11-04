@@ -3,7 +3,9 @@ import sanitizeHtml from 'sanitize-html';
 
 interface Props {
   block: {
+    label?: string;
     html?: string;
+    allowScripts?: boolean;
     maxWidth?: 'narrow' | 'normal' | 'wide' | 'full';
     padding?: 'none' | 'compact' | 'normal' | 'spacious';
     background?: 'transparent' | 'white' | 'cream' | 'peach';
@@ -13,15 +15,74 @@ interface Props {
 const { block } = Astro.props;
 
 const raw = String(block.html || '').trim();
+const allowScripts = Boolean(block.allowScripts);
+const frameId = `kala-html-${Math.random().toString(36).slice(2, 10)}`;
 
 /**
- * Sanitasi berlapis:
- * - Hanya tag/atribut yang aman yang diizinkan.
- * - script, iframe, form, object, embed, dan event handler dibuang.
- * - Skema URL dibatasi ke http/https/mailto/tel.
- * - CSS berbahaya (expression, @import, javascript:) dibersihkan.
+ * Mode sandbox:
+ * - iframe dengan sandbox="allow-scripts" TANPA allow-same-origin.
+ * - Origin menjadi opaque: tidak bisa membaca DOM induk, cookie, localStorage,
+ *   atau mengarahkan ulang halaman.
+ * - CSP membatasi resource: inline script/style, gambar/media https, dan
+ *   library dari jsdelivr/unpkg. Koneksi jaringan (fetch/XHR) diblokir.
  */
-const sanitized = raw
+function buildSandboxDocument(html: string): string {
+  const csp = [
+    "default-src 'none'",
+    "img-src https: data: blob:",
+    "media-src https: data: blob:",
+    "style-src 'unsafe-inline' https:",
+    "script-src 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
+    "font-src https: data:",
+    "connect-src 'none'",
+    "frame-src 'none'",
+    "object-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+  ].join('; ');
+
+  const heightScript = `
+(function () {
+  function sendHeight() {
+    try {
+      var height = Math.max(
+        document.body ? document.body.scrollHeight : 0,
+        document.documentElement ? document.documentElement.scrollHeight : 0
+      );
+      parent.postMessage({ type: 'kala-html-height', id: ${JSON.stringify(frameId)}, height: height }, '*');
+    } catch (error) {}
+  }
+  window.addEventListener('load', sendHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(sendHeight).observe(document.documentElement);
+  } else {
+    window.setInterval(sendHeight, 500);
+  }
+  sendHeight();
+})();
+`;
+
+  return `<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy" content="${csp}" />
+<meta name="referrer" content="no-referrer" />
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #4B2E22; }
+</style>
+<script>${heightScript}</script>
+</head>
+<body>${html}</body>
+</html>`;
+}
+
+const sandboxDocument = allowScripts ? buildSandboxDocument(raw) : '';
+
+const sanitized = !allowScripts && raw
   ? sanitizeHtml(raw, {
       allowedTags: [
         'div', 'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
@@ -78,10 +139,47 @@ const backgroundClasses: Record<string, string> = {
 };
 ---
 
-{sanitized && (
+{(sanitized || sandboxDocument) && (
   <section class={`${paddingClasses[block.padding || 'normal'] || ''} ${backgroundClasses[block.background || 'transparent'] || ''}`}>
     <div class={`${widthClasses[block.maxWidth || 'normal'] || widthClasses.normal} mx-auto px-4 sm:px-6`}>
-      <div set:html={sanitized} />
+      {allowScripts ? (
+        <iframe
+          title={block.label || 'HTML kustom dengan JavaScript'}
+          sandbox="allow-scripts"
+          srcdoc={sandboxDocument}
+          data-kala-html-frame
+          data-frame-id={frameId}
+          class="block w-full border-0"
+          style="height: 200px;"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+        ></iframe>
+      ) : (
+        <div set:html={sanitized} />
+      )}
     </div>
   </section>
 )}
+
+<script>
+  function initKalaHtmlFrames() {
+    const frames = Array.from(document.querySelectorAll<HTMLIFrameElement>('[data-kala-html-frame]'));
+    if (frames.length === 0) return;
+
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (!data || data.type !== 'kala-html-height') return;
+
+      const frame = frames.find((item) => item.contentWindow === event.source);
+      if (!frame) return;
+
+      const height = Number(data.height);
+      if (Number.isFinite(height) && height > 0) {
+        frame.style.height = `${Math.ceil(height)}px`;
+      }
+    });
+  }
+
+  initKalaHtmlFrames();
+  document.addEventListener('astro:page-load', initKalaHtmlFrames);
+</script>
