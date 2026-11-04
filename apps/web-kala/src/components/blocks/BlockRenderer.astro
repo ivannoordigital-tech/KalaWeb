@@ -28,12 +28,26 @@ import SocialBlock from './SocialBlock.astro';
 
 interface Props {
   block: {
+    id?: string;
     blockType: string;
+    disabled?: boolean;
     [key: string]: any;
   };
+  isPreview?: boolean;
+  nested?: boolean;
 }
 
-const { block } = Astro.props;
+const {
+  block,
+  isPreview = Astro.url.pathname.startsWith('/preview/'),
+  nested = false,
+} = Astro.props;
+
+// Blok yang dinonaktifkan tidak tampil di publik, tetapi tetap terlihat di builder
+// (dengan penanda) agar admin bisa mengaktifkannya kembali.
+if (!isPreview && block?.disabled) {
+  return;
+}
 
 const KNOWN_BLOCK_TYPES = [
   'hero',
@@ -133,7 +147,19 @@ const columnWidth: Record<string, string> = {
 const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
 ---
 
-<div id={block.anchorId || undefined} class={visibilityClass || undefined}>
+<div
+  id={block.anchorId || undefined}
+  class={visibilityClass || undefined}
+  data-kala-section-id={nested ? undefined : (block.id || block.blockType)}
+  data-kala-block-type={block.blockType}
+  data-kala-disabled={block.disabled ? 'true' : undefined}
+>
+  {isPreview && block.disabled && (
+    <div class="bg-amber-500 text-slate-950 text-xs font-bold px-2.5 py-0.5 rounded absolute top-2 right-2 z-40 shadow pointer-events-none uppercase tracking-wide">
+      Disembunyikan
+    </div>
+  )}
+
   {block.blockType === 'hero' && <HeroBlock block={block as any} />}
   {block.blockType === 'painPoints' && <PainPointsBlock block={block as any} />}
   {block.blockType === 'solutions' && <SolutionsBlock block={block as any} />}
@@ -170,7 +196,7 @@ const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
           {sectionColumns.map((column: any) => (
             <div class={`${columnWidth[column.width] || columnWidth.full} kala-column min-w-0`}>
               {Array.isArray(column.content) && column.content.map((innerBlock: any) => (
-                <Astro.self block={innerBlock} />
+                <Astro.self block={innerBlock} isPreview={isPreview} nested={true} />
               ))}
             </div>
           ))}
@@ -181,7 +207,7 @@ const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
 
   <!-- Render template tersimpan secara modular -->
   {block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
-    <Astro.self block={innerBlock} />
+    <Astro.self block={innerBlock} isPreview={isPreview} />
   ))}
 </div>
 

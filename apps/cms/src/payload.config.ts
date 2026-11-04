@@ -27,6 +27,7 @@ import { migrations } from './migrations'
 import { getDeployStatus, fetchRealCloudflareDeployStatus } from './utilities/triggerDeployHook'
 import { getUserRole } from './access/roles'
 import { validatePageBuilderDoc, validateArticleDoc, type ValidationResult } from './utilities/pageBuilderValidators'
+import { previewEndpoints } from './endpoints/preview'
 import { s3Storage } from '@payloadcms/storage-s3'
 
 // MED-002: Cloudflare R2 Storage Adapter configuration
@@ -139,6 +140,7 @@ export default buildConfig({
     },
   },
   endpoints: [
+    ...previewEndpoints,
     // ED-002: Endpoint validasi dry-run untuk UI & agent tanpa menyimpan ke database
     {
       path: '/validate',

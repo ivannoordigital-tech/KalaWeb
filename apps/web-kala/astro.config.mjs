@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import cloudflare from '@astrojs/cloudflare';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import fs from 'node:fs';
@@ -40,6 +41,10 @@ function payloadRedirectsIntegration() {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://kalababyspa.com',
+  output: 'static',
+  adapter: cloudflare({
+    imageService: 'compile',
+  }),
   server: {
     host: true, // Listen on all network interfaces (IPv4 0.0.0.0 & IPv6 ::)
     port: 4321,

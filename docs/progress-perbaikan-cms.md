@@ -722,3 +722,87 @@ Setelah migrasi dibuat, commit file di `apps/cms/src/migrations/` beserta `index
 3. `pricing` dan `testimonials` masih memakai input manual; pengaitan ke koleksi `services`/`testimonials` ditunda ke pekerjaan berikutnya agar perubahan kali ini tetap fokus pada blok basic.
 4. Verifikasi DB nyata (`test:integration`, import artikel, migrasi landing) tetap terblokir Postgres.
 
+---
+
+## Addendum Putaran 5 (4 November 2026) — Visual Builder Dihidupkan Kembali
+
+### A. Temuan: live CMS memakai builder lama
+
+Saat admin membuka "Visual Page Builder" di live, katalog hanya berisi **14 blok**. Penyebabnya bukan blok baru gagal didaftarkan, melainkan:
+
+- Live `admin.kalababyspa.com` masih menjalankan build **sebelum** commit `ec6475c` ("supersede legacy experimental builder").
+- Di repo, commit tersebut menghapus seluruh visual builder (`apps/cms/src/components/admin/builder/**`, `blocks/registry.ts`, endpoint preview, SSR preview, Tailwind CMS) dan menggantinya dengan editor blok bawaan Payload.
+- Akibatnya repo dan live berjalan dengan arsitektur editor yang berbeda.
+
+Sesuai keputusan pemilik produk, visual builder dihidupkan kembali dan dilengkapi.
+
+### B. Yang dipulihkan
+
+| Bagian | File |
+|---|---|
+| UI builder | `apps/cms/src/components/admin/builder/**` (BuilderField, SectionTree, SortableSection, SectionSettings, AddSectionMenu, PreviewFrame, MediaPickerModal, validation, history, save) |
+| Katalog blok | `apps/cms/src/blocks/registry.ts` — sekarang **28 blok** |
+| Endpoint preview | `apps/cms/src/endpoints/preview.ts` (`/preview-token`, `/preview-redirect`) |
+| Preview SSR | `apps/web-kala/src/lib/preview.ts`, `src/pages/preview/[slug].astro`, `src/pages/preview/sales/[slug].astro`, `src/scripts/preview-inspector.js` |
+| Tailwind CMS | `apps/cms/tailwind.config.mjs`, `postcss.config.mjs`, `custom.scss`, `kala-dashboard.scss` |
+| Registrasi | field `editorMode` + UI `builder` di `Pages.ts` dan `LandingPages.ts` |
+
+### C. Fitur baru di builder
+
+- **28 blok** di katalog, dikelompokkan: Tata Letak, Hero, Penawaran, Bukti Kredibilitas, Konten, Gambar & Video, Formulir, Promosi, CTA.
+- **Seksi & Kolom** dengan editor kolom bertingkat (depth 1): tambah/hapus kolom, atur lebar, tambah/hapus/urutkan blok di tiap kolom, klik blok untuk mengedit propertinya.
+- **Anchor & visibilitas per perangkat** untuk semua blok (termasuk blok baru dan blok di dalam kolom).
+- **Editor teks sederhana** untuk blok `richText` dan isi tab; untuk format kompleks (tabel/link) tetap tersedia Mode Formulir Klasik.
+- **Pemilih relasi** untuk Tim Bidan/Profil Bidan (dari koleksi `midwives`) dan Template Tersimpan (dari `block-templates`).
+- Validasi paritas otomatis: `npm run check:parity` memastikan slug, defaults, opsi select, dan relasi registry cocok dengan skema Payload.
+
+### D. Perubahan deployment yang perlu diperhatikan
+
+1. **Web sekarang memakai SSR untuk preview.** `astro.config.mjs` memakai `@astrojs/cloudflare` dan route `/preview/[slug]` serta `/preview/sales/[slug]` memakai `prerender = false`. Build menghasilkan `_worker.js` (Cloudflare Pages Functions). Halaman publik tetap statis.
+2. **Environment baru/ wajib disamakan:**
+   - CMS: `PREVIEW_SECRET` (min. 32 karakter), `PREVIEW_BASE_URL`.
+   - Web/Cloudflare: `PREVIEW_SECRET` (harus sama), `PREVIEW_API_KEY` (API key user CMS yang boleh membaca draft), opsional `PREVIEW_API_URL`, `PREVIEW_CF_ACCESS_CLIENT_ID`, `PREVIEW_CF_ACCESS_CLIENT_SECRET`.
+   - Tanpa `PREVIEW_API_KEY`, iframe preview akan menampilkan error 502.
+3. **Migrasi tetap wajib** sebelum rebuild CMS. Selain tabel 14 blok baru, migrasi kini juga menambahkan kolom/enum `editor_mode` pada `pages`, `_pages_v`, `landing_pages`, dan `_landing_pages_v`.
+
+### E. Verifikasi
+
+| Pemeriksaan | Hasil |
+|---|---|
+| `npm run check:parity` | 28/28 blok, defaults, opsi select, dan relasi cocok |
+| `npm run sync:builder` | `registry.generated.json` diperbarui (28 blok) |
+| `tsc --noEmit` (CMS) | 0 error |
+| `npm run build:cms` | Next.js sukses (builder ter-bundle, +36 kB) |
+| `npm run build` | Astro sukses, SSR preview `_worker.js` terbentuk |
+| `npm run test:validation` | 48/48 lulus |
+| `npm run test:role` | lulus, 0 regresi |
+| `npm run test:contract` | 17/17 lulus |
+
+### F. Langkah deploy (VPS + Cloudflare)
+
+```bash
+cd /var/www/kalaweb
+git pull origin main
+
+# 1. Migrasi (wajib, di host yang bisa mengakses PostgreSQL)
+cd apps/cms
+npm install --legacy-peer-deps
+npm run migrate
+npm run migrate:create -- add_visual_builder_and_basic_blocks
+npm run migrate
+
+# 2. Rebuild CMS
+cd /var/www/kalaweb/apps/cms
+docker compose build cms
+docker compose up -d cms
+```
+
+Di Cloudflare Pages, tambahkan `PREVIEW_SECRET` dan `PREVIEW_API_KEY` pada environment production, lalu deploy ulang web agar `_worker.js` aktif.
+
+### G. Yang masih terbuka
+
+1. Migrasi belum dibuat/diuji karena PostgreSQL lokal dan Docker daemon tidak tersedia di mesin ini.
+2. Preview draft belum diuji end-to-end terhadap CMS+DB nyata (butuh `PREVIEW_SECRET` + `PREVIEW_API_KEY`).
+3. `pricing` dan `testimonials` masih manual (belum terhubung ke koleksi).
+4. Editor rich text di builder bersifat sederhana; format kompleks memakai Mode Formulir Klasik.
+

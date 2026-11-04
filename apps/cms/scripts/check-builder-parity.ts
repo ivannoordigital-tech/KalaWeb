@@ -1,0 +1,203 @@
+import { builderRegistry, builderTemplates } from '../src/blocks/registry';
+import { allBlocks } from '../src/blocks/index';
+import type { Field, Block } from 'payload';
+
+console.log('🔍 [check-builder-parity] Memulai pengecekan paritas menyeluruh...');
+
+let errorsCount = 0;
+
+function logError(msg: string) {
+  console.error(`❌ [Parity Error] ${msg}`);
+  errorsCount++;
+}
+
+// Helper to flatten fields (handles 'row' and 'collapsible' containers)
+function flattenFields(fields: Field[]): Field[] {
+  const result: Field[] = [];
+  for (const f of fields) {
+    if ((f.type === 'row' || f.type === 'collapsible') && Array.isArray((f as any).fields)) {
+      result.push(...flattenFields((f as any).fields));
+    } else {
+      result.push(f);
+    }
+  }
+  return result;
+}
+
+// 1. Slug matching
+const allBlockSlugs = allBlocks.map((b) => b.slug);
+const registrySlugs = Object.keys(builderRegistry);
+
+for (const s of allBlockSlugs) {
+  if (!registrySlugs.includes(s)) {
+    logError(`Block slug '${s}' ada di allBlocks tetapi TIDAK ADA di builderRegistry!`);
+  }
+}
+for (const s of registrySlugs) {
+  if (!allBlockSlugs.includes(s)) {
+    logError(`Registry key '${s}' tidak ada di allBlocks!`);
+  }
+}
+
+// 2. Validate defaults & select options for each block
+const blockMap = new Map<string, Block>();
+for (const b of allBlocks) {
+  blockMap.set(b.slug, b);
+}
+
+for (const [slug, reg] of Object.entries(builderRegistry)) {
+  const block = blockMap.get(slug);
+  if (!block) continue;
+
+  const flat = flattenFields(block.fields);
+  const fieldMap = new Map<string, Field>();
+  for (const f of flat) {
+    if ('name' in f && typeof (f as any).name === 'string') {
+      fieldMap.set((f as any).name, f);
+    }
+  }
+
+  // Check defaults
+  if (reg.defaults) {
+    for (const [key, val] of Object.entries(reg.defaults)) {
+      if (['blockType', 'disabled', 'blockName'].includes(key)) continue;
+
+      const field = fieldMap.get(key);
+      if (!field) {
+        logError(`[${slug}] Default field '${key}' tidak ada di definisi Payload Block!`);
+        continue;
+      }
+
+      if (field.type === 'select') {
+        const options = (field as any).options || [];
+        const validValues = options.map((opt: any) => (typeof opt === 'string' ? opt : opt.value));
+        if (typeof val === 'string' && !validValues.includes(val)) {
+          logError(`[${slug}] Default select '${key}' bernilai '${val}' yang TIDAK VALID! Opsi valid: [${validValues.join(', ')}]`);
+        }
+      }
+    }
+  }
+}
+
+// 3. Validate templates
+for (const tpl of builderTemplates) {
+  for (const [idx, b] of tpl.blocks.entries()) {
+    const slug = b.blockType;
+    if (!slug || !blockMap.has(slug)) {
+      logError(`Template '${tpl.id}' blok #${idx + 1} memiliki blockType '${slug}' yang tidak dikenal!`);
+      continue;
+    }
+
+    const block = blockMap.get(slug)!;
+    const flat = flattenFields(block.fields);
+    const fieldMap = new Map<string, Field>();
+    for (const f of flat) {
+      if ('name' in f && typeof (f as any).name === 'string') {
+        fieldMap.set((f as any).name, f);
+      }
+    }
+
+    for (const [key, val] of Object.entries(b)) {
+      if (['blockType', 'disabled', 'blockName'].includes(key)) continue;
+
+      const field = fieldMap.get(key);
+      if (!field) {
+        logError(`Template '${tpl.id}' -> Block '${slug}': Property '${key}' tidak terdaftar pada field block Payload!`);
+        continue;
+      }
+
+      if (field.type === 'select' && typeof val === 'string') {
+        const options = (field as any).options || [];
+        const validValues = options.map((opt: any) => (typeof opt === 'string' ? opt : opt.value));
+        if (!validValues.includes(val)) {
+          logError(`Template '${tpl.id}' -> Block '${slug}': Select '${key}' bernilai '${val}' yang tidak valid! Opsi: [${validValues.join(', ')}]`);
+        }
+      }
+    }
+  }
+}
+
+// 4. Validate registry fields and innerBlocks against Payload Block definition
+for (const [slug, reg] of Object.entries(builderRegistry)) {
+  const block = blockMap.get(slug);
+  if (!block) continue;
+
+  const flat = flattenFields(block.fields);
+  const fieldMap = new Map<string, Field>();
+  for (const f of flat) {
+    if ('name' in f && typeof (f as any).name === 'string') {
+      fieldMap.set((f as any).name, f);
+    }
+  }
+
+  // Validate top-level registry fields
+  if (Array.isArray(reg.fields)) {
+    for (const f of reg.fields) {
+      const schemaField = fieldMap.get(f.name);
+      if (!schemaField) {
+        logError(`[${slug}] Registry field '${f.name}' tidak ada di skema Payload Block!`);
+        continue;
+      }
+
+      if (f.type === 'select' && schemaField.type === 'select') {
+        const validValues = ((schemaField as any).options || []).map((opt: any) =>
+          typeof opt === 'string' ? opt : opt.value,
+        );
+        for (const option of f.options || []) {
+          if (!validValues.includes(option.value)) {
+            logError(
+              `[${slug}] Opsi select '${f.name}' bernilai '${option.value}' tidak ada di skema Payload! Opsi valid: [${validValues.join(', ')}]`,
+            );
+          }
+        }
+      }
+
+      if (f.type === 'relationship' && schemaField.type === 'relationship') {
+        const relationTo = (schemaField as any).relationTo;
+        const schemaRelation = Array.isArray(relationTo) ? relationTo[0] : relationTo;
+        if (f.relationTo && schemaRelation && f.relationTo !== schemaRelation) {
+          logError(
+            `[${slug}] Registry relationship '${f.name}' mengarah ke '${f.relationTo}', skema mengarah ke '${schemaRelation}'.`,
+          );
+        }
+        if (Boolean(f.hasMany) !== Boolean((schemaField as any).hasMany)) {
+          logError(
+            `[${slug}] Registry relationship '${f.name}' hasMany=${Boolean(f.hasMany)} tidak sama dengan skema (${Boolean((schemaField as any).hasMany)}).`,
+          );
+        }
+      }
+    }
+  }
+
+  // Validate innerBlocks
+  if (reg.innerBlocks) {
+    const arrayField = fieldMap.get(reg.innerBlocks.path);
+    if (!arrayField) {
+      logError(`[${slug}] Registry innerBlocks path '${reg.innerBlocks.path}' tidak ada di skema Payload Block!`);
+    } else if (arrayField.type !== 'array') {
+      logError(`[${slug}] Registry innerBlocks path '${reg.innerBlocks.path}' bukan bertipe 'array' di skema Payload Block!`);
+    } else {
+      const innerFlat = flattenFields((arrayField as any).fields || []);
+      const innerFieldMap = new Map<string, Field>();
+      for (const inf of innerFlat) {
+        if ('name' in inf && typeof (inf as any).name === 'string') {
+          innerFieldMap.set((inf as any).name, inf);
+        }
+      }
+
+      for (const inf of reg.innerBlocks.fields) {
+        if (!innerFieldMap.has(inf.name)) {
+          logError(`[${slug}] Registry innerBlocks '${reg.innerBlocks.path}' field '${inf.name}' tidak ada di skema array Payload Block!`);
+        }
+      }
+    }
+  }
+}
+
+if (errorsCount > 0) {
+  console.error(`\n❌ Pengecekan paritas GAGAL dengan ${errorsCount} error! Perbaiki sebelum deploy.`);
+  process.exit(1);
+} else {
+  console.log(`✅ Paritas 100% SEMPURNA: Semua ${allBlockSlugs.length} blok, defaults, dan template cocok persis dengan konfigurasi Payload!`);
+  process.exit(0);
+}

@@ -716,7 +716,11 @@ export interface Page {
     [k: string]: unknown;
   } | null;
   /**
-   * Gunakan blok visual ini untuk menyusun halaman promo dan penawaran (Banner Utama, Masalah Bunda, Solusi, Paket Harga, Testimoni, FAQ).
+   * Builder Visual menyusun halaman dengan pratinjau langsung. Pilih Formulir Blok Klasik jika ingin mengedit lewat form Payload biasa.
+   */
+  editorMode?: ('builder' | 'form') | null;
+  /**
+   * Mode formulir klasik. Untuk pengalaman drag-and-drop dengan pratinjau langsung, gunakan Builder Visual.
    */
   layout?:
     | (
@@ -3519,7 +3523,11 @@ export interface LandingPage {
    */
   variant?: ('A' | 'B' | 'C') | null;
   /**
-   * Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.
+   * Builder Visual menyusun halaman dengan pratinjau langsung. Pilih Formulir Blok Klasik jika ingin mengedit lewat form Payload biasa.
+   */
+  editorMode?: ('builder' | 'form') | null;
+  /**
+   * Mode formulir klasik. Untuk pengalaman drag-and-drop dengan pratinjau langsung, gunakan Builder Visual.
    */
   layout?:
     | (
@@ -6875,6 +6883,7 @@ export interface PagesSelect<T extends boolean = true> {
   description?: T;
   heroImage?: T;
   content?: T;
+  editorMode?: T;
   layout?:
     | T
     | {
@@ -7890,6 +7899,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
   campaignBaseRef?: T;
   pageLayout?: T;
   variant?: T;
+  editorMode?: T;
   layout?:
     | T
     | {

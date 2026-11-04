@@ -238,12 +238,37 @@ export const Pages: CollectionConfig = {
             },
             // 🧱 Flexible Block-Based Page Builder
             {
+              name: 'editorMode',
+              type: 'select',
+              label: 'Mode Editor Halaman',
+              defaultValue: 'builder',
+              options: [
+                { label: 'Builder Visual (disarankan)', value: 'builder' },
+                { label: 'Formulir Blok Klasik', value: 'form' },
+              ],
+              admin: {
+                description:
+                  'Builder Visual menyusun halaman dengan pratinjau langsung. Pilih Formulir Blok Klasik jika ingin mengedit lewat form Payload biasa.',
+              },
+            },
+            {
+              name: 'builder',
+              type: 'ui',
+              admin: {
+                components: {
+                  Field: '/components/admin/builder/BuilderField#BuilderField',
+                },
+                condition: (data) => data?.editorMode !== 'form',
+              },
+            },
+            {
               name: 'layout',
               type: 'blocks',
               label: 'Susunan Blok Halaman (Page Builder Visual)',
               admin: {
+                condition: (data) => data?.editorMode === 'form',
                 description:
-                  'Gunakan blok visual ini untuk menyusun halaman promo dan penawaran (Banner Utama, Masalah Bunda, Solusi, Paket Harga, Testimoni, FAQ).',
+                  'Mode formulir klasik. Untuk pengalaman drag-and-drop dengan pratinjau langsung, gunakan Builder Visual.',
               },
               blocks: allBlocks,
             },
