@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const PricingPackagesBlock: Block = {
   slug: 'pricing',
@@ -167,5 +168,6 @@ export const PricingPackagesBlock: Block = {
         },
       ],
     },
+    ...blockSettingsFields,
   ],
 }

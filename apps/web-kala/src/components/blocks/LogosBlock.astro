@@ -1,0 +1,62 @@
+---
+import { mediaUrl } from '../../lib/payload';
+
+interface Props {
+  block: {
+    title?: string;
+    items: Array<{
+      image?: { url?: string; alt?: string } | string;
+      imageUrlFallback?: string;
+      name: string;
+    }>;
+    columns?: '3' | '4' | '5' | '6';
+    background?: 'white' | 'cream';
+    grayscale?: boolean;
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+};
+const columnClasses: Record<string, string> = {
+  '3': 'grid-cols-3',
+  '4': 'grid-cols-2 sm:grid-cols-4',
+  '5': 'grid-cols-3 sm:grid-cols-5',
+  '6': 'grid-cols-3 sm:grid-cols-6',
+};
+---
+
+{block.items && block.items.length > 0 && (
+  <section class={`py-10 md:py-12 border-y border-[#F6DCCD] ${bgClasses[block.background || 'white'] || bgClasses.white}`}>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      {block.title && (
+        <p class="text-center text-xs font-bold tracking-wider uppercase text-[#86675A] mb-6">
+          {block.title}
+        </p>
+      )}
+      <div class={`grid items-center gap-6 sm:gap-8 ${columnClasses[block.columns || '4'] || columnClasses['4']}`}>
+        {block.items.map((item) => {
+          const src = mediaUrl(item.image, item.imageUrlFallback || '');
+          return (
+            <div class="flex items-center justify-center">
+              {src ? (
+                <img
+                  src={src}
+                  alt={item.name}
+                  class={`max-h-10 sm:max-h-12 w-auto object-contain ${block.grayscale === false ? '' : 'grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition'}`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span class="text-sm font-bold text-[#86675A]/70 text-center">{item.name}</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+)}

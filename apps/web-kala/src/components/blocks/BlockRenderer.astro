@@ -12,6 +12,19 @@ import RichTextBlock from './RichTextBlock.astro';
 import CallToActionBlock from './CallToActionBlock.astro';
 import GalleryBlock from './GalleryBlock.astro';
 import MidwifeSpotlightBlock from './MidwifeSpotlightBlock.astro';
+import HeadingBlock from './HeadingBlock.astro';
+import ImageBlock from './ImageBlock.astro';
+import ButtonBlock from './ButtonBlock.astro';
+import DividerBlock from './DividerBlock.astro';
+import VideoBlock from './VideoBlock.astro';
+import StatsBlock from './StatsBlock.astro';
+import LogosBlock from './LogosBlock.astro';
+import TeamBlock from './TeamBlock.astro';
+import TabsBlock from './TabsBlock.astro';
+import LeadFormBlock from './LeadFormBlock.astro';
+import BlogFeedBlock from './BlogFeedBlock.astro';
+import CountdownBlock from './CountdownBlock.astro';
+import SocialBlock from './SocialBlock.astro';
 
 interface Props {
   block: {
@@ -37,6 +50,20 @@ const KNOWN_BLOCK_TYPES = [
   'gallery',
   'templateRef',
   'midwifeSpotlight',
+  'section',
+  'heading',
+  'image',
+  'button',
+  'divider',
+  'video',
+  'stats',
+  'logos',
+  'team',
+  'tabs',
+  'leadForm',
+  'blogFeed',
+  'countdown',
+  'social',
 ];
 
 if (!block || !block.blockType) {
@@ -55,23 +82,123 @@ if (!block || !block.blockType) {
 const templateLayout = block.blockType === 'templateRef' && typeof block.template === 'object' && Array.isArray(block.template?.layout)
   ? block.template.layout
   : [];
+
+// Visibilitas per perangkat (dikontrol dari tab Pengaturan setiap blok)
+const visibility = Array.isArray(block.visibility) ? block.visibility : ['mobile', 'tablet', 'desktop'];
+const visibilityKey = ['mobile', 'tablet', 'desktop'].filter((device) => visibility.includes(device)).join('-');
+const visibilityClasses: Record<string, string> = {
+  '': 'hidden',
+  'mobile': 'md:hidden',
+  'tablet': 'hidden md:block lg:hidden',
+  'desktop': 'hidden lg:block',
+  'mobile-tablet': 'lg:hidden',
+  'mobile-desktop': 'md:hidden lg:block',
+  'tablet-desktop': 'hidden md:block',
+  'mobile-tablet-desktop': '',
+};
+const visibilityClass = visibilityClasses[visibilityKey] ?? '';
+
+// Gaya container Section
+const sectionBg: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+  gradient: 'bg-gradient-to-b from-[#FFEFE5]/80 via-[#FFF9F4] to-[#FFF9F4]',
+  dark: 'bg-[#4B2E22]',
+};
+const sectionPadding: Record<string, string> = {
+  none: '',
+  compact: 'py-6 md:py-8',
+  normal: 'py-12 md:py-16',
+  spacious: 'py-16 md:py-24',
+};
+const sectionMaxWidth: Record<string, string> = {
+  narrow: 'max-w-4xl',
+  normal: 'max-w-6xl',
+  wide: 'max-w-7xl',
+  full: 'max-w-none',
+};
+const sectionGap: Record<string, string> = {
+  compact: 'gap-4',
+  normal: 'gap-6 md:gap-8',
+  spacious: 'gap-8 md:gap-12',
+};
+const columnWidth: Record<string, string> = {
+  full: 'w-full',
+  half: 'w-full md:w-[calc(50%-0.75rem)]',
+  third: 'w-full md:w-[calc(33.333%-1rem)]',
+  twoThirds: 'w-full md:w-[calc(66.666%-0.5rem)]',
+  quarter: 'w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]',
+};
+const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
 ---
 
-{block.blockType === 'hero' && <HeroBlock block={block as any} />}
-{block.blockType === 'painPoints' && <PainPointsBlock block={block as any} />}
-{block.blockType === 'solutions' && <SolutionsBlock block={block as any} />}
-{block.blockType === 'pricing' && <PricingPackagesBlock block={block as any} />}
-{block.blockType === 'comparison' && <ComparisonTableBlock block={block as any} />}
-{block.blockType === 'steps' && <StepsFlowBlock block={block as any} />}
-{block.blockType === 'testimonials' && <TestimonialsBlock block={block as any} />}
-{block.blockType === 'guarantee' && <GuaranteeBlock block={block as any} />}
-{block.blockType === 'faq' && <FaqAccordionBlock block={block as any} />}
-{block.blockType === 'richText' && <RichTextBlock block={block as any} />}
-{block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
-{block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
-{block.blockType === 'midwifeSpotlight' && <MidwifeSpotlightBlock block={block as any} />}
+<div id={block.anchorId || undefined} class={visibilityClass || undefined}>
+  {block.blockType === 'hero' && <HeroBlock block={block as any} />}
+  {block.blockType === 'painPoints' && <PainPointsBlock block={block as any} />}
+  {block.blockType === 'solutions' && <SolutionsBlock block={block as any} />}
+  {block.blockType === 'pricing' && <PricingPackagesBlock block={block as any} />}
+  {block.blockType === 'comparison' && <ComparisonTableBlock block={block as any} />}
+  {block.blockType === 'steps' && <StepsFlowBlock block={block as any} />}
+  {block.blockType === 'testimonials' && <TestimonialsBlock block={block as any} />}
+  {block.blockType === 'guarantee' && <GuaranteeBlock block={block as any} />}
+  {block.blockType === 'faq' && <FaqAccordionBlock block={block as any} />}
+  {block.blockType === 'richText' && <RichTextBlock block={block as any} />}
+  {block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
+  {block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
+  {block.blockType === 'midwifeSpotlight' && <MidwifeSpotlightBlock block={block as any} />}
 
-<!-- Render template tersimpan secara modular -->
-{block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
-  <Astro.self block={innerBlock} />
-))}
+  {block.blockType === 'heading' && <HeadingBlock block={block as any} />}
+  {block.blockType === 'image' && <ImageBlock block={block as any} />}
+  {block.blockType === 'button' && <ButtonBlock block={block as any} />}
+  {block.blockType === 'divider' && <DividerBlock block={block as any} />}
+  {block.blockType === 'video' && <VideoBlock block={block as any} />}
+  {block.blockType === 'stats' && <StatsBlock block={block as any} />}
+  {block.blockType === 'logos' && <LogosBlock block={block as any} />}
+  {block.blockType === 'team' && <TeamBlock block={block as any} />}
+  {block.blockType === 'tabs' && <TabsBlock block={block as any} />}
+  {block.blockType === 'leadForm' && <LeadFormBlock block={block as any} />}
+  {block.blockType === 'blogFeed' && <BlogFeedBlock block={block as any} />}
+  {block.blockType === 'countdown' && <CountdownBlock block={block as any} />}
+  {block.blockType === 'social' && <SocialBlock block={block as any} />}
+
+  <!-- Container dengan kolom. Kedalaman nesting maksimal 1 (section tidak bisa di dalam section). -->
+  {block.blockType === 'section' && (
+    <section class={`${sectionBg[block.background] || sectionBg.white} ${sectionPadding[block.padding] || sectionPadding.normal}`}>
+      <div class={`${sectionMaxWidth[block.maxWidth] || sectionMaxWidth.normal} mx-auto px-4 sm:px-6`}>
+        <div class={`flex flex-wrap items-start ${sectionGap[block.gap] || sectionGap.normal}`}>
+          {sectionColumns.map((column: any) => (
+            <div class={`${columnWidth[column.width] || columnWidth.full} kala-column min-w-0`}>
+              {Array.isArray(column.content) && column.content.map((innerBlock: any) => (
+                <Astro.self block={innerBlock} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Render template tersimpan secara modular -->
+  {block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
+    <Astro.self block={innerBlock} />
+  ))}
+</div>
+
+<style>
+  /* Blok di dalam kolom tidak perlu padding section penuh, border, atau latar sendiri.
+     Ini membuat blok lama tetap bisa dipakai di dalam Section tanpa diubah satu per satu. */
+  .kala-column :global(section) {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-top-width: 0 !important;
+    border-bottom-width: 0 !important;
+    background-image: none !important;
+    background-color: transparent !important;
+  }
+  .kala-column :global(section > div) {
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+</style>

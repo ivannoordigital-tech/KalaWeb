@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const MidwifeSpotlightBlock: Block = {
   slug: 'midwifeSpotlight',
@@ -59,5 +60,6 @@ export const MidwifeSpotlightBlock: Block = {
         { label: 'Longgar (Spacious)', value: 'spacious' },
       ],
     },
+    ...blockSettingsFields,
   ],
 }

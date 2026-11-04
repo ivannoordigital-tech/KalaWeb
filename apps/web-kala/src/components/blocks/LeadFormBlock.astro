@@ -1,0 +1,206 @@
+---
+import { siteConfig } from '../../config/site';
+import { fetchPayloadServices } from '../../lib/payload';
+
+interface Props {
+  block: {
+    heading: string;
+    description?: string;
+    fields?: string[];
+    serviceOptions?: Array<{ label: string }>;
+    submitLabel?: string;
+    consentText?: string;
+    background?: 'white' | 'cream' | 'peach';
+    note?: string;
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+
+const enabled = new Set(
+  Array.isArray(block.fields) && block.fields.length > 0
+    ? block.fields
+    : ['name', 'phone', 'service', 'date', 'message'],
+);
+enabled.add('name');
+enabled.add('phone');
+
+let serviceOptions: string[] = Array.isArray(block.serviceOptions)
+  ? block.serviceOptions.map((option) => option.label).filter(Boolean)
+  : [];
+
+if (enabled.has('service') && serviceOptions.length === 0) {
+  const services = await fetchPayloadServices();
+  serviceOptions = services.map((service) => service.name);
+}
+
+const uid = `lead-${Math.random().toString(36).slice(2, 9)}`;
+const inputClass =
+  'w-full rounded-xl border border-[#F6DCCD] bg-white px-4 py-3 text-sm text-[#4B2E22] placeholder:text-[#86675A]/60 focus:border-[#B3471E] focus:outline-none focus:ring-2 focus:ring-[#B3471E]/20';
+const labelClass = 'block text-xs font-bold text-[#4B2E22] mb-1.5';
+---
+
+<section class={`py-12 md:py-16 border-y border-[#F6DCCD] ${bgClasses[block.background || 'cream'] || bgClasses.cream}`}>
+  <div class="max-w-2xl mx-auto px-4 sm:px-6">
+    <div class="bg-white rounded-3xl border border-[#F6DCCD] shadow-sm p-6 sm:p-8">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22]">{block.heading}</h2>
+        {block.description && (
+          <p class="mt-2 text-sm text-[#86675A] leading-relaxed">{block.description}</p>
+        )}
+      </div>
+
+      <form
+        data-kala-lead-form
+        data-phone={siteConfig.whatsappNumber}
+        novalidate
+        class="space-y-4"
+      >
+        <div class="hidden" aria-hidden="true">
+          <label for={`${uid}-company`}>Company</label>
+          <input id={`${uid}-company`} name="company" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        {enabled.has('name') && (
+          <div>
+            <label class={labelClass} for={`${uid}-name`}>Nama Bunda <span class="text-[#B3471E]">*</span></label>
+            <input id={`${uid}-name`} name="name" type="text" required class={inputClass} placeholder="Bunda Sarah" autocomplete="name" />
+          </div>
+        )}
+
+        {enabled.has('phone') && (
+          <div>
+            <label class={labelClass} for={`${uid}-phone`}>Nomor WhatsApp <span class="text-[#B3471E]">*</span></label>
+            <input id={`${uid}-phone`} name="phone" type="tel" required inputmode="tel" class={inputClass} placeholder="0812xxxxxxx" autocomplete="tel" />
+          </div>
+        )}
+
+        {enabled.has('email') && (
+          <div>
+            <label class={labelClass} for={`${uid}-email`}>Email (Opsional)</label>
+            <input id={`${uid}-email`} name="email" type="email" class={inputClass} placeholder="bunda@email.com" autocomplete="email" />
+          </div>
+        )}
+
+        {enabled.has('service') && serviceOptions.length > 0 && (
+          <div>
+            <label class={labelClass} for={`${uid}-service`}>Layanan yang Diminati</label>
+            <select id={`${uid}-service`} name="service" class={inputClass}>
+              <option value="">Pilih layanan…</option>
+              {serviceOptions.map((option) => (
+                <option value={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {enabled.has('date') && (
+          <div>
+            <label class={labelClass} for={`${uid}-date`}>Tanggal yang Diinginkan</label>
+            <input id={`${uid}-date`} name="date" type="date" class={inputClass} />
+          </div>
+        )}
+
+        {enabled.has('message') && (
+          <div>
+            <label class={labelClass} for={`${uid}-message`}>Catatan / Keluhan (Opsional)</label>
+            <textarea id={`${uid}-message`} name="message" rows="3" class={inputClass} placeholder="Contoh: bayi 2 bulan sering rewel malam hari"></textarea>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#0E733D] hover:bg-[#0B582F] text-white font-bold py-3.5 px-6 shadow-md transition-colors"
+        >
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347" />
+          </svg>
+          {block.submitLabel || 'Kirim & Chat via WhatsApp'}
+        </button>
+
+        {block.consentText && (
+          <p class="text-[11px] text-[#86675A] leading-relaxed text-center">{block.consentText}</p>
+        )}
+        <p data-kala-form-error class="hidden text-xs font-semibold text-red-600 text-center" role="alert"></p>
+      </form>
+
+      {block.note && (
+        <p class="mt-3 text-[11px] text-[#86675A] text-center">{block.note}</p>
+      )}
+    </div>
+  </div>
+</section>
+
+<script>
+  function initKalaLeadForms() {
+    document.querySelectorAll<HTMLFormElement>('[data-kala-lead-form]').forEach((form) => {
+      if (form.dataset.kalaLeadReady === 'true') return;
+      form.dataset.kalaLeadReady = 'true';
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const errorBox = form.querySelector<HTMLElement>('[data-kala-form-error]');
+        const showError = (message: string) => {
+          if (!errorBox) return;
+          errorBox.textContent = message;
+          errorBox.classList.remove('hidden');
+        };
+        if (errorBox) errorBox.classList.add('hidden');
+
+        const data = new FormData(form);
+        const value = (key: string) => String(data.get(key) || '').trim();
+
+        // Honeypot anti-spam
+        if (value('company')) return;
+
+        const name = value('name');
+        const phone = value('phone');
+
+        if (!name) {
+          showError('Mohon isi nama Bunda terlebih dahulu.');
+          return;
+        }
+        if (!phone || phone.replace(/\D/g, '').length < 8) {
+          showError('Mohon isi nomor WhatsApp yang valid (minimal 8 digit).');
+          return;
+        }
+
+        const email = value('email');
+        if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+          showError('Format email belum valid. Contoh: bunda@email.com');
+          return;
+        }
+
+        const lines = [
+          'Halo Bidan Kala, saya mau reservasi homecare.',
+          '',
+          `Nama: ${name}`,
+          `No. WhatsApp: ${phone}`,
+        ];
+        const service = value('service');
+        const date = value('date');
+        const message = value('message');
+
+        if (email) lines.push(`Email: ${email}`);
+        if (service) lines.push(`Layanan: ${service}`);
+        if (date) lines.push(`Tanggal: ${date}`);
+        if (message) lines.push(`Catatan: ${message}`);
+        lines.push('', '[Ref: KALA-FORM-LEAD]');
+
+        const targetPhone = String(form.dataset.phone || '').replace(/\D/g, '');
+        const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(lines.join('\n'))}`;
+        window.open(url, '_blank', 'noopener');
+      });
+    });
+  }
+
+  initKalaLeadForms();
+  document.addEventListener('astro:page-load', initKalaLeadForms);
+</script>

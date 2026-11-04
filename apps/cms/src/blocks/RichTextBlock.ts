@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const RichTextBlock: Block = {
   slug: 'richText',
@@ -27,5 +28,6 @@ export const RichTextBlock: Block = {
       ],
       label: 'Lebar Kontainer Teks',
     },
+    ...blockSettingsFields,
   ],
 }

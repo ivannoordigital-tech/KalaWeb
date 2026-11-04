@@ -139,6 +139,26 @@ export function isEmptyLexical(content: any): boolean {
 }
 
 /**
+ * Ratakan blok termasuk isi kolom pada blok Section, agar validasi
+ * (hero, CTA, alt text) tetap berjalan untuk blok bersarang.
+ */
+export function flattenLayout(layout: any[]): any[] {
+  const result: any[] = [];
+  for (const block of Array.isArray(layout) ? layout : []) {
+    if (!block) continue;
+    result.push(block);
+    if (block.blockType === 'section' && Array.isArray(block.columns)) {
+      for (const column of block.columns) {
+        if (Array.isArray(column?.content)) {
+          result.push(...flattenLayout(column.content));
+        }
+      }
+    }
+  }
+  return result;
+}
+
+/**
  * ED-001 & ED-003: Validasi dokumen Page Builder (Pages & LandingPages) saat publikasi.
  */
 export function validatePageBuilderDoc(doc: any, isLandingPage = false): ValidationResult {
@@ -219,8 +239,10 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
   }
 
   if (layout.length > 0) {
+    const flatLayout = flattenLayout(layout);
+
     // Check HeroBlock
-    const heroBlocks = layout.filter((b: any) => b.blockType === 'hero');
+    const heroBlocks = flatLayout.filter((b: any) => b.blockType === 'hero');
     if (heroBlocks.length > 1) {
       addError(
         'layout',
@@ -243,7 +265,7 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     }
 
     // Check WhatsApp CTA presence for landing pages (ED-001: Wajib CTA nyata)
-    const hasCtaBlock = layout.some((b: any) =>
+    const hasCtaBlock = flatLayout.some((b: any) =>
       b.blockType === 'cta' ||
       b.blockType === 'pricing' ||
       (b.blockType === 'hero' && Boolean(b.ctaText || b.buttonText))
@@ -265,8 +287,8 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     }
 
     // Check Template recursion, image alt texts
-    for (let i = 0; i < layout.length; i++) {
-      const block = layout[i];
+    for (let i = 0; i < flatLayout.length; i++) {
+      const block = flatLayout[i];
 
       // Check TemplateRef recursion
       if (block.blockType === 'templateRef') {
@@ -328,6 +350,33 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
             `layout.${i}.imageAlt`,
             'MISSING_ALT_TEXT',
             'Gambar pada Hero Block wajib memiliki Alt Text deskriptif.'
+          );
+        }
+      }
+
+      // Image Block Alt
+      if (block.blockType === 'image' && (block.image || block.imageUrlFallback)) {
+        const hasImageAlt = Boolean(
+          block.alt ||
+          (typeof block.image === 'object' && block.image?.alt)
+        );
+        if (!hasImageAlt) {
+          addError(
+            `layout.${i}.alt`,
+            'MISSING_ALT_TEXT',
+            'Gambar Tunggal wajib memiliki Alt Text deskriptif untuk aksesibilitas & SEO.'
+          );
+        }
+      }
+
+      // Section kosong (tidak ada isi di semua kolom)
+      if (block.blockType === 'section') {
+        const hasColumnContent = Array.isArray(block.columns) && block.columns.some(
+          (column: any) => Array.isArray(column?.content) && column.content.length > 0
+        );
+        if (!hasColumnContent) {
+          warnings.push(
+            `Blok ke-${i + 1} (Seksi & Kolom) belum memiliki isi di kolom mana pun sehingga tidak akan tampil.`
           );
         }
       }

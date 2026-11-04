@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const HeroBlock: Block = {
   slug: 'hero',
@@ -118,5 +119,6 @@ export const HeroBlock: Block = {
       ],
       label: 'Pilihan Warna Latar Belakang',
     },
+    ...blockSettingsFields,
   ],
 }

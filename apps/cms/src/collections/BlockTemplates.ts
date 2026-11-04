@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
-import { baseBlocks } from '../blocks'
+import { templateBlocks } from '../blocks'
 
 export const BlockTemplates: CollectionConfig = {
   slug: 'block-templates',
@@ -108,7 +108,7 @@ export const BlockTemplates: CollectionConfig = {
       admin: {
         description: 'Susun blok-blok yang ingin Anda jadikan template master (misal: Galeri + Testimoni + CTA). Blok yang Anda simpan di sini akan bisa disisipkan ke halaman mana pun.',
       },
-      blocks: baseBlocks,
+      blocks: templateBlocks,
     },
   ],
 }

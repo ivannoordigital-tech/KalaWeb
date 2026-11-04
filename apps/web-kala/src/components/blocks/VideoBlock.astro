@@ -1,0 +1,75 @@
+---
+interface Props {
+  block: {
+    url: string;
+    title?: string;
+    caption?: string;
+    ratio?: '16:9' | '9:16' | '4:3' | '1:1';
+    maxWidth?: 'narrow' | 'normal' | 'wide';
+  };
+}
+
+const { block } = Astro.props;
+
+function toEmbed(raw: string): string | null {
+  const url = String(raw || '').trim();
+  if (!url) return null;
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+  if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return null;
+}
+
+const embed = toEmbed(block.url);
+
+const ratioClasses: Record<string, string> = {
+  '16:9': 'aspect-video',
+  '9:16': 'aspect-[9/16]',
+  '4:3': 'aspect-[4/3]',
+  '1:1': 'aspect-square',
+};
+const widthClasses: Record<string, string> = {
+  narrow: 'max-w-2xl',
+  normal: 'max-w-4xl',
+  wide: 'max-w-6xl',
+};
+---
+
+<section class="py-10 md:py-14">
+  <div class="px-4 sm:px-6">
+    <div class={`mx-auto ${widthClasses[block.maxWidth || 'normal'] || widthClasses.normal}`}>
+      {block.title && (
+        <h2 class="text-xl sm:text-2xl font-brand font-bold text-[#4B2E22] text-center mb-5">
+          {block.title}
+        </h2>
+      )}
+      {embed ? (
+        <div class={`relative w-full overflow-hidden rounded-2xl border border-[#F6DCCD] bg-black ${ratioClasses[block.ratio || '16:9'] || ratioClasses['16:9']}`}>
+          <iframe
+            src={embed}
+            title={block.title || 'Video Kala'}
+            class="absolute inset-0 w-full h-full"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      ) : (
+        <a
+          href={block.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-3 rounded-2xl border border-[#F6DCCD] bg-white p-6 text-[#B3471E] font-semibold hover:bg-[#FFF9F4] transition-colors"
+        >
+          ▶ Tonton video
+        </a>
+      )}
+      {block.caption && (
+        <p class="mt-3 text-xs sm:text-sm text-[#86675A] text-center leading-relaxed">
+          {block.caption}
+        </p>
+      )}
+    </div>
+  </div>
+</section>

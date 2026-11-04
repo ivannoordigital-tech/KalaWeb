@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const ComparisonTableBlock: Block = {
   slug: 'comparison',
@@ -68,5 +69,6 @@ export const ComparisonTableBlock: Block = {
         },
       ],
     },
+    ...blockSettingsFields,
   ],
 }

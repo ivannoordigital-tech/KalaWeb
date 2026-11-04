@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const StepsFlowBlock: Block = {
   slug: 'steps',
@@ -49,5 +50,6 @@ export const StepsFlowBlock: Block = {
         },
       ],
     },
+    ...blockSettingsFields,
   ],
 }

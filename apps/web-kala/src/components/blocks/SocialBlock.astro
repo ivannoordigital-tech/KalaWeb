@@ -1,0 +1,166 @@
+---
+interface Props {
+  block: {
+    variant: 'icons' | 'share' | 'both';
+    title?: string;
+    items?: Array<{ platform: string; url: string }>;
+    shareLabel?: string;
+    align?: 'left' | 'center';
+    background?: 'white' | 'cream' | 'peach';
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+const alignClass = block.align === 'left' ? 'text-left' : 'text-center';
+
+const icons: Record<string, string> = {
+  instagram:
+    '<path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.5-3.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>',
+  facebook:
+    '<path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z"/>',
+  tiktok:
+    '<path d="M16 3c.3 2.3 1.7 3.8 4 4v3c-1.5.1-2.9-.4-4-1.2V16a5.5 5.5 0 1 1-5.5-5.5c.3 0 .6 0 1 .1v3.1a2.6 2.6 0 1 0 1.6 2.4V3h3z"/>',
+  youtube:
+    '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/>',
+  email:
+    '<path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 7L4.5 6.5v11h15v-11L12 11z"/>',
+  whatsapp:
+    '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>',
+};
+
+const platformStyles: Record<string, string> = {
+  instagram: 'bg-[#E1306C] hover:bg-[#C1275B]',
+  tiktok: 'bg-[#111827] hover:bg-[#000000]',
+  facebook: 'bg-[#1877F2] hover:bg-[#0F63CC]',
+  youtube: 'bg-[#FF0000] hover:bg-[#D90000]',
+  whatsapp: 'bg-[#0E733D] hover:bg-[#0B582F]',
+  email: 'bg-[#B3471E] hover:bg-[#A3431F]',
+};
+
+const platformLabels: Record<string, string> = {
+  instagram: 'Instagram',
+  tiktok: 'TikTok',
+  facebook: 'Facebook',
+  youtube: 'YouTube',
+  whatsapp: 'WhatsApp',
+  email: 'Email',
+};
+
+const items = Array.isArray(block.items) ? block.items.filter((item) => item?.url) : [];
+const showIcons = block.variant === 'icons' || block.variant === 'both';
+const showShare = block.variant === 'share' || block.variant === 'both';
+const shareLabel = block.shareLabel || 'Bagikan halaman ini';
+---
+
+<section class={`py-10 md:py-12 border-y border-[#F6DCCD] ${bgClasses[block.background || 'white'] || bgClasses.white}`}>
+  <div class={`max-w-3xl mx-auto px-4 sm:px-6 ${alignClass}`}>
+    {block.title && (
+      <p class="text-sm font-semibold text-[#4B2E22] mb-4">{block.title}</p>
+    )}
+
+    {showIcons && items.length > 0 && (
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        {items.map((item) => (
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={platformLabels[item.platform] || item.platform}
+            class={`inline-flex items-center justify-center w-11 h-11 rounded-full text-white shadow-sm transition-colors ${platformStyles[item.platform] || platformStyles.whatsapp}`}
+          >
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true" set:html={icons[item.platform] || icons.whatsapp} />
+          </a>
+        ))}
+      </div>
+    )}
+
+    {showShare && (
+      <div class={showIcons && items.length > 0 ? 'mt-6' : ''}>
+        <p class="text-xs font-semibold text-[#86675A] mb-3">{shareLabel}</p>
+        <div class="flex flex-wrap items-center justify-center gap-2" data-kala-share>
+          <a
+            href="#"
+            data-share="whatsapp"
+            class="inline-flex items-center gap-2 rounded-full bg-[#0E733D] hover:bg-[#0B582F] text-white text-xs font-bold px-4 py-2.5 transition-colors"
+          >
+            WhatsApp
+          </a>
+          <a
+            href="#"
+            data-share="facebook"
+            class="inline-flex items-center gap-2 rounded-full bg-[#1877F2] hover:bg-[#0F63CC] text-white text-xs font-bold px-4 py-2.5 transition-colors"
+          >
+            Facebook
+          </a>
+          <a
+            href="#"
+            data-share="telegram"
+            class="inline-flex items-center gap-2 rounded-full bg-[#229ED9] hover:bg-[#1B7FB0] text-white text-xs font-bold px-4 py-2.5 transition-colors"
+          >
+            Telegram
+          </a>
+          <button
+            type="button"
+            data-share="copy"
+            class="inline-flex items-center gap-2 rounded-full border border-[#F6DCCD] bg-white hover:bg-[#FFF9F4] text-[#4B2E22] text-xs font-bold px-4 py-2.5 transition-colors"
+          >
+            Salin Tautan
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+  function initKalaShare() {
+    document.querySelectorAll<HTMLElement>('[data-kala-share]').forEach((root) => {
+      if (root.dataset.kalaShareReady === 'true') return;
+      root.dataset.kalaShareReady = 'true';
+
+      const pageUrl = window.location.href;
+      const pageTitle = document.title;
+
+      const links: Record<string, string> = {
+        whatsapp: `https://wa.me/?text=${encodeURIComponent(`${pageTitle} ${pageUrl}`)}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`,
+        telegram: `https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(pageTitle)}`,
+      };
+
+      root.querySelectorAll<HTMLElement>('[data-share]').forEach((element) => {
+        const kind = element.dataset.share || '';
+
+        if (kind === 'copy') {
+          element.addEventListener('click', async () => {
+            const original = element.textContent;
+            try {
+              await navigator.clipboard.writeText(pageUrl);
+              element.textContent = 'Tautan tersalin ✓';
+            } catch {
+              element.textContent = 'Gagal menyalin';
+            }
+            window.setTimeout(() => {
+              element.textContent = original;
+            }, 2000);
+          });
+          return;
+        }
+
+        if (links[kind]) {
+          element.setAttribute('href', links[kind]);
+          element.setAttribute('target', '_blank');
+          element.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+    });
+  }
+
+  initKalaShare();
+  document.addEventListener('astro:page-load', initKalaShare);
+</script>

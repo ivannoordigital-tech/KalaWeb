@@ -1,0 +1,107 @@
+---
+import { mediaUrl, fetchPayloadArticles } from '../../lib/payload';
+
+interface Props {
+  block: {
+    heading?: string;
+    description?: string;
+    source?: 'latest' | 'category';
+    category?: string;
+    limit?: number;
+    columns?: '2' | '3';
+    background?: 'white' | 'cream';
+    showImage?: boolean;
+    showExcerpt?: boolean;
+    ctaText?: string;
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+};
+const columnClasses: Record<string, string> = {
+  '2': 'grid-cols-1 sm:grid-cols-2',
+  '3': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+};
+const categoryLabels: Record<string, string> = {
+  bayi: 'Bayi & Newborn',
+  'ibu-menyusui': 'Ibu Menyusui',
+  layanan: 'Layanan Homecare',
+  kehamilan: 'Kehamilan',
+};
+
+const limit = Math.min(Math.max(Number(block.limit) || 3, 1), 6);
+const all = await fetchPayloadArticles();
+
+const filtered = (block.source === 'category' && block.category
+  ? all.filter((article) => article.category === block.category)
+  : all
+)
+  .slice()
+  .sort((a, b) => new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime())
+  .slice(0, limit);
+---
+
+{filtered.length > 0 && (
+  <section class={`py-12 md:py-16 border-y border-[#F6DCCD] ${bgClasses[block.background || 'white'] || bgClasses.white}`}>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      {(block.heading || block.description) && (
+        <div class="text-center mb-8">
+          {block.heading && (
+            <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22]">{block.heading}</h2>
+          )}
+          {block.description && (
+            <p class="mt-2 text-sm sm:text-base text-[#86675A] leading-relaxed max-w-2xl mx-auto">{block.description}</p>
+          )}
+        </div>
+      )}
+
+      <div class={`grid gap-6 ${columnClasses[block.columns || '3'] || columnClasses['3']}`}>
+        {filtered.map((article) => {
+          const image = mediaUrl(article.heroImage, article.heroImageUrlFallback || '');
+          return (
+            <article class="bg-white rounded-2xl border border-[#F6DCCD] shadow-sm overflow-hidden flex flex-col">
+              {block.showImage !== false && image && (
+                <a href={`/blog/${article.slug}`} class="block">
+                  <img
+                    src={image}
+                    alt={article.heroImageAlt || article.heroImage?.alt || article.title}
+                    class="w-full aspect-[16/10] object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+              )}
+              <div class="p-5 flex flex-col flex-1">
+                {article.category && (
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-[#B3471E]">
+                    {categoryLabels[article.category] || article.category}
+                  </span>
+                )}
+                <h3 class="mt-2 font-brand font-bold text-base sm:text-lg text-[#4B2E22] leading-snug">
+                  <a href={`/blog/${article.slug}`} class="hover:text-[#B3471E] transition-colors">
+                    {article.title}
+                  </a>
+                </h3>
+                {block.showExcerpt !== false && article.description && (
+                  <p class="mt-2 text-xs sm:text-sm text-[#86675A] leading-relaxed line-clamp-3">
+                    {article.description}
+                  </p>
+                )}
+                <a
+                  href={`/blog/${article.slug}`}
+                  class="mt-4 text-xs font-bold text-[#B3471E] hover:underline"
+                >
+                  {block.ctaText || 'Baca Artikel'} →
+                </a>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+)}

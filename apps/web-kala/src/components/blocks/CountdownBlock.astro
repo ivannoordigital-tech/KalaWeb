@@ -1,0 +1,124 @@
+---
+import WhatsAppButton from '../WhatsAppButton.astro';
+
+interface Props {
+  block: {
+    title: string;
+    subtitle?: string;
+    targetDate: string;
+    expiredText?: string;
+    ctaText?: string;
+    ctaMessage?: string;
+    background?: 'peach' | 'cream' | 'dark';
+  };
+}
+
+const { block } = Astro.props;
+
+const isDark = block.background === 'dark';
+const bgClass = isDark
+  ? 'bg-[#4B2E22]'
+  : block.background === 'cream'
+    ? 'bg-[#FFF9F4]'
+    : 'bg-[#FFEFE5]';
+const titleClass = isDark ? 'text-[#FFF9F4]' : 'text-[#4B2E22]';
+const subtitleClass = isDark ? 'text-[#FFD9C4]' : 'text-[#86675A]';
+const unitClass = isDark
+  ? 'bg-white/10 border-white/15 text-[#FFF9F4]'
+  : 'bg-white border-[#F6DCCD] text-[#4B2E22]';
+const labelClass = isDark ? 'text-[#FFD9C4]' : 'text-[#86675A]';
+---
+
+<section class={`py-12 md:py-16 border-y border-[#F6DCCD] ${bgClass}`}>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+    <h2 class={`text-2xl sm:text-3xl font-brand font-bold ${titleClass}`}>{block.title}</h2>
+    {block.subtitle && (
+      <p class={`mt-2 text-sm sm:text-base leading-relaxed ${subtitleClass}`}>{block.subtitle}</p>
+    )}
+
+    <div
+      data-kala-countdown
+      data-target={block.targetDate}
+      data-expired-text={block.expiredText || 'Promo telah berakhir.'}
+      class="mt-6"
+    >
+      <div data-cd-timer class="flex items-start justify-center gap-3 sm:gap-5">
+        {[
+          { key: 'days', label: 'Hari' },
+          { key: 'hours', label: 'Jam' },
+          { key: 'minutes', label: 'Menit' },
+          { key: 'seconds', label: 'Detik' },
+        ].map((unit) => (
+          <div class="flex flex-col items-center">
+            <div class={`min-w-[3.25rem] sm:min-w-[4.5rem] rounded-2xl border px-2 py-3 ${unitClass}`}>
+              <span data-cd={unit.key} class="block text-2xl sm:text-3xl font-brand font-bold leading-none tabular-nums">00</span>
+            </div>
+            <span class={`mt-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider ${labelClass}`}>{unit.label}</span>
+          </div>
+        ))}
+      </div>
+      <p data-cd-expired class={`hidden mt-4 text-sm font-semibold ${subtitleClass}`}></p>
+    </div>
+
+    {block.ctaText && (
+      <div class="mt-7">
+        <WhatsAppButton
+          refCode="KALA-COUNTDOWN"
+          message={block.ctaMessage || `Halo Bu Bidan, saya mau ambil promo ${block.title}`}
+          text={block.ctaText}
+          variant="primary"
+        />
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+  function initKalaCountdowns() {
+    document.querySelectorAll<HTMLElement>('[data-kala-countdown]').forEach((root) => {
+      if (root.dataset.kalaCountdownReady === 'true') return;
+      root.dataset.kalaCountdownReady = 'true';
+
+      const target = new Date(String(root.dataset.target || '')).getTime();
+      const timer = root.querySelector<HTMLElement>('[data-cd-timer]');
+      const expired = root.querySelector<HTMLElement>('[data-cd-expired]');
+      const pads = (value: number) => String(Math.max(0, value)).padStart(2, '0');
+      let intervalId: number | undefined;
+
+      const update = () => {
+        const distance = target - Date.now();
+        if (!Number.isFinite(target)) return;
+
+        if (distance <= 0) {
+          if (timer) timer.classList.add('hidden');
+          if (expired) {
+            expired.textContent = root.dataset.expiredText || 'Promo telah berakhir.';
+            expired.classList.remove('hidden');
+          }
+          if (intervalId) window.clearInterval(intervalId);
+          return;
+        }
+
+        const days = Math.floor(distance / 86_400_000);
+        const hours = Math.floor((distance % 86_400_000) / 3_600_000);
+        const minutes = Math.floor((distance % 3_600_000) / 60_000);
+        const seconds = Math.floor((distance % 60_000) / 1_000);
+
+        const set = (key: string, value: number) => {
+          const el = root.querySelector<HTMLElement>(`[data-cd="${key}"]`);
+          if (el) el.textContent = pads(value);
+        };
+        set('days', days);
+        set('hours', hours);
+        set('minutes', minutes);
+        set('seconds', seconds);
+      };
+
+      intervalId = window.setInterval(update, 1000);
+      update();
+    });
+  }
+
+  initKalaCountdowns();
+  document.addEventListener('astro:page-load', initKalaCountdowns);
+</script>

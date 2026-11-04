@@ -19,7 +19,8 @@
     "test:validation": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-validation.ts",
     "test:integration": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-integration.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
-    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
+    "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.91.0",

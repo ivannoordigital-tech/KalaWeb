@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const FaqAccordionBlock: Block = {
   slug: 'faq',
@@ -42,5 +43,6 @@ export const FaqAccordionBlock: Block = {
         },
       ],
     },
+    ...blockSettingsFields,
   ],
 }

@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const GalleryBlock: Block = {
   slug: 'gallery',
@@ -86,5 +87,6 @@ export const GalleryBlock: Block = {
         },
       ],
     },
+    ...blockSettingsFields,
   ],
 }

@@ -16,6 +16,7 @@ import {
 import { Articles } from '../collections/Articles';
 import { Pages } from '../collections/Pages';
 import configPromise from '../payload.config';
+import { allBlocks, columnBlocks, leafBlocks, SectionBlock } from '../blocks';
 
 let passed = 0;
 let failed = 0;
@@ -344,8 +345,174 @@ assert('Articles memiliki field relationship authorMidwife (ED-006)', hasAuthorM
 assert('Articles memiliki field relationship reviewedByMidwife (ED-006)', hasReviewedByMidwife);
 assert('Articles memiliki field tanggal reviewedAt (ED-006)', hasReviewedAt);
 
-// --- 4. Pengujian Endpoint /api/validate (ED-002) ---
-console.log('\n--- 4. Pengujian Endpoint /api/validate (ED-002) ---');
+// --- 4. Pengujian Blok Basic Page Builder (Section, Heading, Image, dst.) ---
+console.log('\n--- 4. Pengujian Blok Basic Page Builder ---');
+
+const registeredSlugs: string[] = (allBlocks as any[]).map((block) => block.slug);
+
+function collectFieldNames(fields: any[]): string[] {
+  const names: string[] = [];
+  for (const field of Array.isArray(fields) ? fields : []) {
+    if (field?.name) names.push(field.name);
+    if (Array.isArray(field?.fields)) names.push(...collectFieldNames(field.fields));
+    if (Array.isArray(field?.tabs)) {
+      for (const tab of field.tabs) names.push(...collectFieldNames(tab?.fields));
+    }
+  }
+  return names;
+}
+
+const requiredBasicSlugs = [
+  'section',
+  'heading',
+  'image',
+  'button',
+  'divider',
+  'video',
+  'stats',
+  'logos',
+  'team',
+  'tabs',
+  'leadForm',
+  'blogFeed',
+  'countdown',
+  'social',
+];
+
+assert(
+  `Semua ${requiredBasicSlugs.length} blok basic baru terdaftar di allBlocks`,
+  requiredBasicSlugs.every((slug) => registeredSlugs.includes(slug)),
+  `Terdaftar: ${registeredSlugs.join(', ')}`,
+);
+assert(
+  'allBlocks berisi 28 blok (13 lama + 13 baru + Section + TemplateRef)',
+  registeredSlugs.length === 28,
+  `Jumlah aktual: ${registeredSlugs.length}`,
+);
+assert(
+  'Blok Section tidak boleh muncul di columnBlocks (mencegah nesting rekursif)',
+  !columnBlocks.some((block: any) => block.slug === 'section'),
+);
+assert(
+  'Blok Hero tidak boleh muncul di columnBlocks (mencegah dua H1)',
+  !columnBlocks.some((block: any) => block.slug === 'hero'),
+);
+assert(
+  'Semua blok baru memiliki pengaturan anchorId & visibility',
+  [...leafBlocks, SectionBlock].every((block: any) => {
+    const names = collectFieldNames(block.fields);
+    return names.includes('anchorId') && names.includes('visibility');
+  }),
+);
+assert(
+  'Semua 13 blok lama juga memiliki pengaturan anchorId & visibility',
+  (allBlocks as any[])
+    .filter((block) => !requiredBasicSlugs.includes(block.slug) && block.slug !== 'templateRef')
+    .every((block: any) => {
+      const names = collectFieldNames(block.fields);
+      return names.includes('anchorId') && names.includes('visibility');
+    }),
+);
+
+// Section dengan CTA di dalam kolom harus dihitung sebagai CTA nyata.
+const landingWithSectionCta = {
+  title: 'Promo dengan Section',
+  slug: 'promo-section-cta',
+  refCode: 'LP-SECTION-CTA',
+  pageType: 'landing',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'section',
+      background: 'cream',
+      columns: [
+        {
+          width: 'half',
+          content: [
+            { blockType: 'heading', text: 'Promo Spesial' },
+            { blockType: 'cta', headline: 'Chat Bidan Kala', buttonText: 'Reservasi' },
+          ],
+        },
+        {
+          width: 'half',
+          content: [{ blockType: 'leadForm', heading: 'Reservasi Cepat' }],
+        },
+      ],
+    },
+  ],
+};
+const res4A = validatePageBuilderDoc(landingWithSectionCta);
+assert(
+  'Landing page dengan CTA di dalam Section DITERIMA',
+  res4A.isValid,
+  res4A.errors.join(' | '),
+);
+
+// Gambar Tunggal tanpa alt text harus ditolak.
+const pageWithImageNoAlt = {
+  title: 'Halaman Gambar',
+  slug: 'halaman-gambar',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'image',
+      image: { url: '/media/foto.webp' },
+    },
+  ],
+};
+const res4B = validatePageBuilderDoc(pageWithImageNoAlt);
+assert('Gambar Tunggal tanpa Alt Text DITOLAK', !res4B.isValid);
+assert(
+  'Error Gambar Tunggal berkode MISSING_ALT_TEXT',
+  res4B.fieldErrors.some((fe) => fe.code === 'MISSING_ALT_TEXT'),
+);
+
+// Klaim medis di dalam kolom Section harus tetap terdeteksi.
+const pageWithNestedForbiddenClaim = {
+  title: 'Halaman Section Klaim',
+  slug: 'halaman-section-klaim',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'section',
+      columns: [
+        {
+          width: 'full',
+          content: [
+            { blockType: 'heading', text: 'Terapi Ajaib Pasti Sembuh' },
+            { blockType: 'cta', headline: 'Hubungi kami', buttonText: 'Chat' },
+          ],
+        },
+      ],
+    },
+  ],
+};
+const res4C = validatePageBuilderDoc(pageWithNestedForbiddenClaim);
+assert(
+  'Klaim medis di dalam kolom Section tetap DIBLOKIR',
+  !res4C.isValid && res4C.fieldErrors.some((fe) => fe.code === 'FORBIDDEN_MEDICAL_CLAIM'),
+);
+
+// Section kosong hanya memunculkan peringatan, bukan blokir publikasi.
+const pageWithEmptySection = {
+  title: 'Halaman Section Kosong',
+  slug: 'halaman-section-kosong',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'section',
+      columns: [{ width: 'full', content: [] }],
+    },
+  ],
+};
+const res4D = validatePageBuilderDoc(pageWithEmptySection);
+assert(
+  'Section tanpa isi memberi peringatan (tidak memblokir)',
+  res4D.isValid && res4D.warnings.some((warning) => warning.includes('Seksi & Kolom')),
+);
+
+// --- 5. Pengujian Endpoint /api/validate (ED-002) ---
+console.log('\n--- 5. Pengujian Endpoint /api/validate (ED-002) ---');
 
 async function testEndpoint() {
   const config = await configPromise;

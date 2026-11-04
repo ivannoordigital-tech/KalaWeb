@@ -78,10 +78,12 @@ export interface Config {
     'service-areas': ServiceArea;
     testimonials: Testimonial;
     faq: Faq;
+    deployments: Deployment;
     redirects: Redirect;
     'help-center': HelpCenter;
     users: User;
     'payload-kv': PayloadKv;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -99,10 +101,12 @@ export interface Config {
     'service-areas': ServiceAreasSelect<false> | ServiceAreasSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     faq: FaqSelect<false> | FaqSelect<true>;
+    deployments: DeploymentsSelect<false> | DeploymentsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'help-center': HelpCenterSelect<false> | HelpCenterSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -123,7 +127,13 @@ export interface Config {
   };
   user: User;
   jobs: {
-    tasks: unknown;
+    tasks: {
+      schedulePublish: TaskSchedulePublish;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
@@ -244,14 +254,30 @@ export interface Article {
     relatedAreas?: (number | ServiceArea)[] | null;
   };
   /**
+   * Pilih profil bidan terdaftar untuk otomatis mengisi nama dan gelar penulis.
+   */
+  authorMidwife?: (number | null) | Midwife;
+  /**
    * Nama tenaga kesehatan resmi yang menyusun artikel.
    */
   author: string;
   authorTitle: string;
   /**
-   * Otoritas medis yang memvalidasi kebenaran klinis isi artikel.
+   * Pilih profil bidan ber-STR resmi yang meninjau akurasi klinis isi artikel.
+   */
+  reviewedByMidwife?: (number | null) | Midwife;
+  /**
+   * Otoritas medis (nama bidan bergelar) yang memvalidasi kebenaran klinis isi artikel.
    */
   medicalReviewer: string;
+  /**
+   * Tanggal saat artikel selesai divalidasi oleh reviewer medis.
+   */
+  reviewedAt?: string | null;
+  /**
+   * Catatan verifikasi klinis internal dari bidan peninjau (tidak tampil di publik).
+   */
+  reviewNotes?: string | null;
   /**
    * URL gambar cadangan jika tidak mengunggah file media (misal: /images/blog/bayi-kolik.svg).
    */
@@ -294,10 +320,23 @@ export interface Article {
           id?: string | null;
         }[]
       | null;
+    engineVersion?: string | null;
+    metrics?: {
+      titleScore?: number | null;
+      descScore?: number | null;
+      keywordScore?: number | null;
+      h1Score?: number | null;
+      altScore?: number | null;
+      slugScore?: number | null;
+      ogScore?: number | null;
+      contentScore?: number | null;
+      wordCount?: number | null;
+    };
     lastAuditedAt?: string | null;
   };
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
 }
 /**
@@ -310,6 +349,14 @@ export interface Media {
    * Wajib diisi untuk aksesibilitas pembaca layar dan perayap Google Images. Jelaskan apa yang terlihat di gambar.
    */
   alt: string;
+  /**
+   * Kelompokkan aset untuk memudahkan pencarian tim konten.
+   */
+  folder?: ('baby-newborn' | 'moms-lactation' | 'midwives-clinic' | 'documents' | 'banners-promo' | 'general') | null;
+  /**
+   * Pisahkan dengan koma (contoh: kolik, pijat, homecare, surabaya)
+   */
+  tags?: string | null;
   /**
    * Keterangan singkat yang tampil di bawah foto jika disematkan dalam artikel.
    */
@@ -496,7 +543,11 @@ export interface ServiceArea {
    */
   estimatedArrivalMinutes?: string | null;
   /**
-   * Paket perawatan yang dapat dipanggil ke wilayah ini.
+   * Pilih layanan aktif dari data resmi. Mencegah nama layanan fiktif atau salah ketik.
+   */
+  services?: (number | Service)[] | null;
+  /**
+   * Paket perawatan yang dapat dipanggil ke wilayah ini (fallback jika relasi belum dipilih).
    */
   availableServices?:
     | {
@@ -519,6 +570,89 @@ export interface ServiceArea {
     metaTitle?: string | null;
     /**
      * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "uniqueDescription".
+     */
+    metaDescription?: string | null;
+    /**
+     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
+     */
+    focusKeyword?: string | null;
+    /**
+     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
+     */
+    canonicalUrl?: string | null;
+    /**
+     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
+     */
+    noIndex?: boolean | null;
+    /**
+     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
+     */
+    isSubstantiveUpdate?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "midwives".
+ */
+export interface Midwife {
+  id: number;
+  /**
+   * Contoh: Bidan Annisa Rahmawati
+   */
+  name: string;
+  /**
+   * Contoh: S.Tr.Keb, Bdn
+   */
+  title: string;
+  /**
+   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google dan foreign key bot klinik.
+   */
+  strNumber: string;
+  /**
+   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Lama pengalaman menangani ibu dan anak. Contoh: 5
+   */
+  experienceYears?: number | null;
+  /**
+   * Daftar kompetensi khusus yang dimiliki bidan.
+   */
+  specialties?:
+    | {
+        specialty: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
+   */
+  bio: string;
+  /**
+   * Huruf kecil dan strip. Contoh: bidan-annisa
+   */
+  slug: string;
+  /**
+   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
+   */
+  active?: boolean | null;
+  /**
+   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
+   */
+  seo?: {
+    /**
+     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
+     */
+    metaTitle?: string | null;
+    /**
+     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
      */
     metaDescription?: string | null;
     /**
@@ -609,6 +743,14 @@ export interface Page {
             align?: ('center' | 'left') | null;
             btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
             bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'hero';
@@ -625,6 +767,14 @@ export interface Page {
               description: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'painPoints';
@@ -642,6 +792,14 @@ export interface Page {
               quote?: string | null;
               author?: string | null;
             };
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'solutions';
@@ -672,6 +830,14 @@ export interface Page {
               refCode?: string | null;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'pricing';
@@ -687,6 +853,14 @@ export interface Page {
               otherValue: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'comparison';
@@ -700,6 +874,14 @@ export interface Page {
               description: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'steps';
@@ -714,6 +896,14 @@ export interface Page {
               area?: string | null;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'testimonials';
@@ -723,6 +913,14 @@ export interface Page {
             title: string;
             description: string;
             note?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'guarantee';
@@ -735,6 +933,14 @@ export interface Page {
               a: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'faq';
@@ -759,6 +965,14 @@ export interface Page {
               [k: string]: unknown;
             };
             containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'richText';
@@ -770,6 +984,14 @@ export interface Page {
             buttonText?: string | null;
             buttonMessage?: string | null;
             footnote?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'cta';
@@ -787,6 +1009,14 @@ export interface Page {
               tag?: string | null;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'gallery';
@@ -806,9 +1036,996 @@ export interface Page {
              */
             background?: ('white' | 'cream' | 'peach') | null;
             spacing?: ('compact' | 'normal' | 'spacious') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'midwifeSpotlight';
+          }
+        | {
+            /**
+             * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+             */
+            eyebrow?: string | null;
+            text: string;
+            subtitle?: string | null;
+            /**
+             * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+             */
+            level?: ('h2' | 'h3' | 'h4') | null;
+            size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+            align?: ('center' | 'left') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'heading';
+          }
+        | {
+            /**
+             * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+             */
+            image?: (number | null) | Media;
+            imageUrlFallback?: string | null;
+            /**
+             * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+             */
+            alt?: string | null;
+            caption?: string | null;
+            link?: string | null;
+            width?: ('normal' | 'wide' | 'full') | null;
+            align?: ('center' | 'left' | 'right') | null;
+            ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+            rounded?: ('none' | 'md' | 'lg') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            text: string;
+            action?: ('whatsapp' | 'url') | null;
+            style?: ('primary' | 'secondary' | 'outline') | null;
+            whatsappMessage?: string | null;
+            url?: string | null;
+            openInNewTab?: boolean | null;
+            size?: ('sm' | 'md' | 'lg') | null;
+            align?: ('left' | 'center' | 'right') | null;
+            note?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'button';
+          }
+        | {
+            variant?: ('line' | 'dots' | 'space') | null;
+            spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+            width?: ('narrow' | 'normal' | 'full') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'divider';
+          }
+        | {
+            /**
+             * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+             */
+            url: string;
+            title?: string | null;
+            caption?: string | null;
+            ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+            maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'video';
+          }
+        | {
+            title?: string | null;
+            subtitle?: string | null;
+            items: {
+              value: string;
+              label: string;
+              icon?: string | null;
+              id?: string | null;
+            }[];
+            columns?: ('2' | '3' | '4') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            style?: ('plain' | 'card') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'stats';
+          }
+        | {
+            title?: string | null;
+            items: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              /**
+               * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+               */
+              name: string;
+              id?: string | null;
+            }[];
+            columns?: ('3' | '4' | '5' | '6') | null;
+            background?: ('white' | 'cream') | null;
+            grayscale?: boolean | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'logos';
+          }
+        | {
+            heading: string;
+            subheading?: string | null;
+            /**
+             * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+             */
+            midwives?: (number | Midwife)[] | null;
+            columns?: ('2' | '3' | '4') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            showStr?: boolean | null;
+            ctaText?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'team';
+          }
+        | {
+            title?: string | null;
+            subtitle?: string | null;
+            tabs: {
+              label: string;
+              content: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
+              id?: string | null;
+            }[];
+            style?: ('pills' | 'underline') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'tabs';
+          }
+        | {
+            heading: string;
+            description?: string | null;
+            /**
+             * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+             */
+            fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+            /**
+             * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+             */
+            serviceOptions?:
+              | {
+                  label: string;
+                  id?: string | null;
+                }[]
+              | null;
+            submitLabel?: string | null;
+            consentText?: string | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            note?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'leadForm';
+          }
+        | {
+            heading?: string | null;
+            description?: string | null;
+            source?: ('latest' | 'category') | null;
+            category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+            limit?: number | null;
+            columns?: ('2' | '3') | null;
+            background?: ('white' | 'cream') | null;
+            showImage?: boolean | null;
+            showExcerpt?: boolean | null;
+            ctaText?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'blogFeed';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Gunakan waktu WIB (Asia/Jakarta).
+             */
+            targetDate: string;
+            expiredText?: string | null;
+            ctaText?: string | null;
+            background?: ('peach' | 'cream' | 'dark') | null;
+            ctaMessage?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'countdown';
+          }
+        | {
+            variant: 'icons' | 'share' | 'both';
+            title?: string | null;
+            /**
+             * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+             */
+            items?:
+              | {
+                  platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+                  url: string;
+                  id?: string | null;
+                }[]
+              | null;
+            shareLabel?: string | null;
+            align?: ('left' | 'center') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'social';
+          }
+        | {
+            /**
+             * Hanya tampil di admin untuk memudahkan navigasi, tidak tampil di website.
+             */
+            label?: string | null;
+            background?: ('white' | 'cream' | 'peach' | 'gradient') | null;
+            padding?: ('none' | 'compact' | 'normal' | 'spacious') | null;
+            maxWidth?: ('narrow' | 'normal' | 'wide' | 'full') | null;
+            gap?: ('compact' | 'normal' | 'spacious') | null;
+            /**
+             * Tambahkan 1–4 kolom. Setiap kolom bisa diisi blok apa pun (judul, teks, gambar, tombol, video, dsb).
+             */
+            columns: {
+              width?: ('full' | 'half' | 'third' | 'twoThirds' | 'quarter') | null;
+              content?:
+                | (
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        columns?: ('2' | '3') | null;
+                        background?: ('cream' | 'white' | 'peach') | null;
+                        spacing?: ('compact' | 'normal' | 'spacious') | null;
+                        points: {
+                          icon?: string | null;
+                          title: string;
+                          description: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'painPoints';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        items: {
+                          icon?: string | null;
+                          title: string;
+                          description: string;
+                          id?: string | null;
+                        }[];
+                        highlightQuote?: {
+                          quote?: string | null;
+                          author?: string | null;
+                        };
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'solutions';
+                      }
+                    | {
+                        badge?: string | null;
+                        title: string;
+                        subtitle?: string | null;
+                        layoutStyle?: ('cards' | 'list') | null;
+                        background?: ('cream' | 'white' | 'peach') | null;
+                        spacing?: ('compact' | 'normal' | 'spacious') | null;
+                        packages: {
+                          name: string;
+                          target?: string | null;
+                          price: string;
+                          originalPrice?: string | null;
+                          duration?: string | null;
+                          description?: string | null;
+                          isPopular?: boolean | null;
+                          popularBadge?: string | null;
+                          features?:
+                            | {
+                                feature: string;
+                                id?: string | null;
+                              }[]
+                            | null;
+                          ctaText?: string | null;
+                          refCode?: string | null;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'pricing';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        kalaLabel?: string | null;
+                        otherLabel?: string | null;
+                        rows: {
+                          feature: string;
+                          kalaValue: string;
+                          otherValue: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'comparison';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        steps: {
+                          num?: string | null;
+                          title: string;
+                          description: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'steps';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        items: {
+                          quote: string;
+                          author: string;
+                          role?: string | null;
+                          area?: string | null;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'testimonials';
+                      }
+                    | {
+                        badge?: string | null;
+                        title: string;
+                        description: string;
+                        note?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'guarantee';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        faqs: {
+                          q: string;
+                          a: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'faq';
+                      }
+                    | {
+                        /**
+                         * Tulis paragraf, judul, kutipan, dan link secara bebas.
+                         */
+                        content: {
+                          root: {
+                            type: string;
+                            children: {
+                              type: any;
+                              version: number;
+                              [k: string]: unknown;
+                            }[];
+                            direction: ('ltr' | 'rtl') | null;
+                            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                            indent: number;
+                            version: number;
+                          };
+                          [k: string]: unknown;
+                        };
+                        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'richText';
+                      }
+                    | {
+                        badge?: string | null;
+                        headline: string;
+                        description?: string | null;
+                        buttonText?: string | null;
+                        buttonMessage?: string | null;
+                        footnote?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'cta';
+                      }
+                    | {
+                        badge?: string | null;
+                        title: string;
+                        subtitle?: string | null;
+                        columns?: ('2' | '3' | '4') | null;
+                        bgStyle?: ('white' | 'warm') | null;
+                        images: {
+                          image?: (number | null) | Media;
+                          imageUrlFallback?: string | null;
+                          caption?: string | null;
+                          tag?: string | null;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'gallery';
+                      }
+                    | {
+                        /**
+                         * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+                         */
+                        heading: string;
+                        subheading?: string | null;
+                        /**
+                         * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+                         */
+                        midwives?: (number | Midwife)[] | null;
+                        /**
+                         * Pilihan palet warna latar belakang.
+                         */
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        spacing?: ('compact' | 'normal' | 'spacious') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'midwifeSpotlight';
+                      }
+                    | {
+                        /**
+                         * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+                         */
+                        eyebrow?: string | null;
+                        text: string;
+                        subtitle?: string | null;
+                        /**
+                         * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+                         */
+                        level?: ('h2' | 'h3' | 'h4') | null;
+                        size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                        align?: ('center' | 'left') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'heading';
+                      }
+                    | {
+                        /**
+                         * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+                         */
+                        image?: (number | null) | Media;
+                        imageUrlFallback?: string | null;
+                        /**
+                         * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+                         */
+                        alt?: string | null;
+                        caption?: string | null;
+                        link?: string | null;
+                        width?: ('normal' | 'wide' | 'full') | null;
+                        align?: ('center' | 'left' | 'right') | null;
+                        ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+                        rounded?: ('none' | 'md' | 'lg') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'image';
+                      }
+                    | {
+                        text: string;
+                        action?: ('whatsapp' | 'url') | null;
+                        style?: ('primary' | 'secondary' | 'outline') | null;
+                        whatsappMessage?: string | null;
+                        url?: string | null;
+                        openInNewTab?: boolean | null;
+                        size?: ('sm' | 'md' | 'lg') | null;
+                        align?: ('left' | 'center' | 'right') | null;
+                        note?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'button';
+                      }
+                    | {
+                        variant?: ('line' | 'dots' | 'space') | null;
+                        spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                        width?: ('narrow' | 'normal' | 'full') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'divider';
+                      }
+                    | {
+                        /**
+                         * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+                         */
+                        url: string;
+                        title?: string | null;
+                        caption?: string | null;
+                        ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+                        maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'video';
+                      }
+                    | {
+                        title?: string | null;
+                        subtitle?: string | null;
+                        items: {
+                          value: string;
+                          label: string;
+                          icon?: string | null;
+                          id?: string | null;
+                        }[];
+                        columns?: ('2' | '3' | '4') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        style?: ('plain' | 'card') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'stats';
+                      }
+                    | {
+                        title?: string | null;
+                        items: {
+                          image?: (number | null) | Media;
+                          imageUrlFallback?: string | null;
+                          /**
+                           * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+                           */
+                          name: string;
+                          id?: string | null;
+                        }[];
+                        columns?: ('3' | '4' | '5' | '6') | null;
+                        background?: ('white' | 'cream') | null;
+                        grayscale?: boolean | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'logos';
+                      }
+                    | {
+                        heading: string;
+                        subheading?: string | null;
+                        /**
+                         * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+                         */
+                        midwives?: (number | Midwife)[] | null;
+                        columns?: ('2' | '3' | '4') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        showStr?: boolean | null;
+                        ctaText?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'team';
+                      }
+                    | {
+                        title?: string | null;
+                        subtitle?: string | null;
+                        tabs: {
+                          label: string;
+                          content: {
+                            root: {
+                              type: string;
+                              children: {
+                                type: any;
+                                version: number;
+                                [k: string]: unknown;
+                              }[];
+                              direction: ('ltr' | 'rtl') | null;
+                              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                              indent: number;
+                              version: number;
+                            };
+                            [k: string]: unknown;
+                          };
+                          id?: string | null;
+                        }[];
+                        style?: ('pills' | 'underline') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'tabs';
+                      }
+                    | {
+                        heading: string;
+                        description?: string | null;
+                        /**
+                         * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+                         */
+                        fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+                        /**
+                         * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+                         */
+                        serviceOptions?:
+                          | {
+                              label: string;
+                              id?: string | null;
+                            }[]
+                          | null;
+                        submitLabel?: string | null;
+                        consentText?: string | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        note?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'leadForm';
+                      }
+                    | {
+                        heading?: string | null;
+                        description?: string | null;
+                        source?: ('latest' | 'category') | null;
+                        category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+                        limit?: number | null;
+                        columns?: ('2' | '3') | null;
+                        background?: ('white' | 'cream') | null;
+                        showImage?: boolean | null;
+                        showExcerpt?: boolean | null;
+                        ctaText?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'blogFeed';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        /**
+                         * Gunakan waktu WIB (Asia/Jakarta).
+                         */
+                        targetDate: string;
+                        expiredText?: string | null;
+                        ctaText?: string | null;
+                        background?: ('peach' | 'cream' | 'dark') | null;
+                        ctaMessage?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'countdown';
+                      }
+                    | {
+                        variant: 'icons' | 'share' | 'both';
+                        title?: string | null;
+                        /**
+                         * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+                         */
+                        items?:
+                          | {
+                              platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+                              url: string;
+                              id?: string | null;
+                            }[]
+                          | null;
+                        shareLabel?: string | null;
+                        align?: ('left' | 'center') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'social';
+                      }
+                  )[]
+                | null;
+              id?: string | null;
+            }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'section';
           }
         | {
             /**
@@ -879,7 +2096,7 @@ export interface Page {
   /**
    * Pilih sistem analitik iklan yang aktif untuk halaman ini.
    */
-  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
+  activePixels?: ('meta' | 'google' | 'tiktok' | 'ga4' | 'clarity')[] | null;
   /**
    * Alamat URL halaman (huruf kecil dan tanda hubung). Otomatis dibuat dari judul jika kosong.
    */
@@ -908,94 +2125,24 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
+    engineVersion?: string | null;
+    metrics?: {
+      titleScore?: number | null;
+      descScore?: number | null;
+      keywordScore?: number | null;
+      h1Score?: number | null;
+      altScore?: number | null;
+      slugScore?: number | null;
+      ogScore?: number | null;
+      contentScore?: number | null;
+      wordCount?: number | null;
+    };
     lastAuditedAt?: string | null;
   };
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "midwives".
- */
-export interface Midwife {
-  id: number;
-  /**
-   * Contoh: Bidan Annisa Rahmawati
-   */
-  name: string;
-  /**
-   * Contoh: S.Tr.Keb, Bdn
-   */
-  title: string;
-  /**
-   * Bukti legalitas nakes resmi Kemenkes untuk membangun otoritas medis (E-E-A-T) di Google dan foreign key bot klinik.
-   */
-  strNumber: string;
-  /**
-   * Unggah foto profil seragam bidan (resolusi tajam, rasio 1:1 atau 3:4).
-   */
-  photo?: (number | null) | Media;
-  /**
-   * Lama pengalaman menangani ibu dan anak. Contoh: 5
-   */
-  experienceYears?: number | null;
-  /**
-   * Daftar kompetensi khusus yang dimiliki bidan.
-   */
-  specialties?:
-    | {
-        specialty: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Komitmen pelayanan hangat tanpa mom-shaming kepada Bunda dan si kecil.
-   */
-  bio: string;
-  /**
-   * Huruf kecil dan strip. Contoh: bidan-annisa
-   */
-  slug: string;
-  /**
-   * Hapus centang jika bidan sedang cuti atau tidak bertugas aktif.
-   */
-  active?: boolean | null;
-  /**
-   * Pengaturan metadata mesin pencari, live Google preview, dan checklist skor SEO.
-   */
-  seo?: {
-    /**
-     * Panjang ideal: 30–60 karakter. Kosongkan untuk otomatis menggunakan isi dari "name".
-     */
-    metaTitle?: string | null;
-    /**
-     * Panjang ideal: 70–160 karakter. Kosongkan untuk otomatis menggunakan isi dari "bio".
-     */
-    metaDescription?: string | null;
-    /**
-     * Satu frasa kata kunci utama target pencarian halaman ini. Contoh: pijat bayi homecare surabaya
-     */
-    focusKeyword?: string | null;
-    /**
-     * Ukuran ideal: 1200×630 pixel. Jika kosong, sistem otomatis memakai foto sampul halaman atau logo resmi.
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.
-     */
-    canonicalUrl?: string | null;
-    /**
-     * ⚠️ HATI-HATI: Jangan centang ini kecuali halaman ini adalah landing page iklan rahasia yang tidak boleh diindeks Google.
-     */
-    noIndex?: boolean | null;
-    /**
-     * Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.
-     */
-    isSubstantiveUpdate?: boolean | null;
-  };
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * Pustaka template susunan blok yang dapat disimpan dan dipakai berulang kali di halaman mana pun tanpa perlu menyusun dari nol.
@@ -1042,6 +2189,14 @@ export interface BlockTemplate {
         align?: ('center' | 'left') | null;
         btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
         bgStyle?: ('gradient' | 'plain' | 'white') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'hero';
@@ -1058,6 +2213,14 @@ export interface BlockTemplate {
           description: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'painPoints';
@@ -1075,6 +2238,14 @@ export interface BlockTemplate {
           quote?: string | null;
           author?: string | null;
         };
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'solutions';
@@ -1105,6 +2276,14 @@ export interface BlockTemplate {
           refCode?: string | null;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'pricing';
@@ -1120,6 +2299,14 @@ export interface BlockTemplate {
           otherValue: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'comparison';
@@ -1133,6 +2320,14 @@ export interface BlockTemplate {
           description: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'steps';
@@ -1147,6 +2342,14 @@ export interface BlockTemplate {
           area?: string | null;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'testimonials';
@@ -1156,6 +2359,14 @@ export interface BlockTemplate {
         title: string;
         description: string;
         note?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'guarantee';
@@ -1168,6 +2379,14 @@ export interface BlockTemplate {
           a: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'faq';
@@ -1192,6 +2411,14 @@ export interface BlockTemplate {
           [k: string]: unknown;
         };
         containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'richText';
@@ -1203,6 +2430,14 @@ export interface BlockTemplate {
         buttonText?: string | null;
         buttonMessage?: string | null;
         footnote?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'cta';
@@ -1220,6 +2455,14 @@ export interface BlockTemplate {
           tag?: string | null;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'gallery';
@@ -1239,9 +2482,996 @@ export interface BlockTemplate {
          */
         background?: ('white' | 'cream' | 'peach') | null;
         spacing?: ('compact' | 'normal' | 'spacious') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'midwifeSpotlight';
+      }
+    | {
+        /**
+         * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+         */
+        eyebrow?: string | null;
+        text: string;
+        subtitle?: string | null;
+        /**
+         * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+         */
+        level?: ('h2' | 'h3' | 'h4') | null;
+        size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+        align?: ('center' | 'left') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'heading';
+      }
+    | {
+        /**
+         * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+         */
+        image?: (number | null) | Media;
+        imageUrlFallback?: string | null;
+        /**
+         * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+         */
+        alt?: string | null;
+        caption?: string | null;
+        link?: string | null;
+        width?: ('normal' | 'wide' | 'full') | null;
+        align?: ('center' | 'left' | 'right') | null;
+        ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+        rounded?: ('none' | 'md' | 'lg') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'image';
+      }
+    | {
+        text: string;
+        action?: ('whatsapp' | 'url') | null;
+        style?: ('primary' | 'secondary' | 'outline') | null;
+        whatsappMessage?: string | null;
+        url?: string | null;
+        openInNewTab?: boolean | null;
+        size?: ('sm' | 'md' | 'lg') | null;
+        align?: ('left' | 'center' | 'right') | null;
+        note?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'button';
+      }
+    | {
+        variant?: ('line' | 'dots' | 'space') | null;
+        spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+        width?: ('narrow' | 'normal' | 'full') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'divider';
+      }
+    | {
+        /**
+         * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+         */
+        url: string;
+        title?: string | null;
+        caption?: string | null;
+        ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+        maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'video';
+      }
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+        items: {
+          value: string;
+          label: string;
+          icon?: string | null;
+          id?: string | null;
+        }[];
+        columns?: ('2' | '3' | '4') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        style?: ('plain' | 'card') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'stats';
+      }
+    | {
+        title?: string | null;
+        items: {
+          image?: (number | null) | Media;
+          imageUrlFallback?: string | null;
+          /**
+           * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+           */
+          name: string;
+          id?: string | null;
+        }[];
+        columns?: ('3' | '4' | '5' | '6') | null;
+        background?: ('white' | 'cream') | null;
+        grayscale?: boolean | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'logos';
+      }
+    | {
+        heading: string;
+        subheading?: string | null;
+        /**
+         * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+         */
+        midwives?: (number | Midwife)[] | null;
+        columns?: ('2' | '3' | '4') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        showStr?: boolean | null;
+        ctaText?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'team';
+      }
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+        tabs: {
+          label: string;
+          content: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
+          id?: string | null;
+        }[];
+        style?: ('pills' | 'underline') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'tabs';
+      }
+    | {
+        heading: string;
+        description?: string | null;
+        /**
+         * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+         */
+        fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+        /**
+         * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+         */
+        serviceOptions?:
+          | {
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        submitLabel?: string | null;
+        consentText?: string | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        note?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'leadForm';
+      }
+    | {
+        heading?: string | null;
+        description?: string | null;
+        source?: ('latest' | 'category') | null;
+        category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+        limit?: number | null;
+        columns?: ('2' | '3') | null;
+        background?: ('white' | 'cream') | null;
+        showImage?: boolean | null;
+        showExcerpt?: boolean | null;
+        ctaText?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'blogFeed';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Gunakan waktu WIB (Asia/Jakarta).
+         */
+        targetDate: string;
+        expiredText?: string | null;
+        ctaText?: string | null;
+        background?: ('peach' | 'cream' | 'dark') | null;
+        ctaMessage?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'countdown';
+      }
+    | {
+        variant: 'icons' | 'share' | 'both';
+        title?: string | null;
+        /**
+         * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+         */
+        items?:
+          | {
+              platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
+        shareLabel?: string | null;
+        align?: ('left' | 'center') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'social';
+      }
+    | {
+        /**
+         * Hanya tampil di admin untuk memudahkan navigasi, tidak tampil di website.
+         */
+        label?: string | null;
+        background?: ('white' | 'cream' | 'peach' | 'gradient') | null;
+        padding?: ('none' | 'compact' | 'normal' | 'spacious') | null;
+        maxWidth?: ('narrow' | 'normal' | 'wide' | 'full') | null;
+        gap?: ('compact' | 'normal' | 'spacious') | null;
+        /**
+         * Tambahkan 1–4 kolom. Setiap kolom bisa diisi blok apa pun (judul, teks, gambar, tombol, video, dsb).
+         */
+        columns: {
+          width?: ('full' | 'half' | 'third' | 'twoThirds' | 'quarter') | null;
+          content?:
+            | (
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    columns?: ('2' | '3') | null;
+                    background?: ('cream' | 'white' | 'peach') | null;
+                    spacing?: ('compact' | 'normal' | 'spacious') | null;
+                    points: {
+                      icon?: string | null;
+                      title: string;
+                      description: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'painPoints';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    items: {
+                      icon?: string | null;
+                      title: string;
+                      description: string;
+                      id?: string | null;
+                    }[];
+                    highlightQuote?: {
+                      quote?: string | null;
+                      author?: string | null;
+                    };
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'solutions';
+                  }
+                | {
+                    badge?: string | null;
+                    title: string;
+                    subtitle?: string | null;
+                    layoutStyle?: ('cards' | 'list') | null;
+                    background?: ('cream' | 'white' | 'peach') | null;
+                    spacing?: ('compact' | 'normal' | 'spacious') | null;
+                    packages: {
+                      name: string;
+                      target?: string | null;
+                      price: string;
+                      originalPrice?: string | null;
+                      duration?: string | null;
+                      description?: string | null;
+                      isPopular?: boolean | null;
+                      popularBadge?: string | null;
+                      features?:
+                        | {
+                            feature: string;
+                            id?: string | null;
+                          }[]
+                        | null;
+                      ctaText?: string | null;
+                      refCode?: string | null;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'pricing';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    kalaLabel?: string | null;
+                    otherLabel?: string | null;
+                    rows: {
+                      feature: string;
+                      kalaValue: string;
+                      otherValue: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'comparison';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    steps: {
+                      num?: string | null;
+                      title: string;
+                      description: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'steps';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    items: {
+                      quote: string;
+                      author: string;
+                      role?: string | null;
+                      area?: string | null;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'testimonials';
+                  }
+                | {
+                    badge?: string | null;
+                    title: string;
+                    description: string;
+                    note?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'guarantee';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    faqs: {
+                      q: string;
+                      a: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'faq';
+                  }
+                | {
+                    /**
+                     * Tulis paragraf, judul, kutipan, dan link secara bebas.
+                     */
+                    content: {
+                      root: {
+                        type: string;
+                        children: {
+                          type: any;
+                          version: number;
+                          [k: string]: unknown;
+                        }[];
+                        direction: ('ltr' | 'rtl') | null;
+                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                        indent: number;
+                        version: number;
+                      };
+                      [k: string]: unknown;
+                    };
+                    containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'richText';
+                  }
+                | {
+                    badge?: string | null;
+                    headline: string;
+                    description?: string | null;
+                    buttonText?: string | null;
+                    buttonMessage?: string | null;
+                    footnote?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'cta';
+                  }
+                | {
+                    badge?: string | null;
+                    title: string;
+                    subtitle?: string | null;
+                    columns?: ('2' | '3' | '4') | null;
+                    bgStyle?: ('white' | 'warm') | null;
+                    images: {
+                      image?: (number | null) | Media;
+                      imageUrlFallback?: string | null;
+                      caption?: string | null;
+                      tag?: string | null;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'gallery';
+                  }
+                | {
+                    /**
+                     * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+                     */
+                    heading: string;
+                    subheading?: string | null;
+                    /**
+                     * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+                     */
+                    midwives?: (number | Midwife)[] | null;
+                    /**
+                     * Pilihan palet warna latar belakang.
+                     */
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    spacing?: ('compact' | 'normal' | 'spacious') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'midwifeSpotlight';
+                  }
+                | {
+                    /**
+                     * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+                     */
+                    eyebrow?: string | null;
+                    text: string;
+                    subtitle?: string | null;
+                    /**
+                     * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+                     */
+                    level?: ('h2' | 'h3' | 'h4') | null;
+                    size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                    align?: ('center' | 'left') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'heading';
+                  }
+                | {
+                    /**
+                     * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+                     */
+                    image?: (number | null) | Media;
+                    imageUrlFallback?: string | null;
+                    /**
+                     * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+                     */
+                    alt?: string | null;
+                    caption?: string | null;
+                    link?: string | null;
+                    width?: ('normal' | 'wide' | 'full') | null;
+                    align?: ('center' | 'left' | 'right') | null;
+                    ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+                    rounded?: ('none' | 'md' | 'lg') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'image';
+                  }
+                | {
+                    text: string;
+                    action?: ('whatsapp' | 'url') | null;
+                    style?: ('primary' | 'secondary' | 'outline') | null;
+                    whatsappMessage?: string | null;
+                    url?: string | null;
+                    openInNewTab?: boolean | null;
+                    size?: ('sm' | 'md' | 'lg') | null;
+                    align?: ('left' | 'center' | 'right') | null;
+                    note?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'button';
+                  }
+                | {
+                    variant?: ('line' | 'dots' | 'space') | null;
+                    spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                    width?: ('narrow' | 'normal' | 'full') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'divider';
+                  }
+                | {
+                    /**
+                     * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+                     */
+                    url: string;
+                    title?: string | null;
+                    caption?: string | null;
+                    ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+                    maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'video';
+                  }
+                | {
+                    title?: string | null;
+                    subtitle?: string | null;
+                    items: {
+                      value: string;
+                      label: string;
+                      icon?: string | null;
+                      id?: string | null;
+                    }[];
+                    columns?: ('2' | '3' | '4') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    style?: ('plain' | 'card') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'stats';
+                  }
+                | {
+                    title?: string | null;
+                    items: {
+                      image?: (number | null) | Media;
+                      imageUrlFallback?: string | null;
+                      /**
+                       * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+                       */
+                      name: string;
+                      id?: string | null;
+                    }[];
+                    columns?: ('3' | '4' | '5' | '6') | null;
+                    background?: ('white' | 'cream') | null;
+                    grayscale?: boolean | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'logos';
+                  }
+                | {
+                    heading: string;
+                    subheading?: string | null;
+                    /**
+                     * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+                     */
+                    midwives?: (number | Midwife)[] | null;
+                    columns?: ('2' | '3' | '4') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    showStr?: boolean | null;
+                    ctaText?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'team';
+                  }
+                | {
+                    title?: string | null;
+                    subtitle?: string | null;
+                    tabs: {
+                      label: string;
+                      content: {
+                        root: {
+                          type: string;
+                          children: {
+                            type: any;
+                            version: number;
+                            [k: string]: unknown;
+                          }[];
+                          direction: ('ltr' | 'rtl') | null;
+                          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                          indent: number;
+                          version: number;
+                        };
+                        [k: string]: unknown;
+                      };
+                      id?: string | null;
+                    }[];
+                    style?: ('pills' | 'underline') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'tabs';
+                  }
+                | {
+                    heading: string;
+                    description?: string | null;
+                    /**
+                     * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+                     */
+                    fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+                    /**
+                     * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+                     */
+                    serviceOptions?:
+                      | {
+                          label: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    submitLabel?: string | null;
+                    consentText?: string | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    note?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'leadForm';
+                  }
+                | {
+                    heading?: string | null;
+                    description?: string | null;
+                    source?: ('latest' | 'category') | null;
+                    category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+                    limit?: number | null;
+                    columns?: ('2' | '3') | null;
+                    background?: ('white' | 'cream') | null;
+                    showImage?: boolean | null;
+                    showExcerpt?: boolean | null;
+                    ctaText?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'blogFeed';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    /**
+                     * Gunakan waktu WIB (Asia/Jakarta).
+                     */
+                    targetDate: string;
+                    expiredText?: string | null;
+                    ctaText?: string | null;
+                    background?: ('peach' | 'cream' | 'dark') | null;
+                    ctaMessage?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'countdown';
+                  }
+                | {
+                    variant: 'icons' | 'share' | 'both';
+                    title?: string | null;
+                    /**
+                     * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+                     */
+                    items?:
+                      | {
+                          platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+                          url: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    shareLabel?: string | null;
+                    align?: ('left' | 'center') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'social';
+                  }
+              )[]
+            | null;
+          id?: string | null;
+        }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'section';
       }
   )[];
   updatedAt: string;
@@ -1249,6 +3479,8 @@ export interface BlockTemplate {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * ⚠️ [DEPRECATED / ARSIP] Koleksi ini telah dikonsolidasikan ke menu "Semua Halaman" (Pages) dengan tipe Landing Page. Gunakan menu Pages untuk mengelola halaman promosi aktif.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "landing-pages".
  */
@@ -1270,7 +3502,7 @@ export interface LandingPage {
   /**
    * Pilih pixel pelacakan konversi yang aktif. ID pixel dikonfigurasi terpusat di Site Settings.
    */
-  activePixels?: ('meta' | 'google' | 'tiktok')[] | null;
+  activePixels?: ('meta' | 'google' | 'tiktok' | 'ga4' | 'clarity')[] | null;
   /**
    * Contoh: KALA-LP-KOLIK. Digunakan untuk mengelompokkan laporan perbandingan varian.
    */
@@ -1314,6 +3546,14 @@ export interface LandingPage {
             align?: ('center' | 'left') | null;
             btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
             bgStyle?: ('gradient' | 'plain' | 'white') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'hero';
@@ -1330,6 +3570,14 @@ export interface LandingPage {
               description: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'painPoints';
@@ -1347,6 +3595,14 @@ export interface LandingPage {
               quote?: string | null;
               author?: string | null;
             };
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'solutions';
@@ -1377,6 +3633,14 @@ export interface LandingPage {
               refCode?: string | null;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'pricing';
@@ -1392,6 +3656,14 @@ export interface LandingPage {
               otherValue: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'comparison';
@@ -1405,6 +3677,14 @@ export interface LandingPage {
               description: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'steps';
@@ -1419,6 +3699,14 @@ export interface LandingPage {
               area?: string | null;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'testimonials';
@@ -1428,6 +3716,14 @@ export interface LandingPage {
             title: string;
             description: string;
             note?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'guarantee';
@@ -1440,6 +3736,14 @@ export interface LandingPage {
               a: string;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'faq';
@@ -1464,6 +3768,14 @@ export interface LandingPage {
               [k: string]: unknown;
             };
             containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'richText';
@@ -1475,6 +3787,14 @@ export interface LandingPage {
             buttonText?: string | null;
             buttonMessage?: string | null;
             footnote?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'cta';
@@ -1492,6 +3812,14 @@ export interface LandingPage {
               tag?: string | null;
               id?: string | null;
             }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'gallery';
@@ -1511,9 +3839,996 @@ export interface LandingPage {
              */
             background?: ('white' | 'cream' | 'peach') | null;
             spacing?: ('compact' | 'normal' | 'spacious') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'midwifeSpotlight';
+          }
+        | {
+            /**
+             * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+             */
+            eyebrow?: string | null;
+            text: string;
+            subtitle?: string | null;
+            /**
+             * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+             */
+            level?: ('h2' | 'h3' | 'h4') | null;
+            size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+            align?: ('center' | 'left') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'heading';
+          }
+        | {
+            /**
+             * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+             */
+            image?: (number | null) | Media;
+            imageUrlFallback?: string | null;
+            /**
+             * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+             */
+            alt?: string | null;
+            caption?: string | null;
+            link?: string | null;
+            width?: ('normal' | 'wide' | 'full') | null;
+            align?: ('center' | 'left' | 'right') | null;
+            ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+            rounded?: ('none' | 'md' | 'lg') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            text: string;
+            action?: ('whatsapp' | 'url') | null;
+            style?: ('primary' | 'secondary' | 'outline') | null;
+            whatsappMessage?: string | null;
+            url?: string | null;
+            openInNewTab?: boolean | null;
+            size?: ('sm' | 'md' | 'lg') | null;
+            align?: ('left' | 'center' | 'right') | null;
+            note?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'button';
+          }
+        | {
+            variant?: ('line' | 'dots' | 'space') | null;
+            spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+            width?: ('narrow' | 'normal' | 'full') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'divider';
+          }
+        | {
+            /**
+             * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+             */
+            url: string;
+            title?: string | null;
+            caption?: string | null;
+            ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+            maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'video';
+          }
+        | {
+            title?: string | null;
+            subtitle?: string | null;
+            items: {
+              value: string;
+              label: string;
+              icon?: string | null;
+              id?: string | null;
+            }[];
+            columns?: ('2' | '3' | '4') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            style?: ('plain' | 'card') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'stats';
+          }
+        | {
+            title?: string | null;
+            items: {
+              image?: (number | null) | Media;
+              imageUrlFallback?: string | null;
+              /**
+               * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+               */
+              name: string;
+              id?: string | null;
+            }[];
+            columns?: ('3' | '4' | '5' | '6') | null;
+            background?: ('white' | 'cream') | null;
+            grayscale?: boolean | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'logos';
+          }
+        | {
+            heading: string;
+            subheading?: string | null;
+            /**
+             * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+             */
+            midwives?: (number | Midwife)[] | null;
+            columns?: ('2' | '3' | '4') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            showStr?: boolean | null;
+            ctaText?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'team';
+          }
+        | {
+            title?: string | null;
+            subtitle?: string | null;
+            tabs: {
+              label: string;
+              content: {
+                root: {
+                  type: string;
+                  children: {
+                    type: any;
+                    version: number;
+                    [k: string]: unknown;
+                  }[];
+                  direction: ('ltr' | 'rtl') | null;
+                  format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                  indent: number;
+                  version: number;
+                };
+                [k: string]: unknown;
+              };
+              id?: string | null;
+            }[];
+            style?: ('pills' | 'underline') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'tabs';
+          }
+        | {
+            heading: string;
+            description?: string | null;
+            /**
+             * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+             */
+            fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+            /**
+             * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+             */
+            serviceOptions?:
+              | {
+                  label: string;
+                  id?: string | null;
+                }[]
+              | null;
+            submitLabel?: string | null;
+            consentText?: string | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            note?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'leadForm';
+          }
+        | {
+            heading?: string | null;
+            description?: string | null;
+            source?: ('latest' | 'category') | null;
+            category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+            limit?: number | null;
+            columns?: ('2' | '3') | null;
+            background?: ('white' | 'cream') | null;
+            showImage?: boolean | null;
+            showExcerpt?: boolean | null;
+            ctaText?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'blogFeed';
+          }
+        | {
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Gunakan waktu WIB (Asia/Jakarta).
+             */
+            targetDate: string;
+            expiredText?: string | null;
+            ctaText?: string | null;
+            background?: ('peach' | 'cream' | 'dark') | null;
+            ctaMessage?: string | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'countdown';
+          }
+        | {
+            variant: 'icons' | 'share' | 'both';
+            title?: string | null;
+            /**
+             * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+             */
+            items?:
+              | {
+                  platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+                  url: string;
+                  id?: string | null;
+                }[]
+              | null;
+            shareLabel?: string | null;
+            align?: ('left' | 'center') | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'social';
+          }
+        | {
+            /**
+             * Hanya tampil di admin untuk memudahkan navigasi, tidak tampil di website.
+             */
+            label?: string | null;
+            background?: ('white' | 'cream' | 'peach' | 'gradient') | null;
+            padding?: ('none' | 'compact' | 'normal' | 'spacious') | null;
+            maxWidth?: ('narrow' | 'normal' | 'wide' | 'full') | null;
+            gap?: ('compact' | 'normal' | 'spacious') | null;
+            /**
+             * Tambahkan 1–4 kolom. Setiap kolom bisa diisi blok apa pun (judul, teks, gambar, tombol, video, dsb).
+             */
+            columns: {
+              width?: ('full' | 'half' | 'third' | 'twoThirds' | 'quarter') | null;
+              content?:
+                | (
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        columns?: ('2' | '3') | null;
+                        background?: ('cream' | 'white' | 'peach') | null;
+                        spacing?: ('compact' | 'normal' | 'spacious') | null;
+                        points: {
+                          icon?: string | null;
+                          title: string;
+                          description: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'painPoints';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        items: {
+                          icon?: string | null;
+                          title: string;
+                          description: string;
+                          id?: string | null;
+                        }[];
+                        highlightQuote?: {
+                          quote?: string | null;
+                          author?: string | null;
+                        };
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'solutions';
+                      }
+                    | {
+                        badge?: string | null;
+                        title: string;
+                        subtitle?: string | null;
+                        layoutStyle?: ('cards' | 'list') | null;
+                        background?: ('cream' | 'white' | 'peach') | null;
+                        spacing?: ('compact' | 'normal' | 'spacious') | null;
+                        packages: {
+                          name: string;
+                          target?: string | null;
+                          price: string;
+                          originalPrice?: string | null;
+                          duration?: string | null;
+                          description?: string | null;
+                          isPopular?: boolean | null;
+                          popularBadge?: string | null;
+                          features?:
+                            | {
+                                feature: string;
+                                id?: string | null;
+                              }[]
+                            | null;
+                          ctaText?: string | null;
+                          refCode?: string | null;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'pricing';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        kalaLabel?: string | null;
+                        otherLabel?: string | null;
+                        rows: {
+                          feature: string;
+                          kalaValue: string;
+                          otherValue: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'comparison';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        steps: {
+                          num?: string | null;
+                          title: string;
+                          description: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'steps';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        items: {
+                          quote: string;
+                          author: string;
+                          role?: string | null;
+                          area?: string | null;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'testimonials';
+                      }
+                    | {
+                        badge?: string | null;
+                        title: string;
+                        description: string;
+                        note?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'guarantee';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        faqs: {
+                          q: string;
+                          a: string;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'faq';
+                      }
+                    | {
+                        /**
+                         * Tulis paragraf, judul, kutipan, dan link secara bebas.
+                         */
+                        content: {
+                          root: {
+                            type: string;
+                            children: {
+                              type: any;
+                              version: number;
+                              [k: string]: unknown;
+                            }[];
+                            direction: ('ltr' | 'rtl') | null;
+                            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                            indent: number;
+                            version: number;
+                          };
+                          [k: string]: unknown;
+                        };
+                        containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'richText';
+                      }
+                    | {
+                        badge?: string | null;
+                        headline: string;
+                        description?: string | null;
+                        buttonText?: string | null;
+                        buttonMessage?: string | null;
+                        footnote?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'cta';
+                      }
+                    | {
+                        badge?: string | null;
+                        title: string;
+                        subtitle?: string | null;
+                        columns?: ('2' | '3' | '4') | null;
+                        bgStyle?: ('white' | 'warm') | null;
+                        images: {
+                          image?: (number | null) | Media;
+                          imageUrlFallback?: string | null;
+                          caption?: string | null;
+                          tag?: string | null;
+                          id?: string | null;
+                        }[];
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'gallery';
+                      }
+                    | {
+                        /**
+                         * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+                         */
+                        heading: string;
+                        subheading?: string | null;
+                        /**
+                         * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+                         */
+                        midwives?: (number | Midwife)[] | null;
+                        /**
+                         * Pilihan palet warna latar belakang.
+                         */
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        spacing?: ('compact' | 'normal' | 'spacious') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'midwifeSpotlight';
+                      }
+                    | {
+                        /**
+                         * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+                         */
+                        eyebrow?: string | null;
+                        text: string;
+                        subtitle?: string | null;
+                        /**
+                         * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+                         */
+                        level?: ('h2' | 'h3' | 'h4') | null;
+                        size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                        align?: ('center' | 'left') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'heading';
+                      }
+                    | {
+                        /**
+                         * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+                         */
+                        image?: (number | null) | Media;
+                        imageUrlFallback?: string | null;
+                        /**
+                         * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+                         */
+                        alt?: string | null;
+                        caption?: string | null;
+                        link?: string | null;
+                        width?: ('normal' | 'wide' | 'full') | null;
+                        align?: ('center' | 'left' | 'right') | null;
+                        ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+                        rounded?: ('none' | 'md' | 'lg') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'image';
+                      }
+                    | {
+                        text: string;
+                        action?: ('whatsapp' | 'url') | null;
+                        style?: ('primary' | 'secondary' | 'outline') | null;
+                        whatsappMessage?: string | null;
+                        url?: string | null;
+                        openInNewTab?: boolean | null;
+                        size?: ('sm' | 'md' | 'lg') | null;
+                        align?: ('left' | 'center' | 'right') | null;
+                        note?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'button';
+                      }
+                    | {
+                        variant?: ('line' | 'dots' | 'space') | null;
+                        spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                        width?: ('narrow' | 'normal' | 'full') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'divider';
+                      }
+                    | {
+                        /**
+                         * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+                         */
+                        url: string;
+                        title?: string | null;
+                        caption?: string | null;
+                        ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+                        maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'video';
+                      }
+                    | {
+                        title?: string | null;
+                        subtitle?: string | null;
+                        items: {
+                          value: string;
+                          label: string;
+                          icon?: string | null;
+                          id?: string | null;
+                        }[];
+                        columns?: ('2' | '3' | '4') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        style?: ('plain' | 'card') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'stats';
+                      }
+                    | {
+                        title?: string | null;
+                        items: {
+                          image?: (number | null) | Media;
+                          imageUrlFallback?: string | null;
+                          /**
+                           * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+                           */
+                          name: string;
+                          id?: string | null;
+                        }[];
+                        columns?: ('3' | '4' | '5' | '6') | null;
+                        background?: ('white' | 'cream') | null;
+                        grayscale?: boolean | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'logos';
+                      }
+                    | {
+                        heading: string;
+                        subheading?: string | null;
+                        /**
+                         * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+                         */
+                        midwives?: (number | Midwife)[] | null;
+                        columns?: ('2' | '3' | '4') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        showStr?: boolean | null;
+                        ctaText?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'team';
+                      }
+                    | {
+                        title?: string | null;
+                        subtitle?: string | null;
+                        tabs: {
+                          label: string;
+                          content: {
+                            root: {
+                              type: string;
+                              children: {
+                                type: any;
+                                version: number;
+                                [k: string]: unknown;
+                              }[];
+                              direction: ('ltr' | 'rtl') | null;
+                              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                              indent: number;
+                              version: number;
+                            };
+                            [k: string]: unknown;
+                          };
+                          id?: string | null;
+                        }[];
+                        style?: ('pills' | 'underline') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'tabs';
+                      }
+                    | {
+                        heading: string;
+                        description?: string | null;
+                        /**
+                         * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+                         */
+                        fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+                        /**
+                         * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+                         */
+                        serviceOptions?:
+                          | {
+                              label: string;
+                              id?: string | null;
+                            }[]
+                          | null;
+                        submitLabel?: string | null;
+                        consentText?: string | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        note?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'leadForm';
+                      }
+                    | {
+                        heading?: string | null;
+                        description?: string | null;
+                        source?: ('latest' | 'category') | null;
+                        category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+                        limit?: number | null;
+                        columns?: ('2' | '3') | null;
+                        background?: ('white' | 'cream') | null;
+                        showImage?: boolean | null;
+                        showExcerpt?: boolean | null;
+                        ctaText?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'blogFeed';
+                      }
+                    | {
+                        title: string;
+                        subtitle?: string | null;
+                        /**
+                         * Gunakan waktu WIB (Asia/Jakarta).
+                         */
+                        targetDate: string;
+                        expiredText?: string | null;
+                        ctaText?: string | null;
+                        background?: ('peach' | 'cream' | 'dark') | null;
+                        ctaMessage?: string | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'countdown';
+                      }
+                    | {
+                        variant: 'icons' | 'share' | 'both';
+                        title?: string | null;
+                        /**
+                         * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+                         */
+                        items?:
+                          | {
+                              platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+                              url: string;
+                              id?: string | null;
+                            }[]
+                          | null;
+                        shareLabel?: string | null;
+                        align?: ('left' | 'center') | null;
+                        background?: ('white' | 'cream' | 'peach') | null;
+                        /**
+                         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                         */
+                        anchorId?: string | null;
+                        /**
+                         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                         */
+                        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                        id?: string | null;
+                        blockName?: string | null;
+                        blockType: 'social';
+                      }
+                  )[]
+                | null;
+              id?: string | null;
+            }[];
+            /**
+             * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+             */
+            anchorId?: string | null;
+            /**
+             * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+             */
+            visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'section';
           }
         | {
             /**
@@ -1636,6 +4951,18 @@ export interface LandingPage {
           id?: string | null;
         }[]
       | null;
+    engineVersion?: string | null;
+    metrics?: {
+      titleScore?: number | null;
+      descScore?: number | null;
+      keywordScore?: number | null;
+      h1Score?: number | null;
+      altScore?: number | null;
+      slugScore?: number | null;
+      ogScore?: number | null;
+      contentScore?: number | null;
+      wordCount?: number | null;
+    };
     lastAuditedAt?: string | null;
   };
   updatedAt: string;
@@ -1687,6 +5014,14 @@ export interface PageTemplate {
         align?: ('center' | 'left') | null;
         btnColor?: ('terracotta' | 'whatsapp' | 'chocolate') | null;
         bgStyle?: ('gradient' | 'plain' | 'white') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'hero';
@@ -1703,6 +5038,14 @@ export interface PageTemplate {
           description: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'painPoints';
@@ -1720,6 +5063,14 @@ export interface PageTemplate {
           quote?: string | null;
           author?: string | null;
         };
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'solutions';
@@ -1750,6 +5101,14 @@ export interface PageTemplate {
           refCode?: string | null;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'pricing';
@@ -1765,6 +5124,14 @@ export interface PageTemplate {
           otherValue: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'comparison';
@@ -1778,6 +5145,14 @@ export interface PageTemplate {
           description: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'steps';
@@ -1792,6 +5167,14 @@ export interface PageTemplate {
           area?: string | null;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'testimonials';
@@ -1801,6 +5184,14 @@ export interface PageTemplate {
         title: string;
         description: string;
         note?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'guarantee';
@@ -1813,6 +5204,14 @@ export interface PageTemplate {
           a: string;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'faq';
@@ -1837,6 +5236,14 @@ export interface PageTemplate {
           [k: string]: unknown;
         };
         containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'richText';
@@ -1848,6 +5255,14 @@ export interface PageTemplate {
         buttonText?: string | null;
         buttonMessage?: string | null;
         footnote?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'cta';
@@ -1865,6 +5280,14 @@ export interface PageTemplate {
           tag?: string | null;
           id?: string | null;
         }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'gallery';
@@ -1884,9 +5307,996 @@ export interface PageTemplate {
          */
         background?: ('white' | 'cream' | 'peach') | null;
         spacing?: ('compact' | 'normal' | 'spacious') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'midwifeSpotlight';
+      }
+    | {
+        /**
+         * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+         */
+        eyebrow?: string | null;
+        text: string;
+        subtitle?: string | null;
+        /**
+         * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+         */
+        level?: ('h2' | 'h3' | 'h4') | null;
+        size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+        align?: ('center' | 'left') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'heading';
+      }
+    | {
+        /**
+         * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+         */
+        image?: (number | null) | Media;
+        imageUrlFallback?: string | null;
+        /**
+         * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+         */
+        alt?: string | null;
+        caption?: string | null;
+        link?: string | null;
+        width?: ('normal' | 'wide' | 'full') | null;
+        align?: ('center' | 'left' | 'right') | null;
+        ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+        rounded?: ('none' | 'md' | 'lg') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'image';
+      }
+    | {
+        text: string;
+        action?: ('whatsapp' | 'url') | null;
+        style?: ('primary' | 'secondary' | 'outline') | null;
+        whatsappMessage?: string | null;
+        url?: string | null;
+        openInNewTab?: boolean | null;
+        size?: ('sm' | 'md' | 'lg') | null;
+        align?: ('left' | 'center' | 'right') | null;
+        note?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'button';
+      }
+    | {
+        variant?: ('line' | 'dots' | 'space') | null;
+        spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+        width?: ('narrow' | 'normal' | 'full') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'divider';
+      }
+    | {
+        /**
+         * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+         */
+        url: string;
+        title?: string | null;
+        caption?: string | null;
+        ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+        maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'video';
+      }
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+        items: {
+          value: string;
+          label: string;
+          icon?: string | null;
+          id?: string | null;
+        }[];
+        columns?: ('2' | '3' | '4') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        style?: ('plain' | 'card') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'stats';
+      }
+    | {
+        title?: string | null;
+        items: {
+          image?: (number | null) | Media;
+          imageUrlFallback?: string | null;
+          /**
+           * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+           */
+          name: string;
+          id?: string | null;
+        }[];
+        columns?: ('3' | '4' | '5' | '6') | null;
+        background?: ('white' | 'cream') | null;
+        grayscale?: boolean | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'logos';
+      }
+    | {
+        heading: string;
+        subheading?: string | null;
+        /**
+         * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+         */
+        midwives?: (number | Midwife)[] | null;
+        columns?: ('2' | '3' | '4') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        showStr?: boolean | null;
+        ctaText?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'team';
+      }
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+        tabs: {
+          label: string;
+          content: {
+            root: {
+              type: string;
+              children: {
+                type: any;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          };
+          id?: string | null;
+        }[];
+        style?: ('pills' | 'underline') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'tabs';
+      }
+    | {
+        heading: string;
+        description?: string | null;
+        /**
+         * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+         */
+        fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+        /**
+         * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+         */
+        serviceOptions?:
+          | {
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        submitLabel?: string | null;
+        consentText?: string | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        note?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'leadForm';
+      }
+    | {
+        heading?: string | null;
+        description?: string | null;
+        source?: ('latest' | 'category') | null;
+        category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+        limit?: number | null;
+        columns?: ('2' | '3') | null;
+        background?: ('white' | 'cream') | null;
+        showImage?: boolean | null;
+        showExcerpt?: boolean | null;
+        ctaText?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'blogFeed';
+      }
+    | {
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Gunakan waktu WIB (Asia/Jakarta).
+         */
+        targetDate: string;
+        expiredText?: string | null;
+        ctaText?: string | null;
+        background?: ('peach' | 'cream' | 'dark') | null;
+        ctaMessage?: string | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'countdown';
+      }
+    | {
+        variant: 'icons' | 'share' | 'both';
+        title?: string | null;
+        /**
+         * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+         */
+        items?:
+          | {
+              platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+              url: string;
+              id?: string | null;
+            }[]
+          | null;
+        shareLabel?: string | null;
+        align?: ('left' | 'center') | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'social';
+      }
+    | {
+        /**
+         * Hanya tampil di admin untuk memudahkan navigasi, tidak tampil di website.
+         */
+        label?: string | null;
+        background?: ('white' | 'cream' | 'peach' | 'gradient') | null;
+        padding?: ('none' | 'compact' | 'normal' | 'spacious') | null;
+        maxWidth?: ('narrow' | 'normal' | 'wide' | 'full') | null;
+        gap?: ('compact' | 'normal' | 'spacious') | null;
+        /**
+         * Tambahkan 1–4 kolom. Setiap kolom bisa diisi blok apa pun (judul, teks, gambar, tombol, video, dsb).
+         */
+        columns: {
+          width?: ('full' | 'half' | 'third' | 'twoThirds' | 'quarter') | null;
+          content?:
+            | (
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    columns?: ('2' | '3') | null;
+                    background?: ('cream' | 'white' | 'peach') | null;
+                    spacing?: ('compact' | 'normal' | 'spacious') | null;
+                    points: {
+                      icon?: string | null;
+                      title: string;
+                      description: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'painPoints';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    items: {
+                      icon?: string | null;
+                      title: string;
+                      description: string;
+                      id?: string | null;
+                    }[];
+                    highlightQuote?: {
+                      quote?: string | null;
+                      author?: string | null;
+                    };
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'solutions';
+                  }
+                | {
+                    badge?: string | null;
+                    title: string;
+                    subtitle?: string | null;
+                    layoutStyle?: ('cards' | 'list') | null;
+                    background?: ('cream' | 'white' | 'peach') | null;
+                    spacing?: ('compact' | 'normal' | 'spacious') | null;
+                    packages: {
+                      name: string;
+                      target?: string | null;
+                      price: string;
+                      originalPrice?: string | null;
+                      duration?: string | null;
+                      description?: string | null;
+                      isPopular?: boolean | null;
+                      popularBadge?: string | null;
+                      features?:
+                        | {
+                            feature: string;
+                            id?: string | null;
+                          }[]
+                        | null;
+                      ctaText?: string | null;
+                      refCode?: string | null;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'pricing';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    kalaLabel?: string | null;
+                    otherLabel?: string | null;
+                    rows: {
+                      feature: string;
+                      kalaValue: string;
+                      otherValue: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'comparison';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    steps: {
+                      num?: string | null;
+                      title: string;
+                      description: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'steps';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    items: {
+                      quote: string;
+                      author: string;
+                      role?: string | null;
+                      area?: string | null;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'testimonials';
+                  }
+                | {
+                    badge?: string | null;
+                    title: string;
+                    description: string;
+                    note?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'guarantee';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    faqs: {
+                      q: string;
+                      a: string;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'faq';
+                  }
+                | {
+                    /**
+                     * Tulis paragraf, judul, kutipan, dan link secara bebas.
+                     */
+                    content: {
+                      root: {
+                        type: string;
+                        children: {
+                          type: any;
+                          version: number;
+                          [k: string]: unknown;
+                        }[];
+                        direction: ('ltr' | 'rtl') | null;
+                        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                        indent: number;
+                        version: number;
+                      };
+                      [k: string]: unknown;
+                    };
+                    containerWidth?: ('narrow' | 'normal' | 'wide') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'richText';
+                  }
+                | {
+                    badge?: string | null;
+                    headline: string;
+                    description?: string | null;
+                    buttonText?: string | null;
+                    buttonMessage?: string | null;
+                    footnote?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'cta';
+                  }
+                | {
+                    badge?: string | null;
+                    title: string;
+                    subtitle?: string | null;
+                    columns?: ('2' | '3' | '4') | null;
+                    bgStyle?: ('white' | 'warm') | null;
+                    images: {
+                      image?: (number | null) | Media;
+                      imageUrlFallback?: string | null;
+                      caption?: string | null;
+                      tag?: string | null;
+                      id?: string | null;
+                    }[];
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'gallery';
+                  }
+                | {
+                    /**
+                     * Contoh: Dipijat oleh bidan ber-STR yang sudah Anda kenal (maks 70 karakter).
+                     */
+                    heading: string;
+                    subheading?: string | null;
+                    /**
+                     * Pilih bidan yang bertugas melayani wilayah atau fokus pada tindakan ini.
+                     */
+                    midwives?: (number | Midwife)[] | null;
+                    /**
+                     * Pilihan palet warna latar belakang.
+                     */
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    spacing?: ('compact' | 'normal' | 'spacious') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'midwifeSpotlight';
+                  }
+                | {
+                    /**
+                     * Teks pendek berwarna di atas judul, berguna sebagai penanda kategori.
+                     */
+                    eyebrow?: string | null;
+                    text: string;
+                    subtitle?: string | null;
+                    /**
+                     * Satu halaman sebaiknya hanya punya satu H1 (biasanya di Hero).
+                     */
+                    level?: ('h2' | 'h3' | 'h4') | null;
+                    size?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                    align?: ('center' | 'left') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'heading';
+                  }
+                | {
+                    /**
+                     * Unggah foto (WebP/JPG/PNG). Jika kosong, isi URL cadangan di bawah.
+                     */
+                    image?: (number | null) | Media;
+                    imageUrlFallback?: string | null;
+                    /**
+                     * Deskripsikan isi gambar. Contoh: Bidan memijat bayi dengan lembut.
+                     */
+                    alt?: string | null;
+                    caption?: string | null;
+                    link?: string | null;
+                    width?: ('normal' | 'wide' | 'full') | null;
+                    align?: ('center' | 'left' | 'right') | null;
+                    ratio?: ('auto' | '16:9' | '4:3' | '1:1') | null;
+                    rounded?: ('none' | 'md' | 'lg') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'image';
+                  }
+                | {
+                    text: string;
+                    action?: ('whatsapp' | 'url') | null;
+                    style?: ('primary' | 'secondary' | 'outline') | null;
+                    whatsappMessage?: string | null;
+                    url?: string | null;
+                    openInNewTab?: boolean | null;
+                    size?: ('sm' | 'md' | 'lg') | null;
+                    align?: ('left' | 'center' | 'right') | null;
+                    note?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'button';
+                  }
+                | {
+                    variant?: ('line' | 'dots' | 'space') | null;
+                    spacing?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                    width?: ('narrow' | 'normal' | 'full') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'divider';
+                  }
+                | {
+                    /**
+                     * Tempel tautan YouTube, Vimeo, atau Shorts. Video akan diputar di dalam halaman (tanpa keluar situs).
+                     */
+                    url: string;
+                    title?: string | null;
+                    caption?: string | null;
+                    ratio?: ('16:9' | '9:16' | '4:3' | '1:1') | null;
+                    maxWidth?: ('narrow' | 'normal' | 'wide') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'video';
+                  }
+                | {
+                    title?: string | null;
+                    subtitle?: string | null;
+                    items: {
+                      value: string;
+                      label: string;
+                      icon?: string | null;
+                      id?: string | null;
+                    }[];
+                    columns?: ('2' | '3' | '4') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    style?: ('plain' | 'card') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'stats';
+                  }
+                | {
+                    title?: string | null;
+                    items: {
+                      image?: (number | null) | Media;
+                      imageUrlFallback?: string | null;
+                      /**
+                       * Dipakai sebagai alt text logo untuk aksesibilitas dan SEO.
+                       */
+                      name: string;
+                      id?: string | null;
+                    }[];
+                    columns?: ('3' | '4' | '5' | '6') | null;
+                    background?: ('white' | 'cream') | null;
+                    grayscale?: boolean | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'logos';
+                  }
+                | {
+                    heading: string;
+                    subheading?: string | null;
+                    /**
+                     * Kosongkan untuk menampilkan semua bidan aktif. Data diambil otomatis dari koleksi Bidan (tidak perlu input ulang).
+                     */
+                    midwives?: (number | Midwife)[] | null;
+                    columns?: ('2' | '3' | '4') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    showStr?: boolean | null;
+                    ctaText?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'team';
+                  }
+                | {
+                    title?: string | null;
+                    subtitle?: string | null;
+                    tabs: {
+                      label: string;
+                      content: {
+                        root: {
+                          type: string;
+                          children: {
+                            type: any;
+                            version: number;
+                            [k: string]: unknown;
+                          }[];
+                          direction: ('ltr' | 'rtl') | null;
+                          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                          indent: number;
+                          version: number;
+                        };
+                        [k: string]: unknown;
+                      };
+                      id?: string | null;
+                    }[];
+                    style?: ('pills' | 'underline') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'tabs';
+                  }
+                | {
+                    heading: string;
+                    description?: string | null;
+                    /**
+                     * Kolom "Nama" dan "Nomor WhatsApp" selalu ditampilkan karena dibutuhkan untuk menghubungi Bunda.
+                     */
+                    fields?: ('name' | 'phone' | 'email' | 'service' | 'date' | 'message')[] | null;
+                    /**
+                     * Kosongkan untuk mengambil daftar layanan aktif otomatis dari koleksi Layanan.
+                     */
+                    serviceOptions?:
+                      | {
+                          label: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    submitLabel?: string | null;
+                    consentText?: string | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    note?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'leadForm';
+                  }
+                | {
+                    heading?: string | null;
+                    description?: string | null;
+                    source?: ('latest' | 'category') | null;
+                    category?: ('bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan') | null;
+                    limit?: number | null;
+                    columns?: ('2' | '3') | null;
+                    background?: ('white' | 'cream') | null;
+                    showImage?: boolean | null;
+                    showExcerpt?: boolean | null;
+                    ctaText?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'blogFeed';
+                  }
+                | {
+                    title: string;
+                    subtitle?: string | null;
+                    /**
+                     * Gunakan waktu WIB (Asia/Jakarta).
+                     */
+                    targetDate: string;
+                    expiredText?: string | null;
+                    ctaText?: string | null;
+                    background?: ('peach' | 'cream' | 'dark') | null;
+                    ctaMessage?: string | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'countdown';
+                  }
+                | {
+                    variant: 'icons' | 'share' | 'both';
+                    title?: string | null;
+                    /**
+                     * Kosongkan untuk mengambil tautan dari Pengaturan Situs (Site Settings).
+                     */
+                    items?:
+                      | {
+                          platform: 'instagram' | 'tiktok' | 'facebook' | 'youtube' | 'whatsapp' | 'email';
+                          url: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    shareLabel?: string | null;
+                    align?: ('left' | 'center') | null;
+                    background?: ('white' | 'cream' | 'peach') | null;
+                    /**
+                     * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+                     */
+                    anchorId?: string | null;
+                    /**
+                     * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+                     */
+                    visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+                    id?: string | null;
+                    blockName?: string | null;
+                    blockType: 'social';
+                  }
+              )[]
+            | null;
+          id?: string | null;
+        }[];
+        /**
+         * Dipakai untuk tautan langsung ke bagian ini, contoh: paket-harga. Hanya huruf kecil, angka, dan tanda hubung.
+         */
+        anchorId?: string | null;
+        /**
+         * Kosongkan pilihan untuk menyembunyikan blok ini sepenuhnya. Berguna untuk menyembunyikan bagian yang terlalu panjang di ponsel.
+         */
+        visibility?: ('mobile' | 'tablet' | 'desktop')[] | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'section';
       }
     | {
         /**
@@ -1936,9 +6346,14 @@ export interface Testimonial {
    */
   photo?: (number | null) | Media;
   /**
-   * Wajib dicentang demi mematuhi UU Perlindungan Data Pribadi (UU PDP) dan etika kerahasiaan medis.
+   * Wajib dicentang sebelum testimoni boleh tampil di website. Biarkan kosong selama izin pasien belum terverifikasi.
    */
-  permissionGranted: boolean;
+  permissionGranted?: boolean | null;
+  /**
+   * Bentuk bukti persetujuan orang tua/pasien untuk penayangan testimoni.
+   */
+  consentMethod?: ('whatsapp' | 'written' | 'online_form') | null;
+  consentDate?: string | null;
   /**
    * ID unik dari booking bot WA (contoh: booking-20261023-001) untuk mencegah duplikasi webhook (idempotency).
    */
@@ -1946,7 +6361,7 @@ export interface Testimonial {
   date?: string | null;
   order?: number | null;
   /**
-   * Untuk ulasan masuk dari Bot WA, pastikan centang ini HANYA setelah admin memverifikasi kelayakan ulasan.
+   * Centang HANYA setelah admin memverifikasi kelayakan dan izin publikasi ulasan.
    */
   active?: boolean | null;
   updatedAt: string;
@@ -1977,6 +6392,35 @@ export interface Faq {
   relatedAreas?: (number | ServiceArea)[] | null;
   order?: number | null;
   active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Catatan riwayat build Cloudflare Pages dan sinkronisasi konten publik.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deployments".
+ */
+export interface Deployment {
+  id: number;
+  /**
+   * Status aktual proses build di Cloudflare Pages.
+   */
+  status: 'queued' | 'building' | 'success' | 'failed' | 'canceled';
+  /**
+   * Aksi konten yang memicu build. Contoh: [PUBLISH] Articles (bayi-kolik)
+   */
+  triggerReason: string;
+  /**
+   * Tautan spesifik untuk pratinjau commit/build ini.
+   */
+  url?: string | null;
+  cloudflareDeploymentId?: string | null;
+  environment?: ('production' | 'preview') | null;
+  durationSeconds?: number | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
+  errorMessage?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2050,7 +6494,7 @@ export interface User {
   /**
    * Menentukan menu apa saja yang dapat dilihat dan diedit oleh pengguna ini di dashboard.
    */
-  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing';
+  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing' | 'automation';
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -2091,6 +6535,98 @@ export interface PayloadKv {
     | number
     | boolean
     | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'schedulePublish';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'schedulePublish') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2142,6 +6678,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faq';
         value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'deployments';
+        value: number | Deployment;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2227,9 +6767,13 @@ export interface ArticlesSelect<T extends boolean = true> {
         relatedArticles?: T;
         relatedAreas?: T;
       };
+  authorMidwife?: T;
   author?: T;
   authorTitle?: T;
+  reviewedByMidwife?: T;
   medicalReviewer?: T;
+  reviewedAt?: T;
+  reviewNotes?: T;
   heroImageUrlFallback?: T;
   keywords?:
     | T
@@ -2256,10 +6800,25 @@ export interface ArticlesSelect<T extends boolean = true> {
               targetField?: T;
               id?: T;
             };
+        engineVersion?: T;
+        metrics?:
+          | T
+          | {
+              titleScore?: T;
+              descScore?: T;
+              keywordScore?: T;
+              h1Score?: T;
+              altScore?: T;
+              slugScore?: T;
+              ogScore?: T;
+              contentScore?: T;
+              wordCount?: T;
+            };
         lastAuditedAt?: T;
       };
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -2268,6 +6827,8 @@ export interface ArticlesSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  folder?: T;
+  tags?: T;
   caption?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2333,6 +6894,8 @@ export interface PagesSelect<T extends boolean = true> {
               align?: T;
               btnColor?: T;
               bgStyle?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2352,6 +6915,8 @@ export interface PagesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2374,6 +6939,8 @@ export interface PagesSelect<T extends boolean = true> {
                     quote?: T;
                     author?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2407,6 +6974,8 @@ export interface PagesSelect<T extends boolean = true> {
                     refCode?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2425,6 +6994,8 @@ export interface PagesSelect<T extends boolean = true> {
                     otherValue?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2441,6 +7012,8 @@ export interface PagesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2458,6 +7031,8 @@ export interface PagesSelect<T extends boolean = true> {
                     area?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2468,6 +7043,8 @@ export interface PagesSelect<T extends boolean = true> {
               title?: T;
               description?: T;
               note?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2483,6 +7060,8 @@ export interface PagesSelect<T extends boolean = true> {
                     a?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2491,6 +7070,8 @@ export interface PagesSelect<T extends boolean = true> {
           | {
               content?: T;
               containerWidth?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2503,6 +7084,8 @@ export interface PagesSelect<T extends boolean = true> {
               buttonText?: T;
               buttonMessage?: T;
               footnote?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2523,6 +7106,8 @@ export interface PagesSelect<T extends boolean = true> {
                     tag?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2534,6 +7119,698 @@ export interface PagesSelect<T extends boolean = true> {
               midwives?: T;
               background?: T;
               spacing?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              eyebrow?: T;
+              text?: T;
+              subtitle?: T;
+              level?: T;
+              size?: T;
+              align?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              imageUrlFallback?: T;
+              alt?: T;
+              caption?: T;
+              link?: T;
+              width?: T;
+              align?: T;
+              ratio?: T;
+              rounded?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              text?: T;
+              action?: T;
+              style?: T;
+              whatsappMessage?: T;
+              url?: T;
+              openInNewTab?: T;
+              size?: T;
+              align?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              variant?: T;
+              spacing?: T;
+              width?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              url?: T;
+              title?: T;
+              caption?: T;
+              ratio?: T;
+              maxWidth?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        stats?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              style?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        logos?:
+          | T
+          | {
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    name?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              grayscale?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        team?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              columns?: T;
+              background?: T;
+              showStr?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        tabs?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              tabs?:
+                | T
+                | {
+                    label?: T;
+                    content?: T;
+                    id?: T;
+                  };
+              style?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        leadForm?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              fields?: T;
+              serviceOptions?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              submitLabel?: T;
+              consentText?: T;
+              background?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        blogFeed?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              source?: T;
+              category?: T;
+              limit?: T;
+              columns?: T;
+              background?: T;
+              showImage?: T;
+              showExcerpt?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        countdown?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              targetDate?: T;
+              expiredText?: T;
+              ctaText?: T;
+              background?: T;
+              ctaMessage?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        social?:
+          | T
+          | {
+              variant?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    platform?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              shareLabel?: T;
+              align?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        section?:
+          | T
+          | {
+              label?: T;
+              background?: T;
+              padding?: T;
+              maxWidth?: T;
+              gap?: T;
+              columns?:
+                | T
+                | {
+                    width?: T;
+                    content?:
+                      | T
+                      | {
+                          painPoints?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                background?: T;
+                                spacing?: T;
+                                points?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          solutions?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                highlightQuote?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          pricing?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                layoutStyle?: T;
+                                background?: T;
+                                spacing?: T;
+                                packages?:
+                                  | T
+                                  | {
+                                      name?: T;
+                                      target?: T;
+                                      price?: T;
+                                      originalPrice?: T;
+                                      duration?: T;
+                                      description?: T;
+                                      isPopular?: T;
+                                      popularBadge?: T;
+                                      features?:
+                                        | T
+                                        | {
+                                            feature?: T;
+                                            id?: T;
+                                          };
+                                      ctaText?: T;
+                                      refCode?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          comparison?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                kalaLabel?: T;
+                                otherLabel?: T;
+                                rows?:
+                                  | T
+                                  | {
+                                      feature?: T;
+                                      kalaValue?: T;
+                                      otherValue?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          steps?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                steps?:
+                                  | T
+                                  | {
+                                      num?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          testimonials?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                      role?: T;
+                                      area?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          guarantee?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                description?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          faq?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                faqs?:
+                                  | T
+                                  | {
+                                      q?: T;
+                                      a?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          richText?:
+                            | T
+                            | {
+                                content?: T;
+                                containerWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                badge?: T;
+                                headline?: T;
+                                description?: T;
+                                buttonText?: T;
+                                buttonMessage?: T;
+                                footnote?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          gallery?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                bgStyle?: T;
+                                images?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      caption?: T;
+                                      tag?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          midwifeSpotlight?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                background?: T;
+                                spacing?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          heading?:
+                            | T
+                            | {
+                                eyebrow?: T;
+                                text?: T;
+                                subtitle?: T;
+                                level?: T;
+                                size?: T;
+                                align?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          image?:
+                            | T
+                            | {
+                                image?: T;
+                                imageUrlFallback?: T;
+                                alt?: T;
+                                caption?: T;
+                                link?: T;
+                                width?: T;
+                                align?: T;
+                                ratio?: T;
+                                rounded?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          button?:
+                            | T
+                            | {
+                                text?: T;
+                                action?: T;
+                                style?: T;
+                                whatsappMessage?: T;
+                                url?: T;
+                                openInNewTab?: T;
+                                size?: T;
+                                align?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          divider?:
+                            | T
+                            | {
+                                variant?: T;
+                                spacing?: T;
+                                width?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          video?:
+                            | T
+                            | {
+                                url?: T;
+                                title?: T;
+                                caption?: T;
+                                ratio?: T;
+                                maxWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          stats?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      value?: T;
+                                      label?: T;
+                                      icon?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                style?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          logos?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      name?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                grayscale?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          team?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                columns?: T;
+                                background?: T;
+                                showStr?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          tabs?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                tabs?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      content?: T;
+                                      id?: T;
+                                    };
+                                style?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          leadForm?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                fields?: T;
+                                serviceOptions?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      id?: T;
+                                    };
+                                submitLabel?: T;
+                                consentText?: T;
+                                background?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          blogFeed?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                source?: T;
+                                category?: T;
+                                limit?: T;
+                                columns?: T;
+                                background?: T;
+                                showImage?: T;
+                                showExcerpt?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          countdown?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                targetDate?: T;
+                                expiredText?: T;
+                                ctaText?: T;
+                                background?: T;
+                                ctaMessage?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          social?:
+                            | T
+                            | {
+                                variant?: T;
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      platform?: T;
+                                      url?: T;
+                                      id?: T;
+                                    };
+                                shareLabel?: T;
+                                align?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    id?: T;
+                  };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2579,10 +7856,25 @@ export interface PagesSelect<T extends boolean = true> {
               targetField?: T;
               id?: T;
             };
+        engineVersion?: T;
+        metrics?:
+          | T
+          | {
+              titleScore?: T;
+              descScore?: T;
+              keywordScore?: T;
+              h1Score?: T;
+              altScore?: T;
+              slugScore?: T;
+              ogScore?: T;
+              contentScore?: T;
+              wordCount?: T;
+            };
         lastAuditedAt?: T;
       };
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   _status?: T;
 }
 /**
@@ -2617,6 +7909,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
               align?: T;
               btnColor?: T;
               bgStyle?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2636,6 +7930,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2658,6 +7954,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     quote?: T;
                     author?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2691,6 +7989,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     refCode?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2709,6 +8009,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     otherValue?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2725,6 +8027,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2742,6 +8046,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     area?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2752,6 +8058,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
               title?: T;
               description?: T;
               note?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2767,6 +8075,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     a?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2775,6 +8085,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
           | {
               content?: T;
               containerWidth?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2787,6 +8099,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
               buttonText?: T;
               buttonMessage?: T;
               footnote?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2807,6 +8121,8 @@ export interface LandingPagesSelect<T extends boolean = true> {
                     tag?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2818,6 +8134,698 @@ export interface LandingPagesSelect<T extends boolean = true> {
               midwives?: T;
               background?: T;
               spacing?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              eyebrow?: T;
+              text?: T;
+              subtitle?: T;
+              level?: T;
+              size?: T;
+              align?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              imageUrlFallback?: T;
+              alt?: T;
+              caption?: T;
+              link?: T;
+              width?: T;
+              align?: T;
+              ratio?: T;
+              rounded?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              text?: T;
+              action?: T;
+              style?: T;
+              whatsappMessage?: T;
+              url?: T;
+              openInNewTab?: T;
+              size?: T;
+              align?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              variant?: T;
+              spacing?: T;
+              width?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              url?: T;
+              title?: T;
+              caption?: T;
+              ratio?: T;
+              maxWidth?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        stats?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              style?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        logos?:
+          | T
+          | {
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    name?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              grayscale?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        team?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              columns?: T;
+              background?: T;
+              showStr?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        tabs?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              tabs?:
+                | T
+                | {
+                    label?: T;
+                    content?: T;
+                    id?: T;
+                  };
+              style?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        leadForm?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              fields?: T;
+              serviceOptions?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              submitLabel?: T;
+              consentText?: T;
+              background?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        blogFeed?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              source?: T;
+              category?: T;
+              limit?: T;
+              columns?: T;
+              background?: T;
+              showImage?: T;
+              showExcerpt?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        countdown?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              targetDate?: T;
+              expiredText?: T;
+              ctaText?: T;
+              background?: T;
+              ctaMessage?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        social?:
+          | T
+          | {
+              variant?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    platform?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              shareLabel?: T;
+              align?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        section?:
+          | T
+          | {
+              label?: T;
+              background?: T;
+              padding?: T;
+              maxWidth?: T;
+              gap?: T;
+              columns?:
+                | T
+                | {
+                    width?: T;
+                    content?:
+                      | T
+                      | {
+                          painPoints?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                background?: T;
+                                spacing?: T;
+                                points?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          solutions?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                highlightQuote?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          pricing?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                layoutStyle?: T;
+                                background?: T;
+                                spacing?: T;
+                                packages?:
+                                  | T
+                                  | {
+                                      name?: T;
+                                      target?: T;
+                                      price?: T;
+                                      originalPrice?: T;
+                                      duration?: T;
+                                      description?: T;
+                                      isPopular?: T;
+                                      popularBadge?: T;
+                                      features?:
+                                        | T
+                                        | {
+                                            feature?: T;
+                                            id?: T;
+                                          };
+                                      ctaText?: T;
+                                      refCode?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          comparison?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                kalaLabel?: T;
+                                otherLabel?: T;
+                                rows?:
+                                  | T
+                                  | {
+                                      feature?: T;
+                                      kalaValue?: T;
+                                      otherValue?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          steps?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                steps?:
+                                  | T
+                                  | {
+                                      num?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          testimonials?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                      role?: T;
+                                      area?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          guarantee?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                description?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          faq?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                faqs?:
+                                  | T
+                                  | {
+                                      q?: T;
+                                      a?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          richText?:
+                            | T
+                            | {
+                                content?: T;
+                                containerWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                badge?: T;
+                                headline?: T;
+                                description?: T;
+                                buttonText?: T;
+                                buttonMessage?: T;
+                                footnote?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          gallery?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                bgStyle?: T;
+                                images?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      caption?: T;
+                                      tag?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          midwifeSpotlight?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                background?: T;
+                                spacing?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          heading?:
+                            | T
+                            | {
+                                eyebrow?: T;
+                                text?: T;
+                                subtitle?: T;
+                                level?: T;
+                                size?: T;
+                                align?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          image?:
+                            | T
+                            | {
+                                image?: T;
+                                imageUrlFallback?: T;
+                                alt?: T;
+                                caption?: T;
+                                link?: T;
+                                width?: T;
+                                align?: T;
+                                ratio?: T;
+                                rounded?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          button?:
+                            | T
+                            | {
+                                text?: T;
+                                action?: T;
+                                style?: T;
+                                whatsappMessage?: T;
+                                url?: T;
+                                openInNewTab?: T;
+                                size?: T;
+                                align?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          divider?:
+                            | T
+                            | {
+                                variant?: T;
+                                spacing?: T;
+                                width?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          video?:
+                            | T
+                            | {
+                                url?: T;
+                                title?: T;
+                                caption?: T;
+                                ratio?: T;
+                                maxWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          stats?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      value?: T;
+                                      label?: T;
+                                      icon?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                style?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          logos?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      name?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                grayscale?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          team?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                columns?: T;
+                                background?: T;
+                                showStr?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          tabs?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                tabs?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      content?: T;
+                                      id?: T;
+                                    };
+                                style?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          leadForm?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                fields?: T;
+                                serviceOptions?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      id?: T;
+                                    };
+                                submitLabel?: T;
+                                consentText?: T;
+                                background?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          blogFeed?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                source?: T;
+                                category?: T;
+                                limit?: T;
+                                columns?: T;
+                                background?: T;
+                                showImage?: T;
+                                showExcerpt?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          countdown?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                targetDate?: T;
+                                expiredText?: T;
+                                ctaText?: T;
+                                background?: T;
+                                ctaMessage?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          social?:
+                            | T
+                            | {
+                                variant?: T;
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      platform?: T;
+                                      url?: T;
+                                      id?: T;
+                                    };
+                                shareLabel?: T;
+                                align?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    id?: T;
+                  };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2894,6 +8902,20 @@ export interface LandingPagesSelect<T extends boolean = true> {
               targetField?: T;
               id?: T;
             };
+        engineVersion?: T;
+        metrics?:
+          | T
+          | {
+              titleScore?: T;
+              descScore?: T;
+              keywordScore?: T;
+              h1Score?: T;
+              altScore?: T;
+              slugScore?: T;
+              ogScore?: T;
+              contentScore?: T;
+              wordCount?: T;
+            };
         lastAuditedAt?: T;
       };
   updatedAt?: T;
@@ -2928,6 +8950,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
               align?: T;
               btnColor?: T;
               bgStyle?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2947,6 +8971,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -2969,6 +8995,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     quote?: T;
                     author?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3002,6 +9030,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     refCode?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3020,6 +9050,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     otherValue?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3036,6 +9068,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3053,6 +9087,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     area?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3063,6 +9099,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
               title?: T;
               description?: T;
               note?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3078,6 +9116,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     a?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3086,6 +9126,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
           | {
               content?: T;
               containerWidth?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3098,6 +9140,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
               buttonText?: T;
               buttonMessage?: T;
               footnote?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3118,6 +9162,8 @@ export interface PageTemplatesSelect<T extends boolean = true> {
                     tag?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3129,6 +9175,698 @@ export interface PageTemplatesSelect<T extends boolean = true> {
               midwives?: T;
               background?: T;
               spacing?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              eyebrow?: T;
+              text?: T;
+              subtitle?: T;
+              level?: T;
+              size?: T;
+              align?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              imageUrlFallback?: T;
+              alt?: T;
+              caption?: T;
+              link?: T;
+              width?: T;
+              align?: T;
+              ratio?: T;
+              rounded?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              text?: T;
+              action?: T;
+              style?: T;
+              whatsappMessage?: T;
+              url?: T;
+              openInNewTab?: T;
+              size?: T;
+              align?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              variant?: T;
+              spacing?: T;
+              width?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              url?: T;
+              title?: T;
+              caption?: T;
+              ratio?: T;
+              maxWidth?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        stats?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              style?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        logos?:
+          | T
+          | {
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    name?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              grayscale?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        team?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              columns?: T;
+              background?: T;
+              showStr?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        tabs?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              tabs?:
+                | T
+                | {
+                    label?: T;
+                    content?: T;
+                    id?: T;
+                  };
+              style?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        leadForm?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              fields?: T;
+              serviceOptions?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              submitLabel?: T;
+              consentText?: T;
+              background?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        blogFeed?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              source?: T;
+              category?: T;
+              limit?: T;
+              columns?: T;
+              background?: T;
+              showImage?: T;
+              showExcerpt?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        countdown?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              targetDate?: T;
+              expiredText?: T;
+              ctaText?: T;
+              background?: T;
+              ctaMessage?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        social?:
+          | T
+          | {
+              variant?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    platform?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              shareLabel?: T;
+              align?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        section?:
+          | T
+          | {
+              label?: T;
+              background?: T;
+              padding?: T;
+              maxWidth?: T;
+              gap?: T;
+              columns?:
+                | T
+                | {
+                    width?: T;
+                    content?:
+                      | T
+                      | {
+                          painPoints?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                background?: T;
+                                spacing?: T;
+                                points?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          solutions?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                highlightQuote?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          pricing?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                layoutStyle?: T;
+                                background?: T;
+                                spacing?: T;
+                                packages?:
+                                  | T
+                                  | {
+                                      name?: T;
+                                      target?: T;
+                                      price?: T;
+                                      originalPrice?: T;
+                                      duration?: T;
+                                      description?: T;
+                                      isPopular?: T;
+                                      popularBadge?: T;
+                                      features?:
+                                        | T
+                                        | {
+                                            feature?: T;
+                                            id?: T;
+                                          };
+                                      ctaText?: T;
+                                      refCode?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          comparison?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                kalaLabel?: T;
+                                otherLabel?: T;
+                                rows?:
+                                  | T
+                                  | {
+                                      feature?: T;
+                                      kalaValue?: T;
+                                      otherValue?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          steps?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                steps?:
+                                  | T
+                                  | {
+                                      num?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          testimonials?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                      role?: T;
+                                      area?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          guarantee?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                description?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          faq?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                faqs?:
+                                  | T
+                                  | {
+                                      q?: T;
+                                      a?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          richText?:
+                            | T
+                            | {
+                                content?: T;
+                                containerWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                badge?: T;
+                                headline?: T;
+                                description?: T;
+                                buttonText?: T;
+                                buttonMessage?: T;
+                                footnote?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          gallery?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                bgStyle?: T;
+                                images?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      caption?: T;
+                                      tag?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          midwifeSpotlight?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                background?: T;
+                                spacing?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          heading?:
+                            | T
+                            | {
+                                eyebrow?: T;
+                                text?: T;
+                                subtitle?: T;
+                                level?: T;
+                                size?: T;
+                                align?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          image?:
+                            | T
+                            | {
+                                image?: T;
+                                imageUrlFallback?: T;
+                                alt?: T;
+                                caption?: T;
+                                link?: T;
+                                width?: T;
+                                align?: T;
+                                ratio?: T;
+                                rounded?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          button?:
+                            | T
+                            | {
+                                text?: T;
+                                action?: T;
+                                style?: T;
+                                whatsappMessage?: T;
+                                url?: T;
+                                openInNewTab?: T;
+                                size?: T;
+                                align?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          divider?:
+                            | T
+                            | {
+                                variant?: T;
+                                spacing?: T;
+                                width?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          video?:
+                            | T
+                            | {
+                                url?: T;
+                                title?: T;
+                                caption?: T;
+                                ratio?: T;
+                                maxWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          stats?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      value?: T;
+                                      label?: T;
+                                      icon?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                style?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          logos?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      name?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                grayscale?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          team?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                columns?: T;
+                                background?: T;
+                                showStr?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          tabs?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                tabs?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      content?: T;
+                                      id?: T;
+                                    };
+                                style?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          leadForm?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                fields?: T;
+                                serviceOptions?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      id?: T;
+                                    };
+                                submitLabel?: T;
+                                consentText?: T;
+                                background?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          blogFeed?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                source?: T;
+                                category?: T;
+                                limit?: T;
+                                columns?: T;
+                                background?: T;
+                                showImage?: T;
+                                showExcerpt?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          countdown?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                targetDate?: T;
+                                expiredText?: T;
+                                ctaText?: T;
+                                background?: T;
+                                ctaMessage?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          social?:
+                            | T
+                            | {
+                                variant?: T;
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      platform?: T;
+                                      url?: T;
+                                      id?: T;
+                                    };
+                                shareLabel?: T;
+                                align?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    id?: T;
+                  };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3171,6 +9909,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
               align?: T;
               btnColor?: T;
               bgStyle?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3190,6 +9930,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3212,6 +9954,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     quote?: T;
                     author?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3245,6 +9989,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     refCode?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3263,6 +10009,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     otherValue?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3279,6 +10027,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     description?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3296,6 +10046,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     area?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3306,6 +10058,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
               title?: T;
               description?: T;
               note?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3321,6 +10075,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     a?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3329,6 +10085,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
           | {
               content?: T;
               containerWidth?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3341,6 +10099,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
               buttonText?: T;
               buttonMessage?: T;
               footnote?: T;
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3361,6 +10121,8 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
                     tag?: T;
                     id?: T;
                   };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3372,6 +10134,698 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
               midwives?: T;
               background?: T;
               spacing?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              eyebrow?: T;
+              text?: T;
+              subtitle?: T;
+              level?: T;
+              size?: T;
+              align?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              imageUrlFallback?: T;
+              alt?: T;
+              caption?: T;
+              link?: T;
+              width?: T;
+              align?: T;
+              ratio?: T;
+              rounded?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              text?: T;
+              action?: T;
+              style?: T;
+              whatsappMessage?: T;
+              url?: T;
+              openInNewTab?: T;
+              size?: T;
+              align?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              variant?: T;
+              spacing?: T;
+              width?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              url?: T;
+              title?: T;
+              caption?: T;
+              ratio?: T;
+              maxWidth?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        stats?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              style?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        logos?:
+          | T
+          | {
+              title?: T;
+              items?:
+                | T
+                | {
+                    image?: T;
+                    imageUrlFallback?: T;
+                    name?: T;
+                    id?: T;
+                  };
+              columns?: T;
+              background?: T;
+              grayscale?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        team?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              midwives?: T;
+              columns?: T;
+              background?: T;
+              showStr?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        tabs?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              tabs?:
+                | T
+                | {
+                    label?: T;
+                    content?: T;
+                    id?: T;
+                  };
+              style?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        leadForm?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              fields?: T;
+              serviceOptions?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              submitLabel?: T;
+              consentText?: T;
+              background?: T;
+              note?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        blogFeed?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              source?: T;
+              category?: T;
+              limit?: T;
+              columns?: T;
+              background?: T;
+              showImage?: T;
+              showExcerpt?: T;
+              ctaText?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        countdown?:
+          | T
+          | {
+              title?: T;
+              subtitle?: T;
+              targetDate?: T;
+              expiredText?: T;
+              ctaText?: T;
+              background?: T;
+              ctaMessage?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        social?:
+          | T
+          | {
+              variant?: T;
+              title?: T;
+              items?:
+                | T
+                | {
+                    platform?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              shareLabel?: T;
+              align?: T;
+              background?: T;
+              anchorId?: T;
+              visibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        section?:
+          | T
+          | {
+              label?: T;
+              background?: T;
+              padding?: T;
+              maxWidth?: T;
+              gap?: T;
+              columns?:
+                | T
+                | {
+                    width?: T;
+                    content?:
+                      | T
+                      | {
+                          painPoints?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                background?: T;
+                                spacing?: T;
+                                points?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          solutions?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      icon?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                highlightQuote?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          pricing?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                layoutStyle?: T;
+                                background?: T;
+                                spacing?: T;
+                                packages?:
+                                  | T
+                                  | {
+                                      name?: T;
+                                      target?: T;
+                                      price?: T;
+                                      originalPrice?: T;
+                                      duration?: T;
+                                      description?: T;
+                                      isPopular?: T;
+                                      popularBadge?: T;
+                                      features?:
+                                        | T
+                                        | {
+                                            feature?: T;
+                                            id?: T;
+                                          };
+                                      ctaText?: T;
+                                      refCode?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          comparison?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                kalaLabel?: T;
+                                otherLabel?: T;
+                                rows?:
+                                  | T
+                                  | {
+                                      feature?: T;
+                                      kalaValue?: T;
+                                      otherValue?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          steps?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                steps?:
+                                  | T
+                                  | {
+                                      num?: T;
+                                      title?: T;
+                                      description?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          testimonials?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      quote?: T;
+                                      author?: T;
+                                      role?: T;
+                                      area?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          guarantee?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                description?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          faq?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                faqs?:
+                                  | T
+                                  | {
+                                      q?: T;
+                                      a?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          richText?:
+                            | T
+                            | {
+                                content?: T;
+                                containerWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          cta?:
+                            | T
+                            | {
+                                badge?: T;
+                                headline?: T;
+                                description?: T;
+                                buttonText?: T;
+                                buttonMessage?: T;
+                                footnote?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          gallery?:
+                            | T
+                            | {
+                                badge?: T;
+                                title?: T;
+                                subtitle?: T;
+                                columns?: T;
+                                bgStyle?: T;
+                                images?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      caption?: T;
+                                      tag?: T;
+                                      id?: T;
+                                    };
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          midwifeSpotlight?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                background?: T;
+                                spacing?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          heading?:
+                            | T
+                            | {
+                                eyebrow?: T;
+                                text?: T;
+                                subtitle?: T;
+                                level?: T;
+                                size?: T;
+                                align?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          image?:
+                            | T
+                            | {
+                                image?: T;
+                                imageUrlFallback?: T;
+                                alt?: T;
+                                caption?: T;
+                                link?: T;
+                                width?: T;
+                                align?: T;
+                                ratio?: T;
+                                rounded?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          button?:
+                            | T
+                            | {
+                                text?: T;
+                                action?: T;
+                                style?: T;
+                                whatsappMessage?: T;
+                                url?: T;
+                                openInNewTab?: T;
+                                size?: T;
+                                align?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          divider?:
+                            | T
+                            | {
+                                variant?: T;
+                                spacing?: T;
+                                width?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          video?:
+                            | T
+                            | {
+                                url?: T;
+                                title?: T;
+                                caption?: T;
+                                ratio?: T;
+                                maxWidth?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          stats?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      value?: T;
+                                      label?: T;
+                                      icon?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                style?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          logos?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      image?: T;
+                                      imageUrlFallback?: T;
+                                      name?: T;
+                                      id?: T;
+                                    };
+                                columns?: T;
+                                background?: T;
+                                grayscale?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          team?:
+                            | T
+                            | {
+                                heading?: T;
+                                subheading?: T;
+                                midwives?: T;
+                                columns?: T;
+                                background?: T;
+                                showStr?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          tabs?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                tabs?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      content?: T;
+                                      id?: T;
+                                    };
+                                style?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          leadForm?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                fields?: T;
+                                serviceOptions?:
+                                  | T
+                                  | {
+                                      label?: T;
+                                      id?: T;
+                                    };
+                                submitLabel?: T;
+                                consentText?: T;
+                                background?: T;
+                                note?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          blogFeed?:
+                            | T
+                            | {
+                                heading?: T;
+                                description?: T;
+                                source?: T;
+                                category?: T;
+                                limit?: T;
+                                columns?: T;
+                                background?: T;
+                                showImage?: T;
+                                showExcerpt?: T;
+                                ctaText?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          countdown?:
+                            | T
+                            | {
+                                title?: T;
+                                subtitle?: T;
+                                targetDate?: T;
+                                expiredText?: T;
+                                ctaText?: T;
+                                background?: T;
+                                ctaMessage?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                          social?:
+                            | T
+                            | {
+                                variant?: T;
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      platform?: T;
+                                      url?: T;
+                                      id?: T;
+                                    };
+                                shareLabel?: T;
+                                align?: T;
+                                background?: T;
+                                anchorId?: T;
+                                visibility?: T;
+                                id?: T;
+                                blockName?: T;
+                              };
+                        };
+                    id?: T;
+                  };
+              anchorId?: T;
+              visibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3471,6 +10925,7 @@ export interface ServiceAreasSelect<T extends boolean = true> {
         id?: T;
       };
   estimatedArrivalMinutes?: T;
+  services?: T;
   availableServices?:
     | T
     | {
@@ -3506,6 +10961,8 @@ export interface TestimonialsSelect<T extends boolean = true> {
   quote?: T;
   photo?: T;
   permissionGranted?: T;
+  consentMethod?: T;
+  consentDate?: T;
   externalRef?: T;
   date?: T;
   order?: T;
@@ -3525,6 +10982,23 @@ export interface FaqSelect<T extends boolean = true> {
   relatedAreas?: T;
   order?: T;
   active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deployments_select".
+ */
+export interface DeploymentsSelect<T extends boolean = true> {
+  status?: T;
+  triggerReason?: T;
+  url?: T;
+  cloudflareDeploymentId?: T;
+  environment?: T;
+  durationSeconds?: T;
+  startedAt?: T;
+  completedAt?: T;
+  errorMessage?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3616,6 +11090,37 @@ export interface PayloadKvSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -3652,8 +11157,34 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
+  analytics?: {
+    /**
+     * Format: GTM-XXXXXXX
+     */
+    gtmId?: string | null;
+    /**
+     * Format: 15-16 digit angka Pixel resmi
+     */
+    metaPixelId?: string | null;
+    /**
+     * Format: G-XXXXXXXXXX (Opsional bila di-handle via GTM)
+     */
+    ga4MeasurementId?: string | null;
+    /**
+     * Format: AW-XXXXXXXXXX
+     */
+    gadsConversionId?: string | null;
+    /**
+     * ID Pixel dari TikTok Ads Manager
+     */
+    tiktokPixelId?: string | null;
+    /**
+     * Project ID dari Microsoft Clarity dashboard (heatmaps & session recordings)
+     */
+    clarityProjectId?: string | null;
+  };
   /**
-   * Format baku nomor WA. Contoh: 6281234567890. Sistem otomatis membersihkan spasi, tanda +, atau angka 0. (Setelah Simpan, situs live Cloudflare ter-update ~2 menit).
+   * Format baku nomor WA. Contoh: 6281234567890. Sistem otomatis membersihkan spasi, tanda +, atau angka 0.
    */
   whatsappNumber: string;
   /**
@@ -3668,33 +11199,16 @@ export interface SiteSetting {
    * Jadwal pelayanan homecare yang tampil di footer web. Contoh: Senin - Minggu: 08.00 - 17.00 WIB
    */
   operationalHours?: string | null;
-  /**
-   * Jadwal terstruktur yang dibaca langsung oleh Kala Clinic Bot untuk kalkulasi ketersediaan live CS vs antrean luar jam kerja.
-   */
-  operationalSchedule?: {
-    timezone?: string | null;
-    days?:
-      | {
-          day: '0' | '1' | '2' | '3' | '4' | '5' | '6';
-          closed?: boolean | null;
-          open?: string | null;
-          close?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Pesan otomatis yang dikirimkan oleh Bot WA jika pasien chat di luar jam kerja.
-     */
-    afterHoursAnnouncement?: string | null;
+  structuredHours?: {
+    opens?: string | null;
+    closes?: string | null;
   };
-  /**
-   * Badge penanda di atas judul beranda (contoh: ✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes)
-   */
-  heroBadgeText?: string | null;
-  /**
-   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Bunda di Surabaya & Sidoarjo sejak 2020)
-   */
-  socialProofText?: string | null;
+  coverageCities?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
   bannerGroup?: {
     /**
      * Kosongkan jika tidak ada promo aktif. Jika diisi, akan tampil di bar paling atas website.
@@ -3710,17 +11224,13 @@ export interface SiteSetting {
     bannerEndDate?: string | null;
   };
   /**
-   * Kecamatan / wilayah kota yang dilayani di Surabaya dan Sidoarjo.
+   * Badge penanda di atas judul beranda (contoh: ✨ 100% Bidan Resmi Ber-STR & Terverifikasi Kemenkes)
    */
-  coverageAreas?:
-    | {
-        area: string;
-        id?: string | null;
-      }[]
-    | null;
+  heroBadgeText?: string | null;
   /**
-   * Kelola seluruh teks judul, keluhan, manfaat, promo, dan langkah reservasi di halaman depan (kalababyspa.com). Kosongkan untuk memakai teks default standar.
+   * Statistik kepercayaan Bunda (contoh: Dipercaya 1000+ Bunda di Surabaya & Sidoarjo sejak 2020)
    */
+  socialProofText?: string | null;
   homepage?: {
     heroHeadline?: string | null;
     heroTagline?: string | null;
@@ -3747,8 +11257,8 @@ export interface SiteSetting {
       | null;
     promotion?: {
       title?: string | null;
-      description?: string | null;
       serviceName?: string | null;
+      description?: string | null;
       price?: string | null;
       originalPrice?: string | null;
       badge?: string | null;
@@ -3764,6 +11274,34 @@ export interface SiteSetting {
           id?: string | null;
         }[]
       | null;
+    /**
+     * Poin kredibilitas medis yang tampil di bagian atas beranda.
+     */
+    trustBadges?:
+      | {
+          title: string;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    differentiators?:
+      | {
+          title: string;
+          description: string;
+          id?: string | null;
+        }[]
+      | null;
+    sectionHeadings?: {
+      servicesTitle?: string | null;
+      servicesSubtitle?: string | null;
+      reviewsTitle?: string | null;
+      faqTitle?: string | null;
+    };
+    bottomCta?: {
+      headline?: string | null;
+      subheadline?: string | null;
+      buttonText?: string | null;
+    };
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3773,27 +11311,32 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  analytics?:
+    | T
+    | {
+        gtmId?: T;
+        metaPixelId?: T;
+        ga4MeasurementId?: T;
+        gadsConversionId?: T;
+        tiktokPixelId?: T;
+        clarityProjectId?: T;
+      };
   whatsappNumber?: T;
   whatsappNumberFormatted?: T;
   instagram?: T;
   operationalHours?: T;
-  operationalSchedule?:
+  structuredHours?:
     | T
     | {
-        timezone?: T;
-        days?:
-          | T
-          | {
-              day?: T;
-              closed?: T;
-              open?: T;
-              close?: T;
-              id?: T;
-            };
-        afterHoursAnnouncement?: T;
+        opens?: T;
+        closes?: T;
       };
-  heroBadgeText?: T;
-  socialProofText?: T;
+  coverageCities?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
   bannerGroup?:
     | T
     | {
@@ -3801,12 +11344,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         bannerStartDate?: T;
         bannerEndDate?: T;
       };
-  coverageAreas?:
-    | T
-    | {
-        area?: T;
-        id?: T;
-      };
+  heroBadgeText?: T;
+  socialProofText?: T;
   homepage?:
     | T
     | {
@@ -3831,8 +11370,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
           | T
           | {
               title?: T;
-              description?: T;
               serviceName?: T;
+              description?: T;
               price?: T;
               originalPrice?: T;
               badge?: T;
@@ -3848,6 +11387,35 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               description?: T;
               id?: T;
             };
+        trustBadges?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        differentiators?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        sectionHeadings?:
+          | T
+          | {
+              servicesTitle?: T;
+              servicesSubtitle?: T;
+              reviewsTitle?: T;
+              faqTitle?: T;
+            };
+        bottomCta?:
+          | T
+          | {
+              headline?: T;
+              subheadline?: T;
+              buttonText?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;
@@ -3862,6 +11430,31 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSchedulePublish".
+ */
+export interface TaskSchedulePublish {
+  input: {
+    type?: ('publish' | 'unpublish') | null;
+    locale?: string | null;
+    doc?:
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
+        } | null)
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null);
+    global?: string | null;
+    user?: {
+      relationTo: 'users';
+      value: number | User;
+    } | null;
+  };
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,0 +1,125 @@
+---
+import WhatsAppButton from '../WhatsAppButton.astro';
+import { mediaUrl } from '../../lib/payload';
+import { fetchPayloadMidwives } from '../../lib/payload';
+
+interface Props {
+  block: {
+    heading: string;
+    subheading?: string;
+    midwives?: Array<any> | string[];
+    columns?: '2' | '3' | '4';
+    background?: 'white' | 'cream' | 'peach';
+    showStr?: boolean;
+    ctaText?: string;
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+const columnClasses: Record<string, string> = {
+  '2': 'grid-cols-1 sm:grid-cols-2',
+  '3': 'grid-cols-1 sm:grid-cols-3',
+  '4': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+};
+
+let midwives: any[] = [];
+let selectedIds: string[] = [];
+
+if (Array.isArray(block.midwives)) {
+  midwives = block.midwives.filter((m: any) => m && typeof m === 'object');
+  selectedIds = block.midwives
+    .filter((m: any) => typeof m === 'string' || typeof m === 'number')
+    .map((m: any) => String(m));
+}
+
+if (midwives.length === 0 && selectedIds.length > 0) {
+  const all = await fetchPayloadMidwives();
+  midwives = all.filter((m) => selectedIds.includes(String(m.id)));
+}
+
+if (midwives.length === 0) {
+  midwives = await fetchPayloadMidwives();
+}
+
+midwives = midwives.slice(0, 4);
+---
+
+{midwives.length > 0 && (
+  <section class={`py-12 md:py-16 border-y border-[#F6DCCD] ${bgClasses[block.background || 'white'] || bgClasses.white}`}>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22]">{block.heading}</h2>
+        {block.subheading && (
+          <p class="mt-2 text-sm sm:text-base text-[#86675A] leading-relaxed max-w-2xl mx-auto">{block.subheading}</p>
+        )}
+      </div>
+
+      <div class={`grid gap-6 ${columnClasses[block.columns || '3'] || columnClasses['3']}`}>
+        {midwives.map((midwife) => {
+          const photo = mediaUrl(midwife.photo, '');
+          return (
+            <article class="bg-white rounded-2xl border border-[#F6DCCD] shadow-sm overflow-hidden flex flex-col">
+              {photo ? (
+                <img
+                  src={photo}
+                  alt={midwife.photo?.alt || `Foto ${midwife.name}`}
+                  class="w-full aspect-[4/5] object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="w-full aspect-[4/5] bg-[#FFEFE5] flex items-center justify-center text-4xl" aria-hidden="true">
+                  👩‍⚕️
+                </div>
+              )}
+              <div class="p-5 flex flex-col flex-1">
+                <h3 class="font-brand font-bold text-lg text-[#4B2E22] leading-snug">{midwife.name}</h3>
+                {midwife.title && (
+                  <p class="text-xs text-[#B3471E] font-semibold mt-0.5">{midwife.title}</p>
+                )}
+                {midwife.experienceYears && (
+                  <p class="text-xs text-[#86675A] mt-1">Pengalaman {midwife.experienceYears} tahun</p>
+                )}
+                {block.showStr !== false && midwife.strNumber && (
+                  <p class="text-[11px] text-[#86675A]/80 mt-1">STR: {midwife.strNumber}</p>
+                )}
+                {Array.isArray(midwife.specialties) && midwife.specialties.length > 0 && (
+                  <ul class="mt-3 space-y-1">
+                    {midwife.specialties.slice(0, 3).map((s: any) => (
+                      <li class="text-xs text-[#86675A] leading-relaxed">• {s.specialty || s}</li>
+                    ))}
+                  </ul>
+                )}
+                {midwife.slug && (
+                  <a
+                    href={`/tim-bidan/${midwife.slug}`}
+                    class="mt-4 text-xs font-bold text-[#B3471E] hover:underline"
+                  >
+                    Lihat profil lengkap →
+                  </a>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      {block.ctaText && (
+        <div class="mt-8 text-center">
+          <WhatsAppButton
+            refCode="KALA-TEAM"
+            message={`Halo Bu Bidan, saya mau konsultasi dengan tim bidan Kala`}
+            text={block.ctaText}
+            variant="primary"
+          />
+        </div>
+      )}
+    </div>
+  </section>
+)}

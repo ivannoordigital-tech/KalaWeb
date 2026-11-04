@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const CallToActionBlock: Block = {
   slug: 'cta',
@@ -44,5 +45,6 @@ export const CallToActionBlock: Block = {
       defaultValue: '⏰ Balas cepat dalam 5 menit · Bebas mom-shaming',
       label: 'Catatan Kaki Bawah Tombol',
     },
+    ...blockSettingsFields,
   ],
 }

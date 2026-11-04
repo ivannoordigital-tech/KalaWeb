@@ -1,0 +1,39 @@
+---
+interface Props {
+  block: {
+    variant?: 'line' | 'dots' | 'space';
+    spacing?: 'sm' | 'md' | 'lg' | 'xl';
+    width?: 'narrow' | 'normal' | 'full';
+  };
+}
+
+const { block } = Astro.props;
+
+const spacingClasses: Record<string, string> = {
+  sm: 'py-3',
+  md: 'py-6',
+  lg: 'py-10',
+  xl: 'py-16',
+};
+const widthClasses: Record<string, string> = {
+  narrow: 'max-w-md',
+  normal: 'max-w-3xl',
+  full: 'max-w-none',
+};
+const variant = block.variant || 'line';
+---
+
+<section class={spacingClasses[block.spacing || 'md'] || spacingClasses.md}>
+  <div class="px-4 sm:px-6">
+    <div class={`mx-auto ${widthClasses[block.width || 'normal'] || widthClasses.normal}`}>
+      {variant === 'line' && <hr class="border-0 border-t border-[#F6DCCD]" />}
+      {variant === 'dots' && (
+        <div class="flex items-center justify-center gap-2" aria-hidden="true">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#F6DCCD]"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#E9C4B2]"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[#F6DCCD]"></span>
+        </div>
+      )}
+    </div>
+  </div>
+</section>

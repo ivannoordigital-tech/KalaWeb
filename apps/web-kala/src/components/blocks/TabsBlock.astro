@@ -1,0 +1,147 @@
+---
+import { renderLexicalToHtml } from '../../lib/lexical';
+
+interface Props {
+  block: {
+    title?: string;
+    subtitle?: string;
+    tabs: Array<{ label: string; content: any }>;
+    style?: 'pills' | 'underline';
+    background?: 'white' | 'cream' | 'peach';
+  };
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+const uid = `tabs-${Math.random().toString(36).slice(2, 9)}`;
+const tabs = Array.isArray(block.tabs) ? block.tabs : [];
+const isPills = (block.style || 'pills') === 'pills';
+---
+
+{tabs.length > 0 && (
+  <section class={`py-12 md:py-16 border-y border-[#F6DCCD] ${bgClasses[block.background || 'white'] || bgClasses.white}`}>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      {(block.title || block.subtitle) && (
+        <div class="text-center mb-8">
+          {block.title && (
+            <h2 class="text-2xl sm:text-3xl font-brand font-bold text-[#4B2E22]">{block.title}</h2>
+          )}
+          {block.subtitle && (
+            <p class="mt-2 text-sm sm:text-base text-[#86675A] leading-relaxed">{block.subtitle}</p>
+          )}
+        </div>
+      )}
+
+      <div data-kala-tabs id={uid}>
+        <div
+          class={isPills ? 'flex flex-wrap justify-center gap-2 mb-6' : 'flex flex-wrap gap-6 border-b border-[#F6DCCD] mb-6'}
+          role="tablist"
+          aria-label={block.title || 'Tab konten'}
+        >
+          {tabs.map((tab, index) => (
+            <button
+              type="button"
+              role="tab"
+              id={`${uid}-tab-${index}`}
+              aria-controls={`${uid}-panel-${index}`}
+              aria-selected={index === 0 ? 'true' : 'false'}
+              data-tab-button={index}
+              class:list={[
+                isPills ? 'kala-tab kala-tab--pill' : 'kala-tab kala-tab--underline',
+              ]}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {tabs.map((tab, index) => (
+          <div
+            role="tabpanel"
+            id={`${uid}-panel-${index}`}
+            aria-labelledby={`${uid}-tab-${index}`}
+            data-tab-panel={index}
+            class={index === 0 ? 'block' : 'hidden'}
+          >
+            <article class="prose prose-kala max-w-none text-sm sm:text-base text-[#4B2E22]" set:html={renderLexicalToHtml(tab.content)} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .kala-tab {
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+    cursor: pointer;
+  }
+  .kala-tab--pill {
+    border-radius: 9999px;
+    border: 1px solid #f6dccd;
+    padding: 0.5rem 1rem;
+    color: #86675a;
+    background: #ffffff;
+  }
+  .kala-tab--pill[aria-selected='true'] {
+    background: #b3471e;
+    border-color: #b3471e;
+    color: #ffffff;
+  }
+  .kala-tab--underline {
+    padding: 0.5rem 0 0.75rem;
+    border-bottom: 2px solid transparent;
+    color: #86675a;
+    background: transparent;
+  }
+  .kala-tab--underline[aria-selected='true'] {
+    color: #b3471e;
+    border-bottom-color: #b3471e;
+  }
+</style>
+
+<script>
+  function initKalaTabs() {
+    document.querySelectorAll<HTMLElement>('[data-kala-tabs]').forEach((root) => {
+      if (root.dataset.kalaTabsReady === 'true') return;
+      root.dataset.kalaTabsReady = 'true';
+
+      const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab-button]'));
+      const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-tab-panel]'));
+
+      const activate = (index: number) => {
+        buttons.forEach((button, i) => {
+          button.setAttribute('aria-selected', String(i === index));
+          button.tabIndex = i === index ? 0 : -1;
+        });
+        panels.forEach((panel, i) => {
+          panel.classList.toggle('hidden', i !== index);
+        });
+      };
+
+      buttons.forEach((button, index) => {
+        button.addEventListener('click', () => activate(index));
+        button.addEventListener('keydown', (event) => {
+          if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+          event.preventDefault();
+          const next = event.key === 'ArrowRight'
+            ? (index + 1) % buttons.length
+            : (index - 1 + buttons.length) % buttons.length;
+          buttons[next]?.focus();
+          activate(next);
+        });
+      });
+    });
+  }
+
+  initKalaTabs();
+  document.addEventListener('astro:page-load', initKalaTabs);
+</script>

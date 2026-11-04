@@ -1,4 +1,5 @@
 import type { Block } from 'payload'
+import { blockSettingsFields } from './commonBlockFields'
 
 export const GuaranteeBlock: Block = {
   slug: 'guarantee',
@@ -33,5 +34,6 @@ export const GuaranteeBlock: Block = {
       defaultValue: '*Kepercayaan dan ketenangan keluarga Bunda adalah prioritas utama kami.',
       label: 'Catatan Kaki Garansi (Opsional)',
     },
+    ...blockSettingsFields,
   ],
 }

@@ -627,3 +627,98 @@ Verifikasi independen atas klaim “10/10 gap selesai” menemukan **2 klaim yan
 3. **Landing pages remote** (id 1–3) masih `_status=draft`; `pageType=landing` belum terisi sampai `npm run migrate:landing` dijalankan.
 4. **Preview draft** butuh keputusan arsitektur (SSR adapter vs route CMS). Bukan pekerjaan konfigurasi kecil; jangan diklaim selesai sebelum ada route yang benar-benar menampilkan `draft:true`.
 
+---
+
+## Addendum Putaran 4 (4 November 2026) — Blok Basic Page Builder Lengkap
+
+### A. Ruang lingkup yang disepakati
+
+"Basic" di sini berarti **blok inti yang pasti dipakai** untuk halaman marketing Kala (baby spa & homecare), bukan widget gratis/berbayar dan bukan widget efek lanjutan. Target akhirnya **28 blok**: 13 blok lama + 13 blok daun baru + `section` + `templateRef`.
+
+Blok baru yang ditambahkan:
+
+| Tier | Blok | Fungsi |
+|---|---|---|
+| A — Fondasi | `section` | Container 1–4 kolom, latar, padding, lebar, gap, anchor |
+| A | `heading` | Judul H2/H3/H4 dengan eyebrow, subjudul, ukuran, perataan |
+| A | `image` | Gambar tunggal + alt wajib + caption + link + rasio |
+| A | `button` | Tombol WhatsApp atau URL, 3 gaya, 3 ukuran, perataan |
+| A | `divider` | Garis, titik, atau spacer |
+| A | `video` | Embed YouTube/Vimeo (tanpa keluar situs) |
+| B — Konten | `stats` | Angka pencapaian (counter statis, tanpa animasi berat) |
+| B | `logos` | Strip logo kepercayaan/partner |
+| B | `team` | Grid bidan, **dinamis dari koleksi `midwives`** |
+| B | `tabs` | Tab konten dengan rich text |
+| B | `leadForm` | Formulir reservasi yang mengirim ke WhatsApp |
+| B | `blogFeed` | Daftar artikel **dinamis dari koleksi `articles`** |
+| C — Promo | `countdown` | Hitung mundur promo (client-side, ringan) |
+| C | `social` | Ikon media sosial + tombol bagikan |
+
+Yang **sengaja tidak** dibuat: popup builder, animation/timeline, chart, Lottie, WooCommerce, full-page scroll, mega menu, multi-step form kompleks.
+
+### B. Keputusan arsitektur
+
+- **Nested container depth 1.** `section` → `columns[].content` → blok daun. `section` tidak boleh berada di dalam kolom, dan `hero` dikecualikan dari isi kolom agar tidak ada dua H1. Ini dijaga di `columnBlocks` (`apps/cms/src/blocks/leafBlocks.ts`) dan diuji.
+- **Registry dipisah** agar tidak ada import melingkar: `baseBlocks.ts` (13 blok lama), `leafBlocks.ts` (13 blok daun + `columnBlocks`), `SectionBlock.ts`, `index.ts` (`allBlocks` + `templateBlocks`). `BlockTemplates` memakai `templateBlocks` (tanpa `templateRef`).
+- **Pengaturan umum semua blok.** `blockSettingsFields` menambahkan `anchorId` dan `visibility` (mobile/tablet/desktop) ke **28 blok**, termasuk 13 blok lama. `BlockRenderer` membungkus setiap blok dengan `<div id=...>` dan kelas visibilitas, sehingga tidak perlu mengubah satu per satu komponen lama.
+- **Blok lama tetap aman di dalam kolom.** `BlockRenderer` menetralkan `padding`, `border`, dan `background` milik `<section>` anak di dalam `.kala-column` lewat CSS, jadi 13 komponen lama tidak perlu ditulis ulang.
+- **Sumber data dinamis** untuk `team` (midwives), `blogFeed` (articles), dan opsi layanan `leadForm` (services). `team` juga menerima daftar bidan manual lewat relasi; jika koleksi kosong, blok tidak ditampilkan (tidak mengarang data).
+- **`leadForm` tanpa tabel baru.** Formulir menyusun pesan terstruktur lalu membuka WhatsApp resmi (pola yang sama dengan seluruh CTA Kala). Ini dipilih agar tidak menambah koleksi/migrasi yang tidak bisa diverifikasi saat Postgres mati. Penyimpanan lead ke CMS dapat ditambahkan kemudian sebagai pekerjaan terpisah.
+
+### C. Validasi yang ditambahkan
+
+- `flattenLayout()` meratakan isi kolom `section` agar validasi tetap berjalan untuk blok bersarang.
+- CTA di dalam kolom `section` dihitung sebagai CTA nyata untuk landing page.
+- `image` tanpa alt text ditolak saat publikasi.
+- Klaim medis terlarang di dalam kolom `section` tetap diblokir.
+- `section` tanpa isi hanya memberi peringatan (tidak memblokir), agar draf bisa disimpan.
+
+### D. Bukti verifikasi (independen)
+
+| Pemeriksaan | Perintah | Hasil |
+|---|---|---|
+| Validasi editorial + blok basic | `npm run test:validation` | **48/48 LULUS** (sebelumnya 37) |
+| Matriks hak akses | `npm run test:role` | LULUS, 0 regresi |
+| Kontrak otomasi & MCP | `npm run test:contract` | 17/17 LULUS |
+| TypeScript CMS | `npx tsc --noEmit` (apps/cms) | 0 error |
+| Build frontend | `npm run build` | 44 halaman statis, sukses |
+| Build CMS | `npm run build:cms` | Next.js sukses, 0 error tipe |
+
+Verifikasi rendering dilakukan dengan halaman uji sementara (`/block-test`) yang memuat seluruh blok baru, lalu dihapus kembali:
+
+- 2 kolom `section` benar-benar berdampingan; `anchorId` menjadi `id` pada wrapper.
+- Visibilitas `['desktop']` menghasilkan kelas `hidden lg:block` (sesuai).
+- `<section>` di dalam kolom menjadi transparan, padding 0, border 0 (netralisasi CSS bekerja).
+- Tab: klik tab kedua mengubah `aria-selected` dan hanya 1 panel terlihat.
+- Countdown: menampilkan 57 hari menuju 31 Des 2026 dan berdetak.
+- Form: submit tanpa nomor WA memunculkan pesan validasi yang benar; 6 field termasuk honeypot.
+- `team` merender kartu bidan; `video` menghasilkan iframe `youtube-nocookie`; `social` merender 4 tombol bagikan.
+- Tidak ada error console.
+
+### E. BLOCKER DEPLOY: migrasi skema belum dibuat
+
+Payload Postgres menyimpan setiap blok sebagai tabel sendiri (mis. `pages_blocks_hero`, `landing_pages_blocks_hero`). Menambah 14 blok berarti menambah tabel untuk `pages`, `_pages_v`, `landing_pages`, `_landing_pages_v`, `block_templates`, dan `page_templates`.
+
+**Tanpa migrasi, admin akan gagal menyimpan halaman yang memakai blok baru.** Migrasi belum bisa dibuat karena:
+
+- PostgreSQL lokal tidak berjalan (`ECONNREFUSED 127.0.0.1:5432`), dan
+- Docker Desktop terpasang tetapi daemon-nya tidak aktif; tidak ada binary `psql`/`pg_ctl` di mesin ini.
+
+Langkah yang wajib dilakukan di host ber-DB sebelum deploy:
+
+```bash
+# dari apps/cms, dengan DATABASE_URI & PAYLOAD_SECRET valid
+npm run migrate            # terapkan migrasi lama
+npm run migrate:create -- add_basic_page_builder_blocks
+npm run migrate            # terapkan migrasi baru
+```
+
+Setelah migrasi dibuat, commit file di `apps/cms/src/migrations/` beserta `index.ts`. **Jangan deploy selama migrasi ini belum ada dan belum dijalankan.**
+
+### F. Yang masih terbuka (tidak diklaim selesai)
+
+1. Migrasi blok baru (poin E).
+2. Preview draft SSR (masih sama seperti putaran 3).
+3. `pricing` dan `testimonials` masih memakai input manual; pengaitan ke koleksi `services`/`testimonials` ditunda ke pekerjaan berikutnya agar perubahan kali ini tetap fokus pada blok basic.
+4. Verifikasi DB nyata (`test:integration`, import artikel, migrasi landing) tetap terblokir Postgres.
+

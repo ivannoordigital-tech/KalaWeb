@@ -1,39 +1,32 @@
-import { HeroBlock } from './HeroBlock'
-import { PainPointsBlock } from './PainPointsBlock'
-import { SolutionsBlock } from './SolutionsBlock'
-import { PricingPackagesBlock } from './PricingPackagesBlock'
-import { ComparisonTableBlock } from './ComparisonTableBlock'
-import { StepsFlowBlock } from './StepsFlowBlock'
-import { TestimonialsBlock } from './TestimonialsBlock'
-import { GuaranteeBlock } from './GuaranteeBlock'
-import { FaqAccordionBlock } from './FaqAccordionBlock'
-import { RichTextBlock } from './RichTextBlock'
-import { CallToActionBlock } from './CallToActionBlock'
-import { GalleryBlock } from './GalleryBlock'
+import { baseBlocks } from './baseBlocks'
+import { leafBlocks } from './leafBlocks'
+import { SectionBlock } from './SectionBlock'
 import { TemplateRefBlock } from './TemplateRefBlock'
-import { MidwifeSpotlightBlock } from './MidwifeSpotlightBlock'
 
-export const baseBlocks = [
-  HeroBlock,
-  PainPointsBlock,
-  SolutionsBlock,
-  PricingPackagesBlock,
-  ComparisonTableBlock,
-  StepsFlowBlock,
-  TestimonialsBlock,
-  GuaranteeBlock,
-  FaqAccordionBlock,
-  RichTextBlock,
-  CallToActionBlock,
-  GalleryBlock,
-  MidwifeSpotlightBlock,
-]
+// Blok yang boleh dipakai di dalam Pustaka Template Blok (tanpa TemplateRef
+// agar tidak terjadi referensi bersarang).
+export const templateBlocks = [...baseBlocks, ...leafBlocks, SectionBlock]
 
-export const allBlocks = [
-  ...baseBlocks,
-  TemplateRefBlock,
-]
+// Semua blok yang tersedia untuk halaman (Pages & LandingPages).
+export const allBlocks = [...baseBlocks, ...leafBlocks, SectionBlock, TemplateRefBlock]
 
+export { baseBlocks, leafBlocks, SectionBlock, TemplateRefBlock }
+export { columnBlocks } from './leafBlocks'
+export {
+  HeadingBlock,
+  ImageBlock,
+  ButtonBlock,
+  DividerBlock,
+  VideoBlock,
+  StatsBlock,
+  LogosBlock,
+  TeamBlock,
+  TabsBlock,
+  LeadFormBlock,
+  BlogFeedBlock,
+  CountdownBlock,
+  SocialBlock,
+} from './leafBlocks'
 export {
   HeroBlock,
   PainPointsBlock,
@@ -47,6 +40,5 @@ export {
   RichTextBlock,
   CallToActionBlock,
   GalleryBlock,
-  TemplateRefBlock,
   MidwifeSpotlightBlock,
-}
+} from './baseBlocks'
