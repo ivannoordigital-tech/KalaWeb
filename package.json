@@ -14,6 +14,17 @@
     "build:cms": "npm run build --workspace=cms-kala",
     "set:superadmin": "npm run set:superadmin --workspace=cms-kala",
     "audit:seo": "node scripts/audit-seo.mjs",
+    "test:role": "npm run test:role --workspace=cms-kala",
+    "test:validation": "npm run test:validation --workspace=cms-kala",
+    "test:contract": "node apps/automation/test/contract.test.mjs",
+    "test:articles": "node scripts/verify-articles.mjs",
+    "test:landing": "node scripts/verify-landing-pages.mjs",
+    "test:media": "node scripts/verify-media-health.mjs",
+    "test:integration": "npm run test:integration --workspace=cms-kala",
+    "import:articles": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/import-articles.ts",
+    "import:articles:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/import-articles.ts",
+    "migrate:landing": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/migrate-landing-pages.ts",
+    "migrate:landing:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/migrate-landing-pages.ts",
     "preview": "npm run preview --workspace=web-kala"
   }
 }

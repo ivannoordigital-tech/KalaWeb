@@ -16,17 +16,33 @@ export const Users: CollectionConfig = {
   access: {
     create: isSuperAdmin,
     read: ({ req: { user } }) => {
+      if (!user) return false;
       if (getUserRole(user) === 'superadmin') return true;
-      return { id: { equals: user?.id } };
+      return { id: { equals: user.id } };
     },
     update: ({ req: { user } }) => {
+      if (!user) return false;
       if (getUserRole(user) === 'superadmin') return true;
-      return { id: { equals: user?.id } };
+      return { id: { equals: user.id } };
     },
     delete: isSuperAdmin,
   },
   auth: {
     useAPIKey: true,
+  },
+  hooks: {
+    beforeChange: [
+      ({ req, data, originalDoc }) => {
+        // Cegah eskalasi hak akses (privilege escalation):
+        // Hanya Superadmin yang diizinkan menetapkan atau mengubah role pengguna.
+        if (data?.role && data.role !== originalDoc?.role) {
+          if (getUserRole(req.user) !== 'superadmin') {
+            throw new Error('Forbidden: Hanya Super Admin yang berwenang mengubah peran/hak akses akun.');
+          }
+        }
+        return data;
+      },
+    ],
   },
   fields: [
     {
@@ -42,6 +58,9 @@ export const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       defaultValue: 'operator',
+      access: {
+        update: ({ req: { user } }) => getUserRole(user) === 'superadmin',
+      },
       options: [
         { label: 'Super Admin (Akses Penuh)', value: 'superadmin' },
         { label: 'Admin Operasional (Layanan, Area, Banner, FAQ)', value: 'operator' },
@@ -49,6 +68,7 @@ export const Users: CollectionConfig = {
         { label: 'SEO Specialist (Optimasi Metadata & Redirects)', value: 'seo' },
         { label: 'Koordinator Bidan (Data Tim Bidan & Ulasan)', value: 'midwife_coordinator' },
         { label: 'Marketing Specialist (Landing Pages, Pages & Templates)', value: 'marketing' },
+        { label: '🤖 Agen Otomasi / API Bot (Drafting & Validasi)', value: 'automation' },
       ],
       required: true,
       label: 'Peran & Hak Akses (Role)',

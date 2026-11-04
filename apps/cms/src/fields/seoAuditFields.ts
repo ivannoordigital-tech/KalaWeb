@@ -80,6 +80,34 @@ export const seoAuditFields: Field = {
       ],
     },
     {
+      name: 'engineVersion',
+      type: 'text',
+      defaultValue: '2.1.0',
+      label: 'Versi Mesin Audit',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'metrics',
+      type: 'group',
+      label: 'Rincian Metrik Audit',
+      admin: {
+        readOnly: true,
+      },
+      fields: [
+        { name: 'titleScore', type: 'number', defaultValue: 0 },
+        { name: 'descScore', type: 'number', defaultValue: 0 },
+        { name: 'keywordScore', type: 'number', defaultValue: 0 },
+        { name: 'h1Score', type: 'number', defaultValue: 0 },
+        { name: 'altScore', type: 'number', defaultValue: 0 },
+        { name: 'slugScore', type: 'number', defaultValue: 0 },
+        { name: 'ogScore', type: 'number', defaultValue: 0 },
+        { name: 'contentScore', type: 'number', defaultValue: 0 },
+        { name: 'wordCount', type: 'number', defaultValue: 0 },
+      ],
+    },
+    {
       name: 'lastAuditedAt',
       type: 'date',
       label: 'Terakhir Diaudit',

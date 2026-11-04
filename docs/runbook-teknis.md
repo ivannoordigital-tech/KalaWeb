@@ -67,6 +67,25 @@ Langkah-langkah:
    cd /var/www/kalaweb/apps/cms && docker compose start cms
    ```
 
+### 2.3 Prosedur Snapshot Pra-Perubahan & Rollback Checklist (FIX-013)
+Sebelum melakukan rilis kode, migrasi skema database, atau perubahan konfigurasi besar (Phase 0 / Tier 1):
+1. **Buat Snapshot Database On-Demand:**
+   ```bash
+   TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+   docker exec -t kala-postgres pg_dump -U kala_cms_user -d kala_cms_db | gzip > /var/backups/kala-postgres/pre_release_${TIMESTAMP}.sql.gz
+   ```
+2. **Backup Media & Uploads Lokal:**
+   ```bash
+   tar -czf /var/backups/kala-media/media_pre_release_${TIMESTAMP}.tar.gz -C /var/www/kalaweb/apps/cms/public/media .
+   ```
+3. **Uji Simulasi Restore di Staging:**
+   - Jalankan restore dump snapshot ke container DB staging (`kala_cms_staging_db`).
+   - Pastikan count tabel `articles`, `services`, `pages`, `users`, `testimonials` cocok 100%.
+4. **Rollback Checklist:**
+   - Jika CMS gagal boot: pulihkan commit git sebelumnya via `git checkout HEAD~1`.
+   - Jika integritas DB rusak: jalankan `restore-postgres.sh /var/backups/kala-postgres/pre_release_${TIMESTAMP}.sql.gz`.
+   - Jika akun admin terkunci: jalankan darurat `npm run set:superadmin admin@kalababyspa.com`.
+
 ---
 
 ## 3. Rotasi Rahasia (*Secrets*) & Kunci Akses
@@ -154,7 +173,8 @@ Bot WA memanggil CMS via internal Docker URL:
 4. **Monitoring Uptime:**
    - Pasang UptimeRobot atau Better Stack pada:
      - `https://kalababyspa.com` (Target respons < 300ms)
-     - `https://admin.kalababyspa.com/api/deploy-status`
+     - `https://admin.kalababyspa.com/admin` (Portal Admin CMS)
+     - `https://admin.kalababyspa.com/api/deploy-status` (Wajib Header `Authorization: users API-Key <API_KEY>`)
    - Integrasikan alert langsung ke WhatsApp/Telegram PIC.
 
 ---

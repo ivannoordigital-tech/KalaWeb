@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   ];
 
   const allSlugs = new Set([
-    ...cmsPages.map((p) => p.slug),
+    ...cmsPages.filter((p) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(p.slug) && p.slug !== 'babyMassage').map((p) => p.slug),
     ...fallbackPages.map((f) => f.slug),
   ]);
 

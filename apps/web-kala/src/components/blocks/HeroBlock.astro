@@ -1,5 +1,6 @@
 ---
 import WhatsAppButton from '../WhatsAppButton.astro';
+import { mediaUrl, mediaAlt } from '../../lib/payload';
 
 interface Props {
   block: {
@@ -28,8 +29,8 @@ const bgStyles = {
 };
 
 const currentBg = bgStyles[block.bgStyle || 'gradient'] || bgStyles.gradient;
-const imageUrl = typeof block.image === 'string' ? block.image : block.image?.url;
-const imageAlt = block.imageAlt || (typeof block.image === 'object' ? block.image?.alt : null) || block.headline;
+const imageUrl = mediaUrl(block.image);
+const imageAlt = block.imageAlt || mediaAlt(block.image, block.headline);
 
 const isLeft = block.align === 'left' || Boolean(imageUrl);
 const btnVariant = block.btnColor === 'whatsapp' ? 'secondary' : 'primary';

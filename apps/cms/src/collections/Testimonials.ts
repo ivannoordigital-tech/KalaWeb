@@ -8,6 +8,7 @@ export const Testimonials: CollectionConfig = {
     singular: 'Testimoni Bunda',
     plural: 'Testimoni Bunda',
   },
+  defaultSort: 'order',
   admin: {
     group: 'Layanan & Klinik',
     useAsTitle: 'author',
@@ -18,16 +19,27 @@ export const Testimonials: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (user) return true;
+      return {
+        active: { equals: true },
+        permissionGranted: { equals: true },
+      };
+    },
     create: canManageTestimonials,
     update: canManageTestimonials,
     delete: canManageTestimonials,
   },
   hooks: {
     afterChange: [
-      async ({ doc }) => {
-        if (doc.active && doc.permissionGranted) {
-          triggerCloudflareDeploy({ resource: 'Testimonials', action: 'publish' });
+      async ({ doc, previousDoc }) => {
+        const isLive = Boolean(doc.active && doc.permissionGranted);
+        const wasLive = Boolean(previousDoc?.active && previousDoc?.permissionGranted);
+        if (isLive || wasLive) {
+          triggerCloudflareDeploy({
+            resource: 'Testimonials',
+            action: isLive ? 'publish' : 'unpublish',
+          });
         }
       },
     ],
@@ -107,11 +119,34 @@ export const Testimonials: CollectionConfig = {
     {
       name: 'permissionGranted',
       type: 'checkbox',
-      defaultValue: true,
-      required: true,
+      defaultValue: false,
       label: 'Sudah Memperoleh Izin Publikasi Resmi dari Pasien (Etika Medis)',
       admin: {
-        description: 'Wajib dicentang demi mematuhi UU Perlindungan Data Pribadi (UU PDP) dan etika kerahasiaan medis.',
+        description: 'Wajib dicentang sebelum testimoni boleh tampil di website. Biarkan kosong selama izin pasien belum terverifikasi.',
+      },
+    },
+    // MED-006: Catatan Verifikasi Persetujuan Medis (Patient Consent Audit)
+    {
+      name: 'consentMethod',
+      type: 'select',
+      defaultValue: 'whatsapp',
+      label: 'Metode Persetujuan Pasien (Informed Consent)',
+      admin: {
+        condition: (data) => Boolean(data?.permissionGranted),
+        description: 'Bentuk bukti persetujuan orang tua/pasien untuk penayangan testimoni.',
+      },
+      options: [
+        { label: '💬 Chat WhatsApp (Tangkapan Layar/Pesan)', value: 'whatsapp' },
+        { label: '📝 Formulir Tertulis / Surat Fisik', value: 'written' },
+        { label: '🌐 Formulir Ulasan Online Resmi', value: 'online_form' },
+      ],
+    },
+    {
+      name: 'consentDate',
+      type: 'date',
+      label: 'Tanggal Persetujuan Pasien Diberikan',
+      admin: {
+        condition: (data) => Boolean(data?.permissionGranted),
       },
     },
     // Sidebar
@@ -146,11 +181,11 @@ export const Testimonials: CollectionConfig = {
     {
       name: 'active',
       type: 'checkbox',
-      defaultValue: true,
+      defaultValue: false,
       label: 'Status Aktif (Tampil di Website)',
       admin: {
         position: 'sidebar',
-        description: 'Untuk ulasan masuk dari Bot WA, pastikan centang ini HANYA setelah admin memverifikasi kelayakan ulasan.',
+        description: 'Centang HANYA setelah admin memverifikasi kelayakan dan izin publikasi ulasan.',
       },
     },
   ],

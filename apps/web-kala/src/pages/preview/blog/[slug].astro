@@ -1,0 +1,87 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPostLayout from '../../../layouts/BlogPostLayout.astro';
+import { fetchPayloadArticles } from '../../../lib/payload';
+import { renderLexicalToHtml } from '../../../lib/lexical';
+import { toBlogEntry } from '../../../lib/blog';
+
+/**
+ * PRV-001 & PRV-002: Pratinjau artikel edukasi kesehatan (CMS & Fallback)
+ */
+export async function getStaticPaths() {
+  const [cmsArticles, markdownPosts] = await Promise.all([
+    fetchPayloadArticles(),
+    getCollection('blog', ({ data }) => !data.draft),
+  ]);
+
+  const cmsSlugs = new Set(cmsArticles.map((article) => article.slug));
+  const markdownBySlug = new Map(markdownPosts.map((post) => [post.slug, post]));
+
+  return [
+    ...cmsArticles.map((article) => ({
+      params: { slug: article.slug },
+      props: {
+        source: 'cms' as const,
+        article,
+        post: markdownBySlug.get(article.slug) || null,
+      },
+    })),
+    ...markdownPosts
+      .filter((post) => !cmsSlugs.has(post.slug))
+      .map((post) => ({
+        params: { slug: post.slug },
+        props: { source: 'markdown' as const, article: null, post },
+      })),
+  ];
+}
+
+const { source, article, post } = Astro.props;
+
+const useMarkdownFallback = source === 'markdown' || (source === 'cms' && !article?.content);
+
+let MarkdownContent: any = null;
+if (useMarkdownFallback && post) {
+  MarkdownContent = (await render(post)).Content;
+}
+
+const entry = article ? toBlogEntry(article) : post;
+// Paksa noindex pada pratinjau.
+if (entry?.data) {
+  entry.data.seo = { ...(entry.data.seo || {}), noIndex: true };
+}
+
+const contentHtml = article?.content ? renderLexicalToHtml(article.content) : undefined;
+---
+
+<BlogPostLayout entry={entry} contentHtml={contentHtml} previewBanner>
+  {MarkdownContent && <MarkdownContent />}
+
+  <!-- PRV-003: Payload Live Preview Dynamic Re-render Listener -->
+  <script is:inline>
+    (function initPayloadLivePreview() {
+      if (typeof window === 'undefined') return;
+      const isInsideIframe = window.self !== window.top;
+      if (isInsideIframe) {
+        window.addEventListener('message', function(event) {
+          if (event.data && (event.data.type === 'payload-live-preview' || event.data.type === 'payload-live-preview-ready')) {
+            if (event.data.data) {
+              const updated = event.data.data;
+              if (updated.title) {
+                const h1 = document.querySelector('article h1, header h1');
+                if (h1) h1.textContent = updated.title;
+                document.title = '[PRATINJAU DRAFT] ' + updated.title;
+              }
+              if (updated.excerpt) {
+                const desc = document.querySelector('header p.lead, header p.text-base');
+                if (desc) desc.textContent = updated.excerpt;
+              }
+            }
+          }
+        });
+        try {
+          window.parent.postMessage({ type: 'payload-live-preview-ready' }, '*');
+        } catch (e) {}
+      }
+    })();
+  </script>
+</BlogPostLayout>

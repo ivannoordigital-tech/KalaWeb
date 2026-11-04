@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { mediaUrl } from '../lib/payload';
 
 interface Props {
   entry: {
@@ -26,9 +27,11 @@ interface Props {
       };
     };
   };
+  contentHtml?: string;
+  previewBanner?: boolean;
 }
 
-const { entry } = Astro.props;
+const { entry, contentHtml, previewBanner = false } = Astro.props;
 const { data, slug } = entry;
 
 // Determine specific refCode and message per article
@@ -71,6 +74,8 @@ const resolvedOgImage = typeof data.seo?.ogImage === 'object' && data.seo?.ogIma
     : data.heroImage;
 
 const resolvedCanonical = data.seo?.canonicalUrl || `https://kalababyspa.com/blog/${slug}`;
+const finalOgImage = mediaUrl(resolvedOgImage, '/images/og-kala-homecare.png');
+const articleHeroImage = mediaUrl(data.heroImage);
 ---
 
 <BaseLayout
@@ -78,7 +83,7 @@ const resolvedCanonical = data.seo?.canonicalUrl || `https://kalababyspa.com/blo
   description={data.description}
   canonical={resolvedCanonical}
   type="article"
-  image={resolvedOgImage}
+  image={finalOgImage}
   publishedTime={data.pubDate.toISOString()}
   modifiedTime={data.updatedDate.toISOString()}
   author={data.author}
@@ -93,13 +98,20 @@ const resolvedCanonical = data.seo?.canonicalUrl || `https://kalababyspa.com/blo
     author: data.author,
     authorTitle: data.authorTitle,
     url: resolvedCanonical,
-    heroImage: resolvedOgImage || data.heroImage,
+    heroImage: finalOgImage,
   }}
   breadcrumbs={breadcrumbs}
 >
   <article class="py-12 md:py-16 bg-[#FFF9F4]">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
+      {previewBanner && (
+        <aside class="mb-8 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <strong>Mode pratinjau.</strong> Halaman ini hanya menampilkan artikel yang sudah terbit.
+          Pratinjau draft akan tersedia pada tahap preview SSR.
+        </aside>
+      )}
+
       <!-- Breadcrumb Navigation -->
       <nav class="flex items-center gap-2 text-xs text-[#86675A] mb-8 overflow-x-auto whitespace-nowrap" aria-label="Breadcrumb">
         <a href="/" class="hover:text-[#B3471E] transition-colors">Beranda</a>
@@ -150,9 +162,21 @@ const resolvedCanonical = data.seo?.canonicalUrl || `https://kalababyspa.com/blo
         </div>
       </header>
 
+      {articleHeroImage && (
+        <div class="mb-10 rounded-3xl overflow-hidden shadow-sm border border-[#F6DCCD] aspect-[16/9] max-h-[450px]">
+          <img
+            src={articleHeroImage}
+            alt={data.heroImageAlt || data.title}
+            class="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      )}
+
       <!-- Article Prose Content -->
       <div class="prose-kala max-w-none text-base sm:text-lg">
-        <slot />
+        {contentHtml ? <div set:html={contentHtml} /> : <slot />}
       </div>
 
       <!-- Midwife Author Bio Box -->

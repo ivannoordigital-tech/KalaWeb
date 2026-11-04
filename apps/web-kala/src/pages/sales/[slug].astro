@@ -16,7 +16,7 @@ export async function getStaticPaths() {
   ]);
 
   const landingFromPages: PayloadLandingPage[] = cmsPages
-    .filter((p) => (p as any).pageType === 'landing')
+    .filter((p) => (p as any).pageType === 'landing' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(p.slug) && p.slug !== 'babyMassage')
     .map((p) => ({
       id: p.id,
       title: p.title,
@@ -26,6 +26,8 @@ export async function getStaticPaths() {
       variant: p.variant || 'A',
       layout: p.layout || [],
       pageLayout: (p.pageLayout as any) || 'canvas',
+      subheadline: (p as any).description,
+      whatsappCustomMessage: (p as any).whatsappCustomMessage,
       active: true,
     }));
 
@@ -302,13 +304,36 @@ export async function getStaticPaths() {
     },
   ];
 
-  const combinedCampaigns = [...cmsCampaigns];
-  for (const lp of landingFromPages) {
-    if (!combinedCampaigns.some((c) => c.slug === lp.slug)) {
-      combinedCampaigns.push(lp);
+  // LP-003: Prioritize Pages (landing pageType) over legacy LandingPages
+  // Configurable via USE_PAGES_FOR_SALES (default: true)
+  const usePagesForSales = import.meta.env.USE_PAGES_FOR_SALES !== 'false' && process.env.USE_PAGES_FOR_SALES !== 'false';
+  let combinedCampaigns: PayloadLandingPage[] = [];
+
+  if (usePagesForSales) {
+    combinedCampaigns = [...landingFromPages];
+    for (const legacyLp of cmsCampaigns) {
+      if (!combinedCampaigns.some((c) => c.slug === legacyLp.slug)) {
+        combinedCampaigns.push(legacyLp);
+      }
+    }
+  } else {
+    // Rollback mode: legacy LandingPages takes precedence
+    combinedCampaigns = [...cmsCampaigns];
+    for (const lp of landingFromPages) {
+      if (!combinedCampaigns.some((c) => c.slug === lp.slug)) {
+        combinedCampaigns.push(lp);
+      }
     }
   }
-  const rawList = combinedCampaigns.length > 0 ? combinedCampaigns : fallbackCampaigns;
+
+  // Ensure default fallback campaigns exist if not returned by CMS
+  for (const fb of fallbackCampaigns) {
+    if (!combinedCampaigns.some((c) => c.slug === fb.slug)) {
+      combinedCampaigns.push(fb);
+    }
+  }
+
+  const rawList = combinedCampaigns;
 
   const campaigns = rawList.map((c) => ({
     ...c,

@@ -96,9 +96,11 @@ const landmarksList = area.landmarks && area.landmarks.length > 0
   ? area.landmarks.map((l: any) => (typeof l === 'string' ? l : l.name))
   : ['Pusat Pemukiman Residensial', 'Jalur Akses Utama', 'Kawasan Keluarga Muda'];
 
-const availableServicesList = area.availableServices && area.availableServices.length > 0
-  ? area.availableServices.map((s: any) => (typeof s === 'string' ? s : s.serviceName))
-  : ['Kala Bundle Duo (Mom & Baby)', 'Pijat Ceria Newborn', 'Pijat Laktasi & Oksitosin', 'Cukur Rambut & Selapanan'];
+const availableServicesList = (area.services && area.services.length > 0)
+  ? area.services.map((s: any) => (typeof s === 'string' ? s : s.name || s.serviceName))
+  : (area.availableServices && area.availableServices.length > 0)
+    ? area.availableServices.map((s: any) => (typeof s === 'string' ? s : s.serviceName))
+    : ['Kala Bundle Duo (Mom & Baby)', 'Pijat Ceria Newborn', 'Pijat Laktasi & Oksitosin', 'Cukur Rambut & Selapanan'];
 ---
 
 <BaseLayout

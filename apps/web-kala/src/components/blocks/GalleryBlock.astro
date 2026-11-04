@@ -1,4 +1,7 @@
 ---
+
+import { mediaUrl, mediaAlt } from '../../lib/payload';
+
 interface GalleryItem {
   image?: { url?: string; alt?: string } | string;
   imageUrlFallback?: string;
@@ -30,6 +33,7 @@ const currentCols = colClasses[block.columns || '3'] || colClasses['3'];
 const isWarm = block.bgStyle === 'warm';
 ---
 
+
 <section class={`py-14 md:py-20 border-b border-[#F6DCCD] ${isWarm ? 'bg-[#FFF9F4]' : 'bg-white'}`}>
   <div class="max-w-6xl mx-auto px-4 sm:px-6">
     
@@ -54,8 +58,8 @@ const isWarm = block.bgStyle === 'warm';
     <div class={`grid gap-4 sm:gap-6 ${currentCols}`}>
       {images.map((item, idx) => {
         const rawUrl = typeof item.image === 'string' ? item.image : item.image?.url;
-        const finalUrl = rawUrl || item.imageUrlFallback || '/images/hero-baby.jpg';
-        const altText = typeof item.image === 'object' ? item.image?.alt : item.caption || block.title;
+        const finalUrl = mediaUrl(item.image, item.imageUrlFallback || '/images/hero-baby.jpg');
+        const altText = mediaAlt(item.image, item.caption || block.title);
 
         return (
           <div class="group relative rounded-3xl overflow-hidden border border-[#F6DCCD] bg-[#FFEFE5] shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">

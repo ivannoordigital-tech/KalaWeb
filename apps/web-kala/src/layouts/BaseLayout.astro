@@ -87,6 +87,8 @@ const siteSettings = {
   socialProofText: cmsSettings?.socialProofText || siteConfig.socialProofText,
   heroBadgeText: cmsSettings?.heroBadgeText || 'Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo',
   announcementBanner: cmsSettings?.announcementBanner || '',
+  bannerStartDate: cmsSettings?.bannerStartDate,
+  bannerEndDate: cmsSettings?.bannerEndDate,
   coverageAreas: cmsSettings?.coverageAreas?.length ? cmsSettings.coverageAreas.map((c) => c.area) : siteConfig.coverageAreas,
   analytics: {
     ...siteConfig.analytics,
@@ -99,7 +101,26 @@ const isCanvas = pageLayout === 'canvas';
 const isFullWidth = pageLayout === 'full_width';
 const showNavbar = !isCanvas && !hideHeader;
 const showFooter = !isCanvas && !hideFooter;
-const showAnnouncement = !isCanvas && Boolean(siteSettings.announcementBanner);
+function isBannerScheduleActive(text?: string, startStr?: string, endStr?: string): boolean {
+  if (!text || !text.trim()) return false;
+  const now = new Date();
+  if (startStr) {
+    const start = new Date(startStr);
+    if (!isNaN(start.getTime()) && now < start) return false;
+  }
+  if (endStr) {
+    const end = new Date(endStr);
+    if (!isNaN(end.getTime())) {
+      if (endStr.length <= 10) {
+        end.setUTCHours(16, 59, 59, 999);
+      }
+      if (now > end) return false;
+    }
+  }
+  return true;
+}
+
+const showAnnouncement = !isCanvas && isBannerScheduleActive(siteSettings.announcementBanner, siteSettings.bannerStartDate, siteSettings.bannerEndDate);
 const showFloating = !isCanvas && showFloatingWa;
 const showMobileBar = !isCanvas;
 ---
@@ -147,6 +168,7 @@ const showMobileBar = !isCanvas;
     <!-- JSON-LD Structured Data -->
     <JsonLd
       type={schemaType}
+      siteSettings={cmsSettings}
       articleData={articleData}
       serviceData={serviceData}
       personData={personData}

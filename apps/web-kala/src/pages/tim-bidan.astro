@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import { siteConfig } from '../config/site';
-import { fetchPayloadMidwives, type PayloadMidwife } from '../lib/payload';
+import { fetchPayloadMidwives, mediaUrl, mediaAlt, type PayloadMidwife } from '../lib/payload';
 
 const cmsMidwives = await fetchPayloadMidwives();
 
@@ -101,7 +101,16 @@ const primaryMidwife = midwivesList[0];
               <!-- Midwife Avatar Monogram / Badge -->
               <div class="flex items-center gap-4 mb-6">
                 <div class="w-16 h-16 rounded-2xl bg-[#FFEFE5] border-2 border-[#F6DCCD] text-[#B3471E] flex items-center justify-center font-brand font-bold text-2xl flex-shrink-0">
-                  {midwife.name.split(' ')[1]?.[0] || 'B'}
+                  {midwife.photo?.url ? (
+                    <img
+                      src={mediaUrl(midwife.photo)}
+                      alt={mediaAlt(midwife.photo, midwife.name)}
+                      class="w-full h-full rounded-2xl object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    midwife.name.split(' ')[1]?.[0] || 'B'
+                  )}
                 </div>
                 <div>
                   <h2 class="font-brand font-bold text-lg text-[#4B2E22] leading-snug hover:text-[#B3471E] transition-colors"><a href={`/bidan/${midwife.slug}`}>{midwife.name}</a></h2>

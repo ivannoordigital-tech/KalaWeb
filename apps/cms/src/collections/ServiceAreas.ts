@@ -17,18 +17,33 @@ export const ServiceAreas: CollectionConfig = {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
     },
+    preview: (doc) => {
+      // PRV-002: Pratinjau jangkauan wilayah homecare
+      if (doc?.slug) {
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321');
+        return `${baseUrl}/preview/area/${doc.slug}/`;
+      }
+      return null;
+    },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (user) return true;
+      return { active: { equals: true } };
+    },
     create: canManageAreas,
     update: canManageAreas,
     delete: canManageAreas,
   },
   hooks: {
     afterChange: [
-      async ({ doc }) => {
-        if (doc.active) {
-          triggerCloudflareDeploy({ resource: 'ServiceAreas', action: 'publish', slug: doc.slug });
+      async ({ doc, previousDoc }) => {
+        if (doc.active || previousDoc?.active) {
+          triggerCloudflareDeploy({
+            resource: 'ServiceAreas',
+            action: doc.active ? 'publish' : 'unpublish',
+            slug: doc.slug,
+          });
         }
       },
     ],
@@ -98,12 +113,23 @@ export const ServiceAreas: CollectionConfig = {
         placeholder: '20-35 Menit',
       },
     },
+    // DAT-006: Relasi resmi ke koleksi Services untuk mencegah nama layanan salah ketik
+    {
+      name: 'services',
+      type: 'relationship',
+      relationTo: 'services',
+      hasMany: true,
+      label: 'Paket Layanan yang Tersedia di Wilayah Ini (Relasi Resmi)',
+      admin: {
+        description: 'Pilih layanan aktif dari data resmi. Mencegah nama layanan fiktif atau salah ketik.',
+      },
+    },
     {
       name: 'availableServices',
       type: 'array',
-      label: 'Layanan yang Tersedia di Wilayah Ini',
+      label: 'Layanan yang Tersedia di Wilayah Ini (Teks Cadangan)',
       admin: {
-        description: 'Paket perawatan yang dapat dipanggil ke wilayah ini.',
+        description: 'Paket perawatan yang dapat dipanggil ke wilayah ini (fallback jika relasi belum dipilih).',
       },
       fields: [
         {

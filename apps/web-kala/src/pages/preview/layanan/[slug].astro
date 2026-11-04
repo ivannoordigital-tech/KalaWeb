@@ -1,0 +1,274 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../../config/site';
+import { fetchPayloadServices, type PayloadService } from '../../../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsServices = await fetchPayloadServices();
+  
+  const servicesList: PayloadService[] = cmsServices.length > 0 
+    ? cmsServices 
+    : siteConfig.featuredServices.map(s => ({
+        id: s.id,
+        slug: s.id,
+        name: s.name,
+        target: s.target,
+        duration: s.duration,
+        originalPrice: s.originalPrice,
+        price: s.price,
+        numericPrice: s.numericPrice,
+        description: s.description,
+        badge: s.badge,
+        popular: s.popular,
+        refCode: s.refCode,
+        message: s.message,
+        includedItems: [
+          'Tindakan 100% oleh Bidan bersertifikat & STR aktif',
+          'Alat dan linen medis bersih sekali pakai',
+          'Minyak pijat food-grade steril (aman tertelan bayi)',
+          'Konsultasi tumbuh kembang & bebas mom-shaming',
+          'Edukasi stimulasi mandiri untuk orang tua di rumah',
+        ],
+      }));
+
+  return servicesList.map((service) => ({
+    params: { slug: service.slug || service.id },
+    props: { service },
+  }));
+}
+
+interface Props {
+  service: PayloadService;
+}
+
+const { service } = Astro.props;
+const PAYLOAD_URL = import.meta.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
+const editorHref = `${PAYLOAD_URL}/admin/collections/services`;
+
+const includedList: string[] = Array.isArray(service.includedItems)
+  ? service.includedItems.map((item: any) => (typeof item === 'string' ? item : item.item))
+  : [
+      'Tindakan 100% oleh Bidan bersertifikat & STR aktif',
+      'Alat dan linen medis bersih sekali pakai',
+      'Minyak pijat food-grade steril (aman tertelan bayi)',
+      'Konsultasi tumbuh kembang & bebas mom-shaming',
+      'Edukasi stimulasi mandiri untuk orang tua di rumah',
+    ];
+
+const procedureSteps = [
+  {
+    step: '01',
+    title: 'Pemeriksaan Awal & Suhu',
+    desc: 'Bidan tiba tepat waktu, mencuci tangan secara aseptik, serta mengukur suhu dan memeriksa kondisi umum si kecil atau Bunda sebelum tindakan.',
+  },
+  {
+    step: '02',
+    title: 'Persiapan Steril & Suasana Nyaman',
+    desc: 'Menyiapkan alas perlak higienis, linen bersih sekali pakai, serta minyak alami steril food-grade dalam suhu hangat optimal.',
+  },
+  {
+    step: '03',
+    title: 'Tindakan Pijat & Terapi Lembut',
+    desc: 'Pijatan stimulasi taktil berbasis anatomi medis yang disesuaikan dengan respons kenyamanan bayi, tanpa paksaan saat si kecil lelah.',
+  },
+  {
+    step: '04',
+    title: 'Edukasi & Pendampingan Bunda',
+    desc: 'Evaluasi hasil relaksasi, tips stimulasi mandiri di rumah, dan sesi tanya jawab seputar adaptasi menyusui maupun nifas.',
+  },
+];
+---
+
+<BaseLayout
+  title={`[PRATINJAU DRAFT] ${service.name} | Kala Moms and Baby Spa`}
+  description={`Mode pratinjau editor CMS untuk layanan: ${service.name}`}
+  noindex={true}
+>
+  <!-- Prominent Draft Preview Banner (Sticky) -->
+  <aside class="bg-amber-500 text-slate-950 font-bold px-4 py-3 text-center text-xs sm:text-sm sticky top-0 z-50 flex flex-wrap items-center justify-center gap-2 shadow-md">
+    <span class="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[11px] font-mono tracking-wider uppercase">
+      PRATINJAU DRAFT LAYANAN
+    </span>
+    <span>Perubahan tarif, durasi, dan deskripsi paket layanan di bawah ini belum dipublikasikan ke publik.</span>
+    <a
+      href={editorHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="underline hover:text-white transition-colors ml-2"
+    >
+      Kembali ke Editor CMS →
+    </a>
+  </aside>
+
+  <!-- Service Hero Section -->
+  <section class="py-12 md:py-16 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Badges -->
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        {service.badge && (
+          <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+            {service.badge}
+          </span>
+        )}
+        <span class="text-xs font-semibold text-[#0E733D] bg-[#E8F8EE] px-3 py-1 rounded-full border border-[#C5ECD2] flex items-center gap-1">
+          ✓ Bidan Ber-STR Resmi
+        </span>
+        <span class="text-xs font-semibold text-[#86675A] bg-white px-3 py-1 rounded-full border border-[#F6DCCD]">
+          ⏱ <span id="preview-duration">{service.duration}</span>
+        </span>
+      </div>
+
+      <!-- Title & Price Block -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div>
+          <span class="text-xs font-semibold text-[#B3471E] tracking-wider uppercase block mb-1">
+            Homecare Surabaya & Sidoarjo
+          </span>
+          <h1 id="preview-title" class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] tracking-tight">
+            {service.name}
+          </h1>
+          <p id="preview-target" class="text-sm sm:text-base text-[#86675A] mt-2 font-medium">
+            Sasaran: {service.target || 'Bayi & Anak'}
+          </p>
+        </div>
+
+        <!-- Pricing Card Pill -->
+        <div class="bg-white p-5 rounded-2xl border border-[#F6DCCD] shadow-sm flex flex-col items-start md:items-end min-w-[200px]">
+          {service.originalPrice && (
+            <span class="text-xs text-[#86675A] line-through">
+              {service.originalPrice}
+            </span>
+          )}
+          <div class="flex items-baseline gap-1">
+            <span id="preview-price" class="text-2xl sm:text-3xl font-bold text-[#B3471E]">
+              {service.price}
+            </span>
+            <span class="text-xs text-[#86675A]">/ sesi</span>
+          </div>
+          <span class="text-[11px] text-[#0E733D] font-medium mt-1">
+            ✓ Bebas biaya transport (radius standar)
+          </span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-[#F6DCCD] mb-8">
+        <h2 class="text-lg font-bold text-[#4B2E22] mb-3">Tentang Tindakan Ini</h2>
+        <p id="preview-desc" class="text-base text-[#4B2E22]/90 leading-relaxed">
+          {service.description}
+        </p>
+      </div>
+
+      <!-- Action Button -->
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <WhatsAppButton
+          text={`Konsultasi via WhatsApp (Pratinjau)`}
+          message={`Halo Bidan Kala, saya melihat paket ${service.name}.`}
+          refCode={service.refCode || 'PREVIEW'}
+          source="preview-service"
+          className="w-full sm:w-auto text-base py-3.5 px-8 shadow-md"
+        />
+        <a
+          href={editorHref}
+          class="w-full sm:w-auto text-center px-6 py-3 border border-[#F6DCCD] text-[#86675A] rounded-full text-sm font-semibold hover:bg-white transition-colors"
+        >
+          Edit di Payload CMS
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Included Items Section -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-brand font-bold text-[#4B2E22] mb-2 text-center">
+        Standar Higienitas & Yang Bunda Dapatkan
+      </h2>
+      <p class="text-sm text-[#86675A] text-center mb-8 max-w-xl mx-auto">
+        Setiap kunjungan Kala Homecare dirancang agar orang tua merasa tenang tanpa cemas kontaminasi luar.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {includedList.map((item) => (
+          <div class="flex items-start gap-3 p-4 rounded-xl bg-[#FFF9F4] border border-[#F6DCCD]/80">
+            <span class="w-6 h-6 rounded-full bg-[#E8F8EE] text-[#0E733D] font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+              ✓
+            </span>
+            <span class="text-sm text-[#4B2E22] font-medium leading-snug">{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Procedure Steps -->
+  <section class="py-12 bg-[#FFF9F4] border-t border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-brand font-bold text-[#4B2E22] mb-2 text-center">
+        Alur Prosedur Kunjungan Homecare
+      </h2>
+      <p class="text-sm text-[#86675A] text-center mb-10 max-w-xl mx-auto">
+        Kenyamanan dan keselamatan bayi adalah prioritas utama. Bidan kami mengikuti 4 tahapan higienis terstandarisasi:
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {procedureSteps.map((step) => (
+          <div class="bg-white p-6 rounded-2xl border border-[#F6DCCD] shadow-xs relative">
+            <span class="text-3xl font-brand font-bold text-[#F6DCCD] block mb-2">
+              {step.step}
+            </span>
+            <h3 class="text-base font-bold text-[#4B2E22] mb-2">
+              {step.title}
+            </h3>
+            <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">
+              {step.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Live preview listener -->
+  <script is:inline>
+    (function initPayloadLivePreview() {
+      if (typeof window === 'undefined') return;
+      const isInsideIframe = window.self !== window.top;
+      if (isInsideIframe) {
+        window.addEventListener('message', function(event) {
+          if (event.data && (event.data.type === 'payload-live-preview' || event.data.type === 'payload-live-preview-ready')) {
+            if (event.data.data) {
+              const updated = event.data.data;
+              if (updated.name) {
+                const titleEl = document.getElementById('preview-title');
+                if (titleEl) titleEl.textContent = updated.name;
+                document.title = '[PRATINJAU DRAFT] ' + updated.name;
+              }
+              if (updated.price) {
+                const priceEl = document.getElementById('preview-price');
+                if (priceEl) priceEl.textContent = updated.price;
+              }
+              if (updated.duration) {
+                const durEl = document.getElementById('preview-duration');
+                if (durEl) durEl.textContent = updated.duration;
+              }
+              if (updated.description) {
+                const descEl = document.getElementById('preview-desc');
+                if (descEl) descEl.textContent = updated.description;
+              }
+              if (updated.target) {
+                const targetEl = document.getElementById('preview-target');
+                if (targetEl) targetEl.textContent = 'Sasaran: ' + updated.target;
+              }
+            }
+          }
+        });
+        try {
+          window.parent.postMessage({ type: 'payload-live-preview-ready' }, '*');
+        } catch (e) {}
+      }
+    })();
+  </script>
+</BaseLayout>

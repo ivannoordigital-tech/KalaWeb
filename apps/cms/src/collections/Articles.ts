@@ -1,4 +1,5 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
+import { validateArticleDoc } from '../utilities/pageBuilderValidators'
 import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { buildSeoFields } from '../fields/seoFields'
 import { seoScoreField, seoAuditFields } from '../fields/seoAuditFields'
@@ -21,22 +22,35 @@ export const Articles: CollectionConfig = {
       return role === 'midwife_coordinator'
     },
     preview: (doc) => {
+      // PRV-001 & PRV-002: Pratinjau draft dan publik artikel edukasi
       if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
-        return `${baseUrl}/blog/${doc.slug}/`
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
+        return `${baseUrl}/preview/blog/${doc.slug}/`
       }
       return null
     },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      // Dokumen draft tidak boleh terekspos ke publik/API anonim.
+      if (user) return true;
+      return { _status: { equals: 'published' } };
+    },
     create: canManageArticles,
     update: canManageArticles,
     delete: canManageArticles,
   },
   versions: {
-    drafts: true,
+    drafts: {
+      autosave: {
+        interval: 1500,
+        showSaveDraftButton: true,
+      },
+      schedulePublish: true,
+    },
+    maxPerDoc: 25,
   },
+  trash: true,
   hooks: {
     beforeValidate: [
       ({ data }) => {
@@ -48,10 +62,28 @@ export const Articles: CollectionConfig = {
       },
     ],
     beforeChange: [
-      async ({ data, req, operation }) => {
+      async ({ data, req, operation, originalDoc }) => {
         // Otomatis perbarui tanggal pembaruan saat dokumen diubah
         if (operation === 'update') {
           data.updatedDate = new Date().toISOString()
+        }
+
+        // DAT-008: Cegah overwrite antar editor (Optimistic Lock)
+        if (originalDoc?.updatedAt && (data as any)?._expectedUpdatedAt) {
+          const originalTime = new Date(originalDoc.updatedAt).getTime()
+          const expectedTime = new Date((data as any)._expectedUpdatedAt).getTime()
+          if (originalTime > expectedTime) {
+            throw new APIError('Konflik Simpan Terdeteksi: Dokumen ini telah diperbarui oleh pengguna lain. Silakan muat ulang halaman.', 409)
+          }
+        }
+
+        // ED-001 & ED-003: Validasi kelengkapan konten dan proteksi klaim medis saat publish
+        const { isValid, errors, warnings } = validateArticleDoc(data)
+        if (!isValid) {
+          throw new APIError(`[Validasi Publikasi Artikel Gagal]:\n• ${errors.join('\n• ')}`, 400)
+        }
+        if (warnings.length > 0) {
+          req.payload.logger.warn({ warnings }, '[Article Validation Warnings]')
         }
 
         try {
@@ -61,6 +93,8 @@ export const Articles: CollectionConfig = {
           data.seoAudit = {
             score: audit.score,
             grade: audit.grade,
+            engineVersion: audit.engineVersion || '2.1.0',
+            metrics: audit.metrics,
             issues: audit.issues,
             lastAuditedAt: new Date().toISOString(),
           }
@@ -71,7 +105,7 @@ export const Articles: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      async ({ doc, previousDoc, req }) => {
         const isNowPublished = doc._status === 'published' || doc.status === 'published'
         const wasPublished = previousDoc?._status === 'published' || previousDoc?.status === 'published'
 
@@ -81,6 +115,24 @@ export const Articles: CollectionConfig = {
           triggerCloudflareDeploy({ resource: 'Articles', action: 'unpublish', slug: doc.slug })
         } else if (isNowPublished && wasPublished) {
           triggerCloudflareDeploy({ resource: 'Articles', action: 'publish', slug: doc.slug })
+        }
+
+        // DAT-007: Otomatis buat pengalihan URL 301 saat slug berubah
+        if (previousDoc?.slug && doc.slug && previousDoc.slug !== doc.slug) {
+          try {
+            await req.payload.create({
+              collection: 'redirects',
+              data: {
+                from: `/blog/${previousDoc.slug}`,
+                to: `/blog/${doc.slug}`,
+                type: '301',
+                active: true,
+              },
+            })
+            req.payload.logger.info(`[Auto-Redirect] Dibuat redirect /blog/${previousDoc.slug} -> /blog/${doc.slug}`)
+          } catch (e: any) {
+            req.payload.logger.warn(`[Auto-Redirect] Gagal membuat redirect: ${e.message}`)
+          }
         }
       },
     ],
@@ -227,6 +279,16 @@ export const Articles: CollectionConfig = {
         {
           label: 'Pengaturan Lanjutan',
           fields: [
+            // ED-006: Relasi ke Bidan & Reviewer Medis
+            {
+              name: 'authorMidwife',
+              type: 'relationship',
+              relationTo: 'midwives',
+              label: 'Pilih Bidan Penulis (Opsional)',
+              admin: {
+                description: 'Pilih profil bidan terdaftar untuk otomatis mengisi nama dan gelar penulis.',
+              },
+            },
             {
               name: 'author',
               type: 'text',
@@ -245,13 +307,38 @@ export const Articles: CollectionConfig = {
               label: 'Gelar / Jabatan Penulis',
             },
             {
+              name: 'reviewedByMidwife',
+              type: 'relationship',
+              relationTo: 'midwives',
+              label: 'Bidan Peninjau Medis (Medical Reviewer)',
+              admin: {
+                description: 'Pilih profil bidan ber-STR resmi yang meninjau akurasi klinis isi artikel.',
+              },
+            },
+            {
               name: 'medicalReviewer',
               type: 'text',
-              defaultValue: 'Tim Medis & Kebidanan Kala Moms and Baby Spa',
               required: true,
-              label: 'Peninjau Medis (Medical Reviewer)',
+              label: 'Peninjau Medis (Medical Reviewer — Nama Display)',
               admin: {
-                description: 'Otoritas medis yang memvalidasi kebenaran klinis isi artikel.',
+                description: 'Otoritas medis (nama bidan bergelar) yang memvalidasi kebenaran klinis isi artikel.',
+                placeholder: 'Contoh: Bidan Ayu Lestari, A.Md.Keb (STR: STR-KEMENKES-3578-2022-08912)',
+              },
+            },
+            {
+              name: 'reviewedAt',
+              type: 'date',
+              label: 'Tanggal Peninjauan Medis (Sign-off)',
+              admin: {
+                description: 'Tanggal saat artikel selesai divalidasi oleh reviewer medis.',
+              },
+            },
+            {
+              name: 'reviewNotes',
+              type: 'textarea',
+              label: 'Catatan Peninjau Medis (Internal)',
+              admin: {
+                description: 'Catatan verifikasi klinis internal dari bidan peninjau (tidak tampil di publik).',
               },
             },
             {

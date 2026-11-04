@@ -266,13 +266,43 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
     })
   }
 
-  const totalScore = Math.min(
-    100,
-    Math.max(
-      0,
-      titleScore + descScore + keywordScore + h1Score + altScore + slugScore + ogScore
-    )
-  )
+  // 8. SEO-001: Skor Substantif Konten & Kedalaman Artikel (Word Count)
+  let contentScore = 20
+  const wordCount = input.wordCount
+  if (wordCount !== undefined) {
+    if (wordCount < 100) {
+      contentScore = 0
+      issues.push({
+        code: 'ARTICLE_TOO_THIN',
+        severity: 'critical',
+        message: `Konten artikel sangat tipis (hanya ${wordCount} kata). Minimal 300 kata untuk panduan medis terpercaya di Google.`,
+        targetField: 'content',
+      })
+    } else if (wordCount < SEO_THRESHOLDS.ARTICLE_MIN_WORDS) {
+      contentScore = 8
+      issues.push({
+        code: 'ARTICLE_SHORT',
+        severity: 'warning',
+        message: `Panjang konten (${wordCount} kata) di bawah standar ${SEO_THRESHOLDS.ARTICLE_MIN_WORDS} kata.`,
+        targetField: 'content',
+      })
+    } else if (wordCount < SEO_THRESHOLDS.ARTICLE_OPTIMAL_WORDS) {
+      contentScore = 15
+    } else {
+      contentScore = 20
+    }
+  }
+
+  let rawTotal = titleScore + descScore + keywordScore + h1Score + altScore + slugScore + ogScore
+
+  // Jika word count ada dan konten tipis (< 100 kata), artikel TIDAK BISA mendapatkan skor 100 (maksimal 58 / Poor)
+  if (wordCount !== undefined && wordCount < 100) {
+    rawTotal = Math.min(rawTotal * 0.58, 58)
+  } else if (wordCount !== undefined && wordCount < SEO_THRESHOLDS.ARTICLE_MIN_WORDS) {
+    rawTotal = Math.min(rawTotal * 0.85, 78)
+  }
+
+  const totalScore = Math.min(100, Math.max(0, Math.round(rawTotal)))
 
   const grade: 'good' | 'fair' | 'poor' =
     totalScore >= 80 ? 'good' : totalScore >= 60 ? 'fair' : 'poor'
@@ -284,6 +314,7 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
     score: totalScore,
     grade,
     isUnrated: false,
+    engineVersion: '2.1.0',
     issues,
     metrics: {
       titleScore,
@@ -293,6 +324,8 @@ export function calculateSeoScore(input: NormalizedSeoInput): SeoAuditResult {
       altScore,
       slugScore,
       ogScore,
+      contentScore,
+      wordCount: wordCount || 0,
     },
   }
 }

@@ -2,7 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import BlockRenderer from '../components/blocks/BlockRenderer.astro';
-import { fetchPayloadPages, type PayloadPage } from '../lib/payload';
+import { fetchPayloadPages, mediaUrl, mediaAlt, type PayloadPage } from '../lib/payload';
+import { renderLexicalToHtml } from '../lib/lexical';
 
 export async function getStaticPaths() {
   const cmsPages = await fetchPayloadPages();
@@ -34,7 +35,7 @@ export async function getStaticPaths() {
   ];
 
   const rawList = cmsPages.length > 0 ? cmsPages : fallbackPages;
-  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug) && (p as any).pageType !== 'landing');
+  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug) && (p as any).pageType !== 'landing' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(p.slug) && p.slug !== 'babyMassage');
 
   return validPages.map((page) => ({
     params: { slug: page.slug },
@@ -56,31 +57,9 @@ const breadcrumbs = [
 const resolvedTitle = page.seo?.metaTitle || `${page.title} | Kala Moms and Baby Spa`;
 const resolvedDesc = page.description || 'Layanan perawatan ibu dan anak profesional langsung ke rumah oleh bidan ber-STR resmi di Surabaya dan Sidoarjo.';
 const resolvedCanonical = page.seo?.canonicalUrl || `https://kalababyspa.com/${page.slug}`;
-const resolvedOgImage = page.seo?.ogImage?.url || page.heroImage?.url || '/images/hero-baby.jpg';
+const resolvedOgImage = mediaUrl(page.seo?.ogImage?.url || page.heroImage?.url, '/images/hero-baby.jpg');
 
-function renderRichText(content: any): string {
-  if (!content) return '';
-  if (typeof content === 'string') return content;
-  if (content.root && Array.isArray(content.root.children)) {
-    return content.root.children
-      .map((node: any) => {
-        if (node.type === 'paragraph') {
-          const text = (node.children || []).map((c: any) => c.text || '').join('');
-          return text ? `<p class="mb-5 leading-relaxed text-[#4B2E22]">${text}</p>` : '';
-        }
-        if (node.type === 'heading') {
-          const tag = node.tag || 'h2';
-          const text = (node.children || []).map((c: any) => c.text || '').join('');
-          return `<${tag} class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22] mt-8 mb-4">${text}</${tag}>`;
-        }
-        return '';
-      })
-      .join('');
-  }
-  return '';
-}
-
-const renderedHtml = renderRichText(page.content);
+const renderedHtml = renderLexicalToHtml(page.content);
 const isCanvas = page.pageLayout === 'canvas';
 const isFullWidth = page.pageLayout === 'full_width';
 ---
@@ -138,8 +117,8 @@ const isFullWidth = page.pageLayout === 'full_width';
         {page.heroImage?.url && (
           <div class="mb-10 rounded-3xl overflow-hidden border border-[#F6DCCD] shadow-sm max-h-96">
             <img
-              src={page.heroImage.url}
-              alt={page.heroImage.alt || page.title}
+              src={mediaUrl(page.heroImage)}
+              alt={mediaAlt(page.heroImage, page.title)}
               class="w-full h-full object-cover"
             />
           </div>

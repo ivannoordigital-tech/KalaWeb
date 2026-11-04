@@ -4,11 +4,28 @@ import WhatsAppButton from '../../../components/WhatsAppButton.astro';
 import MobileStickyBar from '../../../components/MobileStickyBar.astro';
 import ConsentBanner from '../../../components/ConsentBanner.astro';
 import { siteConfig } from '../../../config/site';
-import { fetchPayloadLandingPages } from '../../../lib/payload';
+import { fetchPayloadLandingPages, fetchPayloadPages } from '../../../lib/payload';
 import '../../../styles/global.css';
 
 export async function getStaticPaths() {
-  const cmsLps = await fetchPayloadLandingPages();
+  const [cmsLps, cmsPages] = await Promise.all([
+    fetchPayloadLandingPages(),
+    fetchPayloadPages(),
+  ]);
+
+  const landingFromPages = cmsPages
+    .filter((p: any) => p.pageType === 'landing' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(p.slug) && p.slug !== 'babyMassage')
+    .map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      refCode: p.refCode || `LP-${p.slug.toUpperCase()}`,
+      activePixels: p.activePixels || ['meta', 'google'],
+      variant: p.variant || 'A',
+      layout: p.layout || [],
+      pageLayout: p.pageLayout || 'canvas',
+      sourceCollection: 'pages',
+    }));
 
   const fallbackCampaigns = [
     { slug: 'bayi-kolik', title: 'Solusi Tangis Kolik & Perut Kembung Bayi di Surabaya & Sidoarjo' },
@@ -16,18 +33,40 @@ export async function getStaticPaths() {
     { slug: 'reservasi-online', title: 'Reservasi Homecare Bidan Kala' },
   ];
 
-  const allSlugs = new Set([
-    ...cmsLps.map((lp) => lp.slug),
-    ...fallbackCampaigns.map((f) => f.slug),
-  ]);
+  const usePagesForSales = import.meta.env.USE_PAGES_FOR_SALES !== 'false' && process.env.USE_PAGES_FOR_SALES !== 'false';
+  const campaignMap = new Map<string, any>();
 
-  return Array.from(allSlugs).map((slug) => {
-    const pageData = cmsLps.find((lp) => lp.slug === slug);
-    return {
-      params: { slug },
-      props: { pageData },
-    };
-  });
+  // LP-003: Prioritize Pages over legacy LandingPages
+  if (usePagesForSales) {
+    for (const p of landingFromPages) {
+      campaignMap.set(p.slug, p);
+    }
+    for (const lp of cmsLps) {
+      if (!campaignMap.has(lp.slug)) {
+        campaignMap.set(lp.slug, { ...lp, sourceCollection: 'landing-pages' });
+      }
+    }
+  } else {
+    for (const lp of cmsLps) {
+      campaignMap.set(lp.slug, { ...lp, sourceCollection: 'landing-pages' });
+    }
+    for (const p of landingFromPages) {
+      if (!campaignMap.has(p.slug)) {
+        campaignMap.set(p.slug, p);
+      }
+    }
+  }
+
+  for (const f of fallbackCampaigns) {
+    if (!campaignMap.has(f.slug)) {
+      campaignMap.set(f.slug, { ...f, sourceCollection: 'fallback' });
+    }
+  }
+
+  return Array.from(campaignMap.values()).map((pageData) => ({
+    params: { slug: pageData.slug },
+    props: { pageData },
+  }));
 }
 
 const { slug } = Astro.params;
@@ -39,6 +78,7 @@ const title = pageData?.title || `Pratinjau Draft: ${slug}`;
 const blocks = Array.isArray(pageData?.layout) ? pageData.layout : [];
 const hasBlocks = blocks.length > 0;
 const isCanvas = pageData?.pageLayout === 'canvas';
+const editorHref = `${PAYLOAD_URL}/admin/collections/${pageData?.sourceCollection === 'landing-pages' ? 'landing-pages' : 'pages'}`;
 ---
 
 <!DOCTYPE html>
@@ -67,7 +107,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
       </span>
       <span>Halaman ini adalah mode pratinjau editor CMS. Perubahan belum terbit ke pengunjung publik.</span>
       <a
-        href={`https://admin.kalababyspa.com/admin/collections/landing-pages`}
+        href={editorHref}
         target="_blank"
         rel="noopener noreferrer"
         class="underline hover:text-white transition-colors ml-2"
@@ -115,7 +155,7 @@ const isCanvas = pageData?.pageLayout === 'canvas';
             Belum ada susunan blok yang disimpan pada landing page ini di CMS. Silakan tambahkan minimal satu Hero Block di editor CMS Anda.
           </p>
           <a
-            href="https://admin.kalababyspa.com/admin/collections/landing-pages"
+            href={editorHref}
             target="_blank"
             rel="noopener noreferrer"
             class="inline-block bg-[#B3471E] text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md hover:bg-[#A3431E] transition-colors"

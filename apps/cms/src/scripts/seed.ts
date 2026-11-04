@@ -1,5 +1,6 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
+import { convertLegacyLandingToBlocks } from './migrate-landing-pages'
 
 export async function seed() {
   const payload = await getPayload({ config })
@@ -22,7 +23,7 @@ export async function seed() {
       collection: 'users',
       data: {
         email: 'admin@kalababyspa.com',
-        password: 'KalaAdminPassword2026!',
+        password: process.env.ADMIN_SEED_PASSWORD || (process.env.NODE_ENV === 'production' ? '' : 'dev-admin-seed-pass'),
         name: 'Admin Utama Kala',
         role: 'superadmin',
       },
@@ -54,11 +55,11 @@ export async function seed() {
       collection: 'users',
       data: {
         email: 'bot@kalababyspa.com',
-        password: botPassword || 'KalaBotOperatorSecPass2026!',
+        password: botPassword || (process.env.NODE_ENV === 'production' ? '' : 'dev-bot-password-change-me'),
         name: 'Kala Clinic Bot Service',
         role: 'operator',
         enableAPIKey: true,
-        apiKey: botApiKey || 'kala_bot_api_key_secure_2026_super_random_token',
+        apiKey: botApiKey || (process.env.NODE_ENV === 'production' ? '' : 'dev-bot-api-key-change-me'),
       },
     });
 
@@ -136,18 +137,24 @@ export async function seed() {
       author: 'Bunda Sarah & Baby Arka (2 bulan)',
       area: 'Rungkut, Surabaya Timur',
       service: 'Kala Bundle Duo',
+      active: true,
+      permissionGranted: true,
     },
     {
       quote: 'Si kecil sempat sering nangis histeris tiap malam karena kembung. Bidan Kala sabar banget ngajarin gerakan ILU dan posisi sendawa yang benar. Sekarang jauh lebih tenang dan kami nggak panikan lagi.',
       author: 'Bunda Nadhira & Baby Zayn (3 minggu)',
       area: 'Waru, Sidoarjo',
       service: 'Pijat Ceria Newborn',
+      active: true,
+      permissionGranted: true,
     },
     {
       quote: 'Cukur selapanan di rumah sama Bidan Kala higienis banget. Alatnya steril dan bidannya telaten ngalihin perhatian bayi sampai nggak nangis sama sekali. Praktis nggak perlu keluar rumah.',
       author: 'Bunda Clarissa & Baby Kenzo (1 bulan)',
       area: 'Wiyung, Surabaya Barat',
       service: 'Kala Bundle Selapan Full',
+      active: true,
+      permissionGranted: true,
     },
   ]
 
@@ -162,6 +169,70 @@ export async function seed() {
         collection: 'testimonials',
         data: test,
       })
+    }
+  }
+
+  // 3b. Seed Midwives
+  const initialMidwives = [
+    {
+      name: 'Bidan Ayu Lestari, A.Md.Keb',
+      slug: 'bidan-ayu-lestari',
+      title: 'Lead Midwife & Certified Infant Massage Practitioner',
+      strNumber: 'STR-KEMENKES-3578-2022-08912',
+      experienceYears: 6,
+      specialties: [
+        { specialty: 'Pijat Taktil Stimulasi Bayi & Kolik' },
+        { specialty: 'Konseling Fisiologi Laktasi & Pijat Oksitosin' },
+        { specialty: 'Perawatan Tali Pusat & Neonatal' },
+      ],
+      bio: 'Bidan Ayu berpengalaman mendampingi ratusan ibu nifas dan bayi baru lahir di Surabaya. Memiliki sertifikasi resmi Pediatric Touch Therapy.',
+      active: true,
+    },
+    {
+      name: 'Bidan Dwi Rahmawati, S.Tr.Keb',
+      slug: 'bidan-dwi-rahmawati',
+      title: 'Senior Clinical Midwife & Postnatal Care Specialist',
+      strNumber: 'STR-KEMENKES-3515-2021-04561',
+      experienceYears: 5,
+      specialties: [
+        { specialty: 'Pijat Tradisi Selapanan & Cukur Bersih Steril' },
+        { specialty: 'Pemulihan Pasca-Sesar (Post-Sectio Caesarea)' },
+        { specialty: 'Edukasi Manajemen Kolik & Sendawa Bayi' },
+      ],
+      bio: 'Fokus pada kenyamanan ibu pasca persalinan normal maupun sesar di wilayah Sidoarjo dan Surabaya Selatan.',
+      active: true,
+    },
+    {
+      name: 'Bidan Nurul Hidayah, A.Md.Keb',
+      slug: 'bidan-nurul-hidayah',
+      title: 'Homecare Midwife & Baby Wellness Therapist',
+      strNumber: 'STR-KEMENKES-3578-2023-11203',
+      experienceYears: 4,
+      specialties: [
+        { specialty: 'Stimulasi Motorik Kasar & Halus Bayi' },
+        { specialty: 'Relaksasi Tidur Bayi Gelisah (Fussy Baby)' },
+        { specialty: 'Pijat Payudara & Bendungan ASI' },
+      ],
+      bio: 'Layanan stimulasi motorik dan pijat relaksasi bayi di rumah dengan pendekatan penuh empati.',
+      active: true,
+    },
+  ];
+
+  const seededMidwifeMap: Record<string, any> = {};
+  for (const m of initialMidwives) {
+    const existing = await payload.find({
+      collection: 'midwives',
+      where: { strNumber: { equals: m.strNumber } },
+    });
+    if (existing.totalDocs === 0) {
+      console.log(`Seeding midwife: ${m.name}`);
+      const created = await (payload.create as any)({
+        collection: 'midwives',
+        data: m,
+      });
+      seededMidwifeMap[m.slug] = created.id;
+    } else {
+      seededMidwifeMap[m.slug] = existing.docs[0].id;
     }
   }
 
@@ -560,6 +631,7 @@ export async function seed() {
       pageLayout: 'canvas' as const,
       showWhatsAppCta: true,
       whatsappCustomMessage: 'Halo Bidan Kala, saya mau konsultasi keluhan kolik si kecil',
+      layout: convertLegacyLandingToBlocks(initialLandingPages.find((l) => l.slug === 'bayi-kolik') as any),
       _status: 'published',
     },
     {
@@ -571,6 +643,7 @@ export async function seed() {
       pageLayout: 'canvas' as const,
       showWhatsAppCta: true,
       whatsappCustomMessage: 'Halo Bidan Kala, saya mau reservasi pijat ceria newborn',
+      layout: convertLegacyLandingToBlocks(initialLandingPages.find((l) => l.slug === 'pijat-newborn') as any),
       _status: 'published',
     },
     {
@@ -582,6 +655,7 @@ export async function seed() {
       pageLayout: 'canvas' as const,
       showWhatsAppCta: true,
       whatsappCustomMessage: 'Halo Bidan Kala, saya mau reservasi homecare untuk si kecil',
+      layout: (initialLandingPages.find((l) => l.slug === 'reservasi-online') as any)?.layout || [],
       _status: 'published',
     },
   ]
@@ -607,6 +681,7 @@ export async function seed() {
           pageType: pg.pageType,
           pageLayout: pg.pageLayout,
           refCode: pg.refCode,
+          layout: (pg as any).layout || existing.docs[0].layout,
         },
       })
     }

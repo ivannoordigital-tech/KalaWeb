@@ -18,9 +18,10 @@ export const LandingPages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'refCode', 'variant', 'seoScore', '_status', 'updatedAt'],
     hidden: () => true,
+    description: '⚠️ [DEPRECATED / ARSIP] Koleksi ini telah dikonsolidasikan ke menu "Semua Halaman" (Pages) dengan tipe Landing Page. Gunakan menu Pages untuk mengelola halaman promosi aktif.',
     preview: (doc) => {
       if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321');
         return `${baseUrl}/preview/sales/${doc.slug}/`;
       }
       return null;
@@ -28,7 +29,7 @@ export const LandingPages: CollectionConfig = {
     livePreview: {
       url: ({ data }) => {
         const slug = data?.slug || 'bayi-kolik';
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321');
         return `${baseUrl}/preview/sales/${slug}/`;
       },
       breakpoints: [
@@ -54,7 +55,14 @@ export const LandingPages: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      // Landing page legacy hanya boleh dibaca publik jika published & aktif.
+      if (user) return true;
+      return {
+        _status: { equals: 'published' },
+        active: { equals: true },
+      };
+    },
     create: canManagePagesAndLPs,
     update: canManagePagesAndLPs,
     delete: canManagePagesAndLPs,
@@ -212,19 +220,19 @@ export const LandingPages: CollectionConfig = {
       defaultValue: 'canvas_minimal',
       options: [
         {
-          label: 'Elementor Canvas Minimal (Header Minimalis Khusus Iklan/Sales: Logo + STR)',
+          label: 'Canvas Minimalis (Header Iklan: Logo + STR)',
           value: 'canvas_minimal',
         },
         {
-          label: 'Elementor Canvas Murni (Blank Canvas: 100% Kosong Tanpa Header Apapun)',
+          label: 'Canvas Polos (Tanpa Header & Footer)',
           value: 'canvas',
         },
         {
-          label: 'Default / Bawaan Tema (Header Navbar & Footer Web Lengkap)',
+          label: 'Standar Tema (Header Navbar & Footer Web Lengkap)',
           value: 'default',
         },
         {
-          label: 'Elementor Full Width (Lebar Penuh dengan Header & Footer Bawaan)',
+          label: 'Lebar Penuh / Full Width (Header & Footer Bawaan)',
           value: 'full_width',
         },
       ],
@@ -265,7 +273,7 @@ export const LandingPages: CollectionConfig = {
         {
           name: 'price',
           type: 'text',
-          label: 'Teks Harga Promo Tampilan (Mode Klasik)',
+          label: 'Teks Harga Promo Tampilan (Arsip Legacy)',
           admin: {
             width: '50%',
             placeholder: 'Rp60.000',
@@ -275,7 +283,7 @@ export const LandingPages: CollectionConfig = {
         {
           name: 'duration',
           type: 'text',
-          label: 'Durasi Layanan (Mode Klasik)',
+          label: 'Durasi Layanan (Arsip Legacy)',
           admin: {
             width: '50%',
             placeholder: '40 Menit',
@@ -295,7 +303,7 @@ export const LandingPages: CollectionConfig = {
     {
       name: 'subheadline',
       type: 'textarea',
-      label: 'Subheadline / Kalimat Empati (Mode Klasik)',
+      label: 'Subheadline / Kalimat Empati (Arsip Legacy)',
       admin: {
         description: 'Penjelasan pembuka 1-2 kalimat (diabaikan jika menggunakan Blok Hero di Page Builder).',
       },
@@ -375,7 +383,7 @@ export const LandingPages: CollectionConfig = {
     {
       name: 'testimonial',
       type: 'group',
-      label: 'Testimoni Pasien Khusus Iklan Ini (Mode Klasik)',
+      label: 'Testimoni Pasien Khusus Iklan Ini (Arsip Legacy)',
       admin: {
         description: 'Diabaikan jika Anda menggunakan Blok Testimoni di Page Builder.',
       },

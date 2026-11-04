@@ -1,9 +1,55 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { fetchPayloadArticles, mediaUrl } from '../../lib/payload';
 
-const posts = await getCollection('blog', ({ data }) => !data.draft);
-const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+interface BlogCard {
+  slug: string;
+  title: string;
+  description: string;
+  category: 'bayi' | 'ibu-menyusui' | 'layanan' | 'kehamilan';
+  pubDate: Date;
+  author: string;
+  heroImage?: string;
+  heroImageAlt?: string;
+}
+
+const cmsArticles = await fetchPayloadArticles();
+
+// Fallback Markdown hanya dipakai selama transisi / saat CMS belum berisi artikel.
+// Di production, kegagalan fetch CMS akan menggagalkan build (fail-safe).
+const markdownPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+const cmsSlugs = new Set(cmsArticles.map((article) => article.slug));
+
+const posts: BlogCard[] = [
+  ...cmsArticles.map((article) => ({
+    slug: article.slug,
+    title: article.title,
+    description: article.description,
+    category: article.category,
+    pubDate: new Date(article.pubDate),
+    author: article.author,
+    heroImage: mediaUrl(article.heroImage, article.heroImageUrlFallback),
+    heroImageAlt: article.heroImageAlt,
+  })),
+  // Artikel Markdown yang belum ada di CMS tetap tampil agar tidak hilang
+  // selama masa transisi.
+  ...markdownPosts
+    .filter((post) => !cmsSlugs.has(post.slug))
+    .map((post) => ({
+      slug: post.slug,
+      title: post.data.title,
+      description: post.data.description,
+      category: post.data.category,
+      pubDate: post.data.pubDate,
+      author: post.data.author,
+      heroImage: mediaUrl(post.data.heroImage),
+      heroImageAlt: post.data.heroImageAlt,
+    })),
+];
+
+const sortedPosts = posts.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 
 const breadcrumbs = [
   { name: 'Beranda', url: '/' },
@@ -19,7 +65,7 @@ const breadcrumbs = [
 >
   <div class="py-14 md:py-20 bg-[#FFF9F4]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
       <!-- Page Header -->
       <div class="text-center max-w-2xl mx-auto mb-16">
         <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
@@ -34,39 +80,55 @@ const breadcrumbs = [
       </div>
 
       <!-- Articles Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {sortedPosts.map((post) => (
-          <article class="bg-white rounded-3xl border border-[#F6DCCD] overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300">
-            <div class="p-8">
-              <div class="flex items-center justify-between text-xs text-[#86675A] mb-4">
-                <span class="px-3 py-1 bg-[#FFEFE5] text-[#B3471E] font-bold rounded-lg border border-[#F6DCCD] uppercase tracking-wider text-[10px]">
-                  {post.data.category}
-                </span>
-                <span>
-                  {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(post.data.pubDate)}
-                </span>
+      {sortedPosts.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {sortedPosts.map((post) => (
+            <article class="bg-white rounded-3xl border border-[#F6DCCD] overflow-hidden flex flex-col justify-between hover:shadow-kala transition-all duration-300">
+              {post.heroImage && (
+                <a href={`/blog/${post.slug}`} class="block aspect-[16/9] overflow-hidden bg-[#FFEFE5] border-b border-[#F6DCCD]">
+                  <img
+                    src={post.heroImage}
+                    alt={post.heroImageAlt || post.title}
+                    class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                </a>
+              )}
+              <div class="p-8">
+                <div class="flex items-center justify-between text-xs text-[#86675A] mb-4">
+                  <span class="px-3 py-1 bg-[#FFEFE5] text-[#B3471E] font-bold rounded-lg border border-[#F6DCCD] uppercase tracking-wider text-[10px]">
+                    {post.category}
+                  </span>
+                  <span>
+                    {new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(post.pubDate)}
+                  </span>
+                </div>
+
+                <h2 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug hover:text-[#B3471E] transition-colors">
+                  <a href={`/blog/${post.slug}`}>
+                    {post.title}
+                  </a>
+                </h2>
+
+                <p class="text-sm text-[#86675A] leading-relaxed line-clamp-3 mb-4">
+                  {post.description}
+                </p>
               </div>
 
-              <h2 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug hover:text-[#B3471E] transition-colors">
-                <a href={`/blog/${post.slug}`}>
-                  {post.data.title}
+              <div class="p-8 pt-0 border-t border-[#F6DCCD]/60 mt-4 flex items-center justify-between text-xs">
+                <span class="text-[#86675A]">Penulis: <strong class="text-[#4B2E22]">{post.author}</strong></span>
+                <a href={`/blog/${post.slug}`} class="font-bold text-[#B3471E] hover:underline flex items-center gap-1">
+                  Baca Artikel →
                 </a>
-              </h2>
-
-              <p class="text-sm text-[#86675A] leading-relaxed line-clamp-3 mb-4">
-                {post.data.description}
-              </p>
-            </div>
-
-            <div class="p-8 pt-0 border-t border-[#F6DCCD]/60 mt-4 flex items-center justify-between text-xs">
-              <span class="text-[#86675A]">Penulis: <strong class="text-[#4B2E22]">{post.data.author}</strong></span>
-              <a href={`/blog/${post.slug}`} class="font-bold text-[#B3471E] hover:underline flex items-center gap-1">
-                Baca Artikel →
-              </a>
-            </div>
-          </article>
-        ))}
-      </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-20 bg-white rounded-3xl border border-[#F6DCCD]">
+          <p class="text-[#86675A]">Belum ada artikel yang diterbitkan.</p>
+        </div>
+      )}
 
     </div>
   </div>

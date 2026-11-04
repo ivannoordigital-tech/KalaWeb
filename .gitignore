@@ -21,6 +21,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Cache
+.cache/
+*.cache
+
 # OS metadata
 .DS_Store
 Thumbs.db

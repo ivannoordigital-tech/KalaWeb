@@ -19,16 +19,23 @@ export const Midwives: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (user) return true;
+      return { active: { equals: true } };
+    },
     create: canManageMidwives,
     update: canManageMidwives,
     delete: canManageMidwives,
   },
   hooks: {
     afterChange: [
-      async ({ doc }) => {
-        if (doc.active) {
-          triggerCloudflareDeploy({ resource: 'Midwives', action: 'publish', slug: doc.slug });
+      async ({ doc, previousDoc }) => {
+        if (doc.active || previousDoc?.active) {
+          triggerCloudflareDeploy({
+            resource: 'Midwives',
+            action: doc.active ? 'publish' : 'unpublish',
+            slug: doc.slug,
+          });
         }
       },
     ],

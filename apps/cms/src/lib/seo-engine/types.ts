@@ -23,6 +23,7 @@ export interface SeoAuditResult {
   score: number // 0 - 100
   grade: 'good' | 'fair' | 'poor'
   isUnrated?: boolean
+  engineVersion?: string
   issues: SeoIssue[]
   metrics: {
     titleScore: number
@@ -32,5 +33,7 @@ export interface SeoAuditResult {
     altScore: number
     slugScore: number
     ogScore: number
+    contentScore?: number
+    wordCount?: number
   }
 }

@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WhatsAppButton from '../../components/WhatsAppButton.astro';
 import { siteConfig } from '../../config/site';
-import { fetchPayloadMidwives, type PayloadMidwife } from '../../lib/payload';
+import { fetchPayloadMidwives, mediaUrl, mediaAlt, type PayloadMidwife } from '../../lib/payload';
 
 export async function getStaticPaths() {
   const cmsMidwives = await fetchPayloadMidwives();
@@ -82,6 +82,7 @@ const personSchema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: midwife.name,
+  image: midwife.photo?.url ? mediaUrl(midwife.photo) : undefined,
   jobTitle: midwife.title,
   identifier: midwife.strNumber,
   description: midwife.bio,
@@ -110,8 +111,17 @@ const personSchema = {
         <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
           
           <!-- Avatar Icon -->
-          <div class="w-32 h-32 rounded-2xl bg-[#FFEFE5] border-2 border-[#B3471E]/30 flex items-center justify-center text-5xl flex-shrink-0 shadow-inner">
-            👩‍⚕️
+          <div class="w-32 h-32 rounded-2xl bg-[#FFEFE5] border-2 border-[#B3471E]/30 flex items-center justify-center text-5xl flex-shrink-0 shadow-inner overflow-hidden">
+            {midwife.photo?.url ? (
+              <img
+                src={mediaUrl(midwife.photo)}
+                alt={mediaAlt(midwife.photo, midwife.name)}
+                class="w-full h-full object-cover"
+                loading="eager"
+              />
+            ) : (
+              '👩‍⚕️'
+            )}
           </div>
 
           <!-- Bio Information -->

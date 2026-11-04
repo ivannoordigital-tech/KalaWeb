@@ -5,9 +5,11 @@ import { fetchPayloadTestimonials } from '../lib/payload';
 interface Props {
   socialProofText?: string;
   foundedYear?: number;
+  title?: string;
+  subtitle?: string;
 }
 
-const { socialProofText, foundedYear } = Astro.props;
+const { socialProofText, foundedYear, title, subtitle } = Astro.props;
 const rawSocialProof = socialProofText || siteConfig.socialProofText;
 const socialProof = rawSocialProof.replace(/500\+\s*Bunda/gi, '1000+ Orang Tua').replace(/500\+/g, '1000+');
 const since = foundedYear || siteConfig.foundedYear;
@@ -31,13 +33,13 @@ const testimonialsList = cmsTestimonials.length > 0
         Cerita & Ulasan Nyata
       </span>
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
-        Kata Bunda yang Sudah Merasakan Sentuhan Kala
+        {title || 'Kata Bunda yang Sudah Merasakan Sentuhan Kala'}
       </h2>
       <p class="text-sm font-semibold text-[#0E733D] mb-2">
         {socialProof} · sejak {since}
       </p>
       <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
-        Cerita dari Bunda di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.
+        {subtitle || 'Cerita dari Bunda di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.'}
       </p>
     </div>
 

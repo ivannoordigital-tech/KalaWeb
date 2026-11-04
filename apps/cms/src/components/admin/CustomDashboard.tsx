@@ -9,7 +9,8 @@ import {
   calculateSeoScore,
   type SeoAuditResult,
 } from '../../lib/seo-engine'
-import { getDeployStatus } from '../../utilities/triggerDeployHook'
+import { getDeployStatus, fetchRealCloudflareDeployStatus } from '../../utilities/triggerDeployHook'
+import { getUserRole } from '../../access/roles'
 
 interface CustomDashboardProps {
   payload?: any
@@ -25,7 +26,26 @@ interface CustomDashboardProps {
 export async function CustomDashboard(props?: CustomDashboardProps) {
   // Use payload instance with fallback
   const req = props?.initPageResult?.req
+  const user = props?.user || req?.user
+  const role = getUserRole(user)
   const payload = props?.payload || req?.payload || (await getPayload({ config: configPromise }))
+
+  // Role labels and badges (UX-004)
+  const roleLabels: Record<string, { label: string; bg: string; color: string; border: string }> = {
+    superadmin: { label: 'Super Administrator', bg: '#f5f3ff', color: '#6d28d9', border: '#ddd6fe' },
+    operator: { label: 'Operator Klinik', bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
+    author: { label: 'Penulis (Author)', bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0' },
+    seo: { label: 'SEO Specialist', bg: '#fffbeb', color: '#b45309', border: '#fde68a' },
+    midwife_coordinator: { label: 'Koordinator Bidan', bg: '#fdf2f8', color: '#be185d', border: '#fbcfe8' },
+    marketing: { label: 'Marketing Specialist', bg: '#fff7ed', color: '#c2410c', border: '#ffedd5' },
+  }
+  const currentRoleInfo = (role && roleLabels[role]) || { label: 'Tamu / Tanpa Login', bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' }
+
+  // Action permissions (UX-001)
+  const canCreateArticles = role === 'superadmin' || role === 'operator' || role === 'author' || role === 'seo'
+  const canCreatePages = role === 'superadmin' || role === 'operator' || role === 'marketing' || role === 'seo'
+  const canManageMidwives = role === 'superadmin' || role === 'operator' || role === 'midwife_coordinator'
+  const canUploadMedia = role !== null
 
   // Fetch recent items across collections with overrideAccess: true for dashboard aggregation
   let articles: any[] = []
@@ -87,12 +107,14 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
         _adapter: () => pageSeoAdapter(d),
       }
     }),
-    ...landingPages.map((d: any) => ({
-      ...d,
-      _type: 'Halaman Penawaran Khusus',
-      _collSlug: 'landing-pages',
-      _adapter: () => landingPageSeoAdapter(d),
-    })),
+    ...landingPages
+      .filter((d: any) => !pages.some((p: any) => p.slug === d.slug))
+      .map((d: any) => ({
+        ...d,
+        _type: 'Halaman Penawaran (Arsip Legacy)',
+        _collSlug: 'landing-pages',
+        _adapter: () => landingPageSeoAdapter(d),
+      })),
   ]
 
   // Filter out any leftover test documents
@@ -255,8 +277,25 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
   const displayedAttention = attentionItems.slice(0, 3)
   const totalAttentionCount = attentionItems.length
 
-  // Live Deploy Status & Last Published Timestamp
+  // Live Deploy Status & Last Published Timestamp (Sinkron dengan Cloudflare API dan DB)
+  try {
+    await fetchRealCloudflareDeployStatus(payload)
+  } catch (e) {
+    // Non-blocking jika offline
+  }
   const deployStatus = getDeployStatus()
+
+  // Ambil riwayat deploy terbaru dari koleksi deployments
+  let latestDeploymentDoc: any = null
+  try {
+    const deploysRes = await payload.find({
+      collection: 'deployments',
+      limit: 1,
+      sort: '-createdAt',
+      overrideAccess: true,
+    })
+    latestDeploymentDoc = deploysRes?.docs?.[0] || null
+  } catch (e) {}
   const latestPublishedDoc = allDocs.find(
     (d: any) => d._status === 'published' || d.status === 'published'
   )
@@ -317,6 +356,24 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
 
         {/* Status Penerbitan & Tautan Lihat Situs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          {/* Badge Peran Pengguna (Role Badge - UX-004) */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '9999px',
+              fontSize: '12px',
+              fontWeight: 600,
+              backgroundColor: currentRoleInfo.bg,
+              color: currentRoleInfo.color,
+              border: `1px solid ${currentRoleInfo.border}`,
+            }}
+          >
+            <span>👤</span>
+            <span>{currentRoleInfo.label}</span>
+          </div>
           <div
             style={{
               display: 'inline-flex',
@@ -392,7 +449,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
         </div>
       </div>
 
-      {/* 2. Tiga Kartu Aksi Cepat Utama */}
+      {/* 2. Kartu Aksi Cepat Sesuai Hak Akses Role (UX-001) */}
       <div
         style={{
           display: 'grid',
@@ -401,105 +458,177 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
           marginBottom: '32px',
         }}
       >
-        {/* Card 1: Tulis Artikel */}
-        <Link
-          href="/admin/collections/articles/create"
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '16px',
-            padding: '20px',
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            border: '1px solid #e2e8f0',
-            textDecoration: 'none',
-            color: 'inherit',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-            transition: 'border-color 0.15s ease',
-          }}
-        >
-          <div
+        {/* Card 1: Tulis Artikel (atau Bidan jika koordinator) */}
+        {canCreateArticles ? (
+          <Link
+            href="/admin/collections/articles/create"
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '10px',
-              backgroundColor: '#f0fdf4',
-              color: '#16a34a',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px',
-              flexShrink: 0,
+              alignItems: 'flex-start',
+              gap: '16px',
+              padding: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              textDecoration: 'none',
+              color: 'inherit',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              transition: 'border-color 0.15s ease',
             }}
           >
-            ✍️
-          </div>
-          <div>
-            <h3
+            <div
               style={{
-                margin: '0 0 4px 0',
-                fontSize: '16px',
-                fontWeight: 650,
-                color: '#0f172a',
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: '#f0fdf4',
+                color: '#16a34a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                flexShrink: 0,
               }}
             >
-              Tulis Artikel Baru
-            </h3>
-            <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
-              Publikasikan panduan kesehatan ibu dan buah hati dengan checklist SEO otomatis.
-            </p>
-          </div>
-        </Link>
+              ✍️
+            </div>
+            <div>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+                Tulis Artikel Baru
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+                Publikasikan panduan kesehatan ibu dan buah hati dengan checklist SEO otomatis.
+              </p>
+            </div>
+          </Link>
+        ) : (
+          <Link
+            href="/admin/collections/midwives"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '16px',
+              padding: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              textDecoration: 'none',
+              color: 'inherit',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: '#fdf2f8',
+                color: '#be185d',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                flexShrink: 0,
+              }}
+            >
+              👩‍⚕️
+            </div>
+            <div>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+                Kelola Tim Bidan & STR
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+                Kelola data keahlian klinis dan validasi nomor Surat Tanda Registrasi nakes.
+              </p>
+            </div>
+          </Link>
+        )}
 
-        {/* Card 2: Buat Halaman */}
-        <Link
-          href="/admin/collections/pages/create"
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '16px',
-            padding: '20px',
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            border: '1px solid #e2e8f0',
-            textDecoration: 'none',
-            color: 'inherit',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-            transition: 'border-color 0.15s ease',
-          }}
-        >
-          <div
+        {/* Card 2: Buat Halaman (atau Testimoni jika tidak punya izin pages) */}
+        {canCreatePages ? (
+          <Link
+            href="/admin/collections/pages/create"
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '10px',
-              backgroundColor: '#eff6ff',
-              color: '#2563eb',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px',
-              flexShrink: 0,
+              alignItems: 'flex-start',
+              gap: '16px',
+              padding: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              textDecoration: 'none',
+              color: 'inherit',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              transition: 'border-color 0.15s ease',
             }}
           >
-            📄
-          </div>
-          <div>
-            <h3
+            <div
               style={{
-                margin: '0 0 4px 0',
-                fontSize: '16px',
-                fontWeight: 650,
-                color: '#0f172a',
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: '#eff6ff',
+                color: '#2563eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                flexShrink: 0,
               }}
             >
-              Buat Halaman Baru
-            </h3>
-            <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
-              Susun halaman informasi klinik atau halaman penawaran khusus kampanye iklan.
-            </p>
-          </div>
-        </Link>
+              📄
+            </div>
+            <div>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+                Buat Halaman Baru
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+                Susun halaman informasi klinik atau halaman penawaran khusus kampanye iklan.
+              </p>
+            </div>
+          </Link>
+        ) : (
+          <Link
+            href="/admin/collections/testimonials"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '16px',
+              padding: '20px',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+              textDecoration: 'none',
+              color: 'inherit',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                backgroundColor: '#fffbeb',
+                color: '#b45309',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                flexShrink: 0,
+              }}
+            >
+              💬
+            </div>
+            <div>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+                Moderasi Testimoni Pasien
+              </h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
+                Tinjau izin tayang (consent) ulasan pasien sebelum ditampilkan di website.
+              </p>
+            </div>
+          </Link>
+        )}
 
         {/* Card 3: Unggah Media */}
         <Link
@@ -550,6 +679,146 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
             </p>
           </div>
         </Link>
+      </div>
+
+      {/* UX-006: Inbox Status & Tindakan Tim (Perlu Review, Perlu Deploy, Status Build) */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '16px',
+          marginBottom: '32px',
+        }}
+      >
+        {/* Inbox 1: Perlu Review */}
+        <div
+          style={{
+            padding: '16px 20px',
+            backgroundColor: draftItems.length > 0 ? '#fffbeb' : '#f8fafc',
+            borderRadius: '12px',
+            border: `1px solid ${draftItems.length > 0 ? '#fde68a' : '#e2e8f0'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>📝</span>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Perlu Review / Draft
+              </div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: draftItems.length > 0 ? '#92400e' : '#0f172a' }}>
+                {draftItems.length > 0 ? `${draftItems.length} dokumen draf` : 'Semua konten sudah terbit'}
+              </div>
+            </div>
+          </div>
+          {draftItems.length > 0 && (
+            <Link
+              href="/admin/collections/articles?where[_status][equals]=draft"
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#b45309',
+                backgroundColor: '#fef3c7',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                textDecoration: 'none',
+              }}
+            >
+              Lihat Draf →
+            </Link>
+          )}
+        </div>
+
+        {/* Inbox 2: Status Deploy Cloudflare */}
+        <div
+          style={{
+            padding: '16px 20px',
+            backgroundColor: deployStatus.status === 'failed' ? '#fef2f2' : deployStatus.isBuilding ? '#fffbeb' : '#f0fdf4',
+            borderRadius: '12px',
+            border: `1px solid ${deployStatus.status === 'failed' ? '#fca5a5' : deployStatus.isBuilding ? '#fde68a' : '#bbf7d0'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>
+              {deployStatus.status === 'failed' ? '❌' : deployStatus.isBuilding ? '⚙️' : '🚀'}
+            </span>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Sinkronisasi Cloudflare
+              </div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: deployStatus.status === 'failed' ? '#b91c1c' : deployStatus.isBuilding ? '#92400e' : '#15803d' }}>
+                {deployStatus.status === 'failed' ? 'Gagal Build (Perlu Bantuan)' : deployStatus.isBuilding ? `Membangun (~ ${deployStatus.estimatedSecondsRemaining}s)` : 'Situs Live & Sinkron'}
+              </div>
+              {latestDeploymentDoc?.triggerReason && (
+                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+                  Terakhir: {latestDeploymentDoc.triggerReason} ({latestDeploymentDoc.status})
+                </div>
+              )}
+            </div>
+          </div>
+          <Link
+            href="/admin/collections/deployments"
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#0f172a',
+              backgroundColor: '#ffffff',
+              border: '1px solid #cbd5e1',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              textDecoration: 'none',
+            }}
+          >
+            Riwayat Deploy
+          </Link>
+        </div>
+
+        {/* Inbox 3: Panduan SOP & Etika Medis (UX-005) */}
+        <div
+          style={{
+            padding: '16px 20px',
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>📖</span>
+            <div>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Pusat Bantuan & SOP
+              </div>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a' }}>
+                Panduan Kerja & Etika Medis
+              </div>
+            </div>
+          </div>
+          <Link
+            href="/admin/collections/help-center"
+            style={{
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#0284c7',
+              backgroundColor: '#f0f9ff',
+              padding: '4px 10px',
+              borderRadius: '6px',
+              textDecoration: 'none',
+            }}
+          >
+            Buka SOP →
+          </Link>
+        </div>
       </div>
 
       {/* 3. Baris Tengah: Perlu Perhatian SEO & Kesehatan SEO */}

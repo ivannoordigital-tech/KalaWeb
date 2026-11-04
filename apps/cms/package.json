@@ -6,11 +6,18 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev -p 3005",
+    "predev": "npm run build --workspace=automation-kala",
+    "prebuild": "npm run build --workspace=automation-kala",
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start -p 3005",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/seed.ts",
+    "import:articles": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/import-articles.ts",
+    "migrate:landing": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/migrate-landing-pages.ts",
     "set:superadmin": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/set-superadmin.ts",
     "audit:backfill": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/audit-backfill.ts",
+    "test:role": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-role-access.ts",
+    "test:validation": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-validation.ts",
+    "test:integration": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-integration.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
   },
@@ -18,6 +25,7 @@
     "@payloadcms/db-postgres": "3.91.0",
     "@payloadcms/next": "3.91.0",
     "@payloadcms/richtext-lexical": "3.91.0",
+    "@payloadcms/storage-s3": "^3.91.0",
     "cross-env": "^7.0.3",
     "graphql": "^16.10.0",
     "next": "15.4.11",
@@ -30,6 +38,7 @@
     "@types/node": "^22.13.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "yaml": "^2.9.1"
   }
 }

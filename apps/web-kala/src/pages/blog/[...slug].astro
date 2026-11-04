@@ -1,19 +1,53 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
+import { fetchPayloadArticles } from '../../lib/payload';
+import { renderLexicalToHtml } from '../../lib/lexical';
+import { toBlogEntry } from '../../lib/blog';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+  const [cmsArticles, markdownPosts] = await Promise.all([
+    fetchPayloadArticles(),
+    getCollection('blog', ({ data }) => !data.draft),
+  ]);
+
+  const cmsSlugs = new Set(cmsArticles.map((article) => article.slug));
+  const markdownBySlug = new Map(markdownPosts.map((post) => [post.slug, post]));
+
+  return [
+    ...cmsArticles.map((article) => ({
+      params: { slug: article.slug },
+      props: {
+        source: 'cms' as const,
+        article,
+        // Fallback Markdown bila artikel CMS belum punya konten.
+        post: markdownBySlug.get(article.slug) || null,
+      },
+    })),
+    // Artikel Markdown yang belum dimigrasikan tetap dibangun agar tidak hilang
+    // selama masa transisi.
+    ...markdownPosts
+      .filter((post) => !cmsSlugs.has(post.slug))
+      .map((post) => ({
+        params: { slug: post.slug },
+        props: { source: 'markdown' as const, article: null, post },
+      })),
+  ];
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { source, article, post } = Astro.props;
+
+const useMarkdownFallback = source === 'markdown' || (source === 'cms' && !article?.content);
+
+let MarkdownContent: any = null;
+if (useMarkdownFallback && post) {
+  MarkdownContent = (await render(post)).Content;
+}
+
+const entry = article ? toBlogEntry(article) : post;
+const contentHtml = article?.content ? renderLexicalToHtml(article.content) : undefined;
 ---
 
-<BlogPostLayout entry={post}>
-  <Content />
+<BlogPostLayout entry={entry} contentHtml={contentHtml}>
+  {MarkdownContent && <MarkdownContent />}
 </BlogPostLayout>

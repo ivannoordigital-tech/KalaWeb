@@ -1,0 +1,216 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
+/**
+ * AUT-009: Generator Spesifikasi OpenAPI 3.0 dari Kontrak Zod Tool
+ * Menghasilkan file openapi.json yang valid dan terstandarisasi.
+ */
+
+const openapiSpec = {
+  openapi: '3.0.3',
+  info: {
+    title: 'KalaWeb Automation & AI Agent API',
+    version: '1.0.0',
+    description: 'API gateway resmi untuk agen AI dan otomatisasi Kala Moms and Baby Spa dengan prinsip least-privilege, idempotency, dan guard regulasi Permenkes No. 1787/2010.',
+    contact: {
+      name: 'Tim Engineering KalaWeb',
+      url: 'https://kalababyspa.com',
+    },
+  },
+  servers: [
+    {
+      url: 'https://admin.kalababyspa.com/api',
+      description: 'Production CMS Gateway',
+    },
+    {
+      url: 'http://localhost:3005/api',
+      description: 'Local Staging Gateway',
+    },
+  ],
+  paths: {
+    '/tools/get_articles': {
+      get: {
+        summary: 'Ambil daftar artikel edukasi',
+        operationId: 'get_articles',
+        parameters: [
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'status', in: 'query', schema: { type: 'string', enum: ['published', 'draft', 'all'] } },
+        ],
+        responses: {
+          '200': { description: 'Daftar artikel berhasil diambil' },
+        },
+      },
+    },
+    '/tools/get_article_by_slug': {
+      get: {
+        summary: 'Ambil artikel detail berdasarkan slug unik',
+        operationId: 'get_article_by_slug',
+        parameters: [
+          { name: 'slug', in: 'query', required: true, schema: { type: 'string' } },
+        ],
+        responses: {
+          '200': { description: 'Detail artikel' },
+          '404': { description: 'Artikel tidak ditemukan' },
+        },
+      },
+    },
+    '/tools/create_article': {
+      post: {
+        summary: 'Buat draf artikel baru dari Markdown (Idempotent)',
+        operationId: 'create_article',
+        parameters: [
+          { name: 'Idempotency-Key', in: 'header', required: true, schema: { type: 'string' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['title', 'slug', 'excerpt', 'contentMarkdown', 'focusKeyword', 'idempotencyKey'],
+                properties: {
+                  title: { type: 'string' },
+                  slug: { type: 'string' },
+                  excerpt: { type: 'string' },
+                  contentMarkdown: { type: 'string' },
+                  category: { type: 'string', enum: ['newborn-care', 'pijat-bayi', 'laktasi-menyusui', 'tumbuh-kembang', 'kesehatan-bunda'] },
+                  focusKeyword: { type: 'string' },
+                  dryRun: { type: 'boolean', default: false },
+                  idempotencyKey: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Artikel berhasil dibuat' },
+          '422': { description: 'Pelanggaran Permenkes 1787 (Klaim Terlarang)' },
+        },
+      },
+    },
+    '/tools/update_article': {
+      put: {
+        summary: 'Perbarui draf artikel yang ada',
+        operationId: 'update_article',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['slug'],
+                properties: {
+                  slug: { type: 'string' },
+                  title: { type: 'string' },
+                  contentMarkdown: { type: 'string' },
+                  excerpt: { type: 'string' },
+                  dryRun: { type: 'boolean', default: false },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Artikel berhasil diperbarui' },
+        },
+      },
+    },
+    '/tools/validate_content': {
+      post: {
+        summary: 'Validasi konten pra-tulis terhadap regulasi medis & panjang kata (Dry-Run)',
+        operationId: 'validate_content',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['collection', 'title', 'content'],
+                properties: {
+                  collection: { type: 'string', enum: ['articles', 'pages', 'services'] },
+                  title: { type: 'string' },
+                  content: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Hasil evaluasi validasi' },
+        },
+      },
+    },
+    '/tools/get_services': {
+      get: {
+        summary: 'Ambil katalog resmi layanan & tarif homecare',
+        operationId: 'get_services',
+        responses: { '200': { description: 'Katalog layanan' } },
+      },
+    },
+    '/tools/get_service_areas': {
+      get: {
+        summary: 'Ambil jangkauan area Surabaya & Sidoarjo beserta estimasi waktu tiba',
+        operationId: 'get_service_areas',
+        responses: { '200': { description: 'Daftar wilayah' } },
+      },
+    },
+    '/tools/get_faq': {
+      get: {
+        summary: 'Ambil daftar tanya-jawab resmi klinik Kala',
+        operationId: 'get_faq',
+        responses: { '200': { description: 'Daftar FAQ' } },
+      },
+    },
+    '/tools/upload_media': {
+      post: {
+        summary: 'Unggah file media/PDF dengan teks alt wajib dan URL CDN absolut',
+        operationId: 'upload_media',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['filename', 'alt', 'dataBase64'],
+                properties: {
+                  filename: { type: 'string' },
+                  alt: { type: 'string' },
+                  folder: { type: 'string' },
+                  dataBase64: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Media tersimpan' } },
+      },
+    },
+    '/tools/get_seo_audit': {
+      post: {
+        summary: 'Audit skor SEO substantif dokumen',
+        operationId: 'get_seo_audit',
+        responses: { '200': { description: 'Skor dan rekomendasi SEO' } },
+      },
+    },
+    '/tools/trigger_deploy': {
+      post: {
+        summary: 'Memicu antrean build Cloudflare Pages',
+        operationId: 'trigger_deploy',
+        responses: { '200': { description: 'Deploy dijadwalkan' } },
+      },
+    },
+    '/tools/get_deploy_status': {
+      get: {
+        summary: 'Periksa status build aktual di Cloudflare Pages',
+        operationId: 'get_deploy_status',
+        responses: { '200': { description: 'Status build' } },
+      },
+    },
+  },
+}
+
+const outDir = path.resolve('apps/automation')
+const outFile = path.join(outDir, 'openapi.json')
+fs.writeFileSync(outFile, JSON.stringify(openapiSpec, null, 2), 'utf8')
+console.log(`✅ openapi.json generated successfully at ${outFile}`)

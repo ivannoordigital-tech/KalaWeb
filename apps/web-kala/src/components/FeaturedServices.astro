@@ -5,14 +5,18 @@ import { fetchPayloadServices } from '../lib/payload';
 
 interface Props {
   phone?: string;
+  title?: string;
+  subtitle?: string;
 }
 
-const { phone = siteConfig.whatsappNumber } = Astro.props;
+const { phone = siteConfig.whatsappNumber, title, subtitle } = Astro.props;
 
 const cmsServices = await fetchPayloadServices();
-const preferredOrder = ['baby-newborn', 'bundle-duo', 'bundle-selapan'];
-const rawServices = cmsServices.length > 0
-  ? cmsServices.slice(0, 3).map((s) => ({
+const recommendedServices = cmsServices.filter((s) => s.recommended);
+const otherServices = cmsServices.filter((s) => !s.recommended);
+const selectedCmsServices = [...recommendedServices, ...otherServices].slice(0, 3);
+const servicesList = selectedCmsServices.length > 0
+  ? selectedCmsServices.map((s) => ({
       id: s.slug || s.id,
       name: s.name,
       target: s.target,
@@ -27,11 +31,6 @@ const rawServices = cmsServices.length > 0
     }))
   : siteConfig.featuredServices;
 
-const servicesList = [...rawServices].sort((a, b) => {
-  const idxA = preferredOrder.indexOf(a.id);
-  const idxB = preferredOrder.indexOf(b.id);
-  return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
-});
 ---
 
 <section id="layanan" class="py-16 md:py-24 bg-[#FFF9F4]">
@@ -41,10 +40,10 @@ const servicesList = [...rawServices].sort((a, b) => {
         Menu Layanan Terfavorit
       </span>
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
-        3 Layanan Unggulan Homecare Kala
+        {title || '3 Layanan Unggulan Homecare Kala'}
       </h2>
       <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
-        Pilihan paling banyak dipesan oleh Bunda di Surabaya & Sidoarjo untuk memulihkan kebugaran ibu dan menstimulasi keceriaan si kecil.
+        {subtitle || 'Pilihan paling banyak dipesan oleh Bunda di Surabaya & Sidoarjo untuk memulihkan kebugaran ibu dan menstimulasi keceriaan si kecil.'}
       </p>
     </div>
 

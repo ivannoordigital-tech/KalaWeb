@@ -10,6 +10,7 @@ export const Services: CollectionConfig = {
     singular: 'Layanan',
     plural: 'Paket Layanan & Spa',
   },
+  defaultSort: 'order',
   admin: {
     group: 'Layanan & Klinik',
     useAsTitle: 'name',
@@ -18,9 +19,20 @@ export const Services: CollectionConfig = {
       const role = getUserRole(user);
       return role === 'author' || role === 'midwife_coordinator';
     },
+    preview: (doc) => {
+      // PRV-002: Pratinjau paket layanan & spa
+      if (doc?.slug) {
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321');
+        return `${baseUrl}/preview/layanan/${doc.slug}/`;
+      }
+      return null;
+    },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (user) return true;
+      return { active: { equals: true } };
+    },
     create: canManageServices,
     update: canManageServices,
     delete: canManageServices,
@@ -30,14 +42,22 @@ export const Services: CollectionConfig = {
       async ({ data, originalDoc }) => {
         if (!data) return data;
 
-        // Auto-format label harga jika string kosong tapi angka terisi
-        if (data.numericPrice && (!data.price || data.price.trim() === '')) {
-          data.price = `Rp${Number(data.numericPrice).toLocaleString('id-ID')}`;
+        // Auto-sync label harga dari numericPrice saat angka diisi atau berubah (FIX-009)
+        if (data.numericPrice !== undefined && data.numericPrice !== null) {
+          const numPrice = Number(data.numericPrice);
+          const oldNumPrice = originalDoc?.numericPrice !== undefined ? Number(originalDoc.numericPrice) : null;
+          if (oldNumPrice !== numPrice || !data.price || data.price.trim() === '') {
+            data.price = `Rp${numPrice.toLocaleString('id-ID')}`;
+          }
         }
 
-        // Auto-format label durasi jika menit terisi
-        if (data.durationMinutes && (!data.duration || data.duration.trim() === '')) {
-          data.duration = `${data.durationMinutes} Menit`;
+        // Auto-sync label durasi dari durationMinutes saat menit diisi atau berubah (FIX-009)
+        if (data.durationMinutes !== undefined && data.durationMinutes !== null) {
+          const numDuration = Number(data.durationMinutes);
+          const oldNumDuration = originalDoc?.durationMinutes !== undefined ? Number(originalDoc.durationMinutes) : null;
+          if (oldNumDuration !== numDuration || !data.duration || data.duration.trim() === '') {
+            data.duration = `${numDuration} Menit`;
+          }
         }
 
         // Proteksi salah ketik harga ekstrim (>30% naik/turun)
@@ -53,13 +73,22 @@ export const Services: CollectionConfig = {
           }
         }
 
+        // Reset confirmLargePriceChange agar guard proteksi harga tidak sticky di penyimpanan berikutnya (FIX-009)
+        if (data.confirmLargePriceChange) {
+          data.confirmLargePriceChange = false;
+        }
+
         return data;
       },
     ],
     afterChange: [
-      async ({ doc }) => {
-        if (doc.active) {
-          triggerCloudflareDeploy({ resource: 'Services', action: 'publish', slug: doc.slug });
+      async ({ doc, previousDoc }) => {
+        if (doc.active || previousDoc?.active) {
+          triggerCloudflareDeploy({
+            resource: 'Services',
+            action: doc.active ? 'publish' : 'unpublish',
+            slug: doc.slug,
+          });
         }
       },
     ],

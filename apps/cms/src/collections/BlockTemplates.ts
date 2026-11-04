@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
+import { triggerCloudflareDeploy } from '../utilities/triggerDeployHook'
 import { baseBlocks } from '../blocks'
 
 export const BlockTemplates: CollectionConfig = {
@@ -26,6 +27,30 @@ export const BlockTemplates: CollectionConfig = {
   },
   versions: {
     drafts: true,
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc, previousDoc }) => {
+        const isLive = doc._status === 'published';
+        const wasLive = previousDoc?._status === 'published';
+        if (isLive || wasLive) {
+          triggerCloudflareDeploy({
+            resource: 'BlockTemplates',
+            action: isLive ? 'publish' : 'unpublish',
+            slug: doc.slug,
+          });
+        }
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        triggerCloudflareDeploy({
+          resource: 'BlockTemplates',
+          action: 'delete',
+          slug: doc?.slug,
+        });
+      },
+    ],
   },
   fields: [
     {

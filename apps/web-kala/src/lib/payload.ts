@@ -4,7 +4,51 @@
  * with strict production protection (build failure on Cloudflare Pages) and graceful local dev fallback.
  */
 
-const PAYLOAD_URL = (typeof import.meta !== 'undefined' && import.meta.env?.PAYLOAD_URL) || process.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
+export const PAYLOAD_URL = (typeof import.meta !== 'undefined' && import.meta.env?.PAYLOAD_URL) || process.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
+export const MEDIA_CDN_URL = (typeof import.meta !== 'undefined' && import.meta.env?.MEDIA_CDN_URL) || process.env.MEDIA_CDN_URL || PAYLOAD_URL;
+
+/**
+ * MED-001: Resolusi URL media CMS ke URL absolut / CDN.
+ * - Mengembalikan fallback jika media kosong.
+ * - Mendukung format string maupun objek Media Payload ({ url, alt }).
+ * - Mempertahankan URL absolut (https://...) dan data URI.
+ * - Mempertahankan aset statis lokal frontend (/images/..., /favicon...).
+ * - Menangani path relatif CMS (/media/... atau media/...) dengan menambahkan prefix CDN/Payload URL.
+ */
+export function mediaUrl(
+  media?: string | { url?: string; [key: string]: any } | null,
+  fallback: string = ''
+): string {
+  if (!media) return fallback;
+  const raw = typeof media === 'string' ? media.trim() : (media.url ? String(media.url).trim() : '');
+  if (!raw) return fallback;
+
+  // URL absolut atau data URI
+  if (/^(?:https?:)?\/\//i.test(raw) || raw.startsWith('data:') || raw.startsWith('blob:')) {
+    return raw;
+  }
+
+  // Aset statis lokal frontend (web-kala public folder)
+  if (raw.startsWith('/images/') || raw.startsWith('/favicon') || raw.startsWith('/icons/') || raw.startsWith('/fonts/')) {
+    return raw;
+  }
+
+  // Aset upload CMS (relatif -> absolut)
+  const baseUrl = MEDIA_CDN_URL.replace(/\/+$/, '');
+  const cleanPath = raw.replace(/^\/+/, '');
+  return baseUrl + '/' + cleanPath;
+}
+
+/**
+ * Helper untuk mengambil teks alt dari objek media Payload secara aman.
+ */
+export function mediaAlt(
+  media?: string | { alt?: string; title?: string; [key: string]: any } | null,
+  fallback: string = ''
+): string {
+  if (!media || typeof media === 'string') return fallback;
+  return media.alt || media.title || fallback;
+}
 
 const isDev = typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV);
 // Fallback is allowed in local development OR when explicitly permitted via ALLOW_FALLBACK=true.
@@ -178,6 +222,11 @@ export interface SiteSettingsData {
   whatsappNumberFormatted?: string;
   instagram?: string;
   operationalHours?: string;
+  structuredHours?: {
+    opens?: string;
+    closes?: string;
+  };
+  coverageCities?: Array<{ name: string }>;
   analytics?: {
     gtmId?: string;
     metaPixelId?: string;
@@ -199,6 +248,8 @@ export interface SiteSettingsData {
   heroBadgeText?: string;
   socialProofText?: string;
   announcementBanner?: string;
+  bannerStartDate?: string;
+  bannerEndDate?: string;
   coverageAreas?: Array<{ area: string }>;
   homepage?: {
     heroHeadline?: string;
@@ -221,6 +272,19 @@ export interface SiteSettingsData {
       message?: string;
     };
     bookingSteps?: Array<{ title: string; description: string }>;
+    trustBadges?: Array<{ title: string; description?: string }>;
+    differentiators?: Array<{ title: string; description: string }>;
+    sectionHeadings?: {
+      servicesTitle?: string;
+      servicesSubtitle?: string;
+      reviewsTitle?: string;
+      faqTitle?: string;
+    };
+    bottomCta?: {
+      headline?: string;
+      subheadline?: string;
+      buttonText?: string;
+    };
   };
 }
 
@@ -229,7 +293,7 @@ export interface SiteSettingsData {
  */
 export async function fetchPayloadArticles(): Promise<PayloadArticle[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/articles?where[status][equals]=published&depth=1&limit=100`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/articles?where[_status][equals]=published&depth=1&limit=100`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });
@@ -247,7 +311,7 @@ export async function fetchPayloadArticles(): Promise<PayloadArticle[]> {
  */
 export async function fetchPayloadServices(): Promise<PayloadService[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/services?where[active][equals]=true&limit=50`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/services?where[active][equals]=true&sort=order&limit=50`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });
@@ -265,7 +329,7 @@ export async function fetchPayloadServices(): Promise<PayloadService[]> {
  */
 export async function fetchPayloadTestimonials(): Promise<PayloadTestimonial[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/testimonials?where[active][equals]=true&where[permissionGranted][equals]=true&limit=50`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/testimonials?where[active][equals]=true&where[permissionGranted][equals]=true&sort=order&limit=50`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });
@@ -390,7 +454,7 @@ export interface PayloadBlockTemplate {
  */
 export async function fetchPayloadLandingPages(): Promise<PayloadLandingPage[]> {
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&depth=3&limit=100`, {
+    const res = await fetch(`${PAYLOAD_URL}/api/landing-pages?where[active][equals]=true&where[_status][equals]=published&depth=3&limit=100`, {
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(4000),
     });

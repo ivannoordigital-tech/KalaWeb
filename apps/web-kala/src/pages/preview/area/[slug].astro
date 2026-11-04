@@ -1,0 +1,190 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import WhatsAppButton from '../../../components/WhatsAppButton.astro';
+import { siteConfig } from '../../../config/site';
+import { fetchPayloadServiceAreas, type PayloadServiceArea } from '../../../lib/payload';
+
+export async function getStaticPaths() {
+  const cmsAreas = await fetchPayloadServiceAreas();
+
+  const fallbackAreas: PayloadServiceArea[] = [
+    {
+      id: 'surabaya-timur',
+      name: 'Surabaya Timur',
+      slug: 'surabaya-timur',
+      city: 'Surabaya',
+      uniqueDescription: 'Area padat residensial keluarga muda Surabaya Timur meliputi Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, dan sekitarnya.',
+      landmarks: [{ name: 'Galaxy Mall & MERR' }, { name: 'Rungkut Asri & Pandugo' }],
+      estimatedArrivalMinutes: '20-35 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo (Mom & Baby)' }, { serviceName: 'Pijat Ceria Newborn' }],
+    },
+    {
+      id: 'surabaya-barat',
+      name: 'Surabaya Barat',
+      slug: 'surabaya-barat',
+      city: 'Surabaya',
+      uniqueDescription: 'Kawasan pemukiman modern Surabaya Barat mencakup Wiyung, CitraLand, Graha Family, Sambikerep, HR Muhammad, hingga Pakuwon Mall.',
+      landmarks: [{ name: 'Pakuwon Mall & Supermall' }, { name: 'CitraLand Fresh Market' }],
+      estimatedArrivalMinutes: '25-45 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }],
+    },
+    {
+      id: 'surabaya-selatan',
+      name: 'Surabaya Selatan',
+      slug: 'surabaya-selatan',
+      city: 'Surabaya',
+      uniqueDescription: 'Mencakup area Wonokromo, Ketintang, Gayungan, Pagesangan, Jemursari, hingga Kutisari.',
+      landmarks: [{ name: 'Royal Plaza & Ahmad Yani' }, { name: 'Jemursari & Margorejo' }],
+      estimatedArrivalMinutes: '25-40 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }],
+    },
+    {
+      id: 'surabaya-pusat',
+      name: 'Surabaya Pusat',
+      slug: 'surabaya-pusat',
+      city: 'Surabaya',
+      uniqueDescription: 'Menjangkau kawasan jantung kota: Tegalsari, Gubeng, Genteng, Bubutan, dan sekitarnya.',
+      landmarks: [{ name: 'Tunjungan Plaza' }, { name: 'Stasiun Gubeng & Kertajaya' }],
+      estimatedArrivalMinutes: '25-40 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Bayi Stimulasi' }],
+    },
+    {
+      id: 'surabaya-utara',
+      name: 'Surabaya Utara',
+      slug: 'surabaya-utara',
+      city: 'Surabaya',
+      uniqueDescription: 'Layanan homecare bidan menjangkau Tambaksari, Kenjeran, Semampir, Pabean Cantian, hingga jembatan Suramadu.',
+      landmarks: [{ name: 'Kapas Krampung' }, { name: 'Kenjeran Park' }],
+      estimatedArrivalMinutes: '30-50 menit',
+      availableServices: [{ serviceName: 'Pijat Ceria Newborn' }, { serviceName: 'Kala Bundle Duo' }],
+    },
+    {
+      id: 'sidoarjo-kota',
+      name: 'Sidoarjo Kota & Waru',
+      slug: 'sidoarjo-kota',
+      city: 'Sidoarjo',
+      uniqueDescription: 'Layanan homecare menjangkau Waru, Sedati, Buduran, Candi, hingga perumahan Kahuripan Nirwana.',
+      landmarks: [{ name: 'Bunderan Waru & Aloha' }, { name: 'Alun-alun Sidoarjo' }],
+      estimatedArrivalMinutes: '20-40 menit',
+      availableServices: [{ serviceName: 'Kala Bundle Duo' }, { serviceName: 'Pijat Ceria Newborn' }],
+    },
+  ];
+
+  const areaList = cmsAreas.length > 0 ? cmsAreas : fallbackAreas;
+
+  return areaList.map((area) => ({
+    params: { slug: area.slug || area.id },
+    props: { area },
+  }));
+}
+
+interface Props {
+  area: PayloadServiceArea;
+}
+
+const { area } = Astro.props;
+const PAYLOAD_URL = import.meta.env.PAYLOAD_URL || 'https://admin.kalababyspa.com';
+const editorHref = `${PAYLOAD_URL}/admin/collections/service-areas`;
+---
+
+<BaseLayout
+  title={`[PRATINJAU DRAFT] Layanan Homecare Bidan di ${area.name} | Kala Baby Spa`}
+  description={`Mode pratinjau editor CMS untuk area jangkauan: ${area.name}`}
+  noindex={true}
+>
+  <!-- Prominent Draft Preview Banner (Sticky) -->
+  <aside class="bg-amber-500 text-slate-950 font-bold px-4 py-3 text-center text-xs sm:text-sm sticky top-0 z-50 flex flex-wrap items-center justify-center gap-2 shadow-md">
+    <span class="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[11px] font-mono tracking-wider uppercase">
+      PRATINJAU DRAFT AREA
+    </span>
+    <span>Informasi jangkauan wilayah & estimasi waktu kedatangan di bawah ini adalah pratinjau editor CMS.</span>
+    <a
+      href={editorHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="underline hover:text-white transition-colors ml-2"
+    >
+      Kembali ke Editor CMS →
+    </a>
+  </aside>
+
+  <!-- Area Hero Section -->
+  <section class="py-12 md:py-16 bg-gradient-to-b from-[#FFF9F4] via-[#FFEFE5]/40 to-[#FFF9F4] border-b border-[#F6DCCD]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Badges -->
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
+          📍 {area.city || 'Jawa Timur'}
+        </span>
+        <span class="text-xs font-semibold text-[#0E733D] bg-[#E8F8EE] px-3 py-1 rounded-full border border-[#C5ECD2] flex items-center gap-1">
+          ✓ Homecare Bebas Repot
+        </span>
+        {area.estimatedArrivalMinutes && (
+          <span class="text-xs font-semibold text-[#86675A] bg-white px-3 py-1 rounded-full border border-[#F6DCCD]">
+            ⏱ Estimasi Datang: <span id="preview-arrival">{area.estimatedArrivalMinutes}</span>
+          </span>
+        )}
+      </div>
+
+      <!-- Title Block -->
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-brand font-bold text-[#4B2E22] tracking-tight mb-4">
+        Homecare Bidan di <span id="preview-title" class="text-[#B3471E]">{area.name}</span>
+      </h1>
+
+      <p id="preview-desc" class="text-base sm:text-lg text-[#4B2E22]/90 leading-relaxed max-w-3xl mb-8">
+        {area.uniqueDescription}
+      </p>
+
+      <!-- Action Button -->
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <WhatsAppButton
+          text={`Pesan Bidan ke ${area.name} (Pratinjau)`}
+          message={`Halo Bidan Kala, saya berdomisili di area ${area.name}.`}
+          refCode={`AREA-${area.slug}`}
+          source="preview-area"
+          className="w-full sm:w-auto text-base py-3.5 px-8 shadow-md"
+        />
+        <a
+          href={editorHref}
+          class="w-full sm:w-auto text-center px-6 py-3 border border-[#F6DCCD] text-[#86675A] rounded-full text-sm font-semibold hover:bg-white transition-colors"
+        >
+          Edit di Payload CMS
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live preview listener -->
+  <script is:inline>
+    (function initPayloadLivePreview() {
+      if (typeof window === 'undefined') return;
+      const isInsideIframe = window.self !== window.top;
+      if (isInsideIframe) {
+        window.addEventListener('message', function(event) {
+          if (event.data && (event.data.type === 'payload-live-preview' || event.data.type === 'payload-live-preview-ready')) {
+            if (event.data.data) {
+              const updated = event.data.data;
+              if (updated.name) {
+                const titleEl = document.getElementById('preview-title');
+                if (titleEl) titleEl.textContent = updated.name;
+                document.title = '[PRATINJAU DRAFT] Layanan Homecare Bidan di ' + updated.name;
+              }
+              if (updated.uniqueDescription) {
+                const descEl = document.getElementById('preview-desc');
+                if (descEl) descEl.textContent = updated.uniqueDescription;
+              }
+              if (updated.estimatedArrivalMinutes) {
+                const arrEl = document.getElementById('preview-arrival');
+                if (arrEl) arrEl.textContent = updated.estimatedArrivalMinutes;
+              }
+            }
+          }
+        });
+        try {
+          window.parent.postMessage({ type: 'payload-live-preview-ready' }, '*');
+        } catch (e) {}
+      }
+    })();
+  </script>
+</BaseLayout>

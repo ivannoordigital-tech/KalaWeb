@@ -13,7 +13,7 @@ keywords:
   - "bayi kolik menangis terus"
   - "pijat kolik bayi ILU"
   - "bayi kembung malam hari"
-medicalReviewer: "Tim Medis & Kebidanan Kala Moms and Baby Spa"
+medicalReviewer: "Bidan Dwi Rahmawati, S.Tr.Keb (STR: STR-KEMENKES-3515-2021-04561)"
 draft: false
 ---
 

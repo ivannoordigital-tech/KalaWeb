@@ -3,6 +3,7 @@ import { siteConfig } from '../config/site';
 
 interface Props {
   type: 'home' | 'article' | 'page' | 'service' | 'person';
+  siteSettings?: any;
   articleData?: {
     title: string;
     description: string;
@@ -31,9 +32,18 @@ interface Props {
   breadcrumbs?: Array<{ name: string; url: string }>;
 }
 
-const { type, articleData, serviceData, personData, breadcrumbs } = Astro.props;
+const { type, articleData, serviceData, personData, breadcrumbs, siteSettings } = Astro.props;
 
 // Schema LocalBusiness / MedicalBusiness for Homepage
+const opensHour = siteSettings?.structuredHours?.opens || '08:00';
+const closesHour = siteSettings?.structuredHours?.closes || '17:00';
+
+const citiesList: string[] = siteSettings?.coverageCities && siteSettings.coverageCities.length > 0
+  ? siteSettings.coverageCities.map((c: any) => typeof c === 'string' ? c : c.name)
+  : (siteSettings?.coverageAreas && siteSettings.coverageAreas.length > 0
+    ? siteSettings.coverageAreas.map((a: any) => typeof a === 'string' ? a : a.area)
+    : siteConfig.coverageAreas);
+
 const homeSchema = {
   '@context': 'https://schema.org',
   '@type': ['MedicalBusiness', 'HealthAndBeautyBusiness'],
@@ -45,7 +55,7 @@ const homeSchema = {
   logo: `${siteConfig.url}/images/logo-kala.png`,
   image: `${siteConfig.url}/images/og-kala-homecare.png`,
   description: siteConfig.description,
-  telephone: `+${siteConfig.whatsappNumber}`,
+  telephone: `+${siteSettings?.whatsappNumber || siteConfig.whatsappNumber}`,
   priceRange: siteConfig.priceRange,
   currenciesAccepted: 'IDR',
   paymentAccepted: 'Tunai, Transfer Bank, QRIS',
@@ -53,11 +63,11 @@ const homeSchema = {
     {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      opens: '08:00',
-      closes: '17:00',
+      opens: opensHour,
+      closes: closesHour,
     },
   ],
-  areaServed: siteConfig.coverageAreas.map((area) => ({
+  areaServed: citiesList.map((area) => ({
     '@type': 'AdministrativeArea',
     name: area,
   })),
@@ -67,7 +77,9 @@ const homeSchema = {
     longitude: siteConfig.geo.longitude,
   },
   sameAs: [
-    siteConfig.instagramUrl,
+    siteSettings?.instagram
+      ? (siteSettings.instagram.startsWith('http') ? siteSettings.instagram : `https://instagram.com/${siteSettings.instagram.replace(/^@/, '')}`)
+      : siteConfig.instagramUrl,
   ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
@@ -113,7 +125,7 @@ const articleSchema = articleData
       reviewedBy: {
         '@type': 'MedicalBusiness',
         name: siteConfig.name,
-        telephone: `+${siteConfig.whatsappNumber}`,
+        telephone: `+${siteSettings?.whatsappNumber || siteConfig.whatsappNumber}`,
       },
       publisher: {
         '@type': 'Organization',
@@ -137,7 +149,7 @@ const serviceSchema = serviceData
         '@type': 'MedicalBusiness',
         name: siteConfig.name,
         url: siteConfig.url,
-        telephone: `+${siteConfig.whatsappNumber}`,
+        telephone: `+${siteSettings?.whatsappNumber || siteConfig.whatsappNumber}`,
       },
       offers: {
         '@type': 'Offer',

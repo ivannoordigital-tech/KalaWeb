@@ -43,7 +43,7 @@ export const Pages: CollectionConfig = {
     },
     preview: (doc) => {
       if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
         const prefix = doc.pageType === 'landing' ? '/preview/sales' : '/preview'
         return `${baseUrl}${prefix}/${doc.slug}/`
       }
@@ -52,7 +52,7 @@ export const Pages: CollectionConfig = {
     livePreview: {
       url: ({ data }) => {
         const slug = data?.slug || 'syarat-ketentuan'
-        const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321'
+        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
         const prefix = data?.pageType === 'landing' ? '/preview/sales' : '/preview'
         return `${baseUrl}${prefix}/${slug}/`
       },
@@ -79,14 +79,26 @@ export const Pages: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      // Hanya halaman published yang boleh diakses anonim.
+      if (user) return true;
+      return { _status: { equals: 'published' } };
+    },
     create: canManagePagesAndLPs,
     update: canManagePagesAndLPs,
     delete: canManagePagesAndLPs,
   },
   versions: {
-    drafts: true,
+    drafts: {
+      autosave: {
+        interval: 1500,
+        showSaveDraftButton: true,
+      },
+      schedulePublish: true,
+    },
+    maxPerDoc: 25,
   },
+  trash: true,
   hooks: {
     beforeOperation: [
       ({ args, operation }) => {
@@ -113,7 +125,16 @@ export const Pages: CollectionConfig = {
       },
     ],
     beforeChange: [
-      async ({ data, req }) => {
+      async ({ data, req, originalDoc }) => {
+        // DAT-008: Cegah overwrite antar editor (Optimistic Lock)
+        if (originalDoc?.updatedAt && (data as any)?._expectedUpdatedAt) {
+          const originalTime = new Date(originalDoc.updatedAt).getTime()
+          const expectedTime = new Date((data as any)._expectedUpdatedAt).getTime()
+          if (originalTime > expectedTime) {
+            throw new APIError('Konflik Simpan Terdeteksi: Dokumen ini telah diperbarui oleh pengguna lain. Silakan muat ulang halaman.', 409)
+          }
+        }
+
         const isLanding = data.pageType === 'landing'
         // Auto-generate refCode if empty for landing pages
         if (isLanding && !data.refCode && data.slug) {
@@ -137,6 +158,8 @@ export const Pages: CollectionConfig = {
           data.seoAudit = {
             score: audit.score,
             grade: audit.grade,
+            engineVersion: audit.engineVersion || '2.1.0',
+            metrics: audit.metrics,
             issues: audit.issues,
             lastAuditedAt: new Date().toISOString(),
           }
@@ -148,7 +171,7 @@ export const Pages: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, previousDoc }) => {
+      async ({ doc, previousDoc, req }) => {
         const isNowPublished = doc._status === 'published'
         const wasPublished = previousDoc?._status === 'published'
 

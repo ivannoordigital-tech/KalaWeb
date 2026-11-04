@@ -8,6 +8,7 @@ export const FAQ: CollectionConfig = {
     singular: 'Tanya Jawab',
     plural: 'Tanya Jawab (FAQ)',
   },
+  defaultSort: 'order',
   admin: {
     group: 'Layanan & Klinik',
     useAsTitle: 'question',
@@ -18,16 +19,22 @@ export const FAQ: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: ({ req: { user } }) => {
+      if (user) return true;
+      return { active: { equals: true } };
+    },
     create: canManageFAQ,
     update: canManageFAQ,
     delete: canManageFAQ,
   },
   hooks: {
     afterChange: [
-      async ({ doc }) => {
-        if (doc.active) {
-          triggerCloudflareDeploy({ resource: 'FAQ', action: 'publish' });
+      async ({ doc, previousDoc }) => {
+        if (doc.active || previousDoc?.active) {
+          triggerCloudflareDeploy({
+            resource: 'FAQ',
+            action: doc.active ? 'publish' : 'unpublish',
+          });
         }
       },
     ],

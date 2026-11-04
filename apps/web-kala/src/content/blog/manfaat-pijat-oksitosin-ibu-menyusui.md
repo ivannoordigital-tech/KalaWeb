@@ -13,7 +13,7 @@ keywords:
   - "pijat oksitosin pelancar ASI"
   - "let down reflex laktasi"
   - "pijat laktasi homecare surabaya"
-medicalReviewer: "Tim Medis & Kebidanan Kala Moms and Baby Spa"
+medicalReviewer: "Bidan Ayu Lestari, A.Md.Keb (STR: STR-KEMENKES-3578-2022-08912)"
 draft: false
 ---
 

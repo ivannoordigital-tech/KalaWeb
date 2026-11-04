@@ -195,6 +195,50 @@ export const SiteSettings: GlobalConfig = {
                 },
               ],
             },
+            // CMS-002: Jam Operasional & Jangkauan Terstruktur untuk Schema JSON-LD
+            {
+              name: 'structuredHours',
+              type: 'group',
+              label: 'Jam Operasional Terstruktur (Schema.org / Google)',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'opens',
+                      type: 'text',
+                      defaultValue: '08:00',
+                      label: 'Jam Buka (Format 24 Jam: 08:00)',
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'closes',
+                      type: 'text',
+                      defaultValue: '17:00',
+                      label: 'Jam Tutup (Format 24 Jam: 17:00)',
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: 'coverageCities',
+              type: 'array',
+              label: 'Kota Cakupan Layanan (Schema LocalBusiness)',
+              defaultValue: [
+                { name: 'Kota Surabaya' },
+                { name: 'Kabupaten Sidoarjo' },
+              ],
+              fields: [
+                {
+                  name: 'name',
+                  type: 'text',
+                  required: true,
+                  label: 'Nama Kota / Kabupaten',
+                },
+              ],
+            },
           ],
         },
 
@@ -238,6 +282,16 @@ export const SiteSettings: GlobalConfig = {
                       admin: {
                         width: '50%',
                         description: 'Banner otomatis hilang dari website setelah tanggal ini (mencegah banner kedaluwarsa tertinggal).',
+                      },
+                      validate: (val: any, { siblingData }: any) => {
+                        if (val && siblingData?.bannerStartDate) {
+                          const start = new Date(siblingData.bannerStartDate).getTime()
+                          const end = new Date(val).getTime()
+                          if (end < start) {
+                            return 'Tanggal berakhir tayang tidak boleh lebih awal dari tanggal mulai tayang.'
+                          }
+                        }
+                        return true
                       },
                     },
                   ],
@@ -454,6 +508,52 @@ export const SiteSettings: GlobalConfig = {
                       required: true,
                       label: 'Deskripsi Langkah',
                     },
+                  ],
+                },
+                // CMS-001: Trust Badges & Nilai Kepercayaan
+                {
+                  name: 'trustBadges',
+                  type: 'array',
+                  label: 'Lencana Kepercayaan (Trust Badges Beranda)',
+                  admin: {
+                    description: 'Poin kredibilitas medis yang tampil di bagian atas beranda.',
+                  },
+                  fields: [
+                    { name: 'title', type: 'text', required: true, label: 'Judul Lencana' },
+                    { name: 'description', type: 'text', label: 'Keterangan Singkat' },
+                  ],
+                },
+                // CMS-001: Nilai Pembeda (Differentiators / Mengapa Memilih Kala)
+                {
+                  name: 'differentiators',
+                  type: 'array',
+                  label: 'Nilai Pembeda ("Mengapa Memilih Kala?")',
+                  fields: [
+                    { name: 'title', type: 'text', required: true, label: 'Poin Keunggulan' },
+                    { name: 'description', type: 'textarea', required: true, label: 'Penjelasan' },
+                  ],
+                },
+                // CMS-001: Judul Seksi Beranda (Section Headings)
+                {
+                  name: 'sectionHeadings',
+                  type: 'group',
+                  label: 'Judul Tiap Seksi Beranda (Section Headings)',
+                  fields: [
+                    { name: 'servicesTitle', type: 'text', label: 'Judul Seksi Paket Layanan', admin: { placeholder: 'Pilihan Layanan Homecare Favorit' } },
+                    { name: 'servicesSubtitle', type: 'text', label: 'Subjudul Seksi Paket Layanan', admin: { placeholder: 'Ditangani langsung oleh bidan bersertifikasi resmi' } },
+                    { name: 'reviewsTitle', type: 'text', label: 'Judul Seksi Testimoni Bunda', admin: { placeholder: 'Cerita Nyata dari Bunda' } },
+                    { name: 'faqTitle', type: 'text', label: 'Judul Seksi Tanya Jawab (FAQ)', admin: { placeholder: 'Pertanyaan yang Sering Diajukan' } },
+                  ],
+                },
+                // CMS-001: Salinan Ajakan Bertindak (CTA Copy)
+                {
+                  name: 'bottomCta',
+                  type: 'group',
+                  label: 'Banner Ajakan Bertindak Bawah (CTA Banner)',
+                  fields: [
+                    { name: 'headline', type: 'text', label: 'Headline Ajakan', admin: { placeholder: 'Siap Memberikan Perawatan Terbaik untuk Si Kecil?' } },
+                    { name: 'subheadline', type: 'text', label: 'Subheadline', admin: { placeholder: 'Konsultasikan jadwal kedatangan bidan ke rumah Anda hari ini.' } },
+                    { name: 'buttonText', type: 'text', label: 'Teks Tombol WhatsApp', admin: { placeholder: 'Hubungi Bidan via WhatsApp' } },
                   ],
                 },
               ],

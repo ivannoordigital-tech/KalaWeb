@@ -1,6 +1,17 @@
 import type { Access, AccessArgs } from 'payload'
 
-export type UserRole = 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing';
+/**
+ * AUT-013 & FIX-002: Matriks Peran Pengguna (Role-Based Access Control)
+ * Mengimplementasikan prinsip Least Privilege untuk melindungi data operasional dan klinis.
+ */
+export type UserRole =
+  | 'superadmin'
+  | 'operator'
+  | 'author'
+  | 'seo'
+  | 'midwife_coordinator'
+  | 'marketing'
+  | 'automation';
 
 export interface UserDoc {
   id: string;
@@ -25,7 +36,7 @@ export const canManagePagesAndLPs: Access = ({ req: { user } }: AccessArgs) => {
 
 export const canManageArticles: Access = ({ req: { user } }: AccessArgs) => {
   const role = getUserRole(user);
-  return role === 'superadmin' || role === 'author' || role === 'seo' || role === 'operator';
+  return role === 'superadmin' || role === 'author' || role === 'seo' || role === 'operator' || role === 'automation';
 };
 
 export const canManageServices: Access = ({ req: { user } }: AccessArgs) => {

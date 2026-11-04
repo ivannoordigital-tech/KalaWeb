@@ -31,7 +31,10 @@ async function setSuperAdmin() {
     console.log(`✅ Berhasil! Akun ${updated.email} kini memiliki role: ${updated.role} (Super Admin Akses Penuh).`);
   } else {
     console.log(`⚠️ Akun ${targetEmail} belum terdaftar. Membuat akun Super Admin baru...`);
-    const defaultPassword = process.env.NEW_ADMIN_PASSWORD || 'KalaAdminPassword2026!';
+    const defaultPassword = process.env.NEW_ADMIN_PASSWORD;
+    if (!defaultPassword) {
+      throw new Error('FATAL: Variabel lingkungan NEW_ADMIN_PASSWORD wajib diset untuk membuat akun Super Admin baru.');
+    }
     const newUser = await payload.create({
       collection: 'users',
       data: {

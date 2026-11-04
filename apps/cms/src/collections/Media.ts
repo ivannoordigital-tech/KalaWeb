@@ -6,6 +6,10 @@ import { getUserRole } from '../access/roles'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+/**
+ * MED-005: Pustaka Media Terpusat (Media Library)
+ * Dilengkapi dengan kategori folder, pencarian tag, crop & focal point, serta dukungan PDF.
+ */
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: {
@@ -15,7 +19,7 @@ export const Media: CollectionConfig = {
   admin: {
     group: 'Konten & Blog',
     useAsTitle: 'alt',
-    defaultColumns: ['alt', 'filename', 'filesize', 'createdAt'],
+    defaultColumns: ['alt', 'folder', 'filename', 'filesize', 'createdAt'],
   },
   access: {
     read: () => true,
@@ -28,7 +32,9 @@ export const Media: CollectionConfig = {
   },
   upload: {
     staticDir: path.resolve(dirname, '../../public/media'),
-    mimeTypes: ['image/*'],
+    mimeTypes: ['image/*', 'application/pdf'],
+    focalPoint: true,
+    crop: true,
     adminThumbnail: 'thumbnail',
     formatOptions: {
       format: 'webp',
@@ -68,11 +74,39 @@ export const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
       required: true,
-      label: 'Teks Alternatif (Alt Text — Wajib)',
+      label: 'Teks Alternatif (Alt Text — Wajib Aksesibilitas & SEO)',
       admin: {
         description:
           'Wajib diisi untuk aksesibilitas pembaca layar dan perayap Google Images. Jelaskan apa yang terlihat di gambar.',
         placeholder: 'Contoh: Bidan Annisa memijat lembut bayi newborn di atas matras klinik...',
+      },
+    },
+    {
+      name: 'folder',
+      type: 'select',
+      defaultValue: 'general',
+      label: 'Kategori Folder Media (MED-005)',
+      admin: {
+        position: 'sidebar',
+        description: 'Kelompokkan aset untuk memudahkan pencarian tim konten.',
+      },
+      options: [
+        { label: '👶 Foto Bayi & Newborn', value: 'baby-newborn' },
+        { label: '🤰 Bunda & Laktasi', value: 'moms-lactation' },
+        { label: '👩‍⚕️ Tim Bidan & Klinik', value: 'midwives-clinic' },
+        { label: '📄 Dokumen & Brosur (PDF)', value: 'documents' },
+        { label: '🏷️ Banner & Promosi', value: 'banners-promo' },
+        { label: '📁 Umum / Lainnya', value: 'general' },
+      ],
+    },
+    {
+      name: 'tags',
+      type: 'text',
+      label: 'Tag / Kata Kunci Pencarian (MED-005)',
+      admin: {
+        position: 'sidebar',
+        description: 'Pisahkan dengan koma (contoh: kolik, pijat, homecare, surabaya)',
+        placeholder: 'kolik, pijat, newborn',
       },
     },
     {

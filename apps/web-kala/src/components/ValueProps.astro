@@ -1,5 +1,25 @@
 ---
 import { siteConfig } from '../config/site';
+
+interface Props {
+  differentiators?: Array<{
+    title: string;
+    description: string;
+    subtitle?: string;
+    number?: string;
+  }>;
+}
+
+const { differentiators } = Astro.props;
+
+const items = (differentiators && differentiators.length > 0)
+  ? differentiators.map((item, index) => ({
+      number: item.number || String(index + 1).padStart(2, '0'),
+      title: item.title,
+      subtitle: item.subtitle || 'Keunggulan Kala',
+      description: item.description,
+    }))
+  : siteConfig.differentiators;
 ---
 
 <section id="pembeda" class="py-16 md:py-24 bg-white border-y border-[#F6DCCD]/80">
@@ -9,7 +29,7 @@ import { siteConfig } from '../config/site';
         Kenapa Memilih Kala?
       </span>
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
-        5 Hal yang Membuat Kala Berbeda
+        {items.length} Hal yang Membuat Kala Berbeda
       </h2>
       <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
         Setiap kunjungan Kala menghadirkan perawatan profesional, perhatian yang tulus, dan kenyamanan untuk Bunda serta si kecil.
@@ -17,7 +37,7 @@ import { siteConfig } from '../config/site';
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 sm:gap-8">
-      {siteConfig.differentiators.map((item, index) => (
+      {items.map((item, index) => (
         <div class={`p-7 rounded-3xl border border-[#F6DCCD] bg-[#FFF9F4] hover:shadow-kala transition-all duration-300 flex flex-col justify-between ${
           index < 3 ? 'lg:col-span-2' : 'lg:col-span-3'
         }`}>

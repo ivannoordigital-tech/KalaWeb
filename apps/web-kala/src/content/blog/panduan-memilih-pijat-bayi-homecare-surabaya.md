@@ -13,7 +13,7 @@ keywords:
   - "baby spa surabaya panggilan"
   - "bidan homecare sidoarjo"
   - "pijat newborn surabaya terpercaya"
-medicalReviewer: "Tim Medis & Kebidanan Kala Moms and Baby Spa"
+medicalReviewer: "Bidan Nurul Hidayah, A.Md.Keb (STR: STR-KEMENKES-3578-2023-11203)"
 draft: false
 ---
 
