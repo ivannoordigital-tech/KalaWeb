@@ -373,6 +373,22 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
             )}
           </div>
         );
+      case 'code':
+        return (
+          <div className="space-y-1">
+            <textarea
+              rows={14}
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              spellCheck={false}
+              placeholder={'<div class="...">...</div>'}
+              className={`${inputClass} font-mono text-[11px] leading-relaxed whitespace-pre`}
+            />
+            {field.description && (
+              <p className="text-[10px] text-slate-500 leading-snug">{field.description}</p>
+            )}
+          </div>
+        );
       case 'date':
         return (
           <input

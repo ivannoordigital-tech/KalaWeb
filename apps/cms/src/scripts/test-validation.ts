@@ -377,6 +377,7 @@ const requiredBasicSlugs = [
   'blogFeed',
   'countdown',
   'social',
+  'html',
 ];
 
 assert(
@@ -385,8 +386,8 @@ assert(
   `Terdaftar: ${registeredSlugs.join(', ')}`,
 );
 assert(
-  'allBlocks berisi 28 blok (13 lama + 13 baru + Section + TemplateRef)',
-  registeredSlugs.length === 28,
+  'allBlocks berisi 29 blok (13 lama + 14 baru + Section + TemplateRef)',
+  registeredSlugs.length === 29,
   `Jumlah aktual: ${registeredSlugs.length}`,
 );
 assert(
@@ -509,6 +510,52 @@ const res4D = validatePageBuilderDoc(pageWithEmptySection);
 assert(
   'Section tanpa isi memberi peringatan (tidak memblokir)',
   res4D.isValid && res4D.warnings.some((warning) => warning.includes('Seksi & Kolom')),
+);
+
+// HTML Kustom: script/event handler harus DIBLOKIR saat publikasi.
+const pageWithUnsafeHtml = {
+  title: 'Halaman HTML Tidak Aman',
+  slug: 'halaman-html-tidak-aman',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'html',
+      html: '<div onclick="alert(1)">Halo</div><script>alert("xss")</script>',
+    },
+  ],
+};
+const res4E = validatePageBuilderDoc(pageWithUnsafeHtml);
+assert(
+  'HTML Kustom dengan script/event handler DITOLAK',
+  !res4E.isValid && res4E.fieldErrors.some((fe) => fe.code === 'UNSAFE_HTML'),
+);
+
+// HTML Kustom yang aman diterima.
+const pageWithSafeHtml = {
+  title: 'Halaman HTML Aman',
+  slug: 'halaman-html-aman',
+  _status: 'published',
+  layout: [
+    {
+      blockType: 'html',
+      html: '<div class="kala-card" style="padding: 16px;">Konten HTML aman</div>',
+    },
+  ],
+};
+const res4F = validatePageBuilderDoc(pageWithSafeHtml);
+assert('HTML Kustom yang aman DITERIMA', res4F.isValid, res4F.errors.join(' | '));
+
+// HTML Kustom kosong ditolak.
+const pageWithEmptyHtml = {
+  title: 'Halaman HTML Kosong',
+  slug: 'halaman-html-kosong',
+  _status: 'published',
+  layout: [{ blockType: 'html', html: '   ' }],
+};
+const res4G = validatePageBuilderDoc(pageWithEmptyHtml);
+assert(
+  'HTML Kustom kosong DITOLAK',
+  !res4G.isValid && res4G.fieldErrors.some((fe) => fe.code === 'EMPTY_HTML_BLOCK'),
 );
 
 // --- 5. Pengujian Endpoint /api/validate (ED-002) ---

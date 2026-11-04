@@ -875,4 +875,41 @@ Environment Cloudflare yang diperlukan agar iframe preview berfungsi: `PREVIEW_S
 - Skrip bantu sementara di server sudah dihapus.
 - Backup database lama tetap disimpan untuk rollback.
 
+---
+
+## Addendum Putaran 7 (4 November 2026) — Blok HTML Kustom
+
+### A. Riset mekanisme Elementor
+
+Widget **HTML** di Elementor:
+
+- Berupa textarea/panel kode tempat admin menempel HTML, CSS, shortcode, dan bahkan JavaScript.
+- Akses widget sengaja dibatasi untuk admin karena kode dapat berisi malware.
+- Elementor mencoba memberi peringatan bila ada kesalahan kode, tetapi tidak menjamin keamanan isi.
+
+Kesimpulan untuk Kala: blok HTML memang dibutuhkan sebagai "escape hatch", tetapi **tidak boleh mengeksekusi script** dari CMS karena halaman dibangun statis dan admin non-teknis bisa saja menempel kode berbahaya.
+
+### B. Implementasi blok `html`
+
+- **CMS**: `apps/cms/src/blocks/HtmlBlock.ts` — editor kode HTML Payload (`type: 'code'`, language `html`) + pengaturan lebar, padding, latar, anchor, dan visibilitas.
+- **Builder visual**: `html` masuk katalog (29 blok) dengan editor textarea monospace; tersedia juga di dalam kolom `section`.
+- **Renderer**: `apps/web-kala/src/components/blocks/HtmlBlock.astro`.
+- **Sanitasi berlapis** saat render memakai `sanitize-html`:
+  - Tag berbahaya (`script`, `iframe`, `object`, `embed`, `form`, `input`, `button`) dibuang.
+  - Event handler (`onclick` dll) dan URL `javascript:` dibuang.
+  - Hanya skema `http`, `https`, `mailto`, dan `tel` yang diizinkan.
+  - CSS berbahaya (`@import`, `expression(`, `behavior:`, `-moz-binding`) dibersihkan.
+  - Tag layout umum, tabel, gambar, video/audio, dan `<style>` diizinkan.
+- **Guard publikasi**: validator menolak publish bila blok HTML kosong atau mengandung `script`, `iframe`, `object`, `embed`, `form`, event handler, atau `javascript:`.
+- **Catatan admin**: CSS di dalam `<style>` bersifat global untuk halaman.
+
+### C. Migrasi & verifikasi
+
+- Migrasi baru: `apps/cms/src/migrations/20261104_030141_add_html_block.ts` (+ snapshot), membuat tabel HTML untuk `pages`, versi, `landing_pages`, `block_templates`, dan `page_templates`.
+- `npm run check:parity`: 29/29 blok cocok.
+- `npm run test:validation`: **51/51 lulus**, termasuk penolakan HTML tidak aman dan penerimaan HTML aman.
+- `tsc --noEmit`: 0 error.
+- `npm run build` (web) dan `npm run build:cms`: sukses.
+
+
 

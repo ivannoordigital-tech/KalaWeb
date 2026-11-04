@@ -8,7 +8,8 @@ export type BuilderFieldType =
   | 'richtext'
   | 'array'
   | 'relationship'
-  | 'date';
+  | 'date'
+  | 'code';
 
 export interface BuilderFieldMeta {
   name: string;
@@ -165,6 +166,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         'countdown',
         'social',
         'richText',
+        'html',
       ],
       widthOptions: [
         { label: 'Penuh (1 kolom)', value: 'full' },
@@ -1361,6 +1363,67 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         { name: 'url', label: 'Tautan Akun', type: 'text', required: true },
       ],
     },
+  },
+
+  html: {
+    slug: 'html',
+    label: 'HTML Kustom (Advanced)',
+    icon: 'Code2',
+    category: 'content',
+    description: 'Tempel HTML/CSS khusus. Script, iframe, form, dan event handler dibuang saat render.',
+    defaults: {
+      blockType: 'html',
+      label: 'HTML Kustom',
+      html: '<div style="padding: 24px; border: 1px dashed #F6DCCD; border-radius: 16px;">\n  <h3 style="margin: 0 0 8px; color: #4B2E22;">Judul HTML Kustom</h3>\n  <p style="margin: 0; color: #86675A;">Tulis HTML atau CSS khusus di sini.</p>\n</div>',
+      maxWidth: 'normal',
+      padding: 'normal',
+      background: 'transparent',
+      disabled: false,
+    },
+    fields: [
+      { name: 'label', label: 'Nama Blok (Penanda Admin)', type: 'text' },
+      {
+        name: 'html',
+        label: 'Kode HTML',
+        type: 'code',
+        required: true,
+        description:
+          'Script, iframe, form, event handler, dan URL javascript: dibuang otomatis. CSS di dalam <style> berlaku global.',
+      },
+      {
+        name: 'maxWidth',
+        label: 'Lebar Maksimal',
+        type: 'select',
+        options: [
+          { label: 'Sempit (768px)', value: 'narrow' },
+          { label: 'Normal (1152px)', value: 'normal' },
+          { label: 'Lebar (1280px)', value: 'wide' },
+          { label: 'Penuh Layar', value: 'full' },
+        ],
+      },
+      {
+        name: 'padding',
+        label: 'Jarak Atas-Bawah',
+        type: 'select',
+        options: [
+          { label: 'Tanpa Jarak', value: 'none' },
+          { label: 'Rapat', value: 'compact' },
+          { label: 'Normal', value: 'normal' },
+          { label: 'Longgar', value: 'spacious' },
+        ],
+      },
+      {
+        name: 'background',
+        label: 'Latar Belakang',
+        type: 'select',
+        options: [
+          { label: 'Transparan', value: 'transparent' },
+          { label: 'Putih', value: 'white' },
+          { label: 'Krem', value: 'cream' },
+          { label: 'Peach', value: 'peach' },
+        ],
+      },
+    ],
   },
 
   templateRef: {

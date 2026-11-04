@@ -12,6 +12,7 @@ import { LeadFormBlock } from './LeadFormBlock'
 import { BlogFeedBlock } from './BlogFeedBlock'
 import { CountdownBlock } from './CountdownBlock'
 import { SocialBlock } from './SocialBlock'
+import { HtmlBlock } from './HtmlBlock'
 
 // Blok "daun" (tanpa container) yang bisa disusun bebas.
 export const leafBlocks = [
@@ -28,6 +29,7 @@ export const leafBlocks = [
   BlogFeedBlock,
   CountdownBlock,
   SocialBlock,
+  HtmlBlock,
 ]
 
 // Blok yang boleh dipakai di dalam kolom Section. Hero dikecualikan agar
@@ -52,4 +54,5 @@ export {
   BlogFeedBlock,
   CountdownBlock,
   SocialBlock,
+  HtmlBlock,
 }

@@ -369,6 +369,36 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
         }
       }
 
+      // HTML Kustom: blokir konten berbahaya saat publikasi
+      if (block.blockType === 'html') {
+        const rawHtml = String(block.html || '');
+        if (!rawHtml.trim()) {
+          addError(
+            `layout.${i}.html`,
+            'EMPTY_HTML_BLOCK',
+            'Blok HTML Kustom tidak boleh kosong saat publikasi.'
+          );
+        } else {
+          const unsafeMarkers: Array<{ pattern: RegExp; label: string }> = [
+            { pattern: /<script\b/i, label: '<script>' },
+            { pattern: /<iframe\b/i, label: '<iframe>' },
+            { pattern: /<object\b/i, label: '<object>' },
+            { pattern: /<embed\b/i, label: '<embed>' },
+            { pattern: /<form\b/i, label: '<form>' },
+            { pattern: /\son[a-z]+\s*=/i, label: 'event handler (onclick dll)' },
+            { pattern: /javascript\s*:/i, label: 'URL javascript:' },
+          ];
+          const found = unsafeMarkers.filter((item) => item.pattern.test(rawHtml)).map((item) => item.label);
+          if (found.length > 0) {
+            addError(
+              `layout.${i}.html`,
+              'UNSAFE_HTML',
+              `HTML Kustom mengandung ${found.join(', ')}. Hapus kode tersebut sebelum publikasi; gunakan blok Video untuk embed dan blok Formulir untuk form.`
+            );
+          }
+        }
+      }
+
       // Section kosong (tidak ada isi di semua kolom)
       if (block.blockType === 'section') {
         const hasColumnContent = Array.isArray(block.columns) && block.columns.some(

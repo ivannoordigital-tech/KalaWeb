@@ -32,6 +32,7 @@ import {
   Newspaper,
   Timer,
   Share2,
+  Code2,
 } from 'lucide-react';
 import { builderRegistry, builderTemplates, type BuilderPageTemplate } from '../../../blocks/registry';
 
@@ -123,6 +124,8 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
         return <Timer size={18} className="text-orange-600" />;
       case 'Share2':
         return <Share2 size={18} className="text-purple-600" />;
+      case 'Code2':
+        return <Code2 size={18} className="text-slate-700" />;
       case 'FileText':
       default:
         return <FileText size={18} className="text-slate-600" />;

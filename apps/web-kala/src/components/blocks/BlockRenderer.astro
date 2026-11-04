@@ -25,6 +25,7 @@ import LeadFormBlock from './LeadFormBlock.astro';
 import BlogFeedBlock from './BlogFeedBlock.astro';
 import CountdownBlock from './CountdownBlock.astro';
 import SocialBlock from './SocialBlock.astro';
+import HtmlBlock from './HtmlBlock.astro';
 
 interface Props {
   block: {
@@ -78,6 +79,7 @@ const KNOWN_BLOCK_TYPES = [
   'blogFeed',
   'countdown',
   'social',
+  'html',
 ];
 
 if (!block || !block.blockType) {
@@ -187,6 +189,7 @@ const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
   {block.blockType === 'blogFeed' && <BlogFeedBlock block={block as any} />}
   {block.blockType === 'countdown' && <CountdownBlock block={block as any} />}
   {block.blockType === 'social' && <SocialBlock block={block as any} />}
+  {block.blockType === 'html' && <HtmlBlock block={block as any} />}
 
   <!-- Container dengan kolom. Kedalaman nesting maksimal 1 (section tidak bisa di dalam section). -->
   {block.blockType === 'section' && (

@@ -26,6 +26,7 @@ export {
   BlogFeedBlock,
   CountdownBlock,
   SocialBlock,
+  HtmlBlock,
 } from './leafBlocks'
 export {
   HeroBlock,

@@ -1,0 +1,88 @@
+---
+import sanitizeHtml from 'sanitize-html';
+
+interface Props {
+  block: {
+    html?: string;
+    maxWidth?: 'narrow' | 'normal' | 'wide' | 'full';
+    padding?: 'none' | 'compact' | 'normal' | 'spacious';
+    background?: 'transparent' | 'white' | 'cream' | 'peach';
+  };
+}
+
+const { block } = Astro.props;
+
+const raw = String(block.html || '').trim();
+
+/**
+ * Sanitasi berlapis:
+ * - Hanya tag/atribut yang aman yang diizinkan.
+ * - script, iframe, form, object, embed, dan event handler dibuang.
+ * - Skema URL dibatasi ke http/https/mailto/tel.
+ * - CSS berbahaya (expression, @import, javascript:) dibersihkan.
+ */
+const sanitized = raw
+  ? sanitizeHtml(raw, {
+      allowedTags: [
+        'div', 'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
+        'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+        'a', 'strong', 'b', 'em', 'i', 'u', 's', 'small', 'mark',
+        'br', 'hr', 'blockquote', 'pre', 'code',
+        'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'colgroup', 'col',
+        'img', 'figure', 'figcaption', 'picture', 'source',
+        'video', 'audio',
+        'style',
+      ],
+      allowedAttributes: {
+        '*': ['class', 'id', 'style', 'title', 'role', 'aria-*', 'data-*'],
+        a: ['href', 'target', 'rel', 'name'],
+        img: ['src', 'alt', 'width', 'height', 'loading', 'decoding', 'srcset', 'sizes'],
+        source: ['src', 'srcset', 'type', 'media', 'sizes'],
+        video: ['src', 'controls', 'poster', 'width', 'height', 'muted', 'loop', 'playsinline', 'preload'],
+        audio: ['src', 'controls', 'preload', 'loop'],
+        td: ['colspan', 'rowspan', 'headers'],
+        th: ['colspan', 'rowspan', 'scope', 'headers'],
+      },
+      allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+      allowedSchemesByTag: {
+        img: ['http', 'https'],
+        source: ['http', 'https'],
+      },
+      allowProtocolRelative: false,
+      disallowedTagsMode: 'discard',
+    })
+      .replace(/@import[^;]+;/gi, '')
+      .replace(/expression\s*\(/gi, '')
+      .replace(/javascript\s*:/gi, '')
+      .replace(/behavior\s*:/gi, '')
+      .replace(/-moz-binding\s*:/gi, '')
+  : '';
+
+const widthClasses: Record<string, string> = {
+  narrow: 'max-w-3xl',
+  normal: 'max-w-6xl',
+  wide: 'max-w-7xl',
+  full: 'max-w-none',
+};
+const paddingClasses: Record<string, string> = {
+  none: '',
+  compact: 'py-6 md:py-8',
+  normal: 'py-10 md:py-14',
+  spacious: 'py-16 md:py-24',
+};
+const backgroundClasses: Record<string, string> = {
+  transparent: '',
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+---
+
+{sanitized && (
+  <section class={`${paddingClasses[block.padding || 'normal'] || ''} ${backgroundClasses[block.background || 'transparent'] || ''}`}>
+    <div class={`${widthClasses[block.maxWidth || 'normal'] || widthClasses.normal} mx-auto px-4 sm:px-6`}>
+      <div set:html={sanitized} />
+    </div>
+  </section>
+)}
