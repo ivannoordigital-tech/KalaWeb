@@ -821,3 +821,58 @@ Catatan: PostgreSQL memperingatkan beberapa nama index/constraint di `block_temp
 2. `pricing` dan `testimonials` masih manual (belum terhubung ke koleksi).
 3. Editor rich text di builder bersifat sederhana; format kompleks memakai Mode Formulir Klasik.
 
+---
+
+## Addendum Putaran 6 (4 November 2026) — Deploy Live CMS
+
+### A. Ringkasan
+
+CMS produksi (`https://admin.kalababyspa.com`) sudah dipindahkan dari commit lama `963bf17` ke kode terbaru dan database-nya dibangun ulang dengan skema lengkap.
+
+| Item | Hasil |
+|---|---|
+| Server | `klinik-server-baru`, repo `/opt/kalaweb` |
+| Commit terpasang | `98b7c56` (setelah pull) |
+| Container | `kala-cms-app` (image baru `cms-cms`) |
+| Database baru | `kala_cms_db` — **568 tabel**, 3 migrasi tercatat |
+| Database lama (cadangan) | `kala_cms_db_old_20261104` |
+| Backup penuh | `/opt/kalaweb/backups/kala_cms_db_20261104_0939.dump` (944 KB) |
+| Data disalin | 116 tabel, 397 baris (pages 2, articles 3, services 3, testimonials 3, users 3) |
+| Admin live | HTTP 200 |
+| API live | `/api/pages` HTTP 200, data utuh |
+| Builder live | Katalog **Koleksi Blok (28)** terverifikasi setelah login uji |
+
+### B. Metode upgrade database
+
+Migrasi tidak bisa dijalankan langsung di PostgreSQL 16 produksi (gagal pada migrasi pertama), sehingga dipakai jalur:
+
+1. Bangun skema lengkap dengan migrasi resmi di container `postgres:18-alpine` sementara.
+2. `pg_dump --schema-only` dari database PG18, buang meta-command PG18 (`\restrict`, `transaction_timeout`).
+3. Restore skema ke database baru di PostgreSQL 16 produksi.
+4. Catat 3 migrasi ke `payload_migrations`.
+5. Salin data dari database lama per tabel menggunakan skrip Node + parameter binding (hanya kolom yang sama; nilai enum lama dipetakan, mis. `preview` → `operator`, `meta_pixel` → `meta`).
+6. Reset seluruh sequence, lalu swap nama database.
+
+Catatan: `REASSIGN OWNED BY postgres` gagal karena ada objek sistem; sebagai gantinya diberikan `GRANT ALL PRIVILEGES` pada semua tabel/sequence/function di schema `public` kepada `kala_cms_user`. Untuk migrasi DDL berikutnya, kepemilikan tabel mungkin perlu disesuaikan.
+
+### C. Perbaikan build Docker
+
+Dua masalah ditemukan saat build image CMS dan sudah diperbaiki:
+
+1. `prebuild` menjalankan workspace `automation-kala` yang tidak ada di konteks build `apps/cms` → Dockerfile memakai `npx next build` langsung.
+2. Type-check Next mencoba me-resolve `automation/dist/services/toolService.js` → ditambahkan shim tipe `src/types/automation-modules.d.ts` dan dynamic import dengan path variabel.
+
+### D. Web deploy
+
+Deploy hook Cloudflare sudah dipicu (`build_uuid 79f680c8-bfb2-4b75-bbaf-5d6faae1ffca`) agar preview SSR aktif. Saat addendum ini ditulis, `https://kalababyspa.com/preview/...` **masih menyajikan halaman statis lama**; status build perlu dicek di dashboard Cloudflare.
+
+Environment Cloudflare yang diperlukan agar iframe preview berfungsi: `PREVIEW_SECRET` (sama dengan CMS) dan `PREVIEW_API_KEY` (API key user CMS yang boleh membaca draft).
+
+### E. Pembersihan
+
+- Akun uji `deploy-test@kala.local` sudah dihapus dari database produksi.
+- Container `kala-schema-pg` dan volume sementaranya sudah dihapus.
+- Skrip bantu sementara di server sudah dihapus.
+- Backup database lama tetap disimpan untuk rollback.
+
+
