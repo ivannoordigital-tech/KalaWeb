@@ -286,7 +286,10 @@ export default buildConfig({
         };
 
         try {
-          const { toolService } = await import('../../automation/dist/services/toolService.js');
+          // Path dirakit dinamis agar bundler Next tidak mewajibkan folder
+          // `automation/dist` saat build image CMS (konteks build hanya apps/cms).
+          const automationModulePath = ['..', '..', 'automation', 'dist', 'services', 'toolService.js'].join('/');
+          const { toolService } = await import(automationModulePath);
           if (toolName === 'get_articles') return Response.json(await toolService.getArticles(body, ctx));
           if (toolName === 'get_article_by_slug') return Response.json(await toolService.getArticleBySlug(body, ctx));
           if (toolName === 'create_article') return Response.json(await toolService.createArticle(body, ctx));
