@@ -166,3 +166,37 @@
   background: linear-gradient(to right, rgba(240, 253, 250, 0.8), #ffffff, rgba(254, 243, 199, 0.4));
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
+
+/* Panel builder selalu berlatar terang. Jangan biarkan teks putih dan
+   color-scheme gelap dari portal builder diwarisi ke panel putih. */
+.kala-builder-portal aside,
+.kala-builder-portal .bg-white,
+.kala-builder-portal .bg-slate-50 {
+  color: #0f172a;
+  color-scheme: light;
+}
+
+.kala-builder-portal aside input,
+.kala-builder-portal aside textarea,
+.kala-builder-portal aside select,
+.kala-builder-portal .bg-white input,
+.kala-builder-portal .bg-white textarea,
+.kala-builder-portal .bg-white select {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background-color: #ffffff !important;
+  color-scheme: light !important;
+}
+
+.kala-builder-portal aside input::placeholder,
+.kala-builder-portal aside textarea::placeholder,
+.kala-builder-portal .bg-white input::placeholder,
+.kala-builder-portal .bg-white textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.kala-builder-portal aside .field-label,
+.kala-builder-portal .bg-white .field-label,
+.kala-builder-portal .bg-white .field-description {
+  color: #0f172a !important;
+}
