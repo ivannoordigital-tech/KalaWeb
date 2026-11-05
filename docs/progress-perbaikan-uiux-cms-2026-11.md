@@ -103,6 +103,7 @@
   - Tombol tutup punya `aria-label`.
 - `MediaPickerModal.tsx`
   - Upload wajib mengisi alt text; tidak lagi memakai nama file.
+  - **Alt dikirim lewat `_payload`**, sesuai format multipart Payload; sebelumnya `alt` dikirim sebagai form field biasa sehingga selalu dianggap kosong.
 - `SortableSection.tsx` / `SectionTree.tsx`
   - `aria-label` pada aksi ikon.
   - Label “Nonaktif” menggantikan “Off”.
@@ -148,6 +149,7 @@ Deploy production: commit `a7ac72b` → `60020ad` → `42d30b0` → `24dab37` �
 | P1-01 Tabel | **Lulus** — `docW = 1296`, `.table-wrap` `overflow-x:auto`, tabel 1.377 px dapat di-scroll |
 | P0-04 Dark mode | **Lulus** — H1 18,42:1; label nav 18,42:1; link nav 15,45:1 |
 | Builder panel terang | **Lulus** — input/textarea `color-scheme: light`, teks `#0f172a` di latar putih |
+| Upload media dari builder | **Lulus** — alt `herotest modal` tersimpan lewat `_payload`; media test dihapus kembali |
 | P1-04 Tanggal | **Lulus** — `24 Oktober 2026, 07.39` |
 | P1-02 Status deploy | **Lulus** — “status deploy belum terverifikasi” (tidak lagi klaim palsu) |
 | P0-01 Group SEO | **Masih gagal** — `#field-seo .render-fields` tetap 0 child |
