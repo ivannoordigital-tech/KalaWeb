@@ -198,6 +198,13 @@ Backfill dijalankan di container sementara `cms-builder-temp` dengan database pr
 - Viewport 375/768 belum diuji.
 - **Butuh:** matriks role dan UAT mobile.
 
+### B-05 — Preview draft tersaji dari cache Cloudflare
+
+- `GET /preview/babyMassage/?token=...` mengembalikan `CF-Cache-Status: HIT` meskipun ada `Cache-Control: no-store`.
+- Cache rule Cloudflare untuk `/preview/*` mengalahkan header origin.
+- Solusi: route preview draft dipindahkan ke `/editor-view/*` (tidak terkena rule), token CMS diarahkan ke route baru, dan `_headers` ditambahkan.
+- Build web Cloudflare masih harus selesai/berhasil agar route baru aktif. Jika build gagal, cek Pages → `kalaweb` → Deployments.
+
 ---
 
 ## 5. Langkah Berikutnya (Urutan)
