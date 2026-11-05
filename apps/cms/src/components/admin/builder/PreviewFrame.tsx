@@ -42,10 +42,6 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   const previewOriginRef = useRef<string | null>(null);
 
   useEffect(() => {
-    previewOriginRef.current = previewOrigin;
-  }, [previewOrigin]);
-
-  useEffect(() => {
     framesRef.current = frames;
   }, [frames]);
 
@@ -58,6 +54,10 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
       return null;
     }
   }, [previewUrl]);
+
+  useEffect(() => {
+    previewOriginRef.current = previewOrigin;
+  }, [previewOrigin]);
 
   // Fetch signed preview token from CMS
   const fetchToken = useCallback(async () => {
