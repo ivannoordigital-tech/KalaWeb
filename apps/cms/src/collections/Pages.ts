@@ -44,7 +44,7 @@ export const Pages: CollectionConfig = {
     preview: (doc) => {
       if (doc?.slug) {
         const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
-        const prefix = doc.pageType === 'landing' ? '/preview/sales' : '/preview'
+        const prefix = doc.pageType === 'landing' ? '/editor-view/sales' : '/editor-view'
         return `${baseUrl}${prefix}/${doc.slug}/`
       }
       return null
@@ -53,7 +53,7 @@ export const Pages: CollectionConfig = {
       url: ({ data }) => {
         const slug = data?.slug || 'syarat-ketentuan'
         const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
-        const prefix = data?.pageType === 'landing' ? '/preview/sales' : '/preview'
+        const prefix = data?.pageType === 'landing' ? '/editor-view/sales' : '/editor-view'
         return `${baseUrl}${prefix}/${slug}/`
       },
       breakpoints: [

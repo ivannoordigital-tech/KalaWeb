@@ -10,6 +10,9 @@
 /preview/*
   Cache-Control: no-store, no-cache, must-revalidate
 
+/editor-view/*
+  Cache-Control: no-store, no-cache, must-revalidate
+
 /images/*
   Cache-Control: public, max-age=31536000, immutable
 
