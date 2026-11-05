@@ -141,25 +141,44 @@ const isCanvas = pageData?.pageLayout === 'canvas';
     <!-- Pertahankan posisi scroll antar-refresh preview (autosave) -->
     <script is:inline>
       (function () {
+        var key = 'kala-preview-scroll:' + location.pathname;
+        var target = 0;
+        var timer;
         try {
-          var key = 'kala-preview-scroll:' + location.pathname;
           var raw = sessionStorage.getItem(key);
-          var target = raw ? parseInt(raw, 10) : 0;
-          if (target > 0) {
-            var restore = function () { window.scrollTo(0, target); };
-            restore();
-            window.addEventListener('load', restore);
-            setTimeout(restore, 150);
-            setTimeout(restore, 500);
-          }
-          var timer;
-          window.addEventListener('scroll', function () {
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-              try { sessionStorage.setItem(key, String(window.scrollY)); } catch (e) {}
-            }, 120);
-          }, { passive: true });
+          target = raw ? parseInt(raw, 10) || 0 : 0;
         } catch (e) {}
+
+        function restore() {
+          if (target > 0) window.scrollTo(0, target);
+        }
+        function notify() {
+          try {
+            window.parent.postMessage(
+              { type: 'KALA_PREVIEW_RESTORED', href: location.href, y: window.scrollY },
+              '*'
+            );
+          } catch (e) {}
+        }
+
+        restore();
+        window.addEventListener('load', function () {
+          restore();
+          requestAnimationFrame(function () { restore(); });
+          // Beri waktu font/gambar menggeser layout sebelum frame ditampilkan.
+          setTimeout(function () { restore(); notify(); }, 250);
+        });
+        if (document.readyState === 'complete') {
+          restore();
+          setTimeout(function () { restore(); notify(); }, 120);
+        }
+
+        window.addEventListener('scroll', function () {
+          clearTimeout(timer);
+          timer = setTimeout(function () {
+            try { sessionStorage.setItem(key, String(window.scrollY)); } catch (e) {}
+          }, 120);
+        }, { passive: true });
       })();
     </script>
 

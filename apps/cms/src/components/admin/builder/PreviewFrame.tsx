@@ -38,6 +38,11 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [lastRefreshTime, setLastRefreshTime] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const framesRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    framesRef.current = frames;
+  }, [frames]);
 
   // Compute allowed origin from previewUrl
   const previewOrigin = useMemo(() => {
@@ -126,12 +131,48 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
     } catch {}
   }, [selectedSectionId, previewOrigin]);
 
+  /**
+   * Aktifkan frame hanya setelah halaman di dalamnya selesai memulihkan
+   * posisi scroll. Selama proses itu frame baru tetap transparan, sehingga
+   * pengguna tidak pernah melihatnya "melompat" dari atas ke posisi semula.
+   */
+  const activateFrame = useCallback((url: string) => {
+    const list = framesRef.current;
+    if (!list.includes(url)) return;
+    // Hanya frame terbaru yang boleh diaktifkan.
+    if (list[list.length - 1] !== url) return;
+    setActiveUrl(url);
+    setFrames([url]);
+  }, []);
+
+  const handleFrameLoad = useCallback(
+    (url: string) => {
+      // Fallback bila pesan KALA_PREVIEW_RESTORED tidak diterima.
+      window.setTimeout(() => activateFrame(url), 700);
+    },
+    [activateFrame],
+  );
+
   // Listen for messages from iframe inspector with strict origin and source checks
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (!event.data || typeof event.data !== 'object') return;
-      if (iframeRef.current && event.source !== iframeRef.current.contentWindow) return;
       if (previewOrigin && event.origin !== previewOrigin) return;
+
+      // Frame baru melaporkan bahwa scroll-nya sudah dipulihkan.
+      if (event.data.type === 'KALA_PREVIEW_RESTORED' && typeof event.data.href === 'string') {
+        const match = framesRef.current.find((candidate) => {
+          try {
+            return new URL(candidate).searchParams.get('v') === new URL(event.data.href).searchParams.get('v');
+          } catch {
+            return false;
+          }
+        });
+        if (match) activateFrame(match);
+        return;
+      }
+
+      if (iframeRef.current && event.source !== iframeRef.current.contentWindow) return;
 
       if (event.data.type === 'KALA_INSPECTOR_READY') {
         if (selectedSectionId && iframeRef.current?.contentWindow) {
@@ -155,13 +196,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [onSelectFromIframe, selectedSectionId, previewOrigin]);
-
-  const handleFrameLoad = useCallback((url: string) => {
-    setActiveUrl(url);
-    // Buang frame lama setelah frame baru tampil.
-    setFrames((prev) => (prev.includes(url) ? [url] : prev));
-  }, []);
+  }, [onSelectFromIframe, selectedSectionId, previewOrigin, activateFrame]);
 
   const getContainerWidth = () => {
     switch (device) {
@@ -305,6 +340,12 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             className="h-full bg-white rounded-lg shadow-lg border border-slate-300 overflow-hidden transition-all duration-200 flex flex-col"
           >
             <div className="relative flex-1">
+              {activeUrl === null && (
+                <div className="absolute inset-0 z-0 flex items-center justify-center gap-2 text-xs text-slate-400">
+                  <RotateCw size={16} className="animate-spin text-teal-600" />
+                  <span>Memuat pratinjau…</span>
+                </div>
+              )}
               {frames.map((url) => (
                 <iframe
                   key={url}
@@ -313,9 +354,11 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
                   }}
                   src={url}
                   onLoad={() => handleFrameLoad(url)}
-                  className="absolute inset-0 w-full h-full border-none transition-opacity duration-150"
+                  className="absolute inset-0 w-full h-full border-none"
                   style={{
-                    opacity: activeUrl === url || (activeUrl === null && frames.length === 1) ? 1 : 0,
+                    opacity: activeUrl === url ? 1 : 0,
+                    pointerEvents: activeUrl === url ? 'auto' : 'none',
+                    zIndex: activeUrl === url ? 2 : 1,
                   }}
                   title="KalaWeb Landing Page Preview"
                 />
