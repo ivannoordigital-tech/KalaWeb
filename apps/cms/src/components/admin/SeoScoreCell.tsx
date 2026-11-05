@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { resolveSeoScore, type SeoMetricsLike } from '../../lib/seo-engine/display'
 
 interface SeoScoreCellProps {
   cellData?: number | null
@@ -9,24 +10,34 @@ interface SeoScoreCellProps {
     seoAudit?: {
       score?: number | null
       grade?: string
+      metrics?: SeoMetricsLike | null
+      lastAuditedAt?: string | null
     }
   }
 }
 
 export const SeoScoreCell: React.FC<SeoScoreCellProps> = ({ cellData, rowData }) => {
-  const rawScore = typeof cellData === 'number' 
-    ? cellData 
-    : typeof rowData?.seoScore === 'number'
-      ? rowData.seoScore
-      : typeof rowData?.seoAudit?.score === 'number'
-        ? rowData.seoAudit.score
-        : null
+  const score = resolveSeoScore({
+    cellData,
+    seoScore: rowData?.seoScore,
+    auditScore: rowData?.seoAudit?.score,
+    metrics: rowData?.seoAudit?.metrics,
+    lastAuditedAt: rowData?.seoAudit?.lastAuditedAt,
+  })
 
-  if (rawScore === null || rawScore === undefined) {
-    return <span style={{ color: '#94a3b8', fontSize: '13px' }}>—</span>
+  if (score === null) {
+    return (
+      <span
+        title="Belum ada audit SEO yang valid. Simpan dokumen atau jalankan audit ulang."
+        aria-label="Belum diaudit"
+        style={{ color: '#94a3b8', fontSize: '13px' }}
+      >
+        —
+      </span>
+    )
   }
 
-  const score = Math.round(rawScore)
+  const rounded = Math.round(score)
 
   let bg = '#fee2e2'
   let text = '#b91c1c'
@@ -34,13 +45,13 @@ export const SeoScoreCell: React.FC<SeoScoreCellProps> = ({ cellData, rowData })
   let label = 'Perlu diperbaiki'
   let dotColor = '#ef4444'
 
-  if (score >= 80) {
+  if (rounded >= 80) {
     bg = '#dcfce7'
     text = '#15803d'
     border = '#86efac'
     label = 'Baik'
     dotColor = '#22c55e'
-  } else if (score >= 60) {
+  } else if (rounded >= 60) {
     bg = '#fef3c7'
     text = '#b45309'
     border = '#fcd34d'
@@ -64,9 +75,11 @@ export const SeoScoreCell: React.FC<SeoScoreCellProps> = ({ cellData, rowData })
         whiteSpace: 'nowrap',
         lineHeight: 1.4,
       }}
-      title={`Skor Audit SEO: ${score}/100 (${label})`}
+      title={`Skor Audit SEO: ${rounded}/100 (${label})`}
+      aria-label={`Skor SEO ${rounded} dari 100, ${label}`}
     >
       <span
+        aria-hidden="true"
         style={{
           width: '7px',
           height: '7px',
@@ -75,7 +88,7 @@ export const SeoScoreCell: React.FC<SeoScoreCellProps> = ({ cellData, rowData })
           display: 'inline-block',
         }}
       />
-      <span>{score} · {label}</span>
+      <span>{rounded} · {label}</span>
     </span>
   )
 }

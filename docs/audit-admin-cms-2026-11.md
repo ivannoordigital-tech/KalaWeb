@@ -1,6 +1,8 @@
 # Audit Admin CMS KalaWeb
 ### Perspektif Pengguna (UI/UX) & Perspektif Agent AI (Automation Readiness)
 
+> **Audit lanjutan (5 November 2026):** audit UI/UX level mikro berbasis runtime produksi ada di [`audit-uiux-admin-cms-2026-11-05.md`](./audit-uiux-admin-cms-2026-11-05.md). Dokumen tersebut memuat temuan P0/P1/P2 terbaru, bukti Lighthouse, pengukuran kontras, dan checklist penerimaan.
+
 **Tanggal audit:** 3 November 2026  
 **Ruang lingkup:** `apps/cms` (Payload CMS 3.91 + Next.js 15) dan integrasinya ke `apps/web-kala` (Astro 5 SSG)  
 **Metode:** code review menyeluruh, penelusuran alur data CMS → website, pembacaan konfigurasi, hooks, access control, komponen admin, dan pengecekan TypeScript (`tsc --noEmit` untuk CMS: lolos).  

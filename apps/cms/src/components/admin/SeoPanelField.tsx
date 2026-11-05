@@ -384,7 +384,7 @@ export const SeoPanelField: React.FC = () => {
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                backgroundColor: '#0284c7',
+                backgroundColor: '#0369a1',
                 color: '#ffffff',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -445,6 +445,7 @@ export const SeoPanelField: React.FC = () => {
             }`,
             borderRadius: '8px',
             fontSize: '13px',
+            color: '#334155',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
@@ -490,6 +491,7 @@ export const SeoPanelField: React.FC = () => {
             }`,
             borderRadius: '8px',
             fontSize: '13px',
+            color: '#334155',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>

@@ -85,7 +85,7 @@ export const Media: CollectionConfig = {
       name: 'folder',
       type: 'select',
       defaultValue: 'general',
-      label: 'Kategori Folder Media (MED-005)',
+      label: 'Kategori Folder Media',
       admin: {
         position: 'sidebar',
         description: 'Kelompokkan aset untuk memudahkan pencarian tim konten.',
@@ -102,7 +102,7 @@ export const Media: CollectionConfig = {
     {
       name: 'tags',
       type: 'text',
-      label: 'Tag / Kata Kunci Pencarian (MED-005)',
+      label: 'Tag / Kata Kunci Pencarian',
       admin: {
         position: 'sidebar',
         description: 'Pisahkan dengan koma (contoh: kolik, pijat, homecare, surabaya)',

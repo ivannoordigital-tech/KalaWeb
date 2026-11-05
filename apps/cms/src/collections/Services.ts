@@ -132,6 +132,9 @@ export const Services: CollectionConfig = {
             width: '50%',
             description: 'Masukkan angka saja tanpa titik/koma. Contoh: 150000',
             placeholder: '150000',
+            components: {
+              Cell: '/components/admin/PriceCell#PriceCell',
+            },
           },
           validate: (val: any) => validatePositiveInteger(val, 'Harga Promo'),
         },

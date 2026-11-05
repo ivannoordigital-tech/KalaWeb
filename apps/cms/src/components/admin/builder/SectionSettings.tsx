@@ -19,6 +19,7 @@ import {
 } from '../../../blocks/registry';
 import type { LayoutBlock } from './useBuilderLayout';
 import { MediaPickerModal, type MediaItem } from './MediaPickerModal';
+import { getMediaDisplay, getMediaThumbUrl, hasMediaValue } from './media-utils';
 import {
   lexicalToPlainText,
   plainTextToLexical,
@@ -444,9 +445,9 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
           />
         );
       case 'upload': {
-        const hasMedia = value !== null && value !== undefined && value !== '';
-        const thumbUrl = typeof value === 'object' ? value?.url : typeof value === 'string' && value.startsWith('http') ? value : null;
-        const mediaDisplay = typeof value === 'object' ? value.alt || value.filename || `Media #${value.id}` : value ? `ID Media: ${value}` : '';
+        const hasMedia = hasMediaValue(value);
+        const thumbUrl = getMediaThumbUrl(value);
+        const mediaDisplay = getMediaDisplay(value);
 
         return (
           <div className="space-y-1.5">
@@ -483,6 +484,7 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
                     onClick={() => onChange(null)}
                     className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
                     title="Hapus foto"
+                    aria-label="Hapus foto"
                   >
                     <Trash2 size={13} />
                   </button>

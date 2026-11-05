@@ -4,6 +4,8 @@
 **Basis:** `docs/audit-admin-cms-2026-11.md`  
 **Tujuan:** menutup seluruh temuan audit (8 P0, 15 P1, 40 P2) dan membuat CMS siap operasional serta siap otomasi AI.
 
+> **Catatan (5 November 2026):** untuk rencana eksekusi khusus temuan UI/UX terbaru (group rendering, builder crash, konsistensi skor SEO, dark mode, tabel, aksesibilitas, microcopy), lihat [`rencana-perbaikan-uiux-cms-2026-11.md`](./rencana-perbaikan-uiux-cms-2026-11.md). Rencana tersebut melengkapi dokumen ini, bukan menggantikannya.
+
 ---
 
 ## 1. Prinsip Eksekusi

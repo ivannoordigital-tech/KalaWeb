@@ -31,6 +31,8 @@ async function run() {
         seoAudit: {
           score: audit.score,
           grade: audit.grade,
+          engineVersion: audit.engineVersion || '2.1.0',
+          metrics: audit.metrics,
           issues: audit.issues,
           lastAuditedAt: new Date().toISOString(),
         },
@@ -60,6 +62,8 @@ async function run() {
         seoAudit: {
           score: audit.score,
           grade: audit.grade,
+          engineVersion: audit.engineVersion || '2.1.0',
+          metrics: audit.metrics,
           issues: audit.issues,
           lastAuditedAt: new Date().toISOString(),
         },
@@ -89,6 +93,8 @@ async function run() {
         seoAudit: {
           score: audit.score,
           grade: audit.grade,
+          engineVersion: audit.engineVersion || '2.1.0',
+          metrics: audit.metrics,
           issues: audit.issues,
           lastAuditedAt: new Date().toISOString(),
         },

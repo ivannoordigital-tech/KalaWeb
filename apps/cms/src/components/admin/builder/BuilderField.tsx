@@ -24,6 +24,7 @@ import { useBuilderHistory } from './useBuilderHistory';
 import { useBuilderSave } from './useBuilderSave';
 import { BuilderValidationBanner } from './BuilderValidationBanner';
 import { useFocusTrap } from './useFocusTrap';
+import { BuilderErrorBoundary } from './BuilderErrorBoundary';
 
 export const BuilderField: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,7 +47,7 @@ export const BuilderField: React.FC = () => {
     canPublish,
   } = useBuilderSave();
 
-  useFocusTrap(portalRef, isOpen && !showCloseConfirm);
+  useFocusTrap(portalRef, isOpen && !showCloseConfirm && !isAddMenuOpen);
   useFocusTrap(confirmDialogRef, showCloseConfirm);
 
   // Read current layout from Payload Form State
@@ -420,20 +421,28 @@ export const BuilderField: React.FC = () => {
           {/* Left Sidebar (360px on desktop) */}
           <aside className="w-full md:w-[360px] bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden shadow-sm">
             {selectedBlock ? (
-              <SectionSettings
-                block={selectedBlock}
-                onBack={() => setSelectedSectionId(null)}
-                onUpdate={(updates, structural) => selectedBlock.id && updateSection(selectedBlock.id, updates, structural)}
-                onAddInnerItem={(path, defaults) =>
-                  selectedBlock.id && addInnerItem(selectedBlock.id, path, defaults)
-                }
-                onRemoveInnerItem={(path, idx) =>
-                  selectedBlock.id && removeInnerItem(selectedBlock.id, path, idx)
-                }
-                onUpdateInnerItem={(path, idx, fields) =>
-                  selectedBlock.id && updateInnerItem(selectedBlock.id, path, idx, fields)
-                }
-              />
+              <BuilderErrorBoundary
+                compact
+                resetKey={selectedSectionId}
+                title="Pengaturan seksi gagal dimuat"
+                description="Seksi lain dan perubahan yang sudah dibuat tetap aman. Kembali ke daftar seksi untuk melanjutkan."
+                onReset={() => setSelectedSectionId(null)}
+              >
+                <SectionSettings
+                  block={selectedBlock}
+                  onBack={() => setSelectedSectionId(null)}
+                  onUpdate={(updates, structural) => selectedBlock.id && updateSection(selectedBlock.id, updates, structural)}
+                  onAddInnerItem={(path, defaults) =>
+                    selectedBlock.id && addInnerItem(selectedBlock.id, path, defaults)
+                  }
+                  onRemoveInnerItem={(path, idx) =>
+                    selectedBlock.id && removeInnerItem(selectedBlock.id, path, idx)
+                  }
+                  onUpdateInnerItem={(path, idx, fields) =>
+                    selectedBlock.id && updateInnerItem(selectedBlock.id, path, idx, fields)
+                  }
+                />
+              </BuilderErrorBoundary>
             ) : (
               <SectionTree
                 layout={layout}
@@ -456,18 +465,24 @@ export const BuilderField: React.FC = () => {
 
           {/* Right Canvas (Live Preview Frame) */}
           <main className="flex-1 overflow-hidden hidden md:block">
-            <PreviewFrame
-              collection={collectionSlug}
-              docId={docInfo?.id}
-              slug={slug}
-              hasUnsavedChanges={modified}
-              selectedSectionId={selectedSectionId}
-              onSelectFromIframe={(sectionId) => setSelectedSectionId(sectionId)}
-              lastSaved={lastUpdateTime}
-              onSaveDraft={() => save('draft')}
-              isSavingDraft={isSaving && saveIntent === 'draft'}
-              canSaveDraft={canSave}
-            />
+            <BuilderErrorBoundary
+              resetKey={`${docInfo?.id || 'new'}:${slug}`}
+              title="Pratinjau gagal dimuat"
+              description="Editor tetap bisa digunakan. Coba muat ulang pratinjau; jika masih gagal, simpan draf lalu buka builder kembali."
+            >
+              <PreviewFrame
+                collection={collectionSlug}
+                docId={docInfo?.id}
+                slug={slug}
+                hasUnsavedChanges={modified}
+                selectedSectionId={selectedSectionId}
+                onSelectFromIframe={(sectionId) => setSelectedSectionId(sectionId)}
+                lastSaved={lastUpdateTime}
+                onSaveDraft={() => save('draft')}
+                isSavingDraft={isSaving && saveIntent === 'draft'}
+                canSaveDraft={canSave}
+              />
+            </BuilderErrorBoundary>
           </main>
         </div>
 

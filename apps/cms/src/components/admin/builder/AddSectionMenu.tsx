@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   X,
   Sparkles,
@@ -35,6 +35,7 @@ import {
   Code2,
 } from 'lucide-react';
 import { builderRegistry, builderTemplates, type BuilderPageTemplate } from '../../../blocks/registry';
+import { useFocusTrap } from './useFocusTrap';
 
 interface AddSectionMenuProps {
   isOpen: boolean;
@@ -62,6 +63,18 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
   onSelectTemplate,
 }) => {
   const [activeTab, setActiveTab] = useState<'blocks' | 'templates'>('blocks');
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(dialogRef, isOpen);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -133,12 +146,23 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden transition-all duration-150">
+    <div
+      className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="kala-add-section-title"
+        className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden transition-all duration-150"
+      >
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Katalog Seksi & Template</h2>
+            <h2 id="kala-add-section-title" className="text-sm font-bold text-slate-900">Katalog Seksi &amp; Template</h2>
             <p className="text-xs text-slate-500 mt-0.5">
               Pilih komponen seksi individual atau terapkan template halaman siap pakai.
             </p>
@@ -146,6 +170,7 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Tutup katalog seksi"
             className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
           >
             <X size={18} />

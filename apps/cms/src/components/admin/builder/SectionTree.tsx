@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
 import { SortableSection } from './SortableSection';
+import { builderRegistry } from '../../../blocks/registry';
 import type { LayoutBlock } from './useBuilderLayout';
 
 interface SectionTreeProps {
@@ -106,7 +107,8 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
                     }}
                     onDelete={(e) => {
                       e.stopPropagation();
-                      if (confirm(`Hapus seksi ${block.blockType}?`)) {
+                      const label = builderRegistry[block.blockType]?.label || 'seksi ini';
+                      if (confirm(`Hapus ${label}?`)) {
                         onDelete(blockId);
                       }
                     }}

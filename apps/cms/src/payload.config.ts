@@ -97,6 +97,7 @@ export default buildConfig({
   ].filter(Boolean),
   admin: {
     user: Users.slug,
+    dateFormat: 'd MMMM yyyy, HH.mm',
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -370,6 +371,15 @@ export default buildConfig({
     supportedLanguages: { id },
     translations: {
       id: {
+        general: {
+          noResults: 'Tidak ada {{label}} ditemukan.',
+          noResultsDescription:
+            'Belum ada data, atau filter yang aktif tidak cocok. Reset filter atau buat data baru.',
+          noLabel: 'Tanpa {{label}}',
+          noValue: '—',
+          true: 'Ya',
+          false: 'Tidak',
+        } as any,
         version: {
           publishChanges: 'Terbitkan',
           publish: 'Terbitkan',
@@ -400,7 +410,10 @@ export default buildConfig({
   sharp,
   db: postgresAdapter({
     push: false,
-    prodMigrations: migrations,
+    // Flag khusus pengujian lokal/CI: lewati auto-migration jika database
+    // sudah disiapkan manual. Jangan dipakai di produksi.
+    prodMigrations:
+      process.env.PAYLOAD_SKIP_MIGRATIONS === 'true' ? undefined : migrations,
     pool: {
       connectionString: databaseUri,
       connectionTimeoutMillis: 10000,

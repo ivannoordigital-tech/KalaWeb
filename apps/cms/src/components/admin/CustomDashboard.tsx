@@ -11,6 +11,7 @@ import {
 } from '../../lib/seo-engine'
 import { getDeployStatus, fetchRealCloudflareDeployStatus } from '../../utilities/triggerDeployHook'
 import { getUserRole } from '../../access/roles'
+import { hasUsableSeoMetrics } from '../../lib/seo-engine/display'
 
 interface CustomDashboardProps {
   payload?: any
@@ -38,6 +39,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
     seo: { label: 'SEO Specialist', bg: '#fffbeb', color: '#b45309', border: '#fde68a' },
     midwife_coordinator: { label: 'Koordinator Bidan', bg: '#fdf2f8', color: '#be185d', border: '#fbcfe8' },
     marketing: { label: 'Marketing Specialist', bg: '#fff7ed', color: '#c2410c', border: '#ffedd5' },
+    automation: { label: 'Agen Otomasi / API Bot', bg: '#ecfeff', color: '#0e7490', border: '#a5f3fc' },
   }
   const currentRoleInfo = (role && roleLabels[role]) || { label: 'Tamu / Tanpa Login', bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' }
 
@@ -137,6 +139,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
     score: number
     grade: string
     isPublished: boolean
+    hasMetrics: boolean
     issues: Array<{
       code: string
       severity: 'critical' | 'warning'
@@ -157,7 +160,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
   const auditedItems: AuditedItem[] = allDocs.map((doc: any) => {
     const isPublished = doc._status === 'published' || doc.status === 'published'
 
-    if (doc.seoAudit?.score && doc.seoAudit?.metrics) {
+    if (doc.seoAudit?.score) {
       return {
         id: doc.id,
         title: doc.title || doc.name || 'Tanpa Judul',
@@ -165,8 +168,18 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
         score: doc.seoAudit.score,
         grade: doc.seoAudit.grade || 'fair',
         isPublished,
+        hasMetrics: hasUsableSeoMetrics(doc.seoAudit.metrics),
         issues: doc.seoAudit.issues || [],
-        metrics: doc.seoAudit.metrics,
+        metrics:
+          doc.seoAudit.metrics || {
+            titleScore: 0,
+            descScore: 0,
+            keywordScore: 0,
+            h1Score: 0,
+            altScore: 0,
+            slugScore: 0,
+            ogScore: 0,
+          },
       }
     }
 
@@ -179,6 +192,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
       score: result.score,
       grade: result.grade,
       isPublished,
+      hasMetrics: hasUsableSeoMetrics(result.metrics),
       issues: result.issues || [],
       metrics: result.metrics,
     }
@@ -187,6 +201,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
   const totalContentCount = auditedItems.length
   const publishedItems = auditedItems.filter((i) => i.isPublished)
   const draftItems = auditedItems.filter((i) => !i.isPublished)
+  const articleDraftCount = auditedItems.filter(
+    (i) => i.collSlug === 'articles' && !i.isPublished,
+  ).length
 
   // Calculate average score prioritizing published content
   const targetForScore = publishedItems.length > 0 ? publishedItems : auditedItems
@@ -215,27 +232,33 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
     }
   }
 
-  // Real Category Progress Percentages from actual metrics
+  // Real Category Progress Percentages from actual metrics.
+  // Hanya hitung dokumen yang metriknya benar-benar tersedia; jangan
+  // mencampur metrik kosong (0) seolah-olah nilai riil.
   let titleDescPct = 0
   let imageAltPct = 0
   let headingPct = 0
   let keywordPct = 0
 
-  if (totalContentCount > 0) {
+  const metricItems = auditedItems.filter((item) => item.hasMetrics)
+
+  if (metricItems.length > 0) {
     const rawTitleDesc =
-      auditedItems.reduce(
+      metricItems.reduce(
         (sum, d) => sum + ((d.metrics.titleScore + d.metrics.descScore) / 40) * 100,
         0
-      ) / totalContentCount
+      ) / metricItems.length
     const rawAlt =
-      auditedItems.reduce((sum, d) => sum + (d.metrics.altScore / 15) * 100, 0) / totalContentCount
+      metricItems.reduce((sum, d) => sum + (d.metrics.altScore / 15) * 100, 0) /
+      metricItems.length
     const rawHeading =
-      auditedItems.reduce((sum, d) => sum + (d.metrics.h1Score / 15) * 100, 0) / totalContentCount
+      metricItems.reduce((sum, d) => sum + (d.metrics.h1Score / 15) * 100, 0) /
+      metricItems.length
     const rawKeyword =
-      auditedItems.reduce(
+      metricItems.reduce(
         (sum, d) => sum + ((d.metrics.keywordScore + d.metrics.slugScore) / 25) * 100,
         0
-      ) / totalContentCount
+      ) / metricItems.length
 
     titleDescPct = Math.min(100, Math.round(rawTitleDesc))
     imageAltPct = Math.min(100, Math.round(rawAlt))
@@ -284,6 +307,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
     // Non-blocking jika offline
   }
   const deployStatus = getDeployStatus()
+  const hasCloudflareApi = Boolean(
+    process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ACCOUNT_ID,
+  )
 
   // Ambil riwayat deploy terbaru dari koleksi deployments
   let latestDeploymentDoc: any = null
@@ -315,13 +341,13 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
     : null
 
   return (
-    <div
+    <main
       style={{
         padding: '24px 32px 48px 32px',
         maxWidth: '1280px',
         margin: '0 auto',
         fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        color: '#0f172a',
+        color: 'var(--theme-text)',
       }}
     >
       {/* 1. Header Dasbor & Status Situs */}
@@ -334,7 +360,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
           gap: '16px',
           marginBottom: '28px',
           paddingBottom: '20px',
-          borderBottom: '1px solid #e2e8f0',
+          borderBottom: '1px solid var(--theme-elevation-150)',
         }}
       >
         <div>
@@ -344,12 +370,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               fontSize: '28px',
               fontWeight: 750,
               letterSpacing: '-0.02em',
-              color: '#0f172a',
+              color: 'var(--theme-text)',
             }}
           >
             Dasbor
           </h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#475569' }}>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--theme-elevation-600)' }}>
             Ringkasan performa situs dan hal yang perlu dikerjakan hari ini.
           </p>
         </div>
@@ -387,17 +413,23 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 ? '#fef3c7'
                 : deployStatus.status === 'failed'
                 ? '#fee2e2'
+                : !hasCloudflareApi
+                ? '#fffbeb'
                 : '#ecfdf5',
               color: deployStatus.isBuilding
                 ? '#b45309'
                 : deployStatus.status === 'failed'
                 ? '#b91c1c'
+                : !hasCloudflareApi
+                ? '#92400e'
                 : '#047857',
               border: `1px solid ${
                 deployStatus.isBuilding
                   ? '#fde68a'
                   : deployStatus.status === 'failed'
                   ? '#fca5a5'
+                  : !hasCloudflareApi
+                  ? '#fde68a'
                   : '#a7f3d0'
               }`,
             }}
@@ -411,6 +443,8 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                   ? '#f59e0b'
                   : deployStatus.status === 'failed'
                   ? '#ef4444'
+                  : !hasCloudflareApi
+                  ? '#f59e0b'
                   : '#10b981',
               }}
             />
@@ -419,7 +453,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 ? `Membangun (~${deployStatus.estimatedSecondsRemaining}s)`
                 : deployStatus.status === 'failed'
                 ? 'Build Terakhir Gagal'
-                : `Situs Aktif & Tayang${lastActiveFormatted ? ` (${lastActiveFormatted})` : ''}`}
+                : hasCloudflareApi
+                ? `Situs Live & Sinkron${lastActiveFormatted ? ` (${lastActiveFormatted})` : ''}`
+                : `Konten diperbarui${lastActiveFormatted ? ` (${lastActiveFormatted})` : ''} • status deploy belum terverifikasi`}
             </span>
           </div>
 
@@ -493,9 +529,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               ✍️
             </div>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+              <h2 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
                 Tulis Artikel Baru
-              </h3>
+              </h2>
               <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
                 Publikasikan panduan kesehatan ibu dan buah hati dengan checklist SEO otomatis.
               </p>
@@ -534,9 +570,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               👩‍⚕️
             </div>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+              <h2 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
                 Kelola Tim Bidan & STR
-              </h3>
+              </h2>
               <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
                 Kelola data keahlian klinis dan validasi nomor Surat Tanda Registrasi nakes.
               </p>
@@ -579,9 +615,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               📄
             </div>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+              <h2 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
                 Buat Halaman Baru
-              </h3>
+              </h2>
               <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
                 Susun halaman informasi klinik atau halaman penawaran khusus kampanye iklan.
               </p>
@@ -620,9 +656,9 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               💬
             </div>
             <div>
-              <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
+              <h2 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: 650, color: '#0f172a' }}>
                 Moderasi Testimoni Pasien
-              </h3>
+              </h2>
               <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
                 Tinjau izin tayang (consent) ulasan pasien sebelum ditampilkan di website.
               </p>
@@ -664,7 +700,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
             🖼️
           </div>
           <div>
-            <h3
+            <h2
               style={{
                 margin: '0 0 4px 0',
                 fontSize: '16px',
@@ -673,7 +709,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               }}
             >
               Unggah Media
-            </h3>
+            </h2>
             <p style={{ margin: 0, fontSize: '13px', color: '#475569', lineHeight: 1.45 }}>
               Kompresi format WebP otomatis dan verifikasi teks alt aksesibilitas.
             </p>
@@ -727,7 +763,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 textDecoration: 'none',
               }}
             >
-              Lihat Draf →
+              Lihat {articleDraftCount > 0 ? `${articleDraftCount} ` : ''}draf artikel →
             </Link>
           )}
         </div>
@@ -736,9 +772,22 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
         <div
           style={{
             padding: '16px 20px',
-            backgroundColor: deployStatus.status === 'failed' ? '#fef2f2' : deployStatus.isBuilding ? '#fffbeb' : '#f0fdf4',
+            backgroundColor:
+              deployStatus.status === 'failed'
+                ? '#fef2f2'
+                : deployStatus.isBuilding
+                ? '#fffbeb'
+                : !hasCloudflareApi
+                ? '#fffbeb'
+                : '#f0fdf4',
             borderRadius: '12px',
-            border: `1px solid ${deployStatus.status === 'failed' ? '#fca5a5' : deployStatus.isBuilding ? '#fde68a' : '#bbf7d0'}`,
+            border: `1px solid ${
+              deployStatus.status === 'failed'
+                ? '#fca5a5'
+                : deployStatus.isBuilding || !hasCloudflareApi
+                ? '#fde68a'
+                : '#bbf7d0'
+            }`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -747,14 +796,20 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '24px' }}>
-              {deployStatus.status === 'failed' ? '❌' : deployStatus.isBuilding ? '⚙️' : '🚀'}
+              {deployStatus.status === 'failed' ? '❌' : deployStatus.isBuilding ? '⚙️' : !hasCloudflareApi ? '⚠️' : '🚀'}
             </span>
             <div>
               <div style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Sinkronisasi Cloudflare
               </div>
-              <div style={{ fontSize: '15px', fontWeight: 700, color: deployStatus.status === 'failed' ? '#b91c1c' : deployStatus.isBuilding ? '#92400e' : '#15803d' }}>
-                {deployStatus.status === 'failed' ? 'Gagal Build (Perlu Bantuan)' : deployStatus.isBuilding ? `Membangun (~ ${deployStatus.estimatedSecondsRemaining}s)` : 'Situs Live & Sinkron'}
+              <div style={{ fontSize: '15px', fontWeight: 700, color: deployStatus.status === 'failed' ? '#b91c1c' : deployStatus.isBuilding || !hasCloudflareApi ? '#92400e' : '#15803d' }}>
+                {deployStatus.status === 'failed'
+                  ? 'Gagal Build (Perlu Bantuan)'
+                  : deployStatus.isBuilding
+                  ? `Membangun (~ ${deployStatus.estimatedSecondsRemaining}s)`
+                  : hasCloudflareApi
+                  ? 'Situs Live & Sinkron'
+                  : 'Status deploy belum terverifikasi'}
               </div>
               {latestDeploymentDoc?.triggerReason && (
                 <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
@@ -809,7 +864,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
             style={{
               fontSize: '12px',
               fontWeight: 600,
-              color: '#0284c7',
+              color: '#0369a1',
               backgroundColor: '#f0f9ff',
               padding: '4px 10px',
               borderRadius: '6px',
@@ -904,7 +959,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                       {item.severity === 'critical' ? 'Penting' : 'Saran'}
                     </span>
                     <div style={{ minWidth: 0 }}>
-                      <h4
+                      <h3
                         style={{
                           margin: '0 0 3px 0',
                           fontSize: '14px',
@@ -915,8 +970,10 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                           textOverflow: 'ellipsis',
                         }}
                       >
-                        {item.title}
-                      </h4>
+                        {item.title === 'Tanpa Judul'
+                          ? `Tanpa Judul (${item.collSlug === 'articles' ? 'Artikel' : 'Halaman'})`
+                          : item.title}
+                      </h3>
                       <p
                         style={{
                           margin: 0,
@@ -932,6 +989,8 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
 
                   <Link
                     href={`/admin/collections/${item.collSlug}/${item.id}`}
+                    aria-label={`Perbaiki SEO: ${item.title}`}
+                    title={`Perbaiki SEO: ${item.title}`}
                     style={{
                       padding: '6px 14px',
                       borderRadius: '8px',
@@ -955,10 +1014,10 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               {totalAttentionCount > 3 && (
                 <div style={{ paddingTop: '8px', textAlign: 'right' }}>
                   <Link
-                    href="/admin/collections/articles"
+                    href="/admin/collections/articles?where[seoScore][less_than]=80"
                     style={{
                       fontSize: '13px',
-                      color: '#0284c7',
+                      color: '#0369a1',
                       fontWeight: 600,
                       textDecoration: 'none',
                     }}
@@ -987,7 +1046,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               }}
             >
               <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎉</div>
-              <h4
+              <h3
                 style={{
                   margin: '0 0 6px 0',
                   fontSize: '15px',
@@ -996,7 +1055,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 }}
               >
                 Semua Konten Memenuhi Standar SEO
-              </h4>
+              </h3>
               <p
                 style={{
                   margin: 0,
@@ -1029,7 +1088,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               }}
             >
               <div style={{ fontSize: '32px', marginBottom: '8px' }}>📝</div>
-              <h4
+              <h3
                 style={{
                   margin: '0 0 6px 0',
                   fontSize: '15px',
@@ -1038,7 +1097,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 }}
               >
                 Belum Ada Halaman atau Artikel
-              </h4>
+              </h3>
               <p
                 style={{
                   margin: '0 0 16px 0',
@@ -1056,7 +1115,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 style={{
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  backgroundColor: '#0284c7',
+                  backgroundColor: '#0369a1',
                   color: '#ffffff',
                   fontSize: '13px',
                   fontWeight: 600,
@@ -1132,29 +1191,52 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
             </span>
           </div>
 
-          {/* 4 Real Progress Bars (Calculated from Actual Database Metrics) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <ProgressBar
-              label="Judul dan meta description"
-              percent={titleDescPct}
-              barColor={titleDescPct >= 80 ? '#16a34a' : titleDescPct >= 60 ? '#f59e0b' : '#dc2626'}
-            />
-            <ProgressBar
-              label="Teks alt gambar"
-              percent={imageAltPct}
-              barColor={imageAltPct >= 80 ? '#16a34a' : imageAltPct >= 60 ? '#f59e0b' : '#dc2626'}
-            />
-            <ProgressBar
-              label="Struktur heading (H1)"
-              percent={headingPct}
-              barColor={headingPct >= 80 ? '#16a34a' : headingPct >= 60 ? '#f59e0b' : '#dc2626'}
-            />
-            <ProgressBar
-              label="Kata kunci fokus & slug URL"
-              percent={keywordPct}
-              barColor={keywordPct >= 80 ? '#16a34a' : keywordPct >= 60 ? '#f59e0b' : '#dc2626'}
-            />
-          </div>
+          {/* 4 Real Progress Bars (hanya dari metrik yang valid) */}
+          {metricItems.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <ProgressBar
+                label="Judul dan meta description"
+                percent={titleDescPct}
+                barColor={titleDescPct >= 80 ? '#16a34a' : titleDescPct >= 60 ? '#f59e0b' : '#dc2626'}
+              />
+              <ProgressBar
+                label="Teks alt gambar"
+                percent={imageAltPct}
+                barColor={imageAltPct >= 80 ? '#16a34a' : imageAltPct >= 60 ? '#f59e0b' : '#dc2626'}
+              />
+              <ProgressBar
+                label="Struktur heading (H1)"
+                percent={headingPct}
+                barColor={headingPct >= 80 ? '#16a34a' : headingPct >= 60 ? '#f59e0b' : '#dc2626'}
+              />
+              <ProgressBar
+                label="Kata kunci fokus & slug URL"
+                percent={keywordPct}
+                barColor={keywordPct >= 80 ? '#16a34a' : keywordPct >= 60 ? '#f59e0b' : '#dc2626'}
+              />
+              {metricItems.length < totalContentCount && (
+                <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>
+                  Rincian metrik tersedia untuk {metricItems.length} dari {totalContentCount} konten.
+                  Jalankan audit ulang untuk melengkapi sisanya.
+                </p>
+              )}
+            </div>
+          ) : (
+            <div
+              style={{
+                padding: '14px 16px',
+                borderRadius: '10px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                fontSize: '13px',
+                color: '#475569',
+                lineHeight: 1.5,
+              }}
+            >
+              Metrik rinci belum tersedia. Skor di atas berasal dari audit tersimpan; jalankan
+              audit ulang agar rincian per kategori dapat ditampilkan.
+            </div>
+          )}
 
           <p
             style={{
@@ -1166,7 +1248,8 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               paddingTop: '12px',
             }}
           >
-            ⚡ Dihitung otomatis dari seluruh konten aktif di database.
+            ⚡ Skor rata-rata dihitung dari konten terbit. Rincian per kategori hanya ditampilkan
+            jika metrik audit tersedia.
           </p>
         </div>
       </div>
@@ -1204,12 +1287,12 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               href="/admin/collections/pages"
               style={{
                 fontSize: '13px',
-                color: '#0284c7',
+                color: '#0369a1',
                 fontWeight: 600,
                 textDecoration: 'none',
               }}
             >
-              Lihat semua dokumen →
+              Lihat semua halaman →
             </Link>
           </div>
 
@@ -1304,13 +1387,23 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                             textOverflow: 'ellipsis',
                           }}
                         >
-                          <Link
-                            href={`/admin/collections/${doc._collSlug}/${doc.id}`}
-                            style={{ color: '#0f172a', textDecoration: 'none' }}
-                            title={doc.title || doc.name || 'Tanpa Judul'}
-                          >
-                            {doc.title || doc.name || 'Tanpa Judul'}
-                          </Link>
+                          {doc._collSlug === 'landing-pages' ? (
+                            <span
+                              style={{ color: '#475569' }}
+                              title="Dokumen arsip legacy. Tidak tersedia sebagai menu edit; migrasikan ke Halaman jika masih dipakai."
+                            >
+                              {doc.title || doc.name || 'Tanpa Judul'}
+                              <span style={{ marginLeft: '6px', fontSize: '10px', fontWeight: 600 }}>ARSIP</span>
+                            </span>
+                          ) : (
+                            <Link
+                              href={`/admin/collections/${doc._collSlug}/${doc.id}`}
+                              style={{ color: '#0f172a', textDecoration: 'none' }}
+                              title={doc.title || doc.name || 'Tanpa Judul'}
+                            >
+                              {doc.title || doc.name || 'Tanpa Judul'}
+                            </Link>
+                          )}
                         </td>
                         <td
                           style={{
@@ -1363,7 +1456,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
               }}
             >
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>📁</div>
-              <h4
+              <h3
                 style={{
                   margin: '0 0 4px 0',
                   fontSize: '14px',
@@ -1372,7 +1465,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
                 }}
               >
                 Belum Ada Aktivitas Terbaru
-              </h4>
+              </h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
                 Setiap perubahan atau pembuatan konten baru akan tercatat di sini secara otomatis.
               </p>
@@ -1469,7 +1562,7 @@ export async function CustomDashboard(props?: CustomDashboardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
 

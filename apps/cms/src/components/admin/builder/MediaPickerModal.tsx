@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Upload, Search, Image as ImageIcon, Check, Loader2 } from 'lucide-react';
+import { useFocusTrap } from './useFocusTrap';
 
 export interface MediaItem {
   id: string | number;
@@ -34,6 +35,20 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [uploadAlt, setUploadAlt] = useState('');
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(dialogRef, isOpen);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const fetchMedia = useCallback(async (query = '') => {
     setIsLoading(true);
@@ -59,16 +74,36 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
     }
   }, [isOpen, fetchMedia]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setPendingFile(file);
+    setUploadAlt('');
+    setError(null);
+    e.target.value = '';
+  };
+
+  const cancelPendingUpload = () => {
+    setPendingFile(null);
+    setUploadAlt('');
+    setError(null);
+  };
+
+  const handleUpload = async () => {
+    if (!pendingFile) return;
+
+    const alt = uploadAlt.trim();
+    if (!alt) {
+      setError('Alt text wajib diisi agar gambar dapat diakses pembaca layar. Jelaskan isi gambar, bukan nama file.');
+      return;
+    }
 
     setIsUploading(true);
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('alt', file.name.replace(/\.[^/.]+$/, ''));
+      formData.append('file', pendingFile);
+      formData.append('alt', alt);
 
       const res = await fetch('/api/media', {
         method: 'POST',
@@ -86,6 +121,8 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
         setItems((prev) => [doc, ...prev]);
         setSelectedItem(doc);
       }
+      setPendingFile(null);
+      setUploadAlt('');
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -96,17 +133,29 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 transition-opacity duration-150">
-      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl flex flex-col max-h-[85vh] overflow-hidden">
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 transition-opacity duration-150"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="kala-media-picker-title"
+        className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-3xl flex flex-col max-h-[85vh] overflow-hidden"
+      >
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div>
-            <h3 className="font-bold text-sm text-slate-800">Pilih Media / Foto</h3>
+            <h3 id="kala-media-picker-title" className="font-bold text-sm text-slate-800">Pilih Media / Foto</h3>
             <p className="text-xs text-slate-500">Pilih dari pustaka media atau unggah foto baru</p>
           </div>
           <button
             type="button"
             onClick={onClose}
+            aria-label="Tutup pemilih media"
             className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition-colors"
           >
             <X size={18} />
@@ -123,6 +172,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && fetchMedia(search)}
               placeholder="Cari foto berdasarkan nama..."
+              aria-label="Cari media berdasarkan nama"
               className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
             />
           </div>
@@ -137,12 +187,49 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             <input
               type="file"
               accept="image/*"
-              onChange={handleUpload}
+              onChange={handleFileSelected}
               disabled={isUploading}
               className="hidden"
             />
           </label>
         </div>
+
+        {pendingFile && (
+          <div className="p-3 border-b border-slate-200 bg-amber-50/70 space-y-2">
+            <p className="text-xs font-semibold text-slate-800">
+              Unggah: <span className="font-normal">{pendingFile.name}</span>
+            </p>
+            <label className="block text-xs font-semibold text-slate-700" htmlFor="kala-media-upload-alt">
+              Alt text (wajib)
+            </label>
+            <input
+              id="kala-media-upload-alt"
+              type="text"
+              value={uploadAlt}
+              onChange={(event) => setUploadAlt(event.target.value)}
+              placeholder="Contoh: Bidan memijat lembut bayi newborn di matras klinik"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none"
+            />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void handleUpload()}
+                disabled={isUploading || !uploadAlt.trim()}
+                className="rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-teal-700 disabled:opacity-40"
+              >
+                {isUploading ? 'Mengunggah...' : 'Unggah dengan Alt Text'}
+              </button>
+              <button
+                type="button"
+                onClick={cancelPendingUpload}
+                disabled={isUploading}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Media Grid */}
         <div className="flex-1 overflow-y-auto p-4 bg-slate-50">

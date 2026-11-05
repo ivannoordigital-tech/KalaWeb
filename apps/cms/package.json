@@ -16,6 +16,7 @@
     "set:superadmin": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/set-superadmin.ts",
     "audit:backfill": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/audit-backfill.ts",
     "test:role": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-role-access.ts",
+    "test:uiux": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/test-uiux-fixes.ts",
     "test:validation": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-validation.ts",
     "test:integration": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/test-integration.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",

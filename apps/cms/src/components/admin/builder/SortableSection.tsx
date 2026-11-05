@@ -61,6 +61,7 @@ export const SortableSection: React.FC<SortableSectionProps> = ({
           onClick={(e) => e.stopPropagation()}
           className="text-slate-400 hover:text-slate-700 cursor-grab active:cursor-grabbing p-0.5 rounded hover:bg-slate-100"
           title="Geser untuk mengubah urutan"
+          aria-label="Geser seksi untuk mengubah urutan"
         >
           <GripVertical size={16} />
         </button>
@@ -73,7 +74,7 @@ export const SortableSection: React.FC<SortableSectionProps> = ({
             </span>
             {block.disabled && (
               <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">
-                Off
+                Nonaktif
               </span>
             )}
           </div>
@@ -91,6 +92,7 @@ export const SortableSection: React.FC<SortableSectionProps> = ({
           type="button"
           onClick={onToggleDisabled}
           title={block.disabled ? 'Tampilkan seksi' : 'Sembunyikan seksi'}
+          aria-label={block.disabled ? 'Tampilkan seksi' : 'Sembunyikan seksi'}
           className={`p-1 rounded hover:bg-slate-200/80 transition-colors ${
             block.disabled ? 'text-amber-600' : 'text-slate-500'
           }`}
@@ -102,6 +104,7 @@ export const SortableSection: React.FC<SortableSectionProps> = ({
           type="button"
           onClick={onDuplicate}
           title="Duplikasi seksi ini"
+          aria-label="Duplikasi seksi ini"
           className="p-1 text-slate-500 hover:text-slate-800 rounded hover:bg-slate-200/80 transition-colors"
         >
           <Copy size={15} />
@@ -111,6 +114,7 @@ export const SortableSection: React.FC<SortableSectionProps> = ({
           type="button"
           onClick={onDelete}
           title="Hapus seksi"
+          aria-label="Hapus seksi"
           className="p-1 text-rose-500 hover:text-rose-700 rounded hover:bg-rose-50 transition-colors"
         >
           <Trash2 size={15} />

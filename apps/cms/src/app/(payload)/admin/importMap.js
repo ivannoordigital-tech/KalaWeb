@@ -25,6 +25,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { SeoPanelField as SeoPanelField_b4a702521fedbede19f4fa7a420b433d } from '../../../components/admin/SeoPanelField'
 import { SeoScoreCell as SeoScoreCell_2ea760479321e603308d6fc1ef48049f } from '../../../components/admin/SeoScoreCell'
 import { BuilderField as BuilderField_2c98b36521b906af460e963a683bb5a9 } from '../../../components/admin/builder/BuilderField'
+import { PriceCell as PriceCell_d96a76b8370ca7c1f6af323c4250ccc0 } from '../../../components/admin/PriceCell'
 import { CustomDashboard as CustomDashboard_bff5a882fa66ab8185114b0a616ede47 } from '../../../components/admin/CustomDashboard'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -57,6 +58,7 @@ export const importMap = {
   "/components/admin/SeoPanelField#SeoPanelField": SeoPanelField_b4a702521fedbede19f4fa7a420b433d,
   "/components/admin/SeoScoreCell#SeoScoreCell": SeoScoreCell_2ea760479321e603308d6fc1ef48049f,
   "/components/admin/builder/BuilderField#BuilderField": BuilderField_2c98b36521b906af460e963a683bb5a9,
+  "/components/admin/PriceCell#PriceCell": PriceCell_d96a76b8370ca7c1f6af323c4250ccc0,
   "/components/admin/CustomDashboard#CustomDashboard": CustomDashboard_bff5a882fa66ab8185114b0a616ede47,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
