@@ -1,17 +1,37 @@
 export const prerender = false;
 
-export const GET = async ({ locals }: { locals: any }) => {
-  const runtime = locals?.runtime;
-  const env = runtime?.env || {};
+const CMS_URL = 'https://admin.kalababyspa.com';
+
+/**
+ * Diagnostik pratinjau.
+ *
+ * Sejak preview memakai pola "CMS proxy", Worker TIDAK membutuhkan
+ * PREVIEW_SECRET / PREVIEW_API_KEY. Endpoint ini memastikan CMS dapat
+ * dihubungi dan endpoint verifikasi token merespons dengan benar.
+ */
+export const GET = async () => {
+  let cmsReachable = false;
+  let cmsStatus = 0;
+
+  try {
+    const res = await fetch(`${CMS_URL}/api/preview-draft?token=healthcheck`, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    });
+    cmsStatus = res.status;
+    // 401 = CMS hidup dan menolak token palsu (perilaku yang benar).
+    cmsReachable = res.status < 500;
+  } catch {
+    cmsReachable = false;
+  }
 
   return new Response(
     JSON.stringify({
-      hasRuntime: Boolean(runtime),
-      hasRuntimeEnv: Boolean(runtime?.env),
-      hasPreviewSecret: Boolean(env.PREVIEW_SECRET),
-      hasPreviewApiKey: Boolean(env.PREVIEW_API_KEY),
-      hasPayloadUrl: Boolean(env.PAYLOAD_URL),
-      envKeys: Object.keys(env).sort(),
+      mode: 'cms-proxy',
+      cmsUrl: CMS_URL,
+      cmsReachable,
+      cmsStatus,
+      requiresWorkerPreviewSecrets: false,
     }),
     {
       headers: {

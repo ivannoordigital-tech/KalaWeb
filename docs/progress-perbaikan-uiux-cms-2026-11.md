@@ -200,10 +200,16 @@ Backfill dijalankan di container sementara `cms-builder-temp` dengan database pr
 
 ### B-05 — Preview draft tersaji dari cache Cloudflare
 
-- `GET /preview/babyMassage/?token=...` mengembalikan `CF-Cache-Status: HIT` meskipun ada `Cache-Control: no-store`.
-- Cache rule Cloudflare untuk `/preview/*` mengalahkan header origin.
-- Solusi: route preview draft dipindahkan ke `/editor-view/*` (tidak terkena rule), token CMS diarahkan ke route baru, dan `_headers` ditambahkan.
-- Build web Cloudflare masih harus selesai/berhasil agar route baru aktif. Jika build gagal, cek Pages → `kalaweb` → Deployments.
+**Status: SELESAI (5 Nov 2026).**
+
+- `GET /preview/babyMassage/?token=...` dulu mengembalikan `CF-Cache-Status: HIT` meskipun ada `Cache-Control: no-store`.
+- Route preview draft dipindahkan ke `/editor-view/*` (di luar cache rule), token CMS diarahkan ke route baru.
+- Akar masalah kedua: `wrangler deploy` menghapus binding dashboard (default `keep_vars: false`), sehingga `PREVIEW_SECRET`/`PREVIEW_API_KEY` hilang dari Worker aktif dan preview selalu 401.
+- Perbaikan final: preview memakai pola **CMS proxy**. Worker hanya mengirim token ke `GET /api/preview-draft` di CMS; CMS yang memverifikasi tanda tangan token dan mengambil dokumen draft (`overrideAccess`). Worker tidak lagi menyimpan secret preview.
+- `keep_vars: true` ditambahkan di `apps/web-kala/wrangler.jsonc` agar binding dashboard tidak terhapus pada deploy berikutnya.
+- Verifikasi: `/editor-view/sales/babyMassage/?token=...` → **200**, memuat konten draft (`NGEREOG`) dan blok bertanda `border: 1px dashed #F6DCCD`.
+- `PREVIEW_SECRET` dan `PREVIEW_API_KEY` sudah dirotasi setelah nilainya sempat terekspos di chat.
+
 
 ---
 
