@@ -42,41 +42,13 @@ export const Pages: CollectionConfig = {
       return role === 'author' || role === 'midwife_coordinator'
     },
     preview: (doc) => {
-      if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
-        const prefix = doc.pageType === 'landing' ? '/editor-view/sales' : '/editor-view'
-        return `${baseUrl}${prefix}/${doc.slug}/`
-      }
-      return null
+      if (!doc?.id) return null
+      const cmsUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://admin.kalababyspa.com'
+      return `${cmsUrl}/api/preview-redirect?collection=pages&id=${doc.id}`
     },
-    livePreview: {
-      url: ({ data }) => {
-        const slug = data?.slug || 'syarat-ketentuan'
-        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321')
-        const prefix = data?.pageType === 'landing' ? '/editor-view/sales' : '/editor-view'
-        return `${baseUrl}${prefix}/${slug}/`
-      },
-      breakpoints: [
-        {
-          label: 'Mobile (375px)',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet (768px)',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop (1280px)',
-          name: 'desktop',
-          width: 1280,
-          height: 800,
-        },
-      ],
-    },
+    // `livePreview` sengaja tidak dipakai: iframe Live Preview Payload tidak
+    // menyertakan token preview, sehingga route /editor-view akan menolak (401).
+    // Pratinjau draft tersedia lewat PreviewFrame di dalam builder.
   },
   access: {
     read: ({ req: { user } }) => {

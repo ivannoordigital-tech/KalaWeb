@@ -20,39 +20,14 @@ export const LandingPages: CollectionConfig = {
     hidden: () => true,
     description: '⚠️ [DEPRECATED / ARSIP] Koleksi ini telah dikonsolidasikan ke menu "Semua Halaman" (Pages) dengan tipe Landing Page. Gunakan menu Pages untuk mengelola halaman promosi aktif.',
     preview: (doc) => {
-      if (doc?.slug) {
-        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321');
-        return `${baseUrl}/preview/sales/${doc.slug}/`;
-      }
-      return null;
+      if (!doc?.id) return null
+      const cmsUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://admin.kalababyspa.com'
+      return `${cmsUrl}/api/preview-redirect?collection=landing-pages&id=${doc.id}`
     },
-    livePreview: {
-      url: ({ data }) => {
-        const slug = data?.slug || 'bayi-kolik';
-        const baseUrl = process.env.PREVIEW_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://kalababyspa.com' : 'http://localhost:4321');
-        return `${baseUrl}/preview/sales/${slug}/`;
-      },
-      breakpoints: [
-        {
-          label: 'Mobile (375px)',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet (768px)',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop (1280px)',
-          name: 'desktop',
-          width: 1280,
-          height: 800,
-        },
-      ],
-    },
+    // `livePreview` sengaja tidak dipakai: route preview membutuhkan token
+    // bertanda tangan dari /api/preview-token, sedangkan iframe Live Preview
+    // Payload tidak menyertakannya. Pratinjau tersedia lewat PreviewFrame
+    // di dalam builder.
   },
   access: {
     read: ({ req: { user } }) => {
