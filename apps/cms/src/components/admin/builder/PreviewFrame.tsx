@@ -30,6 +30,10 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
 }) => {
   const [device, setDevice] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // Double-buffer iframe: frame lama tetap tampil sampai frame baru selesai
+  // dimuat, sehingga tidak ada kedipan putih setiap autosave.
+  const [frames, setFrames] = useState<string[]>([]);
+  const [activeUrl, setActiveUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastRefreshTime, setLastRefreshTime] = useState<string | null>(null);
@@ -49,6 +53,8 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   const fetchToken = useCallback(async () => {
     if (!docId) {
       setPreviewUrl(null);
+      setFrames([]);
+      setActiveUrl(null);
       setError(null);
       return;
     }
@@ -62,7 +68,15 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         throw new Error(data.error || `HTTP ${res.status}: Gagal memuat token pratinjau`);
       }
       const data = await res.json();
-      setPreviewUrl(`${data.url}&v=${Date.now()}`);
+      const nextUrl = `${data.url}&v=${Date.now()}`;
+      setPreviewUrl(nextUrl);
+      setFrames((prev) => {
+        if (prev.length === 0) return [nextUrl];
+        const current = prev[prev.length - 1];
+        // URL sama (mis. refresh cepat) tidak perlu memuat frame baru.
+        if (current === nextUrl) return prev;
+        return [current, nextUrl];
+      });
 
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, '0');
@@ -142,6 +156,12 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [onSelectFromIframe, selectedSectionId, previewOrigin]);
+
+  const handleFrameLoad = useCallback((url: string) => {
+    setActiveUrl(url);
+    // Buang frame lama setelah frame baru tampil.
+    setFrames((prev) => (prev.includes(url) ? [url] : prev));
+  }, []);
 
   const getContainerWidth = () => {
     switch (device) {
@@ -279,17 +299,28 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               Coba Lagi
             </button>
           </div>
-        ) : previewUrl ? (
+        ) : previewUrl && frames.length > 0 ? (
           <div
             style={{ width: getContainerWidth() }}
             className="h-full bg-white rounded-lg shadow-lg border border-slate-300 overflow-hidden transition-all duration-200 flex flex-col"
           >
-            <iframe
-              ref={iframeRef}
-              src={previewUrl}
-              className="w-full h-full border-none"
-              title="KalaWeb Landing Page Preview"
-            />
+            <div className="relative flex-1">
+              {frames.map((url) => (
+                <iframe
+                  key={url}
+                  ref={(el) => {
+                    if (activeUrl === url) iframeRef.current = el;
+                  }}
+                  src={url}
+                  onLoad={() => handleFrameLoad(url)}
+                  className="absolute inset-0 w-full h-full border-none transition-opacity duration-150"
+                  style={{
+                    opacity: activeUrl === url || (activeUrl === null && frames.length === 1) ? 1 : 0,
+                  }}
+                  title="KalaWeb Landing Page Preview"
+                />
+              ))}
+            </div>
           </div>
         ) : (
           <div className="text-slate-400 text-xs flex items-center gap-2">
