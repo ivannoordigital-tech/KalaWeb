@@ -12,7 +12,7 @@ export const seoScoreField: Field = {
   admin: {
     position: 'sidebar',
     readOnly: true,
-    hidden: true, // Disembunyikan dari form edit artikel/halaman agar rapi, tetap aktif di list tabel
+    hidden: false, // tetap tampil di form sebagai informasi read-only; diperlukan agar nilai ikut terkirim ke cell daftar
     description: 'Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.',
     components: {
       Cell: '/components/admin/SeoScoreCell#SeoScoreCell',
