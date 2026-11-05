@@ -3,6 +3,10 @@
   "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2026-10-20",
   "compatibility_flags": ["nodejs_compat"],
+  // Jangan hapus variable/secret yang diset dari dashboard Cloudflare
+  // setiap kali `wrangler deploy` dijalankan. Tanpa ini, semua binding
+  // dari Settings ikut terhapus pada setiap deployment baru.
+  "keep_vars": true,
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
