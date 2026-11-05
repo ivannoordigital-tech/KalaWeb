@@ -7,6 +7,51 @@ import {
   calculateSeoScore,
 } from '../lib/seo-engine'
 
+type AuditResult = ReturnType<typeof calculateSeoScore>
+
+/**
+ * Menyimpan hasil audit ke versi published DAN draft.
+ * Payload Admin List membaca versi draft (`draft: true`), sehingga tanpa
+ * menyimpan ke draft, kolom "Skor SEO" akan tetap menampilkan nilai lama/0.
+ */
+async function persistAudit(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  collection: 'articles' | 'pages' | 'landing-pages',
+  id: string | number,
+  audit: AuditResult,
+) {
+  const data = {
+    seoScore: audit.score,
+    seoAudit: {
+      score: audit.score,
+      grade: audit.grade,
+      engineVersion: audit.engineVersion || '2.1.0',
+      metrics: audit.metrics,
+      issues: audit.issues,
+      lastAuditedAt: new Date().toISOString(),
+    },
+  }
+
+  await payload.update({
+    collection,
+    id,
+    data,
+    overrideAccess: true,
+  })
+
+  try {
+    await payload.update({
+      collection,
+      id,
+      data,
+      draft: true,
+      overrideAccess: true,
+    })
+  } catch {
+    // Koleksi tanpa drafts tidak memerlukan update versi draft.
+  }
+}
+
 async function run() {
   console.log('🚀 Starting SEO Audit Backfill for Kala CMS...')
   const payload = await getPayload({ config: configPromise })
@@ -23,22 +68,7 @@ async function run() {
   for (const doc of articlesRes.docs) {
     const input = articleSeoAdapter(doc)
     const audit = calculateSeoScore(input)
-    await payload.update({
-      collection: 'articles',
-      id: doc.id,
-      data: {
-        seoScore: audit.score,
-        seoAudit: {
-          score: audit.score,
-          grade: audit.grade,
-          engineVersion: audit.engineVersion || '2.1.0',
-          metrics: audit.metrics,
-          issues: audit.issues,
-          lastAuditedAt: new Date().toISOString(),
-        },
-      },
-      overrideAccess: true,
-    })
+    await persistAudit(payload, 'articles', doc.id, audit)
     console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
   }
 
@@ -54,22 +84,7 @@ async function run() {
   for (const doc of pagesRes.docs) {
     const input = pageSeoAdapter(doc)
     const audit = calculateSeoScore(input)
-    await payload.update({
-      collection: 'pages',
-      id: doc.id,
-      data: {
-        seoScore: audit.score,
-        seoAudit: {
-          score: audit.score,
-          grade: audit.grade,
-          engineVersion: audit.engineVersion || '2.1.0',
-          metrics: audit.metrics,
-          issues: audit.issues,
-          lastAuditedAt: new Date().toISOString(),
-        },
-      },
-      overrideAccess: true,
-    })
+    await persistAudit(payload, 'pages', doc.id, audit)
     console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
   }
 
@@ -85,22 +100,7 @@ async function run() {
   for (const doc of lpRes.docs) {
     const input = landingPageSeoAdapter(doc)
     const audit = calculateSeoScore(input)
-    await payload.update({
-      collection: 'landing-pages',
-      id: doc.id,
-      data: {
-        seoScore: audit.score,
-        seoAudit: {
-          score: audit.score,
-          grade: audit.grade,
-          engineVersion: audit.engineVersion || '2.1.0',
-          metrics: audit.metrics,
-          issues: audit.issues,
-          lastAuditedAt: new Date().toISOString(),
-        },
-      },
-      overrideAccess: true,
-    })
+    await persistAudit(payload, 'landing-pages', doc.id, audit)
     console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
   }
 
