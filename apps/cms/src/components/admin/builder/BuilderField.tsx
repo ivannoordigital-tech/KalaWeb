@@ -477,7 +477,7 @@ export const BuilderField: React.FC = () => {
                 hasUnsavedChanges={modified}
                 selectedSectionId={selectedSectionId}
                 onSelectFromIframe={(sectionId) => setSelectedSectionId(sectionId)}
-                lastSaved={lastUpdateTime}
+                lastSaved={lastSavedAt ?? undefined}
                 onSaveDraft={() => save('draft')}
                 isSavingDraft={isSaving && saveIntent === 'draft'}
                 canSaveDraft={canSave}

@@ -122,6 +122,12 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
           try { sessionStorage.setItem(key, String(window.scrollY)); } catch (e) {}
         }, 120);
       }, { passive: true });
+
+      // Builder meminta posisi scroll tepat sebelum memuat frame baru.
+      window.addEventListener('message', function (event) {
+        if (!event.data || event.data.type !== 'KALA_CAPTURE_SCROLL') return;
+        try { sessionStorage.setItem(key, String(window.scrollY)); } catch (e) {}
+      });
     })();
   </script>
 

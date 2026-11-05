@@ -39,6 +39,11 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   const [lastRefreshTime, setLastRefreshTime] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const framesRef = useRef<string[]>([]);
+  const previewOriginRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    previewOriginRef.current = previewOrigin;
+  }, [previewOrigin]);
 
   useEffect(() => {
     framesRef.current = frames;
@@ -66,6 +71,14 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
 
     setIsLoading(true);
     setError(null);
+    // Minta frame yang sedang tampil menyimpan posisi scroll-nya
+    // sebelum frame baru dimuat (tidak bergantung pada event scroll).
+    try {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: 'KALA_CAPTURE_SCROLL' },
+        previewOriginRef.current || '*',
+      );
+    } catch {}
     try {
       const res = await fetch(`/api/preview-token?collection=${collection}&id=${docId}`);
       if (!res.ok) {
@@ -116,7 +129,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
     return () => clearInterval(interval);
   }, [docId, fetchToken]);
 
-  // Notify iframe whenever selectedSectionId changes
+  // Geser preview hanya saat admin memilih blok lain di sidebar.
   useEffect(() => {
     if (!iframeRef.current?.contentWindow) return;
     try {
@@ -129,7 +142,27 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         previewOrigin || '*',
       );
     } catch {}
-  }, [selectedSectionId, previewOrigin]);
+    // previewOrigin sengaja tidak masuk dependency: pergantian origin
+    // (setiap refresh preview) tidak boleh memicu auto-scroll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSectionId]);
+
+  // Saat frame baru aktif, terapkan ulang seleksi tanpa menggeser scroll.
+  useEffect(() => {
+    if (!activeUrl) return;
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    try {
+      win.postMessage(
+        {
+          type: 'KALA_SELECT_SECTION',
+          sectionId: selectedSectionId,
+          scroll: false,
+        },
+        previewOrigin || '*',
+      );
+    } catch {}
+  }, [activeUrl, previewOrigin, selectedSectionId]);
 
   /**
    * Aktifkan frame hanya setelah halaman di dalamnya selesai memulihkan
