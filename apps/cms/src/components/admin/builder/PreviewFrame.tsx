@@ -113,11 +113,14 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
     fetchToken();
   }, [fetchToken]);
 
-  // Auto-refresh when document is saved in CMS
+  // Auto-refresh setelah autosave/simpan, dengan debounce agar tidak
+  // memicu beberapa reload beruntun saat mengetik cepat.
   useEffect(() => {
-    if (lastSaved && docId) {
+    if (!lastSaved || !docId) return;
+    const timer = window.setTimeout(() => {
       fetchToken();
-    }
+    }, 500);
+    return () => window.clearTimeout(timer);
   }, [lastSaved, docId, fetchToken]);
 
   // Auto-refresh before 15m JWT expires (at 14 minutes)

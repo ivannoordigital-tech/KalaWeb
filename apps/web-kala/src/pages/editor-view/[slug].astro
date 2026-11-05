@@ -89,6 +89,9 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
       var target = 0;
       var timer;
       try {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      } catch (e) {}
+      try {
         var raw = sessionStorage.getItem(key);
         target = raw ? parseInt(raw, 10) || 0 : 0;
       } catch (e) {}
