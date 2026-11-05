@@ -80,6 +80,7 @@
 - `custom.scss`
   - Warna sidebar, breadcrumb, label field, deskripsi, border tab memakai token `--theme-*`.
   - Tidak lagi memaksa `#0f172a`/`#475569` di tema gelap.
+  - **Panel builder dipaksa `color-scheme: light`** agar input/textarea di panel putih tidak mewarisi teks putih dari portal builder bertema gelap.
 - `CustomDashboard.tsx`
   - Root memakai `<main>` dan `var(--theme-text)`.
   - H1/subjudul mengikuti tema.
@@ -146,6 +147,7 @@ Deploy production: commit `a7ac72b` → `60020ad` → `42d30b0` → `24dab37` �
 | P0-02 Builder | **Lulus** — pilih Hero tanpa gambar, panel settings tampil, tidak ada “Application error” |
 | P1-01 Tabel | **Lulus** — `docW = 1296`, `.table-wrap` `overflow-x:auto`, tabel 1.377 px dapat di-scroll |
 | P0-04 Dark mode | **Lulus** — H1 18,42:1; label nav 18,42:1; link nav 15,45:1 |
+| Builder panel terang | **Lulus** — input/textarea `color-scheme: light`, teks `#0f172a` di latar putih |
 | P1-04 Tanggal | **Lulus** — `24 Oktober 2026, 07.39` |
 | P1-02 Status deploy | **Lulus** — “status deploy belum terverifikasi” (tidak lagi klaim palsu) |
 | P0-01 Group SEO | **Masih gagal** — `#field-seo .render-fields` tetap 0 child |
