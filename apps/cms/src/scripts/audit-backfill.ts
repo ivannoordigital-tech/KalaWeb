@@ -32,12 +32,22 @@ async function persistAudit(
     },
   }
 
-  await payload.update({
-    collection,
-    id,
-    data,
-    overrideAccess: true,
-  })
+  let publishedSaved = false
+  let draftSaved = false
+
+  try {
+    await payload.update({
+      collection,
+      id,
+      data,
+      overrideAccess: true,
+    })
+    publishedSaved = true
+  } catch (err: any) {
+    console.warn(
+      `    Catatan: versi published [ID: ${id}] tidak dapat diperbarui (${err?.message || err}). Mencoba versi draft...`,
+    )
+  }
 
   try {
     await payload.update({
@@ -47,9 +57,15 @@ async function persistAudit(
       draft: true,
       overrideAccess: true,
     })
-  } catch {
-    // Koleksi tanpa drafts tidak memerlukan update versi draft.
+    draftSaved = true
+  } catch (err: any) {
+    if (!publishedSaved) throw err
+    console.warn(
+      `    Catatan: versi draft [ID: ${id}] tidak dapat diperbarui (${err?.message || err}).`,
+    )
   }
+
+  return { publishedSaved, draftSaved }
 }
 
 async function run() {
