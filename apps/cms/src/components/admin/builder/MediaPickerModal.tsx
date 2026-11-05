@@ -103,7 +103,9 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
     try {
       const formData = new FormData();
       formData.append('file', pendingFile);
-      formData.append('alt', alt);
+      // Payload multipart upload membaca field non-file dari `_payload`,
+      // bukan dari key form langsung.
+      formData.append('_payload', JSON.stringify({ alt }));
 
       const res = await fetch('/api/media', {
         method: 'POST',

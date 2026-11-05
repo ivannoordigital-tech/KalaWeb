@@ -83,6 +83,10 @@ assert(
   'media picker tidak memakai nama file sebagai alt',
   !mediaPickerSource.includes("formData.append('alt', file.name"),
 );
+assert(
+  'media picker mengirim alt melalui _payload (Payload multipart)',
+  mediaPickerSource.includes("formData.append('_payload'"),
+);
 
 console.log('\n=== Config field group (P0-01) ===');
 
