@@ -153,7 +153,18 @@ const isCanvas = pageData?.pageLayout === 'canvas';
         } catch (e) {}
 
         function restore() {
-          if (target > 0) window.scrollTo(0, target);
+          if (target <= 0) return;
+          var html = document.documentElement;
+          var previous = html.style.scrollBehavior;
+          // global.css memakai `scroll-behavior: smooth`; tanpa override ini
+          // pemulihan scroll akan terlihat sebagai animasi dari atas ke bawah.
+          html.style.scrollBehavior = 'auto';
+          try {
+            window.scrollTo({ top: target, left: 0, behavior: 'instant' });
+          } catch (e) {
+            window.scrollTo(0, target);
+          }
+          html.style.scrollBehavior = previous;
         }
         function notify() {
           try {
