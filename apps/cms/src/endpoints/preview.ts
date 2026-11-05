@@ -71,9 +71,8 @@ async function generatePreviewData(req: any) {
       .sign(key);
 
     const baseUrl = process.env.PREVIEW_BASE_URL || 'http://localhost:4321';
-    const isLandingPage =
-      collection === 'landing-pages' || (collection === 'pages' && doc.pageType === 'landing');
-    const prefix = isLandingPage ? '/editor-view/sales' : '/editor-view';
+    // Fallback sementara sampai build web yang memuat /editor-view aktif.
+    const prefix = collection === 'landing-pages' ? '/preview/sales' : '/preview';
     const previewUrl = `${baseUrl}${prefix}/${doc.slug}?token=${token}`;
 
     return { previewUrl, token, doc };
