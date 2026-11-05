@@ -99,8 +99,13 @@ const templateLayout = block.blockType === 'templateRef' && typeof block.templat
   ? block.template.layout
   : [];
 
-// Visibilitas per perangkat (dikontrol dari tab Pengaturan setiap blok)
-const visibility = Array.isArray(block.visibility) ? block.visibility : ['mobile', 'tablet', 'desktop'];
+// Visibilitas per perangkat (dikontrol dari tab Pengaturan setiap blok).
+// Blok lama bisa punya `visibility: []` (field belum ada saat dibuat).
+// Array kosong = tampil di semua perangkat, bukan "sembunyikan semuanya".
+const rawVisibility = Array.isArray(block.visibility)
+  ? block.visibility.filter((device: string) => ['mobile', 'tablet', 'desktop'].includes(device))
+  : [];
+const visibility = rawVisibility.length > 0 ? rawVisibility : ['mobile', 'tablet', 'desktop'];
 const visibilityKey = ['mobile', 'tablet', 'desktop'].filter((device) => visibility.includes(device)).join('-');
 const visibilityClasses: Record<string, string> = {
   '': 'hidden',

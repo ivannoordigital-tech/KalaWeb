@@ -535,9 +535,10 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
     onUpdate({ [path]: items });
   };
 
-  const visibility = Array.isArray(block.visibility)
-    ? block.visibility
-    : ['mobile', 'tablet', 'desktop'];
+  // Array kosong = blok lama tanpa field visibilitas = tampil di semua device.
+  const storedVisibility = Array.isArray(block.visibility) ? block.visibility : [];
+  const visibility =
+    storedVisibility.length > 0 ? storedVisibility : ['mobile', 'tablet', 'desktop'];
 
   const toggleDevice = (device: string) => {
     const next = visibility.includes(device)
