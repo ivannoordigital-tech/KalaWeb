@@ -134,7 +134,7 @@ export const previewEndpoints: Endpoint[] = [
           },
         });
 
-      const url = new URL(req.url, 'http://localhost:3000');
+      const url = new URL(req.url || '/api/preview-draft', 'http://localhost:3000');
       const token = url.searchParams.get('token');
 
       if (!token) {
