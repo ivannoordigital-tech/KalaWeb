@@ -210,6 +210,14 @@ Backfill dijalankan di container sementara `cms-builder-temp` dengan database pr
 - Verifikasi: `/editor-view/sales/babyMassage/?token=...` → **200**, memuat konten draft (`NGEREOG`) dan blok bertanda `border: 1px dashed #F6DCCD`.
 - `PREVIEW_SECRET` dan `PREVIEW_API_KEY` sudah dirotasi setelah nilainya sempat terekspos di chat.
 
+### B-06 — Blok hilang di preview/builder (field `visibility` kosong)
+
+- Gejala: sidebar builder menampilkan 15 blok, preview hanya menampilkan 5 blok (blok baru).
+- Sebab: blok lama punya `visibility: []`. `BlockRenderer` hanya memakai default semua-device jika field-nya **bukan array**; array kosong menghasilkan `visibilityKey = ''` → class `hidden` → blok disembunyikan di semua ukuran layar.
+- Perbaikan: array kosong sekarang dianggap "tampil di semua perangkat" di `BlockRenderer.astro`, dan checkbox di `SectionSettings.tsx` menampilkan semua device tercentang untuk blok lama.
+- Verifikasi: preview `/editor-view/sales/babyMassage/?token=...` → 15 blok, `hidden=False` untuk semuanya.
+
+
 
 ---
 
