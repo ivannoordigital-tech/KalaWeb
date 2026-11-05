@@ -104,10 +104,15 @@
   border-bottom: 2px solid var(--theme-elevation-150) !important;
 }
 
-/* Daftar tabel: cegah kolom terpotong dan body scroll horizontal */
-.table {
+/* Daftar tabel: cegah kolom terpotong dan body scroll horizontal.
+   Payload membungkus tabel dengan .table-wrap; elemen <table> sendiri
+   memakai class .table dan tidak bisa scroll karena display: table. */
+.table-wrap {
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch;
+}
+.table {
+  min-width: 100%;
 }
 
 
