@@ -66,10 +66,14 @@ async function run() {
 
   console.log(`\n📚 Auditing ${articlesRes.docs.length} Articles:`)
   for (const doc of articlesRes.docs) {
-    const input = articleSeoAdapter(doc)
-    const audit = calculateSeoScore(input)
-    await persistAudit(payload, 'articles', doc.id, audit)
-    console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
+    try {
+      const input = articleSeoAdapter(doc)
+      const audit = calculateSeoScore(input)
+      await persistAudit(payload, 'articles', doc.id, audit)
+      console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
+    } catch (err: any) {
+      console.warn(`  - [ID: ${doc.id}] Dilewati: ${err?.message || err}`)
+    }
   }
 
   // 2. Pages
@@ -82,10 +86,14 @@ async function run() {
 
   console.log(`\n📄 Auditing ${pagesRes.docs.length} Pages:`)
   for (const doc of pagesRes.docs) {
-    const input = pageSeoAdapter(doc)
-    const audit = calculateSeoScore(input)
-    await persistAudit(payload, 'pages', doc.id, audit)
-    console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
+    try {
+      const input = pageSeoAdapter(doc)
+      const audit = calculateSeoScore(input)
+      await persistAudit(payload, 'pages', doc.id, audit)
+      console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
+    } catch (err: any) {
+      console.warn(`  - [ID: ${doc.id}] Dilewati: ${err?.message || err}`)
+    }
   }
 
   // 3. Landing Pages
@@ -98,10 +106,14 @@ async function run() {
 
   console.log(`\n📢 Auditing ${lpRes.docs.length} Landing Pages:`)
   for (const doc of lpRes.docs) {
-    const input = landingPageSeoAdapter(doc)
-    const audit = calculateSeoScore(input)
-    await persistAudit(payload, 'landing-pages', doc.id, audit)
-    console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
+    try {
+      const input = landingPageSeoAdapter(doc)
+      const audit = calculateSeoScore(input)
+      await persistAudit(payload, 'landing-pages', doc.id, audit)
+      console.log(`  - [ID: ${doc.id}] ${doc.title.slice(0, 45)}... => Skor: ${audit.score} (${audit.grade})`)
+    } catch (err: any) {
+      console.warn(`  - [ID: ${doc.id}] Dilewati: ${err?.message || err}`)
+    }
   }
 
   console.log('\n✅ SEO Audit Backfill Complete!')
