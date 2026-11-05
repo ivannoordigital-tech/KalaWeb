@@ -1,5 +1,5 @@
 import type { Endpoint } from 'payload';
-import { SignJWT } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import { getUserRole } from '../access/roles';
 
 // Role `preview` sengaja TIDAK ada di sini: akun mesin tidak boleh membuat token preview.
@@ -111,6 +111,76 @@ export const previewEndpoints: Endpoint[] = [
         return new Response(result.error, { status: result.status });
       }
       return Response.redirect(result.previewUrl, 302);
+    },
+  },
+  {
+    /**
+     * Proxy data draft untuk website preview.
+     *
+     * Website hanya mengirim token preview yang sudah ditandatangani CMS.
+     * CMS yang memverifikasi token dan mengambil draft, sehingga Worker tidak
+     * perlu menyimpan PREVIEW_SECRET / PREVIEW_API_KEY sama sekali.
+     */
+    path: '/preview-draft',
+    method: 'get',
+    handler: async (req) => {
+      const json = (body: unknown, status = 200) =>
+        new Response(JSON.stringify(body), {
+          status,
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'no-store, no-cache, must-revalidate',
+            'X-Robots-Tag': 'noindex, nofollow',
+          },
+        });
+
+      const url = new URL(req.url, 'http://localhost:3000');
+      const token = url.searchParams.get('token');
+
+      if (!token) {
+        return json({ error: 'Token pratinjau tidak disertakan.' }, 401);
+      }
+
+      const secret = process.env.PREVIEW_SECRET;
+      if (!secret || secret.trim().length < 32) {
+        return json({ error: 'PREVIEW_SECRET belum disetel di CMS.' }, 500);
+      }
+
+      let payload: { sub?: string; collection?: string };
+      try {
+        const verified = await jwtVerify(token, new TextEncoder().encode(secret.trim()), {
+          issuer: 'kala-cms',
+          audience: 'kala-preview',
+        });
+        payload = verified.payload as { sub?: string; collection?: string };
+      } catch {
+        return json({ error: 'Token pratinjau tidak valid atau sudah kedaluwarsa.' }, 401);
+      }
+
+      const collection = payload.collection;
+      const id = payload.sub;
+
+      if (!id || (collection !== 'pages' && collection !== 'landing-pages')) {
+        return json({ error: 'Token pratinjau tidak lengkap.' }, 400);
+      }
+
+      try {
+        const doc = await req.payload.findByID({
+          collection,
+          id,
+          draft: true,
+          depth: 3,
+          overrideAccess: true,
+        });
+
+        if (!doc) {
+          return json({ error: 'Dokumen draft tidak ditemukan.' }, 404);
+        }
+
+        return json({ doc });
+      } catch (err) {
+        return json({ error: `Gagal mengambil draft: ${(err as Error).message}` }, 502);
+      }
     },
   },
 ];
