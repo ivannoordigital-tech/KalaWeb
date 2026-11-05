@@ -1,8 +1,8 @@
 # Progress Perbaikan UI/UX CMS — Eksekusi 5 November 2026
 
-**Branch:** `fix/uiux-p0-stabilization`  
+**Branch:** `fix/uiux-p0-stabilization` (sudah di-merge ke `main`)  
 **Basis:** [`audit-uiux-admin-cms-2026-11-05.md`](./audit-uiux-admin-cms-2026-11-05.md) dan [`rencana-perbaikan-uiux-cms-2026-11.md`](./rencana-perbaikan-uiux-cms-2026-11.md)  
-**Status:** eksekusi P0/P1 awal selesai di kode; verifikasi produksi belum dilakukan.
+**Status:** **sudah di-deploy ke produksi** pada 5 November 2026 (±11.16 WIB). P0-02/P0-04/P1 tabel terverifikasi live; P0-01 tetap terbuka.
 
 ---
 
@@ -10,14 +10,14 @@
 
 | Item | Status | Catatan |
 |---|---|---|
-| P0-01 Group rendering | **Sebagian / blocked** | Config sumber terbukti benar; bug hanya muncul di runtime produksi. Perlu staging/deploy parity. |
-| P0-02 Builder crash | **Selesai di kode** | Null guard + error boundary + unit test. |
-| P0-03 SEO truth | **Selesai di kode** | Cell/dashboard menangani skor 0 vs belum diaudit; backfill diperbaiki agar menyimpan metrics. |
-| P0-04 Dark mode | **Selesai sebagian** | Sidebar, heading dashboard, subjudul, panel SEO, link kontras diperbaiki. Komponen kustom lain masih perlu audit visual. |
-| P1-01 Tabel overflow | **Selesai di CSS** | `.table` sekarang `overflow-x: auto`. Perlu verifikasi visual. |
-| P1-02 Dashboard links/status | **Selesai di kode** | Link draf/SEO/halaman diperjelas, link legacy tidak lagi 404, status deploy jujur. |
+| P0-01 Group rendering | **Blocked** | Config sumber terbukti benar; produksi masih menampilkan group kosong. Perlu staging/parity/upgrade Payload. |
+| P0-02 Builder crash | **Selesai & terverifikasi live** | Memilih Hero tanpa gambar tidak crash; panel settings tampil. |
+| P0-03 SEO truth | **Sebagian** | Cell menampilkan `—` (bukan 0 palsu); dashboard tidak menampilkan progress dari metrik kosong. Backfill draft dibatalkan karena mengubah status menjadi draf. |
+| P0-04 Dark mode | **Selesai sebagian & terverifikasi** | Kontras H1/nav/link di mode gelap 15–18:1. Komponen kustom lain perlu audit visual. |
+| P1-01 Tabel overflow | **Selesai & terverifikasi live** | `.table-wrap` scroll; `docW = viewport`, tabel 1.377 px bisa di-scroll. |
+| P1-02 Dashboard links/status | **Selesai & terverifikasi live** | Link draf/SEO/halaman, arsip legacy, status deploy jujur. |
 | P1-03 Empty state | **Sebagian** | Copy i18n diperbaiki; data seed belum dijalankan. |
-| P1-04 Tanggal/angka/boolean | **Selesai sebagian** | Format tanggal admin, boolean, harga, placeholder. |
+| P1-04 Tanggal/angka/boolean | **Selesai sebagian & terverifikasi** | Tanggal live: `24 Oktober 2026, 07.39`. |
 | P1-05 A11y | **Sebagian** | Landmark dashboard, heading, aria-label builder, modal semantik. |
 | P1-10 Media picker | **Selesai di kode** | Alt text wajib saat upload; tidak memakai nama file. |
 | P1-12 IA/nav | **Belum** | Global search, item Dasbor, unified content. |
@@ -114,6 +114,8 @@
 
 ## 3. Verifikasi yang Sudah Dilakukan
 
+### 3.1 Verifikasi lokal
+
 | Pemeriksaan | Hasil |
 |---|---|
 | `npx tsc --noEmit` (`apps/cms`) | **Lulus** |
@@ -132,58 +134,82 @@ Test `test:uiux` mencakup:
 - config Artikel memiliki group `seo` dan field `metaTitle`;
 - config SiteSettings memiliki group `analytics` dengan field anak.
 
+### 3.2 Verifikasi produksi setelah deploy
+
+Deploy production: commit `a7ac72b` → `60020ad` → `42d30b0` → `24dab37` → `e37fe5f` → `79eaac1`; container `kala-cms-app` di-recreate. Backup DB sebelum deploy: `kala_cms_db_20261105_pre_uiux.dump`; backup sebelum pembersihan versi: `kala_cms_db_20261105_pre_version_cleanup.dump`.
+
+| Pemeriksaan live | Hasil |
+|---|---|
+| `https://admin.kalababyspa.com/admin/login` | **200** |
+| `/api/pages` | **200** |
+| Dashboard | Tampil; `main` landmark ada; heading berurutan |
+| P0-02 Builder | **Lulus** — pilih Hero tanpa gambar, panel settings tampil, tidak ada “Application error” |
+| P1-01 Tabel | **Lulus** — `docW = 1296`, `.table-wrap` `overflow-x:auto`, tabel 1.377 px dapat di-scroll |
+| P0-04 Dark mode | **Lulus** — H1 18,42:1; label nav 18,42:1; link nav 15,45:1 |
+| P1-04 Tanggal | **Lulus** — `24 Oktober 2026, 07.39` |
+| P1-02 Status deploy | **Lulus** — “status deploy belum terverifikasi” (tidak lagi klaim palsu) |
+| P0-01 Group SEO | **Masih gagal** — `#field-seo .render-fields` tetap 0 child |
+| Daftar Artikel | Skor draf tanpa audit tampil `—` (bukan `0 · Perlu diperbaiki`) |
+| Lighthouse Dashboard | **100** (sebelumnya 92) — kontras, heading, landmark fixed; sisa `meta-description` |
+| Lighthouse Edit Artikel | **81** (sebelumnya 77) — color-contrast hilang; sisa isu framework (`aria-hidden-focus`, `button-name`, `label`, `list`) |
+
+### 3.3 Catatan backfill
+
+Backfill dijalankan di container sementara `cms-builder-temp` dengan database produksi:
+
+- update **published** untuk artikel 1–3 ditolak oleh validasi publikasi (konten kosong, reviewer medis generik, `reviewedAt` kosong);
+- update **draft** berhasil dan sempat mengubah status artikel menjadi “Draf (memiliki versi yang dipublikasikan)”;
+- untuk menghindari perubahan status yang membingungkan, versi draft yang baru dibuat dibersihkan kembali (4 versi artikel, 6 versi halaman, 12 versi landing page) dan `latest` dipulihkan;
+- skor published artikel 1–3 tetap 80/90/91; skor halaman/landing page yang sempat diperbarui tetap tersimpan;
+- **belum ada** backfill final yang aman sampai konten artikel dan reviewer medis dilengkapi.
+
 ---
 
 ## 4. Blocker & Hal yang Belum Bisa Diselesaikan
 
-### B-01 — P0-01 group rendering tidak dapat direproduksi lokal
+### B-01 — P0-01 group rendering masih terbuka di produksi
 
 - Config sumber **terbukti benar** (test config lulus).
-- Produksi tetap menampilkan group kosong.
-- Dugaan: **deploy parity / versi build / bug renderer Payload 3.91**.
-- Lokal tidak bisa dijadikan bukti karena admin lokal tidak ter-hydrate di lingkungan ini (aset standalone sempat 404; setelah diperbaiki, halaman masih kosong).
-- **Butuh:** staging dengan snapshot produksi + akses deploy untuk membandingkan commit/version dan mereproduksi.
+- Produksi tetap menampilkan group kosong setelah deploy ulang.
+- Dugaan: **bug renderer Payload 3.91 / parity build**.
+- **Butuh:** staging dengan snapshot produksi + uji upgrade/pin Payload, atau patch renderer group.
+- Ini satu-satunya P0 yang belum selesai.
 
-**Tindakan berikutnya:** jalankan Gate 0 (parity deploy) di staging. Jangan mengubah data produksi sebelum ini selesai.
+### B-02 — Backfill final tertahan validasi konten
 
-### B-02 — Backfill produksi belum dijalankan
+- Artikel 1–3 tidak bisa di-update published karena validasi publikasi: konten kosong, reviewer medis generik, `reviewedAt` kosong.
+- Draft backfill berhasil tetapi mengubah status menjadi “Draf (memiliki versi…)”; versi draft sudah dibersihkan.
+- **Butuh:** lengkapi konten + reviewer medis, lalu jalankan backfill final; atau tambahkan opsi backfill `skipValidation` yang aman.
 
-- Script sudah diperbaiki, tetapi tidak dijalankan ke produksi.
-- Database lokal yang tersedia lebih lama dari schema (kolom `deleted_at` tidak ada), sehingga backfill lokal gagal.
-- **Butuh:** backup produksi + dry-run di staging, lalu `npm run audit:backfill --workspace=cms-kala`.
+### B-03 — Lighthouse ulang sudah dilakukan
 
-### B-03 — Verifikasi visual & Lighthouse ulang belum dilakukan
-
-- Perubahan tema/tabel perlu deploy ke staging.
-- Target: Lighthouse accessibility ≥95, tidak ada body horizontal scroll, kontras AA.
-- **Butuh:** deploy staging + audit ulang.
+- Dashboard: **100** (naik dari 92).
+- Edit Artikel: **81** (naik dari 77; color-contrast hilang).
+- Login belum diukur ulang.
+- Sisa isu artikel berasal dari komponen framework Payload (`aria-hidden-focus`, `button-name`, `label`, `list`), bukan komponen kustom utama.
 
 ### B-04 — Role & mobile belum diuji
 
 - Hanya role superadmin yang diuji.
-- Viewport 375/768 belum diuji di lingkungan ini.
+- Viewport 375/768 belum diuji.
 - **Butuh:** matriks role dan UAT mobile.
 
 ---
 
 ## 5. Langkah Berikutnya (Urutan)
 
-1. **Gate 0:** staging + snapshot produksi + parity commit/version.
-2. **P0-01:** bandingkan build produksi vs repo; uji minimal group; upgrade/pin Payload bila perlu.
-3. **Deploy staging** perubahan ini, lalu:
-   - buka Artikel → SEO;
-   - buka Pengaturan Situs;
-   - buka Builder → pilih Hero kosong;
-   - cek mode gelap;
-   - cek tabel Testimoni/Halaman.
-4. **Backfill SEO** di staging, verifikasi metrics terisi.
-5. **Lighthouse ulang** dan UAT 8 skenario.
-6. Jika semua lulus, deploy produksi dengan rollback plan.
+1. **P0-01:** buat staging dari snapshot produksi; uji minimal `group` di Payload 3.91; jika bug library, pin/upgrade. Ini satu-satunya P0 yang tersisa.
+2. **Lengkapi konten artikel** (isi, reviewer medis ber-STR, `reviewedAt`) agar validasi publish tidak memblokir.
+3. **Backfill final** SEO setelah konten valid; target metrics terisi dan status tetap “Diterbitkan”.
+4. **Lighthouse/axe ulang** pada dashboard/artikel/login.
+5. **UAT role & mobile** (superadmin/operator/author; 390/768/1024/1366).
+6. Jika semua lulus, tutup P0/P1 dan lanjut rilis 0.2.
 
 ---
 
 ## 6. Catatan
 
-- Tidak ada data produksi yang diubah.
-- Perubahan database lokal hanya pada `payload_migrations` untuk keperluan menjalankan server lokal; bukan bagian dari commit.
-- Branch belum di-commit; perubahan menunggu review.
+- Deploy produksi dilakukan pada 5 November 2026; backup DB tersedia di `/opt/kalaweb/backups/`.
+- Perubahan data produksi: skor halaman/landing page diperbarui oleh backfill; versi draft yang sempat dibuat sudah dibersihkan.
+- Perubahan database lokal hanya pada `payload_migrations` untuk keperluan uji server lokal; sudah dikembalikan.
+- Commit sudah di-merge ke `main` dan di-push ke GitHub.
