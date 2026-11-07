@@ -67,6 +67,60 @@ ditambahkan dari katalog builder.
   beberapa komponen global (mis. nomor WhatsApp, social proof, jam operasional).
 - Jika ingin kembali ke desain statis, cukup unpublish halaman `home`.
 
+## Deploy & migrasi production
+
+Migration `20261107_002701_add_homepage_blocks` bersifat *additive* (hanya `CREATE` dan
+`ALTER TABLE ... ADD COLUMN`, tanpa `DROP`). Migration dijalankan otomatis oleh Payload saat
+inisialisasi aplikasi (`NODE_ENV=production` + `prodMigrations`), yaitu saat container
+`kala-cms-app` pertama kali melayani request, bukan hanya saat container start.
+
+Jika muncul error:
+
+```
+must be owner of table pages_blocks_solutions_items
+```
+
+artinya role database CMS bukan pemilik tabel lama. Perbaiki sebagai superuser Postgres
+(contoh untuk seluruh objek di schema `public`):
+
+```sql
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN SELECT c.relname FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    JOIN pg_roles ro ON ro.oid = c.relowner
+    WHERE n.nspname = 'public' AND c.relkind IN ('r','p') AND ro.rolname = 'postgres'
+  LOOP
+    EXECUTE format('ALTER TABLE public.%I OWNER TO kala_cms_user', r.relname);
+  END LOOP;
+
+  FOR r IN SELECT c.relname FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    JOIN pg_roles ro ON ro.oid = c.relowner
+    WHERE n.nspname = 'public' AND c.relkind = 'S' AND ro.rolname = 'postgres'
+  LOOP
+    EXECUTE format('ALTER SEQUENCE public.%I OWNER TO kala_cms_user', r.relname);
+  END LOOP;
+
+  FOR r IN SELECT t.typname FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    JOIN pg_roles ro ON ro.oid = t.typowner
+    WHERE n.nspname = 'public' AND t.typtype = 'e' AND ro.rolname = 'postgres'
+  LOOP
+    EXECUTE format('ALTER TYPE public.%I OWNER TO kala_cms_user', r.typname);
+  END LOOP;
+END $$;
+```
+
+Setelah itu restart `kala-cms-app` dan buka satu request ke API (`/api/pages`) agar migrasi
+dijalankan ulang. Verifikasi dengan:
+
+```sql
+select name from payload_migrations order by created_at desc limit 3;
+select count(*) from pg_tables where schemaname='public' and tablename like '%promo_banner%';
+```
+
 ## File terkait
 
 - `apps/web-kala/src/pages/index.astro` — renderer beranda + fallback
