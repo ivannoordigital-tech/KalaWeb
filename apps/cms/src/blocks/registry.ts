@@ -335,8 +335,20 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       disabled: false,
     },
     fields: [
+      {
+        name: 'variant',
+        label: 'Gaya Tampilan Blok',
+        type: 'select',
+        options: [
+          { label: 'Standar — Solusi & Manfaat', value: 'default' },
+          { label: 'Manfaat Bernomor — Khusus Beranda', value: 'benefits' },
+          { label: 'Nilai Pembeda — Khusus Beranda', value: 'differentiators' },
+        ],
+      },
+      { name: 'badge', label: 'Badge Atas', type: 'text', placeholder: 'Solusi untuk Bunda dan Si Kecil' },
       { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
       { name: 'subtitle', label: 'Subjudul Seksi', type: 'text' },
+      { name: 'note', label: 'Catatan Kaki', type: 'textarea' },
     ],
     innerBlocks: {
       path: 'items',
@@ -344,7 +356,9 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       itemTitleField: 'title',
       fields: [
         { name: 'icon', label: 'Ikon Emoji', type: 'text', placeholder: '🌿' },
+        { name: 'number', label: 'Nomor Urut', type: 'text', placeholder: '01' },
         { name: 'title', label: 'Judul Manfaat', type: 'text', required: true },
+        { name: 'subtitle', label: 'Subjudul / Kategori', type: 'text', placeholder: 'Tenaga Kesehatan Berpendidikan Resmi' },
         { name: 'description', label: 'Uraian Manfaat', type: 'textarea', required: true },
       ],
     },
@@ -675,6 +689,147 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       { name: 'background', label: 'Warna Latar Belakang', type: 'select', options: bgWhiteCreamPeach },
       { name: 'spacing', label: 'Jarak Seksi', type: 'select', options: spacingOptions },
     ],
+  },
+
+  promoBanner: {
+    slug: 'promoBanner',
+    label: 'Banner Promo Reservasi (Beranda)',
+    icon: 'Tag',
+    category: 'offer',
+    description: 'Banner promo reservasi pertama dengan harga coret, badge diskon, dan tombol WhatsApp.',
+    defaults: {
+      blockType: 'promoBanner',
+      badge: 'Penawaran Reservasi Pertama',
+      title: 'Promo treatment Kala',
+      description: 'Khusus Bunda di Surabaya & Sidoarjo.',
+      price: 'Rp60.000',
+      originalPrice: 'Rp80.000',
+      discountBadge: 'Hemat 25%',
+      note: 'Konfirmasi jadwal dan area via WhatsApp.',
+      capacityNote: 'Kuota harian maksimal 5 sesi agar setiap kunjungan tetap fokus dan higienis.',
+      serviceName: 'Kala Baby: Pijat Ceria Newborn',
+      buttonText: 'Ambil Promo via WhatsApp',
+      refCode: 'KALA-PROMO-INTRO',
+      message: 'Halo Bu Bidan, saya mau ambil promo treatment Kala',
+      disabled: false,
+    },
+    fields: [
+      { name: 'badge', label: 'Badge Atas Banner', type: 'text' },
+      { name: 'title', label: 'Judul Promo', type: 'text', required: true },
+      { name: 'description', label: 'Deskripsi Promo', type: 'textarea' },
+      { name: 'price', label: 'Harga Promo', type: 'text', placeholder: 'Rp60.000' },
+      { name: 'originalPrice', label: 'Harga Coret Asli', type: 'text', placeholder: 'Rp80.000' },
+      { name: 'discountBadge', label: 'Badge Diskon', type: 'text', placeholder: 'Hemat 25%' },
+      { name: 'note', label: 'Catatan Jadwal', type: 'text' },
+      { name: 'capacityNote', label: 'Catatan Kuota', type: 'text' },
+      { name: 'serviceName', label: 'Nama Layanan Promo', type: 'text' },
+      { name: 'buttonText', label: 'Teks Tombol WhatsApp', type: 'text' },
+      { name: 'refCode', label: 'Ref Code WhatsApp', type: 'text', placeholder: 'KALA-PROMO-INTRO' },
+      { name: 'message', label: 'Template Pesan WhatsApp', type: 'textarea' },
+    ],
+  },
+
+  featuredServices: {
+    slug: 'featuredServices',
+    label: 'Layanan Unggulan (Beranda)',
+    icon: 'CheckCircle2',
+    category: 'offer',
+    description: 'Tiga layanan unggulan yang datanya diambil otomatis dari koleksi Services.',
+    defaults: {
+      blockType: 'featuredServices',
+      badge: 'Menu Layanan Terfavorit',
+      title: '3 Layanan Unggulan Homecare Kala',
+      subtitle:
+        'Pilihan paling banyak dipesan oleh Bunda di Surabaya & Sidoarjo untuk memulihkan kebugaran ibu dan menstimulasi keceriaan si kecil.',
+      catalogTitle: 'Mencari Layanan Lain? Tersedia 39 Menu Lengkap',
+      catalogDescription:
+        'Mulai dari tindik telinga bayi steril, terapi uap (nebulizer saline), infrared moksa, pijat lahap makan anak, prenatal yoga hamil, hingga breast care laktasi.',
+      catalogCtaText: 'Minta Katalog Lengkap 39 Menu via WhatsApp',
+      catalogCtaMessage: 'Halo Bu Bidan, boleh minta pricelist dan katalog lengkap 39 layanan Kala?',
+      catalogRefCode: 'KALA-KATALOG',
+      disabled: false,
+    },
+    fields: [
+      { name: 'badge', label: 'Badge Atas Seksi', type: 'text' },
+      { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
+      { name: 'subtitle', label: 'Subjudul Seksi', type: 'textarea' },
+      { name: 'catalogTitle', label: 'Judul Kotak Katalog', type: 'text' },
+      { name: 'catalogDescription', label: 'Deskripsi Kotak Katalog', type: 'textarea' },
+      { name: 'catalogCtaText', label: 'Teks Tombol Katalog', type: 'text' },
+      { name: 'catalogCtaMessage', label: 'Pesan WhatsApp Katalog', type: 'text' },
+      { name: 'catalogRefCode', label: 'Ref Code Katalog', type: 'text' },
+    ],
+  },
+
+  coverageArea: {
+    slug: 'coverageArea',
+    label: 'Area Layanan (Beranda)',
+    icon: 'Building2',
+    category: 'content',
+    description: 'Daftar wilayah layanan homecare beserta kecamatan dan tombol cek ketersediaan.',
+    defaults: {
+      blockType: 'coverageArea',
+      badge: 'Jangkauan Homecare Langsung ke Rumah',
+      title: 'Area Layanan Surabaya & Sidoarjo',
+      subtitle:
+        'Kala beroperasi murni sebagai layanan homecare tanpa antrean outlet fisik. Bidan profesional kami siap berkunjung langsung ke kediaman Anda di seluruh wilayah berikut:',
+      note: 'Lokasi rumah Anda belum tercantum di atas? Hubungi admin untuk konfirmasi jangkauan dan ketersediaan terapis bidan.',
+      ctaText: 'Cek Ketersediaan Bidan ke Rumah Saya',
+      ctaMessage: 'Halo Bu Bidan, saya mau tanya apakah lokasi saya dijangkau homecare Kala?',
+      refCode: 'KALA-AREA-CHECK',
+      areas: [
+        {
+          region: 'Surabaya Barat',
+          slug: 'surabaya-barat',
+          areas: 'Wiyung, Sambikerep, Lakarsantri, Tandes, Sukomanunggal, Benowo, Pakal',
+        },
+        {
+          region: 'Surabaya Timur',
+          slug: 'surabaya-timur',
+          areas: 'Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, Gubeng, Tenggilis Mejoyo',
+        },
+        {
+          region: 'Surabaya Selatan',
+          slug: 'surabaya-selatan',
+          areas: 'Wonokromo, Wonocolo, Jambangan, Gayungan, Karang Pilang, Sawahan',
+        },
+        {
+          region: 'Surabaya Pusat',
+          slug: 'surabaya-pusat',
+          areas: 'Tegalsari, Genteng, Bubutan, Simokerto',
+        },
+        {
+          region: 'Surabaya Utara',
+          slug: 'surabaya-utara',
+          areas: 'Kenjeran, Bulak, Pabean Cantian, Semampir, Krembangan',
+        },
+        {
+          region: 'Kabupaten Sidoarjo',
+          slug: 'sidoarjo',
+          areas: 'Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian',
+        },
+      ],
+      disabled: false,
+    },
+    fields: [
+      { name: 'badge', label: 'Badge Atas Seksi', type: 'text' },
+      { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
+      { name: 'subtitle', label: 'Subjudul Seksi', type: 'textarea' },
+      { name: 'note', label: 'Catatan Bawah Daftar Area', type: 'textarea' },
+      { name: 'ctaText', label: 'Teks Tombol WhatsApp', type: 'text' },
+      { name: 'ctaMessage', label: 'Pesan WhatsApp', type: 'text' },
+      { name: 'refCode', label: 'Ref Code', type: 'text' },
+    ],
+    innerBlocks: {
+      path: 'areas',
+      label: 'Daftar Wilayah',
+      itemTitleField: 'region',
+      fields: [
+        { name: 'region', label: 'Nama Wilayah', type: 'text', required: true },
+        { name: 'slug', label: 'Slug Halaman Area', type: 'text', required: true },
+        { name: 'areas', label: 'Daftar Kecamatan', type: 'textarea', required: true },
+      ],
+    },
   },
 
   richText: {
@@ -1556,6 +1711,352 @@ export const builderTemplates: BuilderPageTemplate[] = [
         description: 'Slot kunjungan harian terbatas untuk menjaga kualitas pelayanan terbaik.',
         buttonText: 'Konsultasi Gratis via WhatsApp',
         footnote: 'Respon cepat dalam 5-10 menit di jam operasional klinik.',
+      },
+    ],
+  },
+  {
+    id: 'homepage-kala',
+    title: 'Homepage Kala Moms & Baby Spa',
+    badge: 'Beranda Utama',
+    description:
+      'Struktur beranda lengkap: Hero, keluhan Bunda, manfaat, testimoni, promo, layanan unggulan, nilai pembeda, alur reservasi, area layanan, FAQ, dan CTA.',
+    blocks: [
+      {
+        blockType: 'hero',
+        badge: 'HOMECARE IBU & BAYI • SURABAYA & SIDOARJO',
+        headline: 'Perawatan Ibu & Bayi di Rumah oleh Bidan Profesional',
+        subheadline:
+          'Bunda Juga Berhak Dirawat dan Ditemani 🤍 — Menjadi ibu penuh kebahagiaan, tetapi terkadang juga melelahkan. Kala hadir langsung ke rumah untuk membantu Bunda merawat diri dan si kecil, dengan sentuhan lembut serta pendampingan yang hangat.',
+        ctaText: 'Konsultasi via WhatsApp',
+        ctaMessage: 'Halo Bu Bidan, saya mau konsultasi homecare untuk ibu dan bayi',
+        align: 'left',
+        btnColor: 'terracotta',
+        bgStyle: 'gradient',
+      },
+      {
+        blockType: 'painPoints',
+        anchorId: 'keluhan',
+        title: 'Apakah ini yang Sedang Bunda Rasakan?',
+        columns: '3',
+        background: 'cream',
+        spacing: 'normal',
+        points: [
+          {
+            icon: '😴',
+            title: 'Si Kecil Rewel & Sulit Tidur',
+            description:
+              'Sudah digendong dan ditenangkan, tapi si kecil masih gelisah? Bunda ingin membantunya merasa lebih nyaman.',
+          },
+          {
+            icon: '🤧',
+            title: 'Batuk Pilek Bikin Tidur Tak Nyenyak',
+            description:
+              'Hidung tersumbat, napas berbunyi, dan batuk pilek yang datang-pergi membuat si kecil tidak nyaman. Bunda khawatir, tapi tidak mau sembarangan menangani.',
+          },
+          {
+            icon: '🍽️',
+            title: 'GTM, Makan Jadi Drama',
+            description:
+              'Mulut tertutup, kepala menoleh, makanan ditolak. Bunda cemas apakah asupannya cukup.',
+          },
+          {
+            icon: '🤱',
+            title: 'ASI Terasa Kurang Lancar',
+            description:
+              'Bunda merasa ASI sulit keluar atau payudara terasa penuh dan tidak nyaman? Rasanya ingin menyusui lebih tenang, tanpa terus dibayangi rasa khawatir.',
+          },
+          {
+            icon: '😟',
+            title: 'Cemas, Takut Salah Merawat',
+            description:
+              'Setiap tangisan dan gerak si kecil bikin bertanya-tanya, “Ini normal atau tidak?” Bunda ingin yakin, tapi bingung harus tanya siapa.',
+          },
+          {
+            icon: '🌱',
+            title: 'Ingin Mendukung Tumbuh Kembang',
+            description:
+              'Bunda ingin memberikan stimulasi sesuai usia si kecil, sekaligus memahami cara perawatan sederhana di rumah.',
+          },
+        ],
+      },
+      {
+        blockType: 'solutions',
+        anchorId: 'manfaat',
+        variant: 'benefits',
+        badge: 'Solusi untuk Bunda dan Si Kecil',
+        title: 'Yang biasa Bunda rasakan setelah sesi',
+        subtitle:
+          'Setiap sesi dirancang untuk menghadirkan pengalaman yang nyaman bagi si kecil dan ketenangan bagi Bunda.',
+        items: [
+          {
+            icon: '✓',
+            title: 'Si Kecil Lebih Rileks',
+            description:
+              'Sentuhan lembut membantu si kecil lebih rileks menjelang waktu tidur. Saat si kecil nyaman, malam Bunda pun bisa terasa lebih tenang.',
+          },
+          {
+            icon: '✓',
+            title: 'Lebih Nyaman Saat Batuk Pilek',
+            description:
+              'Saat hidung tersumbat membuat si kecil rewel, kami membantu memberikan kenyamanan melalui sentuhan lembut dan stimulasi aroma terapi serta panduan perawatan sederhana yang aman dilakukan di rumah.',
+          },
+          {
+            icon: '✓',
+            title: 'Stimulasi Tumbuh Kembang',
+            description:
+              'Pijatan lembut yang disesuaikan dengan usia si kecil untuk mendukung gerak motorik dan tumbuh kembangnya secara alami.',
+          },
+          {
+            icon: '✓',
+            title: 'Perawatan yang Lebih Personal 🧸',
+            description:
+              'Setiap Bunda dan si kecil memiliki kebutuhan berbeda. Kami menyesuaikan treatment dengan kondisi, usia, dan respons masing-masing agar perawatan terasa lebih nyaman.',
+          },
+          {
+            icon: '✓',
+            title: 'Bunda Lebih Tenang dan Percaya Diri ✨',
+            description:
+              'Selain memberikan treatment, kami juga siap berbagi edukasi dan tips perawatan sederhana agar Bunda semakin percaya diri merawat si kecil di rumah.',
+          },
+        ],
+        note:
+          'Setiap bayi memiliki respons yang berbeda terhadap pijat. Treatment Kala bertujuan mendukung relaksasi, stimulasi, dan kenyamanan si kecil, bukan menggantikan pemeriksaan atau penanganan medis.',
+      },
+      {
+        blockType: 'testimonials',
+        anchorId: 'testimoni',
+        title: 'Kata Bunda yang Sudah Merasakan Sentuhan Kala',
+        subtitle:
+          'Cerita dari Bunda di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.',
+        items: [
+          {
+            quote:
+              'Syukurlah kemarin habis massage tidurnya nyenyak, gak rewel lagi, bangun ngajak ngobrol trs tidur lagi gak pakai drama rewel lagi.',
+            author: 'Bunda Vita (Adek El & Kakak Al)',
+            role: 'Ibu dari Adek El & Kakak Al',
+            area: 'Surabaya',
+          },
+          {
+            quote:
+              'Biasanya kalo mau tidur harus dbf, kemarin setelah pijat alhamdulillah mau di nen tapi tiba2 tidur sendiri pules tanpa nen... Waktu malem juga mulai bisa tidur gak ngajak begadang lagi. Bakal langganan soalnya adek suka!',
+            author: 'Bunda Viska & Adek Azel',
+            role: 'Ibu dari Adek Azel',
+            area: 'Rungkut, Surabaya',
+          },
+          {
+            quote:
+              'Alhamdulillah setelah dipijat Arsya dan Aira nyenyak sekali tidurnya. Malamnya juga berkurang grok grok nya. Frekuensi melernya juga berkurang. Terima kasih treatmentnya Bubid.',
+            author: 'Bunda Irlandia (Arsya & Aira)',
+            role: 'Ibu dari Arsya & Aira',
+            area: 'Wonokromo, Surabaya',
+          },
+        ],
+      },
+      {
+        blockType: 'promoBanner',
+        badge: 'Penawaran Reservasi Pertama',
+        title: 'Promo treatment Kala',
+        description: 'Khusus Bunda di Surabaya & Sidoarjo.',
+        price: 'Rp60.000',
+        originalPrice: 'Rp80.000',
+        discountBadge: 'Hemat 25%',
+        note: 'Konfirmasi jadwal dan area via WhatsApp.',
+        capacityNote: 'Kuota harian maksimal 5 sesi agar setiap kunjungan tetap fokus dan higienis.',
+        serviceName: 'Kala Baby: Pijat Ceria Newborn',
+        buttonText: 'Ambil Promo via WhatsApp',
+        refCode: 'KALA-PROMO-INTRO',
+        message:
+          'Halo Bu Bidan, saya mau konsultasi homecare dan ambil promo Kala Baby: Pijat Ceria Newborn Rp60.000',
+      },
+      {
+        blockType: 'featuredServices',
+        badge: 'Menu Layanan Terfavorit',
+        title: '3 Layanan Unggulan Homecare Kala',
+        subtitle:
+          'Pilihan paling banyak dipesan oleh Bunda di Surabaya & Sidoarjo untuk memulihkan kebugaran ibu dan menstimulasi keceriaan si kecil.',
+        catalogTitle: 'Mencari Layanan Lain? Tersedia 39 Menu Lengkap',
+        catalogDescription:
+          'Mulai dari tindik telinga bayi steril, terapi uap (nebulizer saline), infrared moksa, pijat lahap makan anak, prenatal yoga hamil, hingga breast care laktasi.',
+        catalogCtaText: 'Minta Katalog Lengkap 39 Menu via WhatsApp',
+        catalogCtaMessage: 'Halo Bu Bidan, boleh minta pricelist dan katalog lengkap 39 layanan Kala?',
+        catalogRefCode: 'KALA-KATALOG',
+      },
+      {
+        blockType: 'solutions',
+        anchorId: 'pembeda',
+        variant: 'differentiators',
+        badge: 'Kenapa Memilih Kala?',
+        title: '5 Hal yang Membuat Kala Berbeda',
+        subtitle:
+          'Setiap kunjungan Kala menghadirkan perawatan profesional, perhatian yang tulus, dan kenyamanan untuk Bunda serta si kecil.',
+        items: [
+          {
+            number: '01',
+            title: 'Ditangani Langsung oleh Bidan Profesional',
+            subtitle: 'Tenaga Kesehatan Berlatar Pendidikan Resmi',
+            description:
+              'Setiap treatment ditangani oleh bidan dengan latar belakang pendidikan kebidanan dan kompetensi sesuai layanan, sehingga Bunda bisa merasa lebih tenang mempercayakan perawatan diri maupun si kecil.',
+          },
+          {
+            number: '02',
+            title: 'Kami Mendengarkan',
+            subtitle: 'Cerita Bunda Selalu Punya Tempat',
+            description:
+              'Kami percaya setiap perjalanan menjadi ibu itu berbeda. Karena itu, kami selalu berusaha mendengarkan cerita, memahami kekhawatiran, dan selalu memberikan dukungan.',
+          },
+          {
+            number: '03',
+            title: 'Kebersihan dan Kenyamanan Diutamakan',
+            subtitle: 'Perawatan Lembut di Setiap Detail',
+            description:
+              'Mulai dari kebersihan tangan, perlengkapan treatment, hingga pemilihan minyak pijat, kami memperhatikan setiap detail agar perawatan berlangsung higienis dan sesuai kebutuhan Bunda maupun si kecil.',
+          },
+          {
+            number: '04',
+            title: 'Ada Edukasi yang Bisa Bunda Bawa Pulang',
+            subtitle: 'Bekal Perawatan Mandiri untuk di Rumah',
+            description:
+              'Kami senang berbagi tips perawatan, stimulasi sesuai usia, dan sentuhan sederhana yang bisa Bunda serta Ayah praktikkan di rumah. Karena perhatian untuk si kecil tidak berhenti setelah sesi selesai.',
+          },
+          {
+            number: '05',
+            title: 'Kami yang Datang, Bunda Tinggal Nyaman',
+            subtitle: 'Homecare Praktis Tanpa Perlu Keluar Rumah',
+            description:
+              'Tak perlu repot menyiapkan perjalanan atau menghadapi kemacetan. Tim Kala datang langsung ke rumah Bunda di area jangkauan Surabaya dan Sidoarjo, sesuai jadwal yang disepakati.',
+          },
+        ],
+      },
+      {
+        blockType: 'steps',
+        anchorId: 'cara-reservasi',
+        title: 'Cara reservasi homecare',
+        subtitle: 'Selesai dalam beberapa menit lewat WhatsApp, tanpa perlu keluar rumah.',
+        steps: [
+          {
+            num: '1',
+            title: 'Konsultasi gratis',
+            description:
+              'Ceritakan usia dan kondisi si kecil. Bidan kami sarankan layanan yang paling sesuai.',
+          },
+          {
+            num: '2',
+            title: 'Pilih hari dan jam',
+            description:
+              'Kuota maksimal 5 sesi per hari. Jadwal dan area dikonfirmasi lewat WhatsApp.',
+          },
+          {
+            num: '3',
+            title: 'Bidan datang ke rumah',
+            description:
+              'Kami membawa semua perlengkapan. Bunda cukup menyiapkan ruang yang nyaman.',
+          },
+          {
+            num: '4',
+            title: 'Lanjutkan di rumah',
+            description: 'Bunda mendapat panduan sederhana untuk stimulasi harian.',
+          },
+        ],
+      },
+      {
+        blockType: 'button',
+        text: 'Mulai Konsultasi Gratis',
+        action: 'whatsapp',
+        whatsappMessage:
+          'Halo Bu Bidan, saya mau reservasi homecare. Usia bayi: ______, area/kecamatan: ______',
+        style: 'primary',
+        size: 'lg',
+        align: 'center',
+      },
+      {
+        blockType: 'coverageArea',
+        badge: 'Jangkauan Homecare Langsung ke Rumah',
+        title: 'Area Layanan Surabaya & Sidoarjo',
+        subtitle:
+          'Kala beroperasi murni sebagai layanan homecare tanpa antrean outlet fisik. Bidan profesional kami siap berkunjung langsung ke kediaman Anda di seluruh wilayah berikut:',
+        note: 'Lokasi rumah Anda belum tercantum di atas? Hubungi admin untuk konfirmasi jangkauan dan ketersediaan terapis bidan.',
+        ctaText: 'Cek Ketersediaan Bidan ke Rumah Saya',
+        ctaMessage: 'Halo Bu Bidan, saya mau tanya apakah lokasi saya dijangkau homecare Kala?',
+        refCode: 'KALA-AREA-CHECK',
+        areas: [
+          {
+            region: 'Surabaya Barat',
+            slug: 'surabaya-barat',
+            areas: 'Wiyung, Sambikerep, Lakarsantri, Tandes, Sukomanunggal, Benowo, Pakal',
+          },
+          {
+            region: 'Surabaya Timur',
+            slug: 'surabaya-timur',
+            areas: 'Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, Gubeng, Tenggilis Mejoyo',
+          },
+          {
+            region: 'Surabaya Selatan',
+            slug: 'surabaya-selatan',
+            areas: 'Wonokromo, Wonocolo, Jambangan, Gayungan, Karang Pilang, Sawahan',
+          },
+          {
+            region: 'Surabaya Pusat',
+            slug: 'surabaya-pusat',
+            areas: 'Tegalsari, Genteng, Bubutan, Simokerto',
+          },
+          {
+            region: 'Surabaya Utara',
+            slug: 'surabaya-utara',
+            areas: 'Kenjeran, Bulak, Pabean Cantian, Semampir, Krembangan',
+          },
+          {
+            region: 'Kabupaten Sidoarjo',
+            slug: 'sidoarjo',
+            areas: 'Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian',
+          },
+        ],
+      },
+      {
+        blockType: 'faq',
+        anchorId: 'faq',
+        title: 'Pertanyaan yang sering muncul',
+        subtitle:
+          'Belum menemukan jawabannya? Bidan Kala siap membantu lewat WhatsApp pada jam operasional.',
+        faqs: [
+          {
+            q: 'Mulai usia berapa bayi boleh dipijat?',
+            a: 'Kami melayani bayi baru lahir hingga anak 7 tahun. Teknik dan tekanan disesuaikan usia. Ceritakan kondisi si kecil saat konsultasi.',
+          },
+          {
+            q: 'Apakah aman untuk bayi dengan kulit sensitif?',
+            a: 'Kami memakai minyak dan sabun food-grade yang aman untuk kulit sensitif. Jika bayi punya riwayat alergi, sampaikan sebelum sesi agar produk disesuaikan.',
+          },
+          {
+            q: 'Bagaimana jika bayi sedang demam atau sakit?',
+            a: 'Sesi sebaiknya ditunda. Bayi yang demam atau tampak tidak sehat perlu diperiksa dokter terlebih dahulu.',
+          },
+          {
+            q: 'Area mana saja yang dijangkau?',
+            a: 'Surabaya Barat, Timur, Selatan, Pusat, Utara, dan Sidoarjo. Kirim lokasi Bunda lewat WhatsApp untuk memastikan jangkauan dan estimasi waktu kedatangan.',
+          },
+          {
+            q: 'Apa yang perlu disiapkan di rumah?',
+            a: 'Cukup ruang yang hangat dan tenang, serta alas yang nyaman. Perlengkapan lain dibawa oleh bidan.',
+          },
+          {
+            q: 'Berapa sesi yang bisa dijadwalkan setiap hari?',
+            a: 'Maksimal 5 sesi per hari agar setiap kunjungan tetap fokus dan higienis. Jadwal yang tersedia dikonfirmasi lewat WhatsApp.',
+          },
+          {
+            q: 'Bagaimana cara pembayaran?',
+            a: 'Pembayaran dapat dilakukan tunai, transfer bank, atau QRIS. Metode pembayaran dikonfirmasi saat booking lewat WhatsApp.',
+          },
+        ],
+      },
+      {
+        blockType: 'cta',
+        badge: 'Langkah Pertama untuk Si Kecil',
+        headline: 'Perawatan Nyaman untuk Bunda & Si Kecil 🤍',
+        description:
+          'Tak perlu keluar rumah untuk mendapatkan perawatan penuh perhatian. Ceritakan kebutuhan Bunda, kami bantu pilihkan treatment yang sesuai.',
+        buttonText: 'Konsultasi via WhatsApp',
+        buttonMessage: 'Halo Bu Bidan, saya mau konsultasi perawatan untuk Bunda dan si kecil',
+        footnote: '',
       },
     ],
   },

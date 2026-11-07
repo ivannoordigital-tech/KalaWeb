@@ -54,7 +54,19 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     sitemap({
-      filter: (page) => !page.includes('/segera-hadir') && !page.includes('/404') && !page.includes('/sales/') && !page.includes('/lp/') && !page.includes('/preview/') && !page.includes('/_blocks'),
+      filter: (page) => {
+        const pathname = new URL(page).pathname.replace(/\/$/, '');
+        return (
+          !page.includes('/segera-hadir') &&
+          !page.includes('/404') &&
+          !page.includes('/sales/') &&
+          !page.includes('/lp/') &&
+          !page.includes('/preview/') &&
+          !page.includes('/_blocks') &&
+          // Halaman builder dengan slug "home" tampil di "/", bukan "/home".
+          pathname !== '/home'
+        );
+      },
       changefreq: 'weekly',
       priority: 0.8,
       async serialize(item) {

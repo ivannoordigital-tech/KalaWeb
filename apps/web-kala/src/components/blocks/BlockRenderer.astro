@@ -26,6 +26,9 @@ import BlogFeedBlock from './BlogFeedBlock.astro';
 import CountdownBlock from './CountdownBlock.astro';
 import SocialBlock from './SocialBlock.astro';
 import HtmlBlock from './HtmlBlock.astro';
+import PromoBannerBlock from './PromoBannerBlock.astro';
+import FeaturedServicesBlock from './FeaturedServicesBlock.astro';
+import CoverageAreaBlock from './CoverageAreaBlock.astro';
 
 interface Props {
   block: {
@@ -80,6 +83,9 @@ const KNOWN_BLOCK_TYPES = [
   'countdown',
   'social',
   'html',
+  'promoBanner',
+  'featuredServices',
+  'coverageArea',
 ];
 
 if (!block || !block.blockType) {
@@ -195,6 +201,9 @@ const sectionColumns = Array.isArray(block.columns) ? block.columns : [];
   {block.blockType === 'countdown' && <CountdownBlock block={block as any} />}
   {block.blockType === 'social' && <SocialBlock block={block as any} />}
   {block.blockType === 'html' && <HtmlBlock block={block as any} />}
+  {block.blockType === 'promoBanner' && <PromoBannerBlock block={block as any} />}
+  {block.blockType === 'featuredServices' && <FeaturedServicesBlock block={block as any} />}
+  {block.blockType === 'coverageArea' && <CoverageAreaBlock block={block as any} />}
 
   <!-- Container dengan kolom. Kedalaman nesting maksimal 1 (section tidak bisa di dalam section). -->
   {block.blockType === 'section' && (

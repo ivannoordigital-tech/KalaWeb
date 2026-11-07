@@ -935,3 +935,19 @@ Untuk animasi section secara umum, pendekatan yang lebih aman adalah menambahkan
 
 
 
+
+---
+
+## E. Beranda via Page Builder (2026-11-07)
+
+Beranda kini bisa disusun lewat Page Builder CMS, bukan hanya lewat field teks di Site Settings.
+
+- Halaman builder disimpan di koleksi `pages` dengan slug `home`, tetapi tampil di `/` (bukan `/home`).
+- `index.astro` merender `layout` CMS jika ada; jika halaman `home` belum ada / layout kosong, desain statis lama tetap dipakai sebagai fallback.
+- Slug `home` dikecualikan dari route `/[slug]`, sitemap, dan `sitemap-0.xml`.
+- Blok khusus beranda baru: `promoBanner`, `featuredServices`, `coverageArea`; blok `solutions` mendapat varian `benefits` dan `differentiators`.
+- Template siap pakai: **Homepage Kala Moms & Baby Spa** (12 blok) di katalog builder.
+- Seed aman dijalankan ulang: `npm run seed:homepage` melewati halaman yang sudah punya layout; `npm run seed:homepage:force` untuk menimpa.
+- Dokumen panduan: `docs/homepage-page-builder.md`.
+
+Verifikasi: `check:parity` 32/32 blok, validator homepage lolos, `tsc --noEmit` CMS 0 error, build web sukses, dan `/home` tidak dihasilkan di `dist`.

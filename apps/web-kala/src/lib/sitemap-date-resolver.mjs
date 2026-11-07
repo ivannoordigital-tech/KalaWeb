@@ -126,9 +126,15 @@ export async function getDynamicDateMap() {
           if (rawDate) {
             const d = new Date(rawDate);
             if (!isNaN(d.getTime())) {
-              const pathUrl = col.prefix ? `${col.prefix}/${doc.slug}` : `/${doc.slug}`;
-              dateMap.set(pathUrl, d);
-              dateMap.set(`${pathUrl}/`, d);
+              if (col.name === 'pages' && doc.slug === 'home') {
+                // Halaman builder "home" adalah beranda yang tampil di "/".
+                dateMap.set('/', d);
+                dateMap.set('', d);
+              } else {
+                const pathUrl = col.prefix ? `${col.prefix}/${doc.slug}` : `/${doc.slug}`;
+                dateMap.set(pathUrl, d);
+                dateMap.set(`${pathUrl}/`, d);
+              }
             }
           }
         }

@@ -358,7 +358,8 @@ export const Pages: CollectionConfig = {
       label: 'Slug URL (kalababyspa.com/[slug])',
       admin: {
         position: 'sidebar',
-        description: 'Alamat URL halaman (huruf kecil dan tanda hubung). Otomatis dibuat dari judul jika kosong.',
+        description:
+          'Alamat URL halaman (huruf kecil dan tanda hubung). Otomatis dibuat dari judul jika kosong. Gunakan slug "home" untuk menjadikan halaman ini sebagai BERANDA UTAMA (tampil di kalababyspa.com/).',
         placeholder: 'promo-newborn',
       },
       validate: (val: any) => {

@@ -9,6 +9,27 @@ export const SolutionsBlock: Block = {
   },
   fields: [
     {
+      name: 'variant',
+      type: 'select',
+      defaultValue: 'default',
+      label: 'Gaya Tampilan Blok',
+      options: [
+        { label: 'Standar — Solusi & Manfaat', value: 'default' },
+        { label: 'Manfaat Bernomor — Khusus Beranda', value: 'benefits' },
+        { label: 'Nilai Pembeda — Khusus Beranda', value: 'differentiators' },
+      ],
+      admin: {
+        description:
+          'Pilih gaya khusus beranda agar tampilan section manfaat / keunggulan tetap sama seperti desain lama.',
+      },
+    },
+    {
+      name: 'badge',
+      type: 'text',
+      label: 'Badge Atas (Opsional)',
+      admin: { placeholder: 'Solusi untuk Bunda dan Si Kecil' },
+    },
+    {
       name: 'title',
       type: 'text',
       required: true,
@@ -35,11 +56,23 @@ export const SolutionsBlock: Block = {
           admin: { width: '20%' },
         },
         {
+          name: 'number',
+          type: 'text',
+          label: 'Nomor Urut (Opsional)',
+          admin: { width: '20%', placeholder: '01' },
+        },
+        {
           name: 'title',
           type: 'text',
           required: true,
           label: 'Nama Manfaat / Solusi',
-          admin: { width: '80%', placeholder: 'Tidur Lebih Nyenyak & Teratur' },
+          admin: { width: '60%', placeholder: 'Tidur Lebih Nyenyak & Teratur' },
+        },
+        {
+          name: 'subtitle',
+          type: 'text',
+          label: 'Subjudul / Kategori (Opsional)',
+          admin: { placeholder: 'Tenaga Kesehatan Berlatar Pendidikan Resmi' },
         },
         {
           name: 'description',
@@ -49,6 +82,15 @@ export const SolutionsBlock: Block = {
           admin: { placeholder: 'Pijat bayi merangsang produksi melatonin alami — 87% bayi tidur lebih lama.' },
         },
       ],
+    },
+    {
+      name: 'note',
+      type: 'textarea',
+      label: 'Catatan Kaki (Opsional)',
+      admin: {
+        placeholder:
+          'Setiap bayi memiliki respons yang berbeda terhadap pijat. Treatment Kala bertujuan mendukung relaksasi, stimulasi, dan kenyamanan si kecil, bukan menggantikan pemeriksaan atau penanganan medis.',
+      },
     },
     {
       name: 'highlightQuote',

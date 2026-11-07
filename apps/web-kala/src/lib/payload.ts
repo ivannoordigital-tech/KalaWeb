@@ -486,6 +486,34 @@ export async function fetchPayloadPages(): Promise<PayloadPage[]> {
 }
 
 /**
+ * Slug khusus untuk halaman beranda yang disusun lewat Page Builder.
+ * Halaman ini tetap tampil di `/`, bukan di `/home`.
+ */
+export const HOMEPAGE_SLUG = 'home';
+
+/**
+ * Fetch halaman beranda yang disusun lewat Page Builder.
+ * Mengembalikan null jika belum ada, sehingga frontend memakai desain statis lama.
+ */
+export async function fetchHomepagePage(): Promise<PayloadPage | null> {
+  try {
+    const res = await fetch(
+      `${PAYLOAD_URL}/api/pages?where[slug][equals]=${HOMEPAGE_SLUG}&where[_status][equals]=published&depth=3&limit=1`,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(4000),
+      },
+    );
+    if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
+    const data = await res.json();
+    return data.docs?.[0] || null;
+  } catch (err) {
+    handleFetchError('homepage', err as Error);
+    return null;
+  }
+}
+
+/**
  * Fetch block templates from Payload CMS
  */
 export async function fetchPayloadBlockTemplates(): Promise<PayloadBlockTemplate[]> {

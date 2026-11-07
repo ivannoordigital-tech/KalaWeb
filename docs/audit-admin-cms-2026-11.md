@@ -518,6 +518,11 @@ Admin UI (Payload)
 
 ### P1-11. Homepage hanya sebagian bisa dikelola dari CMS
 
+> **Status 2026-11-07:** sebagian besar sudah diselesaikan. Beranda kini dapat disusun
+> penuh lewat Page Builder CMS (halaman slug `home`, tampil di `/`) dengan fallback ke desain
+> statis. Lihat `docs/homepage-page-builder.md`. Poin structured data (`coverageAreas`, jam
+> operasional) masih perlu dihubungkan ke `JsonLd` secara terpisah.
+
 **Bukti**
 - `SiteSettings` mengelola hero, pain points, benefits, promo, booking steps.
 - Namun banyak teks masih hardcoded:
@@ -693,7 +698,7 @@ Legenda: ✅ berfungsi baik · ⚠️ berfungsi sebagian / ada jebakan · ❌ ga
 | # | Tugas pengguna | Status | Penjelasan singkat |
 |---|---|---:|---|
 | 1 | Menulis & menerbitkan artikel edukasi | ❌ | Artikel tidak dirender website; preview 404 |
-| 2 | Mengedit copy beranda (hero, promo, pain points) | ⚠️ | Sebagian dari SiteSettings; banyak heading hardcoded |
+| 2 | Mengedit copy beranda (hero, promo, pain points) | ✅ | Bisa penuh via Page Builder (slug `home`, tampil di `/`); fallback statis jika kosong |
 | 3 | Mengelola layanan & harga | ⚠️ | CRUD jalan, tetapi `price` bisa basi, `order`/`recommended` tidak dipakai, tanpa preview |
 | 4 | Mengelola area layanan | ⚠️ | CRUD jalan; `order` tidak dipakai; schema area tidak ikut CMS |
 | 5 | Mengelola profil bidan & STR | ✅ | Berfungsi; tanpa versi/rollback |

@@ -1,0 +1,32 @@
+---
+import CoverageArea from '../CoverageArea.astro';
+import { fetchSiteSettings } from '../../lib/payload';
+
+interface Props {
+  block: {
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    note?: string;
+    ctaText?: string;
+    ctaMessage?: string;
+    refCode?: string;
+    areas?: Array<{ region: string; slug: string; areas: string }>;
+  };
+}
+
+const { block } = Astro.props;
+const cmsSettings = await fetchSiteSettings();
+---
+
+<CoverageArea
+  phone={cmsSettings?.whatsappNumber}
+  badge={block.badge}
+  title={block.title}
+  subtitle={block.subtitle}
+  note={block.note}
+  ctaText={block.ctaText}
+  ctaMessage={block.ctaMessage}
+  refCode={block.refCode}
+  areas={block.areas}
+/>

@@ -2,13 +2,37 @@
 import { siteConfig } from '../config/site';
 import WhatsAppButton from './WhatsAppButton.astro';
 
-interface Props {
-  phone?: string;
+interface CoverageDistrict {
+  region: string;
+  slug: string;
+  areas: string;
 }
 
-const { phone = siteConfig.whatsappNumber } = Astro.props;
+interface Props {
+  phone?: string;
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  note?: string;
+  ctaText?: string;
+  ctaMessage?: string;
+  refCode?: string;
+  areas?: CoverageDistrict[];
+}
 
-const districts = [
+const {
+  phone = siteConfig.whatsappNumber,
+  badge,
+  title,
+  subtitle,
+  note,
+  ctaText,
+  ctaMessage,
+  refCode,
+  areas,
+} = Astro.props;
+
+const defaultDistricts: CoverageDistrict[] = [
   {
     region: 'Surabaya Barat',
     slug: 'surabaya-barat',
@@ -40,19 +64,21 @@ const districts = [
     areas: 'Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian',
   },
 ];
+
+const districts = areas && areas.length > 0 ? areas : defaultDistricts;
 ---
 
 <section id="area" class="py-16 md:py-24 bg-[#FFF9F4]">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-14">
       <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
-        Jangkauan Homecare Langsung ke Rumah
+        {badge || 'Jangkauan Homecare Langsung ke Rumah'}
       </span>
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mt-4 mb-4">
-        Area Layanan Surabaya & Sidoarjo
+        {title || 'Area Layanan Surabaya & Sidoarjo'}
       </h2>
       <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">
-        Kala beroperasi murni sebagai layanan homecare tanpa antrean outlet fisik. Bidan profesional kami siap berkunjung langsung ke kediaman Anda di seluruh wilayah berikut:
+        {subtitle || 'Kala beroperasi murni sebagai layanan homecare tanpa antrean outlet fisik. Bidan profesional kami siap berkunjung langsung ke kediaman Anda di seluruh wilayah berikut:'}
       </p>
     </div>
 
@@ -80,12 +106,12 @@ const districts = [
     <!-- CTA Check Location -->
     <div class="text-center">
       <p class="text-sm text-[#86675A] mb-4">
-        Lokasi rumah Anda belum tercantum di atas? Hubungi admin untuk konfirmasi jangkauan dan ketersediaan terapis bidan.
+        {note || 'Lokasi rumah Anda belum tercantum di atas? Hubungi admin untuk konfirmasi jangkauan dan ketersediaan terapis bidan.'}
       </p>
       <WhatsAppButton
-        refCode="KALA-AREA-CHECK"
-        message="Halo Bu Bidan, saya mau tanya apakah lokasi saya dijangkau homecare Kala?"
-        text="Cek Ketersediaan Bidan ke Rumah Saya"
+        refCode={refCode || 'KALA-AREA-CHECK'}
+        message={ctaMessage || 'Halo Bu Bidan, saya mau tanya apakah lokasi saya dijangkau homecare Kala?'}
+        text={ctaText || 'Cek Ketersediaan Bidan ke Rumah Saya'}
         variant="primary"
         phone={phone}
       />

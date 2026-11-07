@@ -24,6 +24,9 @@
     "import:articles": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/import-articles.ts",
     "import:articles:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/import-articles.ts",
     "migrate:landing": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/migrate-landing-pages.ts",
+    "seed:homepage": "npm run seed:homepage --workspace=cms-kala",
+    "seed:homepage:dry": "cross-env DRY_RUN=true npm run seed:homepage --workspace=cms-kala",
+    "seed:homepage:force": "npm run seed:homepage:force --workspace=cms-kala",
     "migrate:landing:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/migrate-landing-pages.ts",
     "preview": "npm run preview --workspace=web-kala"
   }

@@ -1,0 +1,32 @@
+---
+import FeaturedServices from '../FeaturedServices.astro';
+import { fetchSiteSettings } from '../../lib/payload';
+
+interface Props {
+  block: {
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    catalogTitle?: string;
+    catalogDescription?: string;
+    catalogCtaText?: string;
+    catalogCtaMessage?: string;
+    catalogRefCode?: string;
+  };
+}
+
+const { block } = Astro.props;
+const cmsSettings = await fetchSiteSettings();
+---
+
+<FeaturedServices
+  phone={cmsSettings?.whatsappNumber}
+  badge={block.badge}
+  title={block.title}
+  subtitle={block.subtitle}
+  catalogTitle={block.catalogTitle}
+  catalogDescription={block.catalogDescription}
+  catalogCtaText={block.catalogCtaText}
+  catalogCtaMessage={block.catalogCtaMessage}
+  catalogRefCode={block.catalogRefCode}
+/>

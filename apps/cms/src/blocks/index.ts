@@ -1,16 +1,17 @@
 import { baseBlocks } from './baseBlocks'
 import { leafBlocks } from './leafBlocks'
+import { homeBlocks } from './homeBlocks'
 import { SectionBlock } from './SectionBlock'
 import { TemplateRefBlock } from './TemplateRefBlock'
 
 // Blok yang boleh dipakai di dalam Pustaka Template Blok (tanpa TemplateRef
 // agar tidak terjadi referensi bersarang).
-export const templateBlocks = [...baseBlocks, ...leafBlocks, SectionBlock]
+export const templateBlocks = [...baseBlocks, ...leafBlocks, ...homeBlocks, SectionBlock]
 
 // Semua blok yang tersedia untuk halaman (Pages & LandingPages).
-export const allBlocks = [...baseBlocks, ...leafBlocks, SectionBlock, TemplateRefBlock]
+export const allBlocks = [...baseBlocks, ...leafBlocks, ...homeBlocks, SectionBlock, TemplateRefBlock]
 
-export { baseBlocks, leafBlocks, SectionBlock, TemplateRefBlock }
+export { baseBlocks, leafBlocks, homeBlocks, SectionBlock, TemplateRefBlock }
 export { columnBlocks } from './leafBlocks'
 export {
   HeadingBlock,
@@ -43,3 +44,8 @@ export {
   GalleryBlock,
   MidwifeSpotlightBlock,
 } from './baseBlocks'
+export {
+  PromoBannerBlock,
+  FeaturedServicesBlock,
+  CoverageAreaBlock,
+} from './homeBlocks'

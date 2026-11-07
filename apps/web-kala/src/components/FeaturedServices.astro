@@ -5,11 +5,27 @@ import { fetchPayloadServices } from '../lib/payload';
 
 interface Props {
   phone?: string;
+  badge?: string;
   title?: string;
   subtitle?: string;
+  catalogTitle?: string;
+  catalogDescription?: string;
+  catalogCtaText?: string;
+  catalogCtaMessage?: string;
+  catalogRefCode?: string;
 }
 
-const { phone = siteConfig.whatsappNumber, title, subtitle } = Astro.props;
+const {
+  phone = siteConfig.whatsappNumber,
+  badge,
+  title,
+  subtitle,
+  catalogTitle,
+  catalogDescription,
+  catalogCtaText,
+  catalogCtaMessage,
+  catalogRefCode,
+} = Astro.props;
 
 const cmsServices = await fetchPayloadServices();
 const recommendedServices = cmsServices.filter((s) => s.recommended);
@@ -37,7 +53,7 @@ const servicesList = selectedCmsServices.length > 0
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto mb-14">
       <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD]">
-        Menu Layanan Terfavorit
+        {badge || 'Menu Layanan Terfavorit'}
       </span>
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-medium text-[#4B2E22] mt-4 mb-4">
         {title || '3 Layanan Unggulan Homecare Kala'}
@@ -119,16 +135,16 @@ const servicesList = selectedCmsServices.length > 0
         📋
       </div>
       <h3 class="font-brand font-bold text-xl sm:text-2xl text-[#4B2E22] mb-3">
-        Mencari Layanan Lain? Tersedia 39 Menu Lengkap
+        {catalogTitle || 'Mencari Layanan Lain? Tersedia 39 Menu Lengkap'}
       </h3>
       <p class="text-sm sm:text-base text-[#86675A] leading-relaxed mb-6 max-w-xl mx-auto">
-        Mulai dari tindik telinga bayi steril, terapi uap (nebulizer saline), infrared moksa, pijat lahap makan anak, prenatal yoga hamil, hingga breast care laktasi.
+        {catalogDescription || 'Mulai dari tindik telinga bayi steril, terapi uap (nebulizer saline), infrared moksa, pijat lahap makan anak, prenatal yoga hamil, hingga breast care laktasi.'}
       </p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
         <WhatsAppButton
-          refCode="KALA-KATALOG"
-          message="Halo Bu Bidan, boleh minta pricelist dan katalog lengkap 39 layanan Kala?"
-          text="Minta Katalog Lengkap 39 Menu via WhatsApp"
+          refCode={catalogRefCode || 'KALA-KATALOG'}
+          message={catalogCtaMessage || 'Halo Bu Bidan, boleh minta pricelist dan katalog lengkap 39 layanan Kala?'}
+          text={catalogCtaText || 'Minta Katalog Lengkap 39 Menu via WhatsApp'}
           variant="secondary"
           phone={phone}
         />

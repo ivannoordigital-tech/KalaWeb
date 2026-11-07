@@ -500,6 +500,31 @@
     },
     "fields": [
       {
+        "name": "variant",
+        "label": "Gaya Tampilan Blok",
+        "type": "select",
+        "options": [
+          {
+            "label": "Standar — Solusi & Manfaat",
+            "value": "default"
+          },
+          {
+            "label": "Manfaat Bernomor — Khusus Beranda",
+            "value": "benefits"
+          },
+          {
+            "label": "Nilai Pembeda — Khusus Beranda",
+            "value": "differentiators"
+          }
+        ]
+      },
+      {
+        "name": "badge",
+        "label": "Badge Atas",
+        "type": "text",
+        "placeholder": "Solusi untuk Bunda dan Si Kecil"
+      },
+      {
         "name": "title",
         "label": "Judul Seksi",
         "type": "text",
@@ -509,6 +534,11 @@
         "name": "subtitle",
         "label": "Subjudul Seksi",
         "type": "text"
+      },
+      {
+        "name": "note",
+        "label": "Catatan Kaki",
+        "type": "textarea"
       }
     ],
     "innerBlocks": {
@@ -523,10 +553,22 @@
           "placeholder": "🌿"
         },
         {
+          "name": "number",
+          "label": "Nomor Urut",
+          "type": "text",
+          "placeholder": "01"
+        },
+        {
           "name": "title",
           "label": "Judul Manfaat",
           "type": "text",
           "required": true
+        },
+        {
+          "name": "subtitle",
+          "label": "Subjudul / Kategori",
+          "type": "text",
+          "placeholder": "Tenaga Kesehatan Berpendidikan Resmi"
         },
         {
           "name": "description",
@@ -1236,6 +1278,271 @@
         ]
       }
     ]
+  },
+  "promoBanner": {
+    "slug": "promoBanner",
+    "label": "Banner Promo Reservasi (Beranda)",
+    "icon": "Tag",
+    "category": "offer",
+    "description": "Banner promo reservasi pertama dengan harga coret, badge diskon, dan tombol WhatsApp.",
+    "defaults": {
+      "blockType": "promoBanner",
+      "badge": "Penawaran Reservasi Pertama",
+      "title": "Promo treatment Kala",
+      "description": "Khusus Bunda di Surabaya & Sidoarjo.",
+      "price": "Rp60.000",
+      "originalPrice": "Rp80.000",
+      "discountBadge": "Hemat 25%",
+      "note": "Konfirmasi jadwal dan area via WhatsApp.",
+      "capacityNote": "Kuota harian maksimal 5 sesi agar setiap kunjungan tetap fokus dan higienis.",
+      "serviceName": "Kala Baby: Pijat Ceria Newborn",
+      "buttonText": "Ambil Promo via WhatsApp",
+      "refCode": "KALA-PROMO-INTRO",
+      "message": "Halo Bu Bidan, saya mau ambil promo treatment Kala",
+      "disabled": false
+    },
+    "fields": [
+      {
+        "name": "badge",
+        "label": "Badge Atas Banner",
+        "type": "text"
+      },
+      {
+        "name": "title",
+        "label": "Judul Promo",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "description",
+        "label": "Deskripsi Promo",
+        "type": "textarea"
+      },
+      {
+        "name": "price",
+        "label": "Harga Promo",
+        "type": "text",
+        "placeholder": "Rp60.000"
+      },
+      {
+        "name": "originalPrice",
+        "label": "Harga Coret Asli",
+        "type": "text",
+        "placeholder": "Rp80.000"
+      },
+      {
+        "name": "discountBadge",
+        "label": "Badge Diskon",
+        "type": "text",
+        "placeholder": "Hemat 25%"
+      },
+      {
+        "name": "note",
+        "label": "Catatan Jadwal",
+        "type": "text"
+      },
+      {
+        "name": "capacityNote",
+        "label": "Catatan Kuota",
+        "type": "text"
+      },
+      {
+        "name": "serviceName",
+        "label": "Nama Layanan Promo",
+        "type": "text"
+      },
+      {
+        "name": "buttonText",
+        "label": "Teks Tombol WhatsApp",
+        "type": "text"
+      },
+      {
+        "name": "refCode",
+        "label": "Ref Code WhatsApp",
+        "type": "text",
+        "placeholder": "KALA-PROMO-INTRO"
+      },
+      {
+        "name": "message",
+        "label": "Template Pesan WhatsApp",
+        "type": "textarea"
+      }
+    ]
+  },
+  "featuredServices": {
+    "slug": "featuredServices",
+    "label": "Layanan Unggulan (Beranda)",
+    "icon": "CheckCircle2",
+    "category": "offer",
+    "description": "Tiga layanan unggulan yang datanya diambil otomatis dari koleksi Services.",
+    "defaults": {
+      "blockType": "featuredServices",
+      "badge": "Menu Layanan Terfavorit",
+      "title": "3 Layanan Unggulan Homecare Kala",
+      "subtitle": "Pilihan paling banyak dipesan oleh Bunda di Surabaya & Sidoarjo untuk memulihkan kebugaran ibu dan menstimulasi keceriaan si kecil.",
+      "catalogTitle": "Mencari Layanan Lain? Tersedia 39 Menu Lengkap",
+      "catalogDescription": "Mulai dari tindik telinga bayi steril, terapi uap (nebulizer saline), infrared moksa, pijat lahap makan anak, prenatal yoga hamil, hingga breast care laktasi.",
+      "catalogCtaText": "Minta Katalog Lengkap 39 Menu via WhatsApp",
+      "catalogCtaMessage": "Halo Bu Bidan, boleh minta pricelist dan katalog lengkap 39 layanan Kala?",
+      "catalogRefCode": "KALA-KATALOG",
+      "disabled": false
+    },
+    "fields": [
+      {
+        "name": "badge",
+        "label": "Badge Atas Seksi",
+        "type": "text"
+      },
+      {
+        "name": "title",
+        "label": "Judul Seksi",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subtitle",
+        "label": "Subjudul Seksi",
+        "type": "textarea"
+      },
+      {
+        "name": "catalogTitle",
+        "label": "Judul Kotak Katalog",
+        "type": "text"
+      },
+      {
+        "name": "catalogDescription",
+        "label": "Deskripsi Kotak Katalog",
+        "type": "textarea"
+      },
+      {
+        "name": "catalogCtaText",
+        "label": "Teks Tombol Katalog",
+        "type": "text"
+      },
+      {
+        "name": "catalogCtaMessage",
+        "label": "Pesan WhatsApp Katalog",
+        "type": "text"
+      },
+      {
+        "name": "catalogRefCode",
+        "label": "Ref Code Katalog",
+        "type": "text"
+      }
+    ]
+  },
+  "coverageArea": {
+    "slug": "coverageArea",
+    "label": "Area Layanan (Beranda)",
+    "icon": "Building2",
+    "category": "content",
+    "description": "Daftar wilayah layanan homecare beserta kecamatan dan tombol cek ketersediaan.",
+    "defaults": {
+      "blockType": "coverageArea",
+      "badge": "Jangkauan Homecare Langsung ke Rumah",
+      "title": "Area Layanan Surabaya & Sidoarjo",
+      "subtitle": "Kala beroperasi murni sebagai layanan homecare tanpa antrean outlet fisik. Bidan profesional kami siap berkunjung langsung ke kediaman Anda di seluruh wilayah berikut:",
+      "note": "Lokasi rumah Anda belum tercantum di atas? Hubungi admin untuk konfirmasi jangkauan dan ketersediaan terapis bidan.",
+      "ctaText": "Cek Ketersediaan Bidan ke Rumah Saya",
+      "ctaMessage": "Halo Bu Bidan, saya mau tanya apakah lokasi saya dijangkau homecare Kala?",
+      "refCode": "KALA-AREA-CHECK",
+      "areas": [
+        {
+          "region": "Surabaya Barat",
+          "slug": "surabaya-barat",
+          "areas": "Wiyung, Sambikerep, Lakarsantri, Tandes, Sukomanunggal, Benowo, Pakal"
+        },
+        {
+          "region": "Surabaya Timur",
+          "slug": "surabaya-timur",
+          "areas": "Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, Gubeng, Tenggilis Mejoyo"
+        },
+        {
+          "region": "Surabaya Selatan",
+          "slug": "surabaya-selatan",
+          "areas": "Wonokromo, Wonocolo, Jambangan, Gayungan, Karang Pilang, Sawahan"
+        },
+        {
+          "region": "Surabaya Pusat",
+          "slug": "surabaya-pusat",
+          "areas": "Tegalsari, Genteng, Bubutan, Simokerto"
+        },
+        {
+          "region": "Surabaya Utara",
+          "slug": "surabaya-utara",
+          "areas": "Kenjeran, Bulak, Pabean Cantian, Semampir, Krembangan"
+        },
+        {
+          "region": "Kabupaten Sidoarjo",
+          "slug": "sidoarjo",
+          "areas": "Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian"
+        }
+      ],
+      "disabled": false
+    },
+    "fields": [
+      {
+        "name": "badge",
+        "label": "Badge Atas Seksi",
+        "type": "text"
+      },
+      {
+        "name": "title",
+        "label": "Judul Seksi",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subtitle",
+        "label": "Subjudul Seksi",
+        "type": "textarea"
+      },
+      {
+        "name": "note",
+        "label": "Catatan Bawah Daftar Area",
+        "type": "textarea"
+      },
+      {
+        "name": "ctaText",
+        "label": "Teks Tombol WhatsApp",
+        "type": "text"
+      },
+      {
+        "name": "ctaMessage",
+        "label": "Pesan WhatsApp",
+        "type": "text"
+      },
+      {
+        "name": "refCode",
+        "label": "Ref Code",
+        "type": "text"
+      }
+    ],
+    "innerBlocks": {
+      "path": "areas",
+      "label": "Daftar Wilayah",
+      "itemTitleField": "region",
+      "fields": [
+        {
+          "name": "region",
+          "label": "Nama Wilayah",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "slug",
+          "label": "Slug Halaman Area",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "areas",
+          "label": "Daftar Kecamatan",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    }
   },
   "richText": {
     "slug": "richText",
@@ -2372,7 +2679,7 @@
       "blockType": "countdown",
       "title": "Promo Berakhir Dalam",
       "subtitle": "Harga spesial hanya sampai akhir bulan ini.",
-      "targetDate": "2026-11-11T03:02:08.902Z",
+      "targetDate": "2026-11-14T00:18:52.706Z",
       "expiredText": "Promo telah berakhir. Hubungi kami untuk penawaran terbaru.",
       "ctaText": "Ambil Promo Sekarang",
       "background": "peach",
@@ -2573,7 +2880,7 @@
     "label": "HTML Kustom (Advanced)",
     "icon": "Code2",
     "category": "content",
-    "description": "Tempel HTML/CSS khusus. Script, iframe, form, dan event handler dibuang saat render.",
+    "description": "Tempel HTML/CSS khusus. Script hanya berjalan jika mode sandbox diaktifkan.",
     "defaults": {
       "blockType": "html",
       "label": "HTML Kustom",
@@ -2581,6 +2888,7 @@
       "maxWidth": "normal",
       "padding": "normal",
       "background": "transparent",
+      "allowScripts": false,
       "disabled": false
     },
     "fields": [
@@ -2594,7 +2902,13 @@
         "label": "Kode HTML",
         "type": "code",
         "required": true,
-        "description": "Script, iframe, form, event handler, dan URL javascript: dibuang otomatis. CSS di dalam <style> berlaku global."
+        "description": "Script, iframe, form, style, event handler, dan URL javascript: dibuang otomatis kecuali mode sandbox diaktifkan."
+      },
+      {
+        "name": "allowScripts",
+        "label": "Jalankan JavaScript di dalam sandbox (Advanced)",
+        "type": "checkbox",
+        "description": "Script berjalan di iframe sandbox tanpa akses ke DOM induk, cookie, atau localStorage. Hanya untuk kode tepercaya."
       },
       {
         "name": "maxWidth",

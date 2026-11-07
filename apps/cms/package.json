@@ -11,6 +11,8 @@
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start -p 3005",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/seed.ts",
+    "seed:homepage": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/seed-homepage.ts",
+    "seed:homepage:force": "cross-env OVERWRITE=true NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/seed-homepage.ts",
     "import:articles": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/import-articles.ts",
     "migrate:landing": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/migrate-landing-pages.ts",
     "set:superadmin": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=.env src/scripts/set-superadmin.ts",
