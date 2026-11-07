@@ -3,6 +3,7 @@ import * as migration_20261104_003446_full_schema_sync from './20261104_003446_f
 import * as migration_20261104_020403_add_visual_builder_and_basic_blocks from './20261104_020403_add_visual_builder_and_basic_blocks';
 import * as migration_20261104_030141_add_html_block from './20261104_030141_add_html_block';
 import * as migration_20261104_031712_add_html_sandbox_flag from './20261104_031712_add_html_sandbox_flag';
+import * as migration_20261107_002701_add_homepage_blocks from './20261107_002701_add_homepage_blocks';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261104_031712_add_html_sandbox_flag.up,
     down: migration_20261104_031712_add_html_sandbox_flag.down,
-    name: '20261104_031712_add_html_sandbox_flag'
+    name: '20261104_031712_add_html_sandbox_flag',
+  },
+  {
+    up: migration_20261107_002701_add_homepage_blocks.up,
+    down: migration_20261107_002701_add_homepage_blocks.down,
+    name: '20261107_002701_add_homepage_blocks'
   },
 ];
