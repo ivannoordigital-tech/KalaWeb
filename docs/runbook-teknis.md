@@ -123,6 +123,13 @@ Status proses build yang ditampilkan pada header dokumen CMS (`DeployStatusPill`
 - Status bersifat **indikatif** untuk memandu admin operasional (apakah deploy telah terpicu dan estimasi waktu selesai).
 - **Sumber kebenaran definitif** status build tetap berada pada Cloudflare Dashboard dan skrip verifikasi otomatis (`npm run verify:deploy`).
 
+### 3.5 Deploy Layout & Widget Builder
+Fitur builder (container + widget) menambah tabel baru pada schema CMS.
+Prosedur lengkap — backup, schema push interaktif, urutan CMS → web, dan
+pembuatan draft "Homepage 2" — ada di
+[`docs/runbook-deploy-layout-builder.md`](./runbook-deploy-layout-builder.md).
+
+
 ---
 
 ## 4. Rollback & Penanganan Kegagalan Build
