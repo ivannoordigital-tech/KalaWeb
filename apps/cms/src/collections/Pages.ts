@@ -402,11 +402,15 @@ export const Pages: CollectionConfig = {
           label: 'Halaman Penawaran Khusus / Iklan (kalababyspa.com/sales/[slug])',
           value: 'landing',
         },
+        {
+          label: 'Beranda Utama (kalababyspa.com) — wajib slug "home"',
+          value: 'home',
+        },
       ],
       admin: {
         position: 'sidebar',
         description:
-          '• Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.\n• Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan WhatsApp & Pixel.',
+          '• Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.\n• Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan WhatsApp & Pixel.\n• Beranda Utama: Halaman yang tampil di "/" dan wajib memakai slug "home".',
       },
     },
     {

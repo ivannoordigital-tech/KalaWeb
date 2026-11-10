@@ -1,0 +1,60 @@
+---
+import WhatsAppButton from '../../WhatsAppButton.astro';
+import { getPaddingClass, getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    text?: string;
+    linkType?: 'whatsapp' | 'url';
+    url?: string;
+    refCode?: string;
+    message?: string;
+    variant?: 'primary' | 'secondary' | 'promo' | 'hero';
+    fullWidth?: boolean;
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block, siteSettings } = Astro.props;
+
+const wrapperClasses = getStyleClasses(block);
+const paddingClass = getPaddingClass(block);
+
+const variant = block?.variant || 'primary';
+const anchorVariants: Record<string, string> = {
+  primary:
+    'bg-[#0E733D] hover:bg-[#0B582F] text-white font-bold py-3.5 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-2.5 text-base',
+  secondary:
+    'bg-[#B3471E] hover:bg-[#A3431F] text-white font-bold py-3.5 px-6 rounded-full shadow-md hover:shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2.5 text-base',
+  promo:
+    'bg-[#FFBE9C] hover:bg-[#FFD9C4] text-[#4B2E22] font-bold py-3 px-5 rounded-full shadow-sm hover:shadow transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm',
+  hero: 'bg-[#B3471E] hover:bg-[#A3431F] text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 inline-flex items-center justify-center gap-3 text-lg',
+};
+
+const anchorClass = `${anchorVariants[variant] || anchorVariants.primary} ${block?.fullWidth ? 'w-full' : ''}`;
+---
+
+<div class={`${wrapperClasses} ${paddingClass}`}>
+  {block?.linkType !== 'url' ? (
+    <WhatsAppButton
+      text={block?.text || 'Konsultasi via WhatsApp'}
+      refCode={block?.refCode || 'KALA-WIDGET'}
+      message={block?.message}
+      variant={variant}
+      phone={siteSettings?.whatsappNumber}
+      className={block?.fullWidth ? 'w-full' : ''}
+    />
+  ) : block?.url ? (
+    <a
+      href={block.url}
+      class={anchorClass}
+      rel={block.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+      target={block.url.startsWith('http') ? '_blank' : undefined}
+    >
+      {block?.text || 'Selengkapnya'}
+    </a>
+  ) : (
+    <span class="text-xs text-[#86675A]">URL tombol belum diisi.</span>
+  )}
+</div>

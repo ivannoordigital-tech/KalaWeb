@@ -1,0 +1,30 @@
+---
+import { getAlignClass, getPaddingClass, getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    icon?: string;
+    title?: string;
+    description?: string;
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const wrapperClasses = getStyleClasses(block);
+const alignClass = getAlignClass(block);
+---
+
+<div class={`${wrapperClasses} bg-white border border-[#F6DCCD] rounded-2xl p-5 shadow-sm ${getPaddingClass(block)} ${alignClass}`}>
+  {block?.icon && <div class="text-2xl mb-2 leading-none">{block.icon}</div>}
+  {block?.title && (
+    <h3 class="text-base font-bold text-[#4B2E22] mb-1">{block.title}</h3>
+  )}
+  {block?.description && (
+    <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed whitespace-pre-line">
+      {block.description}
+    </p>
+  )}
+</div>

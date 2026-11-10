@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Plus, Trash2, Image as ImageIcon, ChevronUp, ChevronDown } from 'lucide-react';
 import { builderRegistry, type BuilderFieldMeta } from '../../../blocks/registry';
 import type { LayoutBlock } from './useBuilderLayout';
 import { MediaPickerModal, type MediaItem } from './MediaPickerModal';
+import { ContainerSettings } from './ContainerSettings';
+import type { ColumnKey } from './tree-utils';
 
 interface SectionSettingsProps {
   block: LayoutBlock;
@@ -13,6 +15,12 @@ interface SectionSettingsProps {
   onAddInnerItem: (path: string, defaults?: Record<string, any>) => void;
   onRemoveInnerItem: (path: string, index: number) => void;
   onUpdateInnerItem: (path: string, index: number, fields: Record<string, any>) => void;
+  onSelectBlock?: (id: string) => void;
+  onAddWidget?: (column: ColumnKey) => void;
+  onRemoveChild?: (column: ColumnKey, index: number) => void;
+  onMoveChild?: (column: ColumnKey, index: number, direction: -1 | 1) => void;
+  onDuplicateChild?: (column: ColumnKey, index: number) => void;
+  onMoveChildToColumn?: (column: ColumnKey, index: number, target: ColumnKey) => void;
 }
 
 export const SectionSettings: React.FC<SectionSettingsProps> = ({
@@ -22,7 +30,15 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
   onAddInnerItem,
   onRemoveInnerItem,
   onUpdateInnerItem,
+  onSelectBlock,
+  onAddWidget,
+  onRemoveChild,
+  onMoveChild,
+  onDuplicateChild,
+  onMoveChildToColumn,
 }) => {
+  const [activeTab, setActiveTab] = useState<'content' | 'style'>('content');
+
   const [activeMediaTarget, setActiveMediaTarget] = useState<{
     fieldName: string;
     isInner?: boolean;
@@ -32,6 +48,23 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
 
   const meta = builderRegistry[block.blockType];
   const label = meta?.label || block.blockType;
+
+  const isContainer = block.blockType === 'container' && Boolean(meta?.nestedBlocks);
+
+  const { contentFields, styleFields } = useMemo(() => {
+    const fields = meta?.fields ?? [];
+    const style = fields.filter((f) => f.name.startsWith('style'));
+    const content = fields.filter((f) => {
+      if (f.name.startsWith('style')) return false;
+      // Container columns are managed by ContainerSettings.
+      if (isContainer && f.name === 'columns') return false;
+      return true;
+    });
+    return { contentFields: content, styleFields: style };
+  }, [meta, isContainer]);
+
+  const visibleFields = activeTab === 'style' ? styleFields : contentFields;
+  const hasStyleTab = styleFields.length > 0;
 
   const handleFieldChange = (name: string, value: any) => {
     onUpdate({ [name]: value });
@@ -155,6 +188,17 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
           </div>
         );
       }
+      case 'code':
+        return (
+          <textarea
+            rows={8}
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={field.placeholder || '<div>...</div>'}
+            spellCheck={false}
+            className="w-full text-[11px] font-mono p-2 rounded border border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all bg-slate-950 text-slate-100"
+          />
+        );
       case 'text':
       default:
         return (
@@ -206,13 +250,55 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
 
       {/* Settings Form Body */}
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
-        {/* Simple Section Fields */}
-        {meta?.fields && meta.fields.length > 0 && (
+        {hasStyleTab && (
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setActiveTab('content')}
+              className={`flex-1 py-1.5 rounded text-[11px] font-bold transition-colors ${
+                activeTab === 'content'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Konten
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('style')}
+              className={`flex-1 py-1.5 rounded text-[11px] font-bold transition-colors ${
+                activeTab === 'style'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Gaya
+            </button>
+          </div>
+        )}
+
+        {isContainer && activeTab === 'content' && onSelectBlock && (
+          <ContainerSettings
+            block={block}
+            onUpdate={onUpdate}
+            onSelectChild={onSelectBlock}
+            onAddWidget={(column) => onAddWidget?.(column)}
+            onRemoveChild={(column, index) => onRemoveChild?.(column, index)}
+            onMoveChild={(column, index, direction) => onMoveChild?.(column, index, direction)}
+            onDuplicateChild={(column, index) => onDuplicateChild?.(column, index)}
+            onMoveChildToColumn={(column, index, target) =>
+              onMoveChildToColumn?.(column, index, target)
+            }
+          />
+        )}
+
+        {/* Section / Widget Fields */}
+        {visibleFields.length > 0 && (
           <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-3">
             <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Pengaturan Seksi
+              {activeTab === 'style' ? 'Gaya & Tampilan' : 'Pengaturan Konten'}
             </h3>
-            {meta.fields.map((f) => (
+            {visibleFields.map((f) => (
               <div key={f.name} className="space-y-1">
                 {f.type !== 'checkbox' && (
                   <label className="block text-xs font-semibold text-slate-700">

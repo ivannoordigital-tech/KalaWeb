@@ -1,0 +1,51 @@
+---
+import {
+  getAlignClass,
+  getPaddingClass,
+  getStyleClasses,
+  getTextColorClass,
+} from '../style-utils';
+
+interface Props {
+  block: {
+    text: string;
+    textSize?: 'sm' | 'base' | 'lg';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const sizeClasses: Record<string, string> = {
+  sm: 'text-sm',
+  base: 'text-sm sm:text-base',
+  lg: 'text-base sm:text-lg',
+};
+
+const paragraphs = String(block?.text || '')
+  .split(/\n{2,}/)
+  .map((part) => part.trim())
+  .filter(Boolean);
+
+const wrapperClasses = getStyleClasses(block);
+const paddingClass = getPaddingClass(block);
+const textClasses = [
+  sizeClasses[block?.textSize || 'base'],
+  getTextColorClass(block),
+  getAlignClass(block),
+  'leading-relaxed',
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class={`${wrapperClasses} ${paddingClass}`}>
+  {paragraphs.length > 0 ? (
+    paragraphs.map((paragraph) => (
+      <p class={`${textClasses} whitespace-pre-line [&:not(:last-child)]:mb-3`}>{paragraph}</p>
+    ))
+  ) : (
+    <p class={textClasses}>&nbsp;</p>
+  )}
+</div>

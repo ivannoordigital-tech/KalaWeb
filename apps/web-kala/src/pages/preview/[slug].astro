@@ -4,9 +4,19 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
 import { verifyPreviewToken, fetchPreviewDraft, type PreviewTokenPayload } from '../../lib/preview';
+import { fetchSiteSettings } from '../../lib/payload';
+import { siteConfig } from '../../config/site';
 
 const { slug } = Astro.params;
 const token = Astro.url.searchParams.get('token');
+
+const cmsSettings = await fetchSiteSettings();
+const siteSettings = {
+  ...siteConfig,
+  whatsappNumber: cmsSettings?.whatsappNumber || siteConfig.whatsappNumber,
+  whatsappNumberFormatted:
+    cmsSettings?.whatsappNumberFormatted || siteConfig.whatsappNumberFormatted,
+};
 
 // Security Check: Token is mandatory
 if (!token) {
@@ -75,7 +85,7 @@ const isFullWidth = pageData?.pageLayout === 'full_width';
   {hasBlocks ? (
       <div class={isFullWidth || isCanvas ? 'w-full' : ''}>
         {blocks.map((block: any) => (
-          <BlockRenderer block={block} isPreview={true} />
+          <BlockRenderer block={block} isPreview={true} siteSettings={siteSettings} />
         ))}
       </div>
     ) : (

@@ -154,7 +154,7 @@ export interface PayloadPage {
   id?: string;
   title: string;
   slug: string;
-  pageType?: 'standard' | 'landing';
+  pageType?: 'standard' | 'landing' | 'home';
   pageLayout?: 'default' | 'canvas' | 'full_width';
   refCode?: string;
   variant?: string;
@@ -418,6 +418,34 @@ export async function fetchPayloadPages(): Promise<PayloadPage[]> {
   } catch (err) {
     handleFetchError('pages', err as Error);
     return [];
+  }
+}
+
+/**
+ * Fetch the published homepage (`slug: home`, `pageType: home`).
+ * Always fails safe: a missing or unreachable homepage returns null so
+ * `index.astro` can render the hardcoded fallback.
+ */
+export async function fetchHomepage(): Promise<PayloadPage | null> {
+  try {
+    const res = await fetch(
+      `${PAYLOAD_URL}/api/pages?where[slug][equals]=home&where[_status][equals]=published&depth=4&limit=1`,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(5000),
+      },
+    );
+    if (!res.ok) throw new Error(`Payload error: ${res.statusText}`);
+    const data = await res.json();
+    const doc = (data.docs || [])[0] as PayloadPage | undefined;
+    if (!doc) return null;
+    if (doc.pageType && doc.pageType !== 'home') return null;
+    return doc;
+  } catch (err) {
+    console.warn(
+      `[PayloadClient] Homepage CMS tidak tersedia (${(err as Error).message}). Memakai homepage fallback.`,
+    );
+    return null;
   }
 }
 

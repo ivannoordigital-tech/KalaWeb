@@ -3,6 +3,16 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { builderRegistry } from '../../../blocks/registry';
+import {
+  type ColumnKey,
+  duplicateBlockInTree,
+  findBlock,
+  moveBlockInTree,
+  moveChildToColumn as moveChildToColumnInTree,
+  removeBlockFromTree,
+  reorderColumnChildren,
+  updateBlockInTree,
+} from './tree-utils';
 
 export interface LayoutBlock {
   id?: string;
@@ -87,7 +97,7 @@ export function useBuilderLayout(
   const removeSection = useCallback(
     (id: string) => {
       flushHistory(layoutRef.current);
-      const next = layoutRef.current.filter((b) => b.id !== id);
+      const next = removeBlockFromTree(layoutRef.current, id);
       layoutRef.current = next;
       setLayout(next);
     },
@@ -97,20 +107,11 @@ export function useBuilderLayout(
   const duplicateSection = useCallback(
     (id: string) => {
       flushHistory(layoutRef.current);
-      const index = layoutRef.current.findIndex((b) => b.id === id);
-      if (index === -1) return;
-
-      const source = layoutRef.current[index];
-      const clone: LayoutBlock = {
-        ...structuredClone(source),
-        id: crypto.randomUUID(),
-      };
-
-      const next = [...layoutRef.current];
-      next.splice(index + 1, 0, clone);
+      const { layout: next, newId } = duplicateBlockInTree(layoutRef.current, id);
+      if (!newId) return null;
       layoutRef.current = next;
       setLayout(next);
-      return clone.id;
+      return newId;
     },
     [setLayout, flushHistory],
   );
@@ -118,7 +119,9 @@ export function useBuilderLayout(
   const toggleDisabled = useCallback(
     (id: string) => {
       flushHistory(layoutRef.current);
-      const next = layoutRef.current.map((b) => (b.id === id ? { ...b, disabled: !b.disabled } : b));
+      const current = findBlock(layoutRef.current, id);
+      if (!current) return;
+      const next = updateBlockInTree(layoutRef.current, id, { disabled: !current.disabled });
       layoutRef.current = next;
       setLayout(next);
     },
@@ -128,7 +131,7 @@ export function useBuilderLayout(
   const updateSection = useCallback(
     (id: string, updates: Partial<LayoutBlock>) => {
       debounceRecordHistory(layoutRef.current);
-      const next = layoutRef.current.map((b) => (b.id === id ? { ...b, ...updates } : b));
+      const next = updateBlockInTree(layoutRef.current, id, updates);
       layoutRef.current = next;
       setLayout(next);
     },
@@ -197,6 +200,85 @@ export function useBuilderLayout(
     [setLayout, debounceRecordHistory],
   );
 
+  // ---------------------------------------------------------------
+  // Nested container operations (max depth: container -> widget)
+  // ---------------------------------------------------------------
+
+  const addBlockToContainer = useCallback(
+    (parentId: string, column: ColumnKey, slug: string) => {
+      flushHistory(layoutRef.current);
+      const meta = builderRegistry[slug];
+      const defaults = meta ? meta.defaults : { blockType: slug };
+      const newBlock: LayoutBlock = {
+        blockType: slug,
+        ...structuredClone(defaults),
+        id: crypto.randomUUID(),
+        disabled: false,
+      };
+
+      const next = layoutRef.current.map((parent) => {
+        if ((parent.id || parent.blockType) !== parentId) return parent;
+        const existing = Array.isArray(parent[column]) ? (parent[column] as LayoutBlock[]) : [];
+        return { ...parent, [column]: [...existing, newBlock] };
+      });
+      layoutRef.current = next;
+      setLayout(next);
+      return newBlock.id;
+    },
+    [setLayout, flushHistory],
+  );
+
+  /** Move a block to a container column, or back to the top level. */
+  const moveBlock = useCallback(
+    (
+      id: string,
+      targetParentId: string | null,
+      targetColumn: ColumnKey | null,
+      targetIndex?: number,
+    ) => {
+      flushHistory(layoutRef.current);
+      const next = moveBlockInTree(layoutRef.current, id, targetParentId, targetColumn, targetIndex);
+      layoutRef.current = next;
+      setLayout(next);
+    },
+    [setLayout, flushHistory],
+  );
+
+  /** Reorder a widget inside a column. */
+  const reorderColumnBlock = useCallback(
+    (parentId: string, column: ColumnKey, oldIndex: number, newIndex: number) => {
+      if (oldIndex === newIndex) return;
+      flushHistory(layoutRef.current);
+      const next = reorderColumnChildren(layoutRef.current, parentId, column, oldIndex, newIndex);
+      layoutRef.current = next;
+      setLayout(next);
+    },
+    [setLayout, flushHistory],
+  );
+
+  /** Move a widget from one column to another. */
+  const moveWidgetToColumn = useCallback(
+    (parentId: string, fromColumn: ColumnKey, childIndex: number, toColumn: ColumnKey) => {
+      if (fromColumn === toColumn) return;
+      flushHistory(layoutRef.current);
+      const next = moveChildToColumnInTree(
+        layoutRef.current,
+        parentId,
+        fromColumn,
+        childIndex,
+        toColumn,
+      );
+      layoutRef.current = next;
+      setLayout(next);
+    },
+    [setLayout, flushHistory],
+  );
+
+  const findBlockById = useCallback(
+    (id: string) => findBlock(layoutRef.current, id),
+    [],
+  );
+
   const applyTemplate = useCallback(
     (templateBlocks: Array<Record<string, any>>, mode: 'replace' | 'append' = 'append') => {
       flushHistory(layoutRef.current);
@@ -226,5 +308,10 @@ export function useBuilderLayout(
     removeInnerItem,
     updateInnerItem,
     applyTemplate,
+    addBlockToContainer,
+    moveBlock,
+    reorderColumnBlock,
+    moveWidgetToColumn,
+    findBlockById,
   };
 }

@@ -1,0 +1,119 @@
+---
+import WhatsAppButton from '../WhatsAppButton.astro';
+import { getPaddingClass, getStyleClasses } from './style-utils';
+
+interface Props {
+  block: {
+    badge?: string;
+    title?: string;
+    subtitle?: string;
+    items?: Array<{ region?: string; slug?: string; areas?: string }>;
+    ctaText?: string;
+    ctaMessage?: string;
+    background?: 'white' | 'cream' | 'peach';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block, siteSettings } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+
+const defaultDistricts = [
+  {
+    region: 'Surabaya Barat',
+    slug: 'surabaya-barat',
+    areas: 'Wiyung, Sambikerep, Lakarsantri, Tandes, Sukomanunggal, Benowo, Pakal',
+  },
+  {
+    region: 'Surabaya Timur',
+    slug: 'surabaya-timur',
+    areas: 'Rungkut, Gunung Anyar, Sukolilo, Mulyorejo, Gubeng, Tenggilis Mejoyo',
+  },
+  {
+    region: 'Surabaya Selatan',
+    slug: 'surabaya-selatan',
+    areas: 'Wonokromo, Wonocolo, Jambangan, Gayungan, Karang Pilang, Sawahan',
+  },
+  {
+    region: 'Surabaya Pusat',
+    slug: 'surabaya-pusat',
+    areas: 'Tegalsari, Genteng, Bubutan, Simokerto',
+  },
+  {
+    region: 'Surabaya Utara',
+    slug: 'surabaya-utara',
+    areas: 'Kenjeran, Bulak, Pabean Cantian, Semampir, Krembangan',
+  },
+  {
+    region: 'Kabupaten Sidoarjo',
+    slug: 'sidoarjo',
+    areas: 'Waru, Sedati, Gedangan, Candi, Buduran, Sidoarjo Kota, Sukodono, Taman, Krian',
+  },
+];
+
+const districts =
+  Array.isArray(block?.items) && block.items.length > 0
+    ? block.items.map((item, index) => ({
+        region: item.region || `Wilayah ${index + 1}`,
+        slug: item.slug || '',
+        areas: item.areas || '',
+      }))
+    : defaultDistricts;
+---
+
+<section id="area" class={`${bgClasses[block?.background || 'cream'] || bgClasses.cream} ${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      {block?.badge && (
+        <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+          {block.badge}
+        </span>
+      )}
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block?.title || 'Area Layanan Surabaya & Sidoarjo'}
+      </h2>
+      {block?.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">{block.subtitle}</p>
+      )}
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+      {districts.map((item) => (
+        <div class="bg-white p-6 rounded-2xl border border-[#F6DCCD] shadow-sm hover:border-[#B3471E] transition-colors">
+          <div class="flex items-center gap-2 mb-2 text-[#B3471E]">
+            <span class="text-lg">📍</span>
+            <h3 class="font-brand font-bold text-lg text-[#4B2E22]">
+              {item.slug ? (
+                <a href={`/area/${item.slug}`} class="hover:text-[#B3471E] transition-colors">
+                  {item.region}
+                </a>
+              ) : (
+                item.region
+              )}
+            </h3>
+          </div>
+          <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">{item.areas}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="text-center">
+      <p class="text-sm text-[#86675A] mb-4">
+        Lokasi rumah Anda belum tercantum? Hubungi admin untuk konfirmasi jangkauan bidan.
+      </p>
+      <WhatsAppButton
+        refCode="KALA-AREA-WIDGET"
+        message={block?.ctaMessage || 'Halo Bu Bidan, saya mau tanya apakah lokasi saya dijangkau homecare Kala?'}
+        text={block?.ctaText || 'Cek Ketersediaan Bidan ke Rumah Saya'}
+        variant="primary"
+        phone={siteSettings?.whatsappNumber}
+      />
+    </div>
+  </div>
+</section>

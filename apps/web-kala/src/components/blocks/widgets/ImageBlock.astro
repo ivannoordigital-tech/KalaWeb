@@ -1,0 +1,65 @@
+---
+import { getPaddingClass, getStyleClasses, resolveMediaUrl } from '../style-utils';
+
+interface Props {
+  block: {
+    image?: any;
+    alt?: string;
+    caption?: string;
+    ratio?: 'auto' | 'square' | 'video' | 'portrait';
+    link?: string;
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const url = resolveMediaUrl(block?.image);
+const alt = block?.alt || block?.image?.alt || '';
+const ratioClasses: Record<string, string> = {
+  auto: '',
+  square: 'aspect-square',
+  video: 'aspect-video',
+  portrait: 'aspect-[4/5]',
+};
+const ratioClass = ratioClasses[block?.ratio || 'auto'] || '';
+const wrapperClasses = getStyleClasses(block);
+const paddingClass = getPaddingClass(block);
+const hasLink = Boolean(block?.link);
+---
+
+<div class={`${wrapperClasses} ${paddingClass}`}>
+  {url ? (
+    <figure class="m-0">
+      <div class={`overflow-hidden rounded-xl bg-[#FFF9F4] ${ratioClass}`}>
+        {hasLink ? (
+          <a href={block.link} class="block w-full h-full">
+            <img
+              src={url}
+              alt={alt}
+              loading="lazy"
+              decoding="async"
+              class={`w-full h-full object-cover ${ratioClass ? '' : 'h-auto'}`}
+            />
+          </a>
+        ) : (
+          <img
+            src={url}
+            alt={alt}
+            loading="lazy"
+            decoding="async"
+            class={`w-full h-full object-cover ${ratioClass ? '' : 'h-auto'}`}
+          />
+        )}
+      </div>
+      {block?.caption && (
+        <figcaption class="text-xs text-[#86675A] mt-2 text-center">{block.caption}</figcaption>
+      )}
+    </figure>
+  ) : (
+    <div class="w-full aspect-video rounded-xl bg-[#FFEFE5] border border-[#F6DCCD] flex items-center justify-center text-xs text-[#86675A]">
+      Foto belum dipilih
+    </div>
+  )}
+</div>

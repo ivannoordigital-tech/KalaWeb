@@ -164,10 +164,46 @@ for (const [slug, reg] of Object.entries(builderRegistry)) {
   }
 }
 
+// 5. Validate nested container/widget metadata
+for (const [slug, reg] of Object.entries(builderRegistry)) {
+  if (!reg.nestedBlocks) continue;
+
+  const block = blockMap.get(slug);
+  if (!block) continue;
+
+  const flat = flattenFields(block.fields);
+  const fieldMap = new Map<string, Field>();
+  for (const f of flat) {
+    if ('name' in f && typeof (f as any).name === 'string') {
+      fieldMap.set((f as any).name, f);
+    }
+  }
+
+  for (const column of reg.nestedBlocks.columns) {
+    const field = fieldMap.get(column);
+    if (!field) {
+      logError(`[${slug}] nestedBlocks column '${column}' tidak ada di skema Payload Block!`);
+    } else if (field.type !== 'blocks') {
+      logError(`[${slug}] nestedBlocks column '${column}' bukan bertipe 'blocks'!`);
+    }
+  }
+
+  for (const allowed of reg.nestedBlocks.allowedBlocks) {
+    const target = blockMap.get(allowed);
+    if (!target) {
+      logError(`[${slug}] nestedBlocks allowedBlocks '${allowed}' tidak ada di allBlocks!`);
+      continue;
+    }
+    if (allowed === slug) {
+      logError(`[${slug}] nestedBlocks tidak boleh memasukkan dirinya sendiri (rekursi).`);
+    }
+  }
+}
+
 if (errorsCount > 0) {
   console.error(`\n❌ Pengecekan paritas GAGAL dengan ${errorsCount} error! Perbaiki sebelum deploy.`);
   process.exit(1);
 } else {
-  console.log('✅ Paritas 100% SEMPURNA: Semua 14 blok, defaults, dan template cocok persis dengan konfigurasi Payload!');
+  console.log(`✅ Paritas 100% SEMPURNA: Semua ${allBlocks.length} blok, defaults, dan template cocok persis dengan konfigurasi Payload!`);
   process.exit(0);
 }

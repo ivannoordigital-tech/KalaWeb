@@ -546,6 +546,8 @@ export interface ServiceArea {
   createdAt: string;
 }
 /**
+ * Halaman tetap situs: Tentang Kami, Layanan, Area, Kebijakan Privasi. Gunakan ini untuk konten yang tidak beriklan.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
@@ -564,7 +566,7 @@ export interface Page {
    */
   heroImage?: (number | null) | Media;
   /**
-   * Gunakan untuk halaman informasi umum yang membutuhkan format teks bebas (paragraf, poin daftar, dan subjudul). Jika blok di bawah diisi, susunan blok akan diprioritaskan.
+   * Gunakan untuk halaman informasi umum yang membutuhkan format teks bebas (paragraf, poin daftar, dan subjudul).
    */
   content?: {
     root: {
@@ -867,6 +869,1371 @@ export interface Page {
              * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
              */
             disabled?: boolean | null;
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Jika memilih CMS, blok akan menampilkan layanan teratas dari koleksi Layanan. Jika kosong, otomatis memakai daftar bawaan.
+             */
+            source?: ('cms' | 'config') | null;
+            maxItems?: number | null;
+            ctaText?: string | null;
+            ctaUrl?: string | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredServices';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan isi pembeda dari CMS.
+             */
+            items?:
+              | {
+                  icon?: string | null;
+                  title: string;
+                  description?: string | null;
+                  highlight?: boolean | null;
+                  id?: string | null;
+                }[]
+              | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'valueProps';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan wilayah dari CMS.
+             */
+            items?:
+              | {
+                  region: string;
+                  slug?: string | null;
+                  areas?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'coverageArea';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            text: string;
+            level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'heading';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            text: string;
+            textSize?: ('sm' | 'base' | 'lg') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'text';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            image: number | Media;
+            /**
+             * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+             */
+            alt: string;
+            caption?: string | null;
+            ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+            link?: string | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            text: string;
+            linkType?: ('whatsapp' | 'url') | null;
+            url?: string | null;
+            refCode?: string | null;
+            message?: string | null;
+            variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+            fullWidth?: boolean | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'button';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            color?: ('line' | 'peach' | 'accent' | 'white') | null;
+            thickness?: ('1' | '2' | '4') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'divider';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            icon?: string | null;
+            title: string;
+            description?: string | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'iconBox';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            url: string;
+            caption?: string | null;
+            ratio?: ('video' | 'vertical' | 'square') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'video';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            /**
+             * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+             */
+            embedUrl: string;
+            height?: ('sm' | 'md' | 'lg') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'map';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            image?: (number | null) | Media;
+            alt?: string | null;
+            title: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonUrl?: string | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'card';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            name?: string | null;
+            /**
+             * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+             */
+            html: string;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'html';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            columns?: ('1' | '2' | '3' | '4') | null;
+            gap?: ('sm' | 'md' | 'lg') | null;
+            /**
+             * Aktifkan jika kolom kedua sebaiknya tampil lebih dulu di layar HP.
+             */
+            reverseMobile?: boolean | null;
+            column1?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            column2?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            column3?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            column4?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'container';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
             /**
              * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
              */
@@ -943,8 +2310,13 @@ export interface Page {
   /**
    * • Halaman Biasa: Untuk konten web profil, info klinik, syarat layanan.
    * • Halaman Iklan: Untuk kampanye iklan berbayar dengan pelacakan WhatsApp & Pixel.
+   * • Beranda Utama: Halaman yang tampil di "/" dan wajib memakai slug "home".
    */
-  pageType?: ('standard' | 'landing') | null;
+  pageType?: ('standard' | 'landing' | 'home') | null;
+  /**
+   * Pilih builder visual dengan live preview atau formulir blok standar.
+   */
+  editorMode?: ('builder' | 'form') | null;
   /**
    * Skor kesehatan SEO (0 - 100) yang dihitung otomatis saat dokumen disimpan.
    */
@@ -1351,12 +2723,327 @@ export interface BlockTemplate {
         blockName?: string | null;
         blockType: 'midwifeSpotlight';
       }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Jika memilih CMS, blok akan menampilkan layanan teratas dari koleksi Layanan. Jika kosong, otomatis memakai daftar bawaan.
+         */
+        source?: ('cms' | 'config') | null;
+        maxItems?: number | null;
+        ctaText?: string | null;
+        ctaUrl?: string | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'featuredServices';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan isi pembeda dari CMS.
+         */
+        items?:
+          | {
+              icon?: string | null;
+              title: string;
+              description?: string | null;
+              highlight?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'valueProps';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan wilayah dari CMS.
+         */
+        items?:
+          | {
+              region: string;
+              slug?: string | null;
+              areas?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        ctaText?: string | null;
+        ctaMessage?: string | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'coverageArea';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        text: string;
+        level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'heading';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        text: string;
+        textSize?: ('sm' | 'base' | 'lg') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'text';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        image: number | Media;
+        /**
+         * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+         */
+        alt: string;
+        caption?: string | null;
+        ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+        link?: string | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'image';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        text: string;
+        linkType?: ('whatsapp' | 'url') | null;
+        url?: string | null;
+        refCode?: string | null;
+        message?: string | null;
+        variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+        fullWidth?: boolean | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'button';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'spacer';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        color?: ('line' | 'peach' | 'accent' | 'white') | null;
+        thickness?: ('1' | '2' | '4') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'divider';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        icon?: string | null;
+        title: string;
+        description?: string | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'iconBox';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        url: string;
+        caption?: string | null;
+        ratio?: ('video' | 'vertical' | 'square') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'video';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        /**
+         * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+         */
+        embedUrl: string;
+        height?: ('sm' | 'md' | 'lg') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'map';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        image?: (number | null) | Media;
+        alt?: string | null;
+        title: string;
+        description?: string | null;
+        buttonText?: string | null;
+        buttonUrl?: string | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'card';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        name?: string | null;
+        /**
+         * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+         */
+        html: string;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'html';
+      }
   )[];
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Halaman kampanye iklan (Meta/Google Ads) dengan kode referensi, pelacakan WhatsApp, dan CAPI. Gunakan ini untuk promo berbayar.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "landing-pages".
  */
@@ -1394,6 +3081,10 @@ export interface LandingPage {
    * Identifikasi varian untuk evaluasi conversion rate iklan.
    */
   variant?: ('A' | 'B' | 'C') | null;
+  /**
+   * Pilih builder visual dengan live preview atau formulir blok standar.
+   */
+  editorMode?: ('builder' | 'form') | null;
   /**
    * Gunakan blok ini untuk menyusun seksi halaman sesuka hati (Hero, Masalah, Solusi, Paket Harga, Komparasi, Garansi, dll.). Jika blok diisi, sistem akan menampilkan susunan blok ini.
    */
@@ -1674,6 +3365,1371 @@ export interface LandingPage {
             id?: string | null;
             blockName?: string | null;
             blockType: 'midwifeSpotlight';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Jika memilih CMS, blok akan menampilkan layanan teratas dari koleksi Layanan. Jika kosong, otomatis memakai daftar bawaan.
+             */
+            source?: ('cms' | 'config') | null;
+            maxItems?: number | null;
+            ctaText?: string | null;
+            ctaUrl?: string | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredServices';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan isi pembeda dari CMS.
+             */
+            items?:
+              | {
+                  icon?: string | null;
+                  title: string;
+                  description?: string | null;
+                  highlight?: boolean | null;
+                  id?: string | null;
+                }[]
+              | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'valueProps';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            badge?: string | null;
+            title: string;
+            subtitle?: string | null;
+            /**
+             * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan wilayah dari CMS.
+             */
+            items?:
+              | {
+                  region: string;
+                  slug?: string | null;
+                  areas?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            ctaText?: string | null;
+            ctaMessage?: string | null;
+            background?: ('white' | 'cream' | 'peach') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'coverageArea';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            text: string;
+            level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'heading';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            text: string;
+            textSize?: ('sm' | 'base' | 'lg') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'text';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            image: number | Media;
+            /**
+             * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+             */
+            alt: string;
+            caption?: string | null;
+            ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+            link?: string | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            text: string;
+            linkType?: ('whatsapp' | 'url') | null;
+            url?: string | null;
+            refCode?: string | null;
+            message?: string | null;
+            variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+            fullWidth?: boolean | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'button';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'spacer';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            color?: ('line' | 'peach' | 'accent' | 'white') | null;
+            thickness?: ('1' | '2' | '4') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'divider';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            icon?: string | null;
+            title: string;
+            description?: string | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'iconBox';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            url: string;
+            caption?: string | null;
+            ratio?: ('video' | 'vertical' | 'square') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'video';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            /**
+             * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+             */
+            embedUrl: string;
+            height?: ('sm' | 'md' | 'lg') | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'map';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            image?: (number | null) | Media;
+            alt?: string | null;
+            title: string;
+            description?: string | null;
+            buttonText?: string | null;
+            buttonUrl?: string | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'card';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            name?: string | null;
+            /**
+             * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+             */
+            html: string;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'html';
+          }
+        | {
+            /**
+             * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+             */
+            disabled?: boolean | null;
+            columns?: ('1' | '2' | '3' | '4') | null;
+            gap?: ('sm' | 'md' | 'lg') | null;
+            /**
+             * Aktifkan jika kolom kedua sebaiknya tampil lebih dulu di layar HP.
+             */
+            reverseMobile?: boolean | null;
+            column1?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            column2?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            column3?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            column4?:
+              | (
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'heading';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      textSize?: ('sm' | 'base' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'text';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image: number | Media;
+                      /**
+                       * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                       */
+                      alt: string;
+                      caption?: string | null;
+                      ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                      link?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'image';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      text: string;
+                      linkType?: ('whatsapp' | 'url') | null;
+                      url?: string | null;
+                      refCode?: string | null;
+                      message?: string | null;
+                      variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                      fullWidth?: boolean | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'button';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'spacer';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                      thickness?: ('1' | '2' | '4') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'divider';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      icon?: string | null;
+                      title: string;
+                      description?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'iconBox';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      url: string;
+                      caption?: string | null;
+                      ratio?: ('video' | 'vertical' | 'square') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'video';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      /**
+                       * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                       */
+                      embedUrl: string;
+                      height?: ('sm' | 'md' | 'lg') | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'map';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      image?: (number | null) | Media;
+                      alt?: string | null;
+                      title: string;
+                      description?: string | null;
+                      buttonText?: string | null;
+                      buttonUrl?: string | null;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'card';
+                    }
+                  | {
+                      /**
+                       * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                       */
+                      disabled?: boolean | null;
+                      name?: string | null;
+                      /**
+                       * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                       */
+                      html: string;
+                      styleBackground?:
+                        ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                      stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                      styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                      styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                      styleAlign?: ('left' | 'center' | 'right') | null;
+                      styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                      styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                      styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                      id?: string | null;
+                      blockName?: string | null;
+                      blockType: 'html';
+                    }
+                )[]
+              | null;
+            styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+            stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+            styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+            styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+            styleAlign?: ('left' | 'center' | 'right') | null;
+            styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+            styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+            styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'container';
           }
         | {
             /**
@@ -2109,6 +5165,1327 @@ export interface PageTemplate {
          * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
          */
         disabled?: boolean | null;
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Jika memilih CMS, blok akan menampilkan layanan teratas dari koleksi Layanan. Jika kosong, otomatis memakai daftar bawaan.
+         */
+        source?: ('cms' | 'config') | null;
+        maxItems?: number | null;
+        ctaText?: string | null;
+        ctaUrl?: string | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'featuredServices';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan isi pembeda dari CMS.
+         */
+        items?:
+          | {
+              icon?: string | null;
+              title: string;
+              description?: string | null;
+              highlight?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'valueProps';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        badge?: string | null;
+        title: string;
+        subtitle?: string | null;
+        /**
+         * Kosongkan untuk memakai daftar bawaan situs. Isi untuk menyesuaikan wilayah dari CMS.
+         */
+        items?:
+          | {
+              region: string;
+              slug?: string | null;
+              areas?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        ctaText?: string | null;
+        ctaMessage?: string | null;
+        background?: ('white' | 'cream' | 'peach') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'coverageArea';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        text: string;
+        level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'heading';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        text: string;
+        textSize?: ('sm' | 'base' | 'lg') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'text';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        image: number | Media;
+        /**
+         * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+         */
+        alt: string;
+        caption?: string | null;
+        ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+        link?: string | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'image';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        text: string;
+        linkType?: ('whatsapp' | 'url') | null;
+        url?: string | null;
+        refCode?: string | null;
+        message?: string | null;
+        variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+        fullWidth?: boolean | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'button';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'spacer';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        color?: ('line' | 'peach' | 'accent' | 'white') | null;
+        thickness?: ('1' | '2' | '4') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'divider';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        icon?: string | null;
+        title: string;
+        description?: string | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'iconBox';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        url: string;
+        caption?: string | null;
+        ratio?: ('video' | 'vertical' | 'square') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'video';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        /**
+         * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+         */
+        embedUrl: string;
+        height?: ('sm' | 'md' | 'lg') | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'map';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        image?: (number | null) | Media;
+        alt?: string | null;
+        title: string;
+        description?: string | null;
+        buttonText?: string | null;
+        buttonUrl?: string | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'card';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        name?: string | null;
+        /**
+         * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+         */
+        html: string;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'html';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
+        columns?: ('1' | '2' | '3' | '4') | null;
+        gap?: ('sm' | 'md' | 'lg') | null;
+        /**
+         * Aktifkan jika kolom kedua sebaiknya tampil lebih dulu di layar HP.
+         */
+        reverseMobile?: boolean | null;
+        column1?:
+          | (
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'heading';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  textSize?: ('sm' | 'base' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'text';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image: number | Media;
+                  /**
+                   * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                   */
+                  alt: string;
+                  caption?: string | null;
+                  ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                  link?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'image';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  linkType?: ('whatsapp' | 'url') | null;
+                  url?: string | null;
+                  refCode?: string | null;
+                  message?: string | null;
+                  variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                  fullWidth?: boolean | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'button';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'spacer';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                  thickness?: ('1' | '2' | '4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'divider';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  icon?: string | null;
+                  title: string;
+                  description?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'iconBox';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  url: string;
+                  caption?: string | null;
+                  ratio?: ('video' | 'vertical' | 'square') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'video';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  /**
+                   * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                   */
+                  embedUrl: string;
+                  height?: ('sm' | 'md' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'map';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image?: (number | null) | Media;
+                  alt?: string | null;
+                  title: string;
+                  description?: string | null;
+                  buttonText?: string | null;
+                  buttonUrl?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'card';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  name?: string | null;
+                  /**
+                   * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                   */
+                  html: string;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'html';
+                }
+            )[]
+          | null;
+        column2?:
+          | (
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'heading';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  textSize?: ('sm' | 'base' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'text';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image: number | Media;
+                  /**
+                   * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                   */
+                  alt: string;
+                  caption?: string | null;
+                  ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                  link?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'image';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  linkType?: ('whatsapp' | 'url') | null;
+                  url?: string | null;
+                  refCode?: string | null;
+                  message?: string | null;
+                  variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                  fullWidth?: boolean | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'button';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'spacer';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                  thickness?: ('1' | '2' | '4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'divider';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  icon?: string | null;
+                  title: string;
+                  description?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'iconBox';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  url: string;
+                  caption?: string | null;
+                  ratio?: ('video' | 'vertical' | 'square') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'video';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  /**
+                   * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                   */
+                  embedUrl: string;
+                  height?: ('sm' | 'md' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'map';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image?: (number | null) | Media;
+                  alt?: string | null;
+                  title: string;
+                  description?: string | null;
+                  buttonText?: string | null;
+                  buttonUrl?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'card';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  name?: string | null;
+                  /**
+                   * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                   */
+                  html: string;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'html';
+                }
+            )[]
+          | null;
+        column3?:
+          | (
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'heading';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  textSize?: ('sm' | 'base' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'text';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image: number | Media;
+                  /**
+                   * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                   */
+                  alt: string;
+                  caption?: string | null;
+                  ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                  link?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'image';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  linkType?: ('whatsapp' | 'url') | null;
+                  url?: string | null;
+                  refCode?: string | null;
+                  message?: string | null;
+                  variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                  fullWidth?: boolean | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'button';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'spacer';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                  thickness?: ('1' | '2' | '4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'divider';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  icon?: string | null;
+                  title: string;
+                  description?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'iconBox';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  url: string;
+                  caption?: string | null;
+                  ratio?: ('video' | 'vertical' | 'square') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'video';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  /**
+                   * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                   */
+                  embedUrl: string;
+                  height?: ('sm' | 'md' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'map';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image?: (number | null) | Media;
+                  alt?: string | null;
+                  title: string;
+                  description?: string | null;
+                  buttonText?: string | null;
+                  buttonUrl?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'card';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  name?: string | null;
+                  /**
+                   * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                   */
+                  html: string;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'html';
+                }
+            )[]
+          | null;
+        column4?:
+          | (
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  level?: ('h1' | 'h2' | 'h3' | 'h4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'heading';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  textSize?: ('sm' | 'base' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'text';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image: number | Media;
+                  /**
+                   * Deskripsikan isi foto. Contoh: Bidan memijat bayi dengan lembut.
+                   */
+                  alt: string;
+                  caption?: string | null;
+                  ratio?: ('auto' | 'square' | 'video' | 'portrait') | null;
+                  link?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'image';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  text: string;
+                  linkType?: ('whatsapp' | 'url') | null;
+                  url?: string | null;
+                  refCode?: string | null;
+                  message?: string | null;
+                  variant?: ('primary' | 'secondary' | 'promo' | 'hero') | null;
+                  fullWidth?: boolean | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'button';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  height?: ('sm' | 'md' | 'lg' | 'xl') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'spacer';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  color?: ('line' | 'peach' | 'accent' | 'white') | null;
+                  thickness?: ('1' | '2' | '4') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'divider';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  icon?: string | null;
+                  title: string;
+                  description?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'iconBox';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  url: string;
+                  caption?: string | null;
+                  ratio?: ('video' | 'vertical' | 'square') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'video';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  /**
+                   * Ambil dari Google Maps → Share → Embed a map → salin src iframe.
+                   */
+                  embedUrl: string;
+                  height?: ('sm' | 'md' | 'lg') | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'map';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  image?: (number | null) | Media;
+                  alt?: string | null;
+                  title: string;
+                  description?: string | null;
+                  buttonText?: string | null;
+                  buttonUrl?: string | null;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'card';
+                }
+              | {
+                  /**
+                   * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+                   */
+                  disabled?: boolean | null;
+                  name?: string | null;
+                  /**
+                   * Gunakan untuk embed (iframe) atau markup khusus. Script dan <style> dilarang. Class Tailwind baru aktif setelah publish/rebuild.
+                   */
+                  html: string;
+                  styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+                  stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+                  styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+                  styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+                  styleAlign?: ('left' | 'center' | 'right') | null;
+                  styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+                  styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+                  styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'html';
+                }
+            )[]
+          | null;
+        styleBackground?: ('none' | 'cream' | 'white' | 'peach' | 'terracotta' | 'dark' | 'gradient') | null;
+        stylePadding?: ('none' | 'sm' | 'md' | 'lg' | 'xl') | null;
+        styleMargin?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleRadius?: ('none' | 'md' | 'lg' | 'full') | null;
+        styleShadow?: ('none' | 'sm' | 'md' | 'lg') | null;
+        styleAlign?: ('left' | 'center' | 'right') | null;
+        styleMaxWidth?: ('narrow' | 'medium' | 'wide' | 'full') | null;
+        styleTextColor?: ('ink' | 'muted' | 'accent' | 'white') | null;
+        styleVisibility?: ('all' | 'desktop' | 'tablet' | 'mobile') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'container';
+      }
+    | {
+        /**
+         * Jika dicentang, seksi ini tidak akan tampil ke pengunjung web publik (tetap terlihat di preview builder).
+         */
+        disabled?: boolean | null;
         /**
          * Pilih salah satu template susunan blok yang telah dibuat dan disimpan di menu Pustaka Template Blok.
          */
@@ -2270,7 +6647,7 @@ export interface User {
   /**
    * Menentukan menu apa saja yang dapat dilihat dan diedit oleh pengguna ini di dashboard.
    */
-  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing';
+  role: 'superadmin' | 'operator' | 'author' | 'seo' | 'midwife_coordinator' | 'marketing' | 'preview';
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -2770,6 +7147,1152 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        featuredServices?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              source?: T;
+              maxItems?: T;
+              ctaText?: T;
+              ctaUrl?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        valueProps?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    highlight?: T;
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        coverageArea?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    region?: T;
+                    slug?: T;
+                    areas?: T;
+                    id?: T;
+                  };
+              ctaText?: T;
+              ctaMessage?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              level?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        text?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              textSize?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              caption?: T;
+              ratio?: T;
+              link?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              linkType?: T;
+              url?: T;
+              refCode?: T;
+              message?: T;
+              variant?: T;
+              fullWidth?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              disabled?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              disabled?: T;
+              color?: T;
+              thickness?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconBox?:
+          | T
+          | {
+              disabled?: T;
+              icon?: T;
+              title?: T;
+              description?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              disabled?: T;
+              url?: T;
+              caption?: T;
+              ratio?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        map?:
+          | T
+          | {
+              disabled?: T;
+              embedUrl?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        card?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              title?: T;
+              description?: T;
+              buttonText?: T;
+              buttonUrl?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        html?:
+          | T
+          | {
+              disabled?: T;
+              name?: T;
+              html?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        container?:
+          | T
+          | {
+              disabled?: T;
+              columns?: T;
+              gap?: T;
+              reverseMobile?: T;
+              column1?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column2?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column3?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column4?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
         templateRef?:
           | T
           | {
@@ -2798,6 +8321,7 @@ export interface PagesSelect<T extends boolean = true> {
   activePixels?: T;
   slug?: T;
   pageType?: T;
+  editorMode?: T;
   seoScore?: T;
   seoAudit?:
     | T
@@ -2832,6 +8356,7 @@ export interface LandingPagesSelect<T extends boolean = true> {
   campaignBaseRef?: T;
   pageLayout?: T;
   variant?: T;
+  editorMode?: T;
   layout?:
     | T
     | {
@@ -3065,6 +8590,1152 @@ export interface LandingPagesSelect<T extends boolean = true> {
               midwives?: T;
               background?: T;
               spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featuredServices?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              source?: T;
+              maxItems?: T;
+              ctaText?: T;
+              ctaUrl?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        valueProps?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    highlight?: T;
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        coverageArea?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    region?: T;
+                    slug?: T;
+                    areas?: T;
+                    id?: T;
+                  };
+              ctaText?: T;
+              ctaMessage?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              level?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        text?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              textSize?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              caption?: T;
+              ratio?: T;
+              link?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              linkType?: T;
+              url?: T;
+              refCode?: T;
+              message?: T;
+              variant?: T;
+              fullWidth?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              disabled?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              disabled?: T;
+              color?: T;
+              thickness?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconBox?:
+          | T
+          | {
+              disabled?: T;
+              icon?: T;
+              title?: T;
+              description?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              disabled?: T;
+              url?: T;
+              caption?: T;
+              ratio?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        map?:
+          | T
+          | {
+              disabled?: T;
+              embedUrl?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        card?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              title?: T;
+              description?: T;
+              buttonText?: T;
+              buttonUrl?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        html?:
+          | T
+          | {
+              disabled?: T;
+              name?: T;
+              html?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        container?:
+          | T
+          | {
+              disabled?: T;
+              columns?: T;
+              gap?: T;
+              reverseMobile?: T;
+              column1?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column2?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column3?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column4?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
               id?: T;
               blockName?: T;
             };
@@ -3393,6 +10064,1152 @@ export interface PageTemplatesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        featuredServices?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              source?: T;
+              maxItems?: T;
+              ctaText?: T;
+              ctaUrl?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        valueProps?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    highlight?: T;
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        coverageArea?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    region?: T;
+                    slug?: T;
+                    areas?: T;
+                    id?: T;
+                  };
+              ctaText?: T;
+              ctaMessage?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              level?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        text?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              textSize?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              caption?: T;
+              ratio?: T;
+              link?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              linkType?: T;
+              url?: T;
+              refCode?: T;
+              message?: T;
+              variant?: T;
+              fullWidth?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              disabled?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              disabled?: T;
+              color?: T;
+              thickness?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconBox?:
+          | T
+          | {
+              disabled?: T;
+              icon?: T;
+              title?: T;
+              description?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              disabled?: T;
+              url?: T;
+              caption?: T;
+              ratio?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        map?:
+          | T
+          | {
+              disabled?: T;
+              embedUrl?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        card?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              title?: T;
+              description?: T;
+              buttonText?: T;
+              buttonUrl?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        html?:
+          | T
+          | {
+              disabled?: T;
+              name?: T;
+              html?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        container?:
+          | T
+          | {
+              disabled?: T;
+              columns?: T;
+              gap?: T;
+              reverseMobile?: T;
+              column1?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column2?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column3?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              column4?:
+                | T
+                | {
+                    heading?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          level?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    text?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          textSize?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    image?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          caption?: T;
+                          ratio?: T;
+                          link?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    button?:
+                      | T
+                      | {
+                          disabled?: T;
+                          text?: T;
+                          linkType?: T;
+                          url?: T;
+                          refCode?: T;
+                          message?: T;
+                          variant?: T;
+                          fullWidth?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    spacer?:
+                      | T
+                      | {
+                          disabled?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    divider?:
+                      | T
+                      | {
+                          disabled?: T;
+                          color?: T;
+                          thickness?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    iconBox?:
+                      | T
+                      | {
+                          disabled?: T;
+                          icon?: T;
+                          title?: T;
+                          description?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    video?:
+                      | T
+                      | {
+                          disabled?: T;
+                          url?: T;
+                          caption?: T;
+                          ratio?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    map?:
+                      | T
+                      | {
+                          disabled?: T;
+                          embedUrl?: T;
+                          height?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    card?:
+                      | T
+                      | {
+                          disabled?: T;
+                          image?: T;
+                          alt?: T;
+                          title?: T;
+                          description?: T;
+                          buttonText?: T;
+                          buttonUrl?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                    html?:
+                      | T
+                      | {
+                          disabled?: T;
+                          name?: T;
+                          html?: T;
+                          styleBackground?: T;
+                          stylePadding?: T;
+                          styleMargin?: T;
+                          styleRadius?: T;
+                          styleShadow?: T;
+                          styleAlign?: T;
+                          styleMaxWidth?: T;
+                          styleTextColor?: T;
+                          styleVisibility?: T;
+                          id?: T;
+                          blockName?: T;
+                        };
+                  };
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
         templateRef?:
           | T
           | {
@@ -3647,6 +11464,273 @@ export interface BlockTemplatesSelect<T extends boolean = true> {
               midwives?: T;
               background?: T;
               spacing?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featuredServices?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              source?: T;
+              maxItems?: T;
+              ctaText?: T;
+              ctaUrl?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        valueProps?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    icon?: T;
+                    title?: T;
+                    description?: T;
+                    highlight?: T;
+                    id?: T;
+                  };
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        coverageArea?:
+          | T
+          | {
+              disabled?: T;
+              badge?: T;
+              title?: T;
+              subtitle?: T;
+              items?:
+                | T
+                | {
+                    region?: T;
+                    slug?: T;
+                    areas?: T;
+                    id?: T;
+                  };
+              ctaText?: T;
+              ctaMessage?: T;
+              background?: T;
+              id?: T;
+              blockName?: T;
+            };
+        heading?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              level?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        text?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              textSize?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              caption?: T;
+              ratio?: T;
+              link?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        button?:
+          | T
+          | {
+              disabled?: T;
+              text?: T;
+              linkType?: T;
+              url?: T;
+              refCode?: T;
+              message?: T;
+              variant?: T;
+              fullWidth?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        spacer?:
+          | T
+          | {
+              disabled?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        divider?:
+          | T
+          | {
+              disabled?: T;
+              color?: T;
+              thickness?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        iconBox?:
+          | T
+          | {
+              disabled?: T;
+              icon?: T;
+              title?: T;
+              description?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              disabled?: T;
+              url?: T;
+              caption?: T;
+              ratio?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        map?:
+          | T
+          | {
+              disabled?: T;
+              embedUrl?: T;
+              height?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        card?:
+          | T
+          | {
+              disabled?: T;
+              image?: T;
+              alt?: T;
+              title?: T;
+              description?: T;
+              buttonText?: T;
+              buttonUrl?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
+              id?: T;
+              blockName?: T;
+            };
+        html?:
+          | T
+          | {
+              disabled?: T;
+              name?: T;
+              html?: T;
+              styleBackground?: T;
+              stylePadding?: T;
+              styleMargin?: T;
+              styleRadius?: T;
+              styleShadow?: T;
+              styleAlign?: T;
+              styleMaxWidth?: T;
+              styleTextColor?: T;
+              styleVisibility?: T;
               id?: T;
               blockName?: T;
             };

@@ -1,0 +1,56 @@
+---
+import { getAlignClass, getPaddingClass, getStyleClasses, resolveMediaUrl } from '../style-utils';
+
+interface Props {
+  block: {
+    image?: any;
+    alt?: string;
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    buttonUrl?: string;
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const url = resolveMediaUrl(block?.image);
+const alignClass = getAlignClass(block);
+const hasButton = Boolean(block?.buttonText && block?.buttonUrl);
+---
+
+<div class={`${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  <article class="bg-white border border-[#F6DCCD] rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">
+    {url && (
+      <div class="aspect-video bg-[#FFF9F4] overflow-hidden">
+        <img
+          src={url}
+          alt={block?.alt || block?.title || ''}
+          loading="lazy"
+          decoding="async"
+          class="w-full h-full object-cover"
+        />
+      </div>
+    )}
+    <div class={`p-5 flex-1 flex flex-col ${alignClass}`}>
+      {block?.title && <h3 class="text-base font-bold text-[#4B2E22] mb-1.5">{block.title}</h3>}
+      {block?.description && (
+        <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed whitespace-pre-line flex-1">
+          {block.description}
+        </p>
+      )}
+      {hasButton && (
+        <a
+          href={block.buttonUrl}
+          class="mt-4 inline-flex items-center justify-center bg-[#0E733D] hover:bg-[#0B582F] text-white text-xs font-bold py-2.5 px-4 rounded-full transition-colors"
+          rel={block.buttonUrl?.startsWith('http') ? 'noopener noreferrer' : undefined}
+          target={block.buttonUrl?.startsWith('http') ? '_blank' : undefined}
+        >
+          {block.buttonText}
+        </a>
+      )}
+    </div>
+  </article>
+</div>

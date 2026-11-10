@@ -1,0 +1,24 @@
+---
+import { getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    height?: 'sm' | 'md' | 'lg' | 'xl';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const heightClasses: Record<string, string> = {
+  sm: 'h-4',
+  md: 'h-8',
+  lg: 'h-16',
+  xl: 'h-24',
+};
+---
+
+<div class={getStyleClasses(block)}>
+  <div class={heightClasses[block?.height || 'md'] || heightClasses.md} aria-hidden="true"></div>
+</div>

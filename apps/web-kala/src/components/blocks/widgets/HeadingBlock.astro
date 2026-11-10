@@ -1,0 +1,45 @@
+---
+import {
+  getAlignClass,
+  getPaddingClass,
+  getStyleClasses,
+  getTextColorClass,
+} from '../style-utils';
+
+interface Props {
+  block: {
+    text: string;
+    level?: 'h1' | 'h2' | 'h3' | 'h4';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const level = ['h1', 'h2', 'h3', 'h4'].includes(block?.level || '')
+  ? (block.level as 'h1' | 'h2' | 'h3' | 'h4')
+  : 'h2';
+
+const Tag = level;
+
+const sizeClasses: Record<string, string> = {
+  h1: 'text-3xl sm:text-4xl lg:text-5xl font-brand font-bold leading-tight',
+  h2: 'text-2xl sm:text-3xl lg:text-4xl font-brand font-bold leading-tight',
+  h3: 'text-xl sm:text-2xl font-brand font-semibold leading-snug',
+  h4: 'text-lg sm:text-xl font-semibold leading-snug',
+};
+
+const classes = [
+  sizeClasses[level],
+  getTextColorClass(block),
+  getAlignClass(block),
+  getPaddingClass(block),
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class={getStyleClasses(block)}>
+  <Tag class={classes}>{block?.text}</Tag>
+</div>

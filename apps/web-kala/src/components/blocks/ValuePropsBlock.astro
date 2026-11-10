@@ -1,0 +1,81 @@
+---
+import { siteConfig } from '../../config/site';
+import { getPaddingClass, getStyleClasses } from './style-utils';
+
+interface Props {
+  block: {
+    badge?: string;
+    title?: string;
+    subtitle?: string;
+    items?: Array<{ icon?: string; title?: string; description?: string; highlight?: boolean }>;
+    background?: 'white' | 'cream' | 'peach';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+
+const sourceItems =
+  Array.isArray(block?.items) && block.items.length > 0
+    ? block.items.map((item, index) => ({
+        icon: item.icon || '',
+        number: String(index + 1).padStart(2, '0'),
+        title: item.title || '',
+        description: item.description || '',
+        highlight: Boolean(item.highlight),
+      }))
+    : siteConfig.differentiators.map((item) => ({
+        icon: '',
+        number: item.number,
+        title: item.title,
+        description: item.description,
+        highlight: false,
+      }));
+---
+
+<section class={`${bgClasses[block?.background || 'white'] || bgClasses.white} ${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      {block?.badge && (
+        <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+          {block.badge}
+        </span>
+      )}
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block?.title || '5 Hal yang Membuat Kala Berbeda'}
+      </h2>
+      {block?.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">{block.subtitle}</p>
+      )}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      {sourceItems.map((item) => (
+        <div
+          class={`p-6 rounded-3xl border flex gap-4 ${
+            item.highlight
+              ? 'bg-[#FFEFE5] border-[#B3471E]'
+              : 'bg-[#FFF9F4] border-[#F6DCCD]'
+          }`}
+        >
+          <div class="shrink-0 w-10 h-10 rounded-full bg-white border border-[#F6DCCD] flex items-center justify-center font-brand font-bold text-sm text-[#B3471E]">
+            {item.icon || item.number}
+          </div>
+          <div class="min-w-0">
+            <h3 class="font-brand font-bold text-base text-[#4B2E22] leading-snug mb-1.5">
+              {item.title}
+            </h3>
+            <p class="text-xs sm:text-sm text-[#86675A] leading-relaxed">{item.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

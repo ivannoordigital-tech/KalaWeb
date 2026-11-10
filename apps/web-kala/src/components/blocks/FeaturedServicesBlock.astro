@@ -1,0 +1,149 @@
+---
+import { siteConfig } from '../../config/site';
+import { fetchPayloadServices } from '../../lib/payload';
+import WhatsAppButton from '../WhatsAppButton.astro';
+import { getPaddingClass, getStyleClasses } from './style-utils';
+
+interface Props {
+  block: {
+    badge?: string;
+    title?: string;
+    subtitle?: string;
+    source?: 'cms' | 'config';
+    maxItems?: number;
+    ctaText?: string;
+    ctaUrl?: string;
+    background?: 'white' | 'cream' | 'peach';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block, siteSettings } = Astro.props;
+const maxItems = Math.min(Math.max(Number(block?.maxItems) || 3, 1), 6);
+
+const bgClasses: Record<string, string> = {
+  white: 'bg-white',
+  cream: 'bg-[#FFF9F4]',
+  peach: 'bg-[#FFEFE5]',
+};
+
+let services: any[] = [];
+
+if (block?.source !== 'config') {
+  const cmsServices = await fetchPayloadServices();
+  services = cmsServices.slice(0, maxItems).map((s: any) => ({
+    id: s.slug || s.id,
+    name: s.name,
+    target: s.target,
+    duration: s.duration,
+    originalPrice: s.originalPrice,
+    price: s.price,
+    description: s.shortDescription || s.description,
+    popular: s.recommended || s.popular,
+    refCode: s.refCode,
+    message: s.message || `Halo Bu Bidan, saya mau reservasi ${s.name} ${s.price}`,
+  }));
+}
+
+if (services.length === 0) {
+  services = siteConfig.featuredServices.slice(0, maxItems).map((s: any) => ({
+    ...s,
+    popular: s.popular,
+  }));
+}
+
+// Samakan urutan dengan komponen FeaturedServices homepage.
+const preferredOrder = ['baby-newborn', 'bundle-duo', 'bundle-selapan'];
+services = [...services].sort((a, b) => {
+  const idxA = preferredOrder.indexOf(a.id);
+  const idxB = preferredOrder.indexOf(b.id);
+  return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+});
+
+const phone = siteSettings?.whatsappNumber;
+---
+
+<section class={`${bgClasses[block?.background || 'cream'] || bgClasses.cream} ${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      {block?.badge && (
+        <span class="text-xs font-bold tracking-wider text-[#B3471E] uppercase bg-[#FFEFE5] px-3.5 py-1.5 rounded-full border border-[#F6DCCD] inline-block mb-3">
+          {block.badge}
+        </span>
+      )}
+      <h2 class="text-2xl sm:text-3xl lg:text-4xl font-brand font-bold text-[#4B2E22] mb-3">
+        {block?.title || 'Layanan Unggulan Kala'}
+      </h2>
+      {block?.subtitle && (
+        <p class="text-sm sm:text-base text-[#86675A] leading-relaxed">{block.subtitle}</p>
+      )}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      {services.map((service) => (
+        <article
+          class={`bg-white rounded-3xl overflow-hidden border flex flex-col ${
+            service.popular
+              ? 'border-[#B3471E] shadow-kala-hover'
+              : 'border-[#F6DCCD] shadow-sm'
+          }`}
+        >
+          {service.popular && (
+            <div class="bg-[#B3471E] text-white text-xs font-bold py-1.5 px-4 text-center tracking-wide uppercase">
+              ★ Rekomendasi Terfavorit
+            </div>
+          )}
+          <div class="p-6 flex-1">
+            <div class="flex items-center justify-between text-xs font-semibold text-[#86675A] mb-3">
+              <span class="px-2.5 py-1 bg-[#FFEFE5] text-[#B3471E] rounded-lg border border-[#F6DCCD]">
+                {service.target}
+              </span>
+              {service.duration && <span>⏱ {service.duration}</span>}
+            </div>
+            <h3 class="font-brand font-bold text-xl text-[#4B2E22] mb-3 leading-snug">
+              {service.id ? (
+                <a href={`/layanan/${service.id}`} class="hover:text-[#B3471E] transition-colors">
+                  {service.name}
+                </a>
+              ) : (
+                service.name
+              )}
+            </h3>
+            <p class="text-sm text-[#86675A] leading-relaxed mb-5">{service.description}</p>
+            <div class="pt-4 border-t border-[#F6DCCD]/60">
+              {service.originalPrice && (
+                <div class="text-xs text-[#86675A] line-through">{service.originalPrice}</div>
+              )}
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-2xl font-brand font-bold text-[#B3471E]">{service.price}</span>
+                <span class="text-xs font-semibold text-[#86675A]">/ sesi</span>
+              </div>
+            </div>
+          </div>
+          <div class="p-6 pt-0">
+            <WhatsAppButton
+              refCode={service.refCode || 'KALA-SRV-WIDGET'}
+              message={service.message}
+              text="Reservasi Layanan Ini"
+              variant={service.popular ? 'primary' : 'card'}
+              phone={phone}
+              className="w-full"
+            />
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {block?.ctaText && block?.ctaUrl && (
+      <div class="text-center mt-10">
+        <a
+          href={block.ctaUrl}
+          class="inline-flex items-center justify-center bg-[#B3471E] hover:bg-[#A3431F] text-white font-bold py-3 px-6 rounded-full transition-colors"
+        >
+          {block.ctaText}
+        </a>
+      </div>
+    )}
+  </div>
+</section>

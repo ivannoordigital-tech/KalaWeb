@@ -1,0 +1,35 @@
+---
+import { applyCmsTokens, sanitizeCmsHtml } from '../../../lib/sanitizeHtml';
+import { getPaddingClass, getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    name?: string;
+    html?: string;
+    refCode?: string;
+    message?: string;
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block, siteSettings } = Astro.props;
+
+const phone = String(siteSettings?.whatsappNumber || '').replace(/\D/g, '');
+const message = block?.message || 'Halo Bidan Kala, saya ingin konsultasi.';
+const refCode = block?.refCode || 'KALA-HOME';
+const waLink = phone
+  ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
+  : '#';
+
+const withTokens = applyCmsTokens(block?.html || '', { waLink, phone, refCode });
+const safeHtml = sanitizeCmsHtml(withTokens);
+---
+
+<div class={`${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  {safeHtml ? (
+    <div class="kala-cms-html max-w-full overflow-x-auto" set:html={safeHtml} />
+  ) : (
+    <div class="text-xs text-[#86675A] text-center py-4">Custom HTML masih kosong.</div>
+  )}
+</div>

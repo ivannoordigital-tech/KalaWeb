@@ -21,6 +21,7 @@ export async function getStaticPaths() {
     'blog',
     'lp',
     'sales',
+    'home',
   ]);
 
   const fallbackPages: PayloadPage[] = [
@@ -34,7 +35,7 @@ export async function getStaticPaths() {
   ];
 
   const rawList = cmsPages.length > 0 ? cmsPages : fallbackPages;
-  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug) && (p as any).pageType !== 'landing');
+  const validPages = rawList.filter((p) => p.slug && !reservedSlugs.has(p.slug) && (p as any).pageType !== 'landing' && (p as any).pageType !== 'home');
 
   return validPages.map((page) => ({
     params: { slug: page.slug },

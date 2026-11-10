@@ -1,0 +1,53 @@
+---
+import { getPaddingClass, getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    embedUrl?: string;
+    height?: 'sm' | 'md' | 'lg';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const heightClasses: Record<string, string> = {
+  sm: 'h-[200px]',
+  md: 'h-[320px]',
+  lg: 'h-[480px]',
+};
+
+const isAllowedMapUrl = (raw: string): boolean => {
+  if (!raw) return false;
+  try {
+    const url = new URL(raw);
+    return (
+      ['www.google.com', 'google.com', 'maps.google.com', 'www.google.co.id'].includes(
+        url.hostname,
+      ) && url.pathname.startsWith('/maps')
+    );
+  } catch {
+    return false;
+  }
+};
+
+const valid = isAllowedMapUrl(block?.embedUrl || '');
+---
+
+<div class={`${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  {valid ? (
+    <iframe
+      src={block.embedUrl}
+      title="Peta area layanan Kala"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen
+      class={`w-full ${heightClasses[block?.height || 'md'] || heightClasses.md} rounded-xl border border-[#F6DCCD]`}
+    ></iframe>
+  ) : (
+    <div class="w-full h-[320px] rounded-xl bg-[#FFEFE5] border border-[#F6DCCD] flex items-center justify-center text-xs text-[#86675A] px-4 text-center">
+      URL embed Google Maps belum valid. Gunakan tautan https://www.google.com/maps/embed?...
+    </div>
+  )}
+</div>

@@ -12,6 +12,11 @@ import { CallToActionBlock } from './CallToActionBlock'
 import { GalleryBlock } from './GalleryBlock'
 import { TemplateRefBlock } from './TemplateRefBlock'
 import { MidwifeSpotlightBlock } from './MidwifeSpotlightBlock'
+import { ContainerBlock } from './ContainerBlock'
+import { FeaturedServicesBlock } from './FeaturedServicesBlock'
+import { ValuePropsBlock } from './ValuePropsBlock'
+import { CoverageAreaBlock } from './CoverageAreaBlock'
+import { widgetBlocks } from './widgets'
 import { withDisabled } from './withDisabled'
 
 export const baseBlocks = [
@@ -28,10 +33,15 @@ export const baseBlocks = [
   CallToActionBlock,
   GalleryBlock,
   MidwifeSpotlightBlock,
-].map(withDisabled)
+  FeaturedServicesBlock,
+  ValuePropsBlock,
+  CoverageAreaBlock,
+  ...widgetBlocks,
+].map((block) => (block.fields?.some((field: any) => field.name === 'disabled') ? block : withDisabled(block)))
 
 export const allBlocks = [
   ...baseBlocks,
+  withDisabled(ContainerBlock),
   withDisabled(TemplateRefBlock),
 ]
 
@@ -50,4 +60,8 @@ export {
   GalleryBlock,
   TemplateRefBlock,
   MidwifeSpotlightBlock,
+  ContainerBlock,
+  FeaturedServicesBlock,
+  ValuePropsBlock,
+  CoverageAreaBlock,
 }

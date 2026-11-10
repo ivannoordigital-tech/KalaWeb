@@ -1,0 +1,77 @@
+---
+import { getPaddingClass, getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    url?: string;
+    caption?: string;
+    ratio?: 'video' | 'vertical' | 'square';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const toEmbedUrl = (raw: string): string | null => {
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    const host = url.hostname.replace(/^www\./, '');
+
+    if (host === 'youtu.be') {
+      const id = url.pathname.split('/').filter(Boolean)[0];
+      return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+    }
+
+    if (host.endsWith('youtube.com')) {
+      const id = url.searchParams.get('v');
+      if (id) return `https://www.youtube-nocookie.com/embed/${id}`;
+      if (url.pathname.startsWith('/embed/')) return raw;
+    }
+
+    if (host.endsWith('vimeo.com')) {
+      if (url.pathname.startsWith('/video/')) return raw;
+      const id = url.pathname.split('/').filter(Boolean)[0];
+      return id ? `https://player.vimeo.com/video/${id}` : null;
+    }
+
+    return raw;
+  } catch {
+    return null;
+  }
+};
+
+const embedUrl = toEmbedUrl(block?.url || '');
+
+const ratioClasses: Record<string, string> = {
+  video: 'aspect-video',
+  vertical: 'aspect-[9/16]',
+  square: 'aspect-square',
+};
+const ratioClass = ratioClasses[block?.ratio || 'video'] || ratioClasses.video;
+---
+
+<div class={`${getStyleClasses(block)} ${getPaddingClass(block)}`}>
+  {embedUrl ? (
+    <figure class="m-0">
+      <div class={`w-full ${ratioClass} overflow-hidden rounded-xl bg-black`}>
+        <iframe
+          src={embedUrl}
+          title={block?.caption || 'Video Kala'}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          class="w-full h-full border-0"
+        ></iframe>
+      </div>
+      {block?.caption && (
+        <figcaption class="text-xs text-[#86675A] mt-2 text-center">{block.caption}</figcaption>
+      )}
+    </figure>
+  ) : (
+    <div class="w-full aspect-video rounded-xl bg-[#FFEFE5] border border-[#F6DCCD] flex items-center justify-center text-xs text-[#86675A]">
+      URL video belum valid.
+    </div>
+  )}
+</div>

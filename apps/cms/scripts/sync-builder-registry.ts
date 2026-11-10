@@ -31,7 +31,7 @@ if (extraInRegistry.length > 0) {
   process.exit(1);
 }
 
-console.log('✅ Paritas 100% Cocok: 14/14 blok valid dan sinkron.');
+console.log(`✅ Paritas 100% Cocok: ${allBlockSlugs.length}/${registrySlugs.length} blok valid dan sinkron.`);
 
 // Target File: apps/web-kala/src/components/blocks/registry.generated.json
 const targetPath = path.resolve(__dirname, '../../web-kala/src/components/blocks/registry.generated.json');

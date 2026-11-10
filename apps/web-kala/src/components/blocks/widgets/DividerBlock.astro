@@ -1,0 +1,35 @@
+---
+import { getStyleClasses } from '../style-utils';
+
+interface Props {
+  block: {
+    color?: 'line' | 'peach' | 'accent' | 'white';
+    thickness?: '1' | '2' | '4';
+    [key: string]: any;
+  };
+  siteSettings?: any;
+}
+
+const { block } = Astro.props;
+
+const colorClasses: Record<string, string> = {
+  line: 'border-[#F6DCCD]',
+  peach: 'border-[#FFBE9C]',
+  accent: 'border-[#B3471E]',
+  white: 'border-white',
+};
+
+const thicknessClasses: Record<string, string> = {
+  '1': 'border-t',
+  '2': 'border-t-2',
+  '4': 'border-t-4',
+};
+---
+
+<div class={`${getStyleClasses(block)} py-2`}>
+  <hr
+    class={`border-0 ${colorClasses[block?.color || 'line'] || colorClasses.line} ${
+      thicknessClasses[block?.thickness || '1'] || thicknessClasses['1']
+    }`}
+  />
+</div>

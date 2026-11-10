@@ -12,6 +12,21 @@ import RichTextBlock from './RichTextBlock.astro';
 import CallToActionBlock from './CallToActionBlock.astro';
 import GalleryBlock from './GalleryBlock.astro';
 import MidwifeSpotlightBlock from './MidwifeSpotlightBlock.astro';
+import ContainerBlock from './ContainerBlock.astro';
+import FeaturedServicesBlock from './FeaturedServicesBlock.astro';
+import ValuePropsBlock from './ValuePropsBlock.astro';
+import CoverageAreaBlock from './CoverageAreaBlock.astro';
+import HeadingBlock from './widgets/HeadingBlock.astro';
+import TextBlock from './widgets/TextBlock.astro';
+import ImageBlock from './widgets/ImageBlock.astro';
+import ButtonBlock from './widgets/ButtonBlock.astro';
+import SpacerBlock from './widgets/SpacerBlock.astro';
+import DividerBlock from './widgets/DividerBlock.astro';
+import IconBoxBlock from './widgets/IconBoxBlock.astro';
+import VideoBlock from './widgets/VideoBlock.astro';
+import MapBlock from './widgets/MapBlock.astro';
+import CardBlock from './widgets/CardBlock.astro';
+import HtmlBlock from './widgets/HtmlBlock.astro';
 
 interface Props {
   block: {
@@ -21,9 +36,14 @@ interface Props {
     [key: string]: any;
   };
   isPreview?: boolean;
+  siteSettings?: any;
 }
 
-const { block, isPreview = Astro.url.pathname.startsWith('/preview/') } = Astro.props;
+const {
+  block,
+  isPreview = Astro.url.pathname.startsWith('/preview/'),
+  siteSettings,
+} = Astro.props;
 
 // If section is disabled and this is public production, DO NOT RENDER
 if (!isPreview && block?.disabled) {
@@ -45,6 +65,21 @@ const KNOWN_BLOCK_TYPES = [
   'gallery',
   'templateRef',
   'midwifeSpotlight',
+  'container',
+  'featuredServices',
+  'valueProps',
+  'coverageArea',
+  'heading',
+  'text',
+  'image',
+  'button',
+  'spacer',
+  'divider',
+  'iconBox',
+  'video',
+  'map',
+  'card',
+  'html',
 ];
 
 if (!block || !block.blockType) {
@@ -91,10 +126,29 @@ const templateLayout = block?.blockType === 'templateRef' && typeof block.templa
     {block.blockType === 'cta' && <CallToActionBlock block={block as any} />}
     {block.blockType === 'gallery' && <GalleryBlock block={block as any} />}
     {block.blockType === 'midwifeSpotlight' && <MidwifeSpotlightBlock block={block as any} />}
+    {block.blockType === 'featuredServices' && <FeaturedServicesBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'valueProps' && <ValuePropsBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'coverageArea' && <CoverageAreaBlock block={block as any} siteSettings={siteSettings} />}
+
+    <!-- Layout container & widgets -->
+    {block.blockType === 'container' && (
+      <ContainerBlock block={block as any} isPreview={isPreview} siteSettings={siteSettings} />
+    )}
+    {block.blockType === 'heading' && <HeadingBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'text' && <TextBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'image' && <ImageBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'button' && <ButtonBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'spacer' && <SpacerBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'divider' && <DividerBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'iconBox' && <IconBoxBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'video' && <VideoBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'map' && <MapBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'card' && <CardBlock block={block as any} siteSettings={siteSettings} />}
+    {block.blockType === 'html' && <HtmlBlock block={block as any} siteSettings={siteSettings} />}
 
     <!-- Render template tersimpan secara modular -->
     {block.blockType === 'templateRef' && templateLayout.map((innerBlock: any) => (
-      <Astro.self block={innerBlock} isPreview={isPreview} />
+      <Astro.self block={innerBlock} isPreview={isPreview} siteSettings={siteSettings} />
     ))}
   </div>
 )}

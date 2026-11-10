@@ -6,7 +6,8 @@ export type BuilderFieldType =
   | 'number'
   | 'upload'
   | 'richtext'
-  | 'array';
+  | 'array'
+  | 'code';
 
 export interface BuilderFieldMeta {
   name: string;
@@ -27,17 +28,175 @@ export interface BuilderInnerBlocks {
   max?: number;
 }
 
+/**
+ * Metadata for a block that can contain other blocks (e.g. a Container
+ * with 1–4 columns). `columns` maps a data field name to the widgets
+ * allowed inside it.
+ */
+export interface BuilderNestedBlocks {
+  /** Field names that hold child block arrays, e.g. column1..column4. */
+  columns: string[];
+  /** Number of columns the block supports (used by the builder UI). */
+  maxColumns: number;
+  /** Widget block slugs allowed as children. */
+  allowedBlocks: string[];
+  /** Maximum nesting depth (container = 1). */
+  maxDepth: number;
+}
+
 export interface BuilderBlockMeta {
   slug: string;
   label: string;
   icon: string;
-  category: 'hero' | 'proof' | 'offer' | 'content' | 'cta';
+  category: 'layout' | 'widget' | 'hero' | 'proof' | 'offer' | 'content' | 'cta';
   description: string;
   defaults: Record<string, unknown>;
   fields: BuilderFieldMeta[];
   innerBlocks?: BuilderInnerBlocks;
+  nestedBlocks?: BuilderNestedBlocks;
   presets?: Array<{ id: string; label: string; defaults: Record<string, unknown> }>;
 }
+
+/** Shared style fields exposed by every widget and container. */
+export const builderStyleFieldMeta: BuilderFieldMeta[] = [
+  {
+    name: 'styleBackground',
+    label: 'Latar Belakang',
+    type: 'select',
+    options: [
+      { label: 'Transparan', value: 'none' },
+      { label: 'Krem Hangat', value: 'cream' },
+      { label: 'Putih Bersih', value: 'white' },
+      { label: 'Peach Lembut', value: 'peach' },
+      { label: 'Terracotta', value: 'terracotta' },
+      { label: 'Cokelat Tua', value: 'dark' },
+      { label: 'Gradasi Peach', value: 'gradient' },
+    ],
+  },
+  {
+    name: 'stylePadding',
+    label: 'Padding',
+    type: 'select',
+    options: [
+      { label: 'Tanpa Padding', value: 'none' },
+      { label: 'Rapat', value: 'sm' },
+      { label: 'Normal', value: 'md' },
+      { label: 'Longgar', value: 'lg' },
+      { label: 'Sangat Longgar', value: 'xl' },
+    ],
+  },
+  {
+    name: 'styleMargin',
+    label: 'Margin Atas/Bawah',
+    type: 'select',
+    options: [
+      { label: 'Tanpa Margin', value: 'none' },
+      { label: 'Kecil', value: 'sm' },
+      { label: 'Sedang', value: 'md' },
+      { label: 'Besar', value: 'lg' },
+    ],
+  },
+  {
+    name: 'styleRadius',
+    label: 'Sudut Melengkung',
+    type: 'select',
+    options: [
+      { label: 'Kotak', value: 'none' },
+      { label: 'Sedang', value: 'md' },
+      { label: 'Besar', value: 'lg' },
+      { label: 'Bulat Penuh', value: 'full' },
+    ],
+  },
+  {
+    name: 'styleShadow',
+    label: 'Bayangan',
+    type: 'select',
+    options: [
+      { label: 'Tanpa Bayangan', value: 'none' },
+      { label: 'Halus', value: 'sm' },
+      { label: 'Sedang', value: 'md' },
+      { label: 'Kuat', value: 'lg' },
+    ],
+  },
+  {
+    name: 'styleAlign',
+    label: 'Perataan Teks',
+    type: 'select',
+    options: [
+      { label: 'Kiri', value: 'left' },
+      { label: 'Tengah', value: 'center' },
+      { label: 'Kanan', value: 'right' },
+    ],
+  },
+  {
+    name: 'styleMaxWidth',
+    label: 'Lebar Maksimum',
+    type: 'select',
+    options: [
+      { label: 'Sempit', value: 'narrow' },
+      { label: 'Sedang', value: 'medium' },
+      { label: 'Lebar', value: 'wide' },
+      { label: 'Penuh', value: 'full' },
+    ],
+  },
+  {
+    name: 'styleTextColor',
+    label: 'Warna Teks',
+    type: 'select',
+    options: [
+      { label: 'Cokelat Ink', value: 'ink' },
+      { label: 'Cokelat Muted', value: 'muted' },
+      { label: 'Terracotta', value: 'accent' },
+      { label: 'Putih', value: 'white' },
+    ],
+  },
+  {
+    name: 'styleVisibility',
+    label: 'Tampil Di',
+    type: 'select',
+    options: [
+      { label: 'Semua Perangkat', value: 'all' },
+      { label: 'Desktop Saja', value: 'desktop' },
+      { label: 'Tablet Saja', value: 'tablet' },
+      { label: 'Mobile Saja', value: 'mobile' },
+    ],
+  },
+];
+
+export const builderStyleDefaults: Record<string, unknown> = {
+  styleBackground: 'none',
+  stylePadding: 'none',
+  styleMargin: 'none',
+  styleRadius: 'none',
+  styleShadow: 'none',
+  styleAlign: 'left',
+  styleMaxWidth: 'full',
+  styleTextColor: 'ink',
+  styleVisibility: 'all',
+};
+
+export const widgetSlugList = [
+  'heading',
+  'text',
+  'image',
+  'button',
+  'spacer',
+  'divider',
+  'iconBox',
+  'video',
+  'map',
+  'card',
+  'html',
+];
+
+/** Empty child arrays for a container with the given number of columns. */
+export const emptyContainerColumns = (): Record<string, unknown[]> => {
+  const out: Record<string, unknown[]> = {};
+  for (let i = 1; i <= 4; i += 1) {
+    out[`column${i}`] = [];
+  }
+  return out;
+};
 
 export const builderRegistry: Record<string, BuilderBlockMeta> = {
   hero: {
@@ -564,6 +723,526 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
       disabled: false,
     },
     fields: [],
+  },
+
+  // ---------------------------------------------------------------
+  // Layout & Widgets
+  // ---------------------------------------------------------------
+
+  container: {
+    slug: 'container',
+    label: 'Layout / Container',
+    icon: 'Columns3',
+    category: 'layout',
+    description: 'Wadah 1–4 kolom untuk menyusun widget secara bebas.',
+    defaults: {
+      blockType: 'container',
+      columns: '2',
+      gap: 'md',
+      reverseMobile: false,
+      ...emptyContainerColumns(),
+      ...builderStyleDefaults,
+      stylePadding: 'md',
+      disabled: false,
+    },
+    fields: [
+      {
+        name: 'columns',
+        label: 'Jumlah Kolom',
+        type: 'select',
+        options: [
+          { label: '1 Kolom', value: '1' },
+          { label: '2 Kolom', value: '2' },
+          { label: '3 Kolom', value: '3' },
+          { label: '4 Kolom', value: '4' },
+        ],
+      },
+      {
+        name: 'gap',
+        label: 'Jarak Antar Kolom',
+        type: 'select',
+        options: [
+          { label: 'Rapat', value: 'sm' },
+          { label: 'Normal', value: 'md' },
+          { label: 'Longgar', value: 'lg' },
+        ],
+      },
+      { name: 'reverseMobile', label: 'Balik Urutan di Mobile', type: 'checkbox' },
+      ...builderStyleFieldMeta,
+    ],
+    nestedBlocks: {
+      columns: ['column1', 'column2', 'column3', 'column4'],
+      maxColumns: 4,
+      allowedBlocks: widgetSlugList,
+      maxDepth: 1,
+    },
+  },
+
+  heading: {
+    slug: 'heading',
+    label: 'Widget: Judul',
+    icon: 'Heading',
+    category: 'widget',
+    description: 'Judul H1–H4 dengan kontrol warna, perataan, dan jarak.',
+    defaults: {
+      blockType: 'heading',
+      text: 'Judul Baru',
+      level: 'h2',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'text', label: 'Teks Judul', type: 'text', required: true },
+      {
+        name: 'level',
+        label: 'Level Heading (SEO)',
+        type: 'select',
+        options: [
+          { label: 'H1 — Judul Utama', value: 'h1' },
+          { label: 'H2 — Judul Seksi', value: 'h2' },
+          { label: 'H3 — Sub-seksi', value: 'h3' },
+          { label: 'H4 — Sub-sub-seksi', value: 'h4' },
+        ],
+      },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  text: {
+    slug: 'text',
+    label: 'Widget: Paragraf',
+    icon: 'Type',
+    category: 'widget',
+    description: 'Paragraf teks bebas untuk penjelasan atau edukasi.',
+    defaults: {
+      blockType: 'text',
+      text: 'Tulis paragraf penjelasan di sini.',
+      textSize: 'base',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'text', label: 'Isi Paragraf', type: 'textarea', required: true },
+      {
+        name: 'textSize',
+        label: 'Ukuran Teks',
+        type: 'select',
+        options: [
+          { label: 'Kecil', value: 'sm' },
+          { label: 'Normal', value: 'base' },
+          { label: 'Besar', value: 'lg' },
+        ],
+      },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  image: {
+    slug: 'image',
+    label: 'Widget: Gambar',
+    icon: 'Image',
+    category: 'widget',
+    description: 'Foto dengan alt text wajib, caption, rasio, dan link opsional.',
+    defaults: {
+      blockType: 'image',
+      alt: 'Foto layanan Kala',
+      ratio: 'auto',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'image', label: 'Foto', type: 'upload', required: true },
+      { name: 'alt', label: 'Alt Text (SEO)', type: 'text', required: true },
+      { name: 'caption', label: 'Keterangan Foto', type: 'text' },
+      {
+        name: 'ratio',
+        label: 'Rasio Foto',
+        type: 'select',
+        options: [
+          { label: 'Otomatis', value: 'auto' },
+          { label: 'Persegi', value: 'square' },
+          { label: 'Video (16:9)', value: 'video' },
+          { label: 'Portrait (4:5)', value: 'portrait' },
+        ],
+      },
+      { name: 'link', label: 'Link Saat Diklik', type: 'text' },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  button: {
+    slug: 'button',
+    label: 'Widget: Tombol',
+    icon: 'MousePointerClick',
+    category: 'widget',
+    description: 'Tombol WhatsApp bertracking atau tombol URL biasa.',
+    defaults: {
+      blockType: 'button',
+      text: 'Konsultasi via WhatsApp',
+      linkType: 'whatsapp',
+      variant: 'primary',
+      fullWidth: false,
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'text', label: 'Teks Tombol', type: 'text', required: true },
+      {
+        name: 'linkType',
+        label: 'Jenis Link',
+        type: 'select',
+        options: [
+          { label: 'WhatsApp (tracking)', value: 'whatsapp' },
+          { label: 'URL Biasa', value: 'url' },
+        ],
+      },
+      { name: 'url', label: 'URL Tujuan', type: 'text' },
+      { name: 'refCode', label: 'Ref Code WhatsApp', type: 'text' },
+      { name: 'message', label: 'Pesan Otomatis WhatsApp', type: 'textarea' },
+      {
+        name: 'variant',
+        label: 'Gaya Tombol',
+        type: 'select',
+        options: [
+          { label: 'Hijau WhatsApp', value: 'primary' },
+          { label: 'Terracotta', value: 'secondary' },
+          { label: 'Promo Kuning', value: 'promo' },
+          { label: 'Hero Besar', value: 'hero' },
+        ],
+      },
+      { name: 'fullWidth', label: 'Lebar Penuh', type: 'checkbox' },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  spacer: {
+    slug: 'spacer',
+    label: 'Widget: Jarak (Spacer)',
+    icon: 'MoveVertical',
+    category: 'widget',
+    description: 'Ruang vertikal kosong antar elemen.',
+    defaults: {
+      blockType: 'spacer',
+      height: 'md',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      {
+        name: 'height',
+        label: 'Tinggi Jarak',
+        type: 'select',
+        options: [
+          { label: 'Kecil', value: 'sm' },
+          { label: 'Sedang', value: 'md' },
+          { label: 'Besar', value: 'lg' },
+          { label: 'Sangat Besar', value: 'xl' },
+        ],
+      },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  divider: {
+    slug: 'divider',
+    label: 'Widget: Garis Pemisah',
+    icon: 'Minus',
+    category: 'widget',
+    description: 'Garis horizontal untuk memisahkan konten.',
+    defaults: {
+      blockType: 'divider',
+      color: 'line',
+      thickness: '1',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      {
+        name: 'color',
+        label: 'Warna Garis',
+        type: 'select',
+        options: [
+          { label: 'Krem Garis', value: 'line' },
+          { label: 'Peach', value: 'peach' },
+          { label: 'Terracotta', value: 'accent' },
+          { label: 'Putih', value: 'white' },
+        ],
+      },
+      {
+        name: 'thickness',
+        label: 'Ketebalan',
+        type: 'select',
+        options: [
+          { label: 'Tipis', value: '1' },
+          { label: 'Sedang', value: '2' },
+          { label: 'Tebal', value: '4' },
+        ],
+      },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  iconBox: {
+    slug: 'iconBox',
+    label: 'Widget: Ikon + Teks',
+    icon: 'BadgeCheck',
+    category: 'widget',
+    description: 'Kartu kecil berisi ikon/emoji, judul, dan deskripsi.',
+    defaults: {
+      blockType: 'iconBox',
+      icon: '✓',
+      title: 'Judul Keunggulan',
+      description: 'Jelaskan manfaat atau keunggulan ini secara singkat.',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'icon', label: 'Emoji / Ikon', type: 'text' },
+      { name: 'title', label: 'Judul', type: 'text', required: true },
+      { name: 'description', label: 'Deskripsi', type: 'textarea' },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  video: {
+    slug: 'video',
+    label: 'Widget: Video',
+    icon: 'PlayCircle',
+    category: 'widget',
+    description: 'Embed YouTube/Vimeo dengan facade ringan.',
+    defaults: {
+      blockType: 'video',
+      ratio: 'video',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'url', label: 'URL Video', type: 'text', required: true },
+      { name: 'caption', label: 'Keterangan Video', type: 'text' },
+      {
+        name: 'ratio',
+        label: 'Rasio Video',
+        type: 'select',
+        options: [
+          { label: '16:9 (Lanskap)', value: 'video' },
+          { label: '9:16 (Vertikal)', value: 'vertical' },
+          { label: '1:1 (Persegi)', value: 'square' },
+        ],
+      },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  map: {
+    slug: 'map',
+    label: 'Widget: Peta Lokasi',
+    icon: 'MapPin',
+    category: 'widget',
+    description: 'Embed Google Maps untuk menunjukkan area layanan.',
+    defaults: {
+      blockType: 'map',
+      height: 'md',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'embedUrl', label: 'URL Embed Google Maps', type: 'text', required: true },
+      {
+        name: 'height',
+        label: 'Tinggi Peta',
+        type: 'select',
+        options: [
+          { label: 'Kecil', value: 'sm' },
+          { label: 'Sedang', value: 'md' },
+          { label: 'Besar', value: 'lg' },
+        ],
+      },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  card: {
+    slug: 'card',
+    label: 'Widget: Kartu',
+    icon: 'Square',
+    category: 'widget',
+    description: 'Kartu generik berisi foto, judul, deskripsi, dan tombol.',
+    defaults: {
+      blockType: 'card',
+      title: 'Judul Kartu',
+      description: 'Deskripsi singkat kartu.',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'image', label: 'Foto Kartu', type: 'upload' },
+      { name: 'alt', label: 'Alt Text Foto', type: 'text' },
+      { name: 'title', label: 'Judul Kartu', type: 'text', required: true },
+      { name: 'description', label: 'Deskripsi', type: 'textarea' },
+      { name: 'buttonText', label: 'Teks Tombol', type: 'text' },
+      { name: 'buttonUrl', label: 'URL Tombol', type: 'text' },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  html: {
+    slug: 'html',
+    label: 'Widget: Custom HTML / Embed',
+    icon: 'Code2',
+    category: 'widget',
+    description: 'Markup khusus atau embed iframe. Script dan <style> dilarang.',
+    defaults: {
+      blockType: 'html',
+      name: 'Custom HTML',
+      html: '',
+      ...builderStyleDefaults,
+      disabled: false,
+    },
+    fields: [
+      { name: 'name', label: 'Nama Blok', type: 'text' },
+      { name: 'html', label: 'Kode HTML', type: 'code', required: true },
+      ...builderStyleFieldMeta,
+    ],
+  },
+
+  // ---------------------------------------------------------------
+  // New composite sections
+  // ---------------------------------------------------------------
+
+  featuredServices: {
+    slug: 'featuredServices',
+    label: 'Layanan Unggulan',
+    icon: 'Sparkles',
+    category: 'offer',
+    description: 'Grid layanan terlaris dari koleksi Layanan CMS.',
+    defaults: {
+      blockType: 'featuredServices',
+      badge: 'Layanan Favorit Keluarga',
+      title: 'Pilihan Layanan Terlaris untuk Si Kecil',
+      subtitle:
+        'Dirancang khusus oleh bidan berpengalaman untuk kebutuhan harian bayi dan Bunda di rumah.',
+      source: 'cms',
+      maxItems: 3,
+      ctaText: 'Lihat Semua Layanan',
+      ctaUrl: '/layanan',
+      background: 'cream',
+      disabled: false,
+    },
+    fields: [
+      { name: 'badge', label: 'Badge Header', type: 'text' },
+      { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
+      { name: 'subtitle', label: 'Subjudul Seksi', type: 'textarea' },
+      {
+        name: 'source',
+        label: 'Sumber Data',
+        type: 'select',
+        options: [
+          { label: 'Koleksi Layanan CMS', value: 'cms' },
+          { label: 'Daftar Bawaan Situs', value: 'config' },
+        ],
+      },
+      { name: 'maxItems', label: 'Jumlah Layanan', type: 'number' },
+      { name: 'ctaText', label: 'Teks Tombol', type: 'text' },
+      { name: 'ctaUrl', label: 'URL Tombol', type: 'text' },
+      {
+        name: 'background',
+        label: 'Latar Belakang',
+        type: 'select',
+        options: [
+          { label: 'Putih', value: 'white' },
+          { label: 'Krem', value: 'cream' },
+          { label: 'Peach', value: 'peach' },
+        ],
+      },
+    ],
+  },
+
+  valueProps: {
+    slug: 'valueProps',
+    label: 'Pembeda Layanan',
+    icon: 'Award',
+    category: 'proof',
+    description: 'Lima pembeda layanan Kala, bisa diisi manual atau bawaan situs.',
+    defaults: {
+      blockType: 'valueProps',
+      badge: 'Kenapa Memilih Kala?',
+      title: '5 Hal yang Membuat Kala Berbeda',
+      subtitle:
+        'Setiap kunjungan Kala menghadirkan perawatan profesional, perhatian yang tulus, dan kenyamanan untuk Bunda serta si kecil.',
+      background: 'white',
+      disabled: false,
+    },
+    fields: [
+      { name: 'badge', label: 'Badge Header', type: 'text' },
+      { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
+      { name: 'subtitle', label: 'Subjudul Seksi', type: 'textarea' },
+      {
+        name: 'background',
+        label: 'Latar Belakang',
+        type: 'select',
+        options: [
+          { label: 'Putih', value: 'white' },
+          { label: 'Krem', value: 'cream' },
+          { label: 'Peach', value: 'peach' },
+        ],
+      },
+    ],
+    innerBlocks: {
+      path: 'items',
+      label: 'Daftar Pembeda',
+      itemTitleField: 'title',
+      fields: [
+        { name: 'icon', label: 'Emoji / Ikon', type: 'text' },
+        { name: 'title', label: 'Judul Pembeda', type: 'text', required: true },
+        { name: 'description', label: 'Penjelasan', type: 'textarea' },
+        { name: 'highlight', label: 'Sorot Kartu', type: 'checkbox' },
+      ],
+    },
+  },
+
+  coverageArea: {
+    slug: 'coverageArea',
+    label: 'Area Layanan',
+    icon: 'Map',
+    category: 'offer',
+    description: 'Daftar wilayah layanan beserta CTA WhatsApp.',
+    defaults: {
+      blockType: 'coverageArea',
+      badge: 'Jangkauan Layanan',
+      title: 'Bidan Kala Siap Hadir di Surabaya & Sidoarjo',
+      subtitle:
+        'Kunjungan homecare tersedia di banyak kecamatan. Cek apakah wilayah Bunda sudah termasuk.',
+      ctaText: 'Cek Ketersediaan Wilayah Saya',
+      background: 'cream',
+      disabled: false,
+    },
+    fields: [
+      { name: 'badge', label: 'Badge Header', type: 'text' },
+      { name: 'title', label: 'Judul Seksi', type: 'text', required: true },
+      { name: 'subtitle', label: 'Subjudul Seksi', type: 'textarea' },
+      { name: 'ctaText', label: 'Teks Tombol CTA', type: 'text' },
+      { name: 'ctaMessage', label: 'Pesan Otomatis WhatsApp', type: 'textarea' },
+      {
+        name: 'background',
+        label: 'Latar Belakang',
+        type: 'select',
+        options: [
+          { label: 'Putih', value: 'white' },
+          { label: 'Krem', value: 'cream' },
+          { label: 'Peach', value: 'peach' },
+        ],
+      },
+    ],
+    innerBlocks: {
+      path: 'items',
+      label: 'Daftar Wilayah',
+      itemTitleField: 'region',
+      fields: [
+        { name: 'region', label: 'Nama Wilayah', type: 'text', required: true },
+        { name: 'slug', label: 'Slug Wilayah', type: 'text' },
+        { name: 'areas', label: 'Daftar Kecamatan', type: 'textarea' },
+      ],
+    },
   },
 };
 

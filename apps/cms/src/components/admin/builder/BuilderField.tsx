@@ -20,6 +20,8 @@ import { SectionSettings } from './SectionSettings';
 import { AddSectionMenu } from './AddSectionMenu';
 import { PreviewFrame } from './PreviewFrame';
 import { useBuilderLayout, type LayoutBlock } from './useBuilderLayout';
+import { findBlock } from './tree-utils';
+import { widgetSlugList } from '../../../blocks/registry';
 import { useBuilderHistory } from './useBuilderHistory';
 import { useBuilderSave } from './useBuilderSave';
 import { BuilderValidationBanner } from './BuilderValidationBanner';
@@ -29,6 +31,7 @@ export const BuilderField: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [addTarget, setAddTarget] = useState<{ parentId: string; column: string } | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const portalRef = useRef<HTMLDivElement>(null);
   const confirmDialogRef = useRef<HTMLDivElement>(null);
@@ -114,11 +117,14 @@ export const BuilderField: React.FC = () => {
     removeInnerItem,
     updateInnerItem,
     applyTemplate,
+    addBlockToContainer,
+    reorderColumnBlock,
+    moveWidgetToColumn,
   } = useBuilderLayout(layout, updatePayloadLayout, pushSnapshot);
 
   const selectedBlock = useMemo(() => {
     if (!selectedSectionId) return null;
-    return layout.find((b) => (b.id || b.blockType) === selectedSectionId) || null;
+    return findBlock(layout, selectedSectionId);
   }, [layout, selectedSectionId]);
 
   // Keyboard shortcut listener (Ctrl/Cmd+S, Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Escape)
@@ -433,12 +439,41 @@ export const BuilderField: React.FC = () => {
                 onUpdateInnerItem={(path, idx, fields) =>
                   selectedBlock.id && updateInnerItem(selectedBlock.id, path, idx, fields)
                 }
+                onSelectBlock={(id) => setSelectedSectionId(id)}
+                onAddWidget={(column) => {
+                  if (!selectedBlock.id) return;
+                  setAddTarget({ parentId: selectedBlock.id, column });
+                  setIsAddMenuOpen(true);
+                }}
+                onRemoveChild={(column, index) => {
+                  const child = Array.isArray(selectedBlock[column])
+                    ? selectedBlock[column][index]
+                    : null;
+                  if (child?.id) removeSection(child.id);
+                }}
+                onMoveChild={(column, index, direction) => {
+                  if (!selectedBlock.id) return;
+                  reorderColumnBlock(selectedBlock.id, column, index, index + direction);
+                }}
+                onDuplicateChild={(column, index) => {
+                  const child = Array.isArray(selectedBlock[column])
+                    ? selectedBlock[column][index]
+                    : null;
+                  if (!child?.id) return;
+                  const newId = duplicateSection(child.id);
+                  if (newId) setSelectedSectionId(newId);
+                }}
+                onMoveChildToColumn={(column, index, target) => {
+                  if (!selectedBlock.id) return;
+                  moveWidgetToColumn(selectedBlock.id, column, index, target);
+                }}
               />
             ) : (
               <SectionTree
                 layout={layout}
                 selectedId={selectedSectionId}
                 onSelect={(id) => setSelectedSectionId(id)}
+                onSelectChild={(id) => setSelectedSectionId(id)}
                 onReorder={reorderSections}
                 onToggleDisabled={toggleDisabled}
                 onDuplicate={(id) => {
@@ -449,7 +484,10 @@ export const BuilderField: React.FC = () => {
                   removeSection(id);
                   if (selectedSectionId === id) setSelectedSectionId(null);
                 }}
-                onOpenAddMenu={() => setIsAddMenuOpen(true)}
+                onOpenAddMenu={() => {
+                  setAddTarget(null);
+                  setIsAddMenuOpen(true);
+                }}
               />
             )}
           </aside>
@@ -474,8 +512,24 @@ export const BuilderField: React.FC = () => {
         {/* Add Section Modal Catalog */}
         <AddSectionMenu
           isOpen={isAddMenuOpen}
-          onClose={() => setIsAddMenuOpen(false)}
+          mode={addTarget ? 'widgets' : 'all'}
+          allowedSlugs={addTarget ? widgetSlugList : undefined}
+          title={addTarget ? 'Tambah Widget ke Kolom' : undefined}
+          onClose={() => {
+            setIsAddMenuOpen(false);
+            setAddTarget(null);
+          }}
           onSelectBlock={(newSlug) => {
+            if (addTarget) {
+              const newId = addBlockToContainer(
+                addTarget.parentId,
+                addTarget.column as any,
+                newSlug,
+              );
+              setAddTarget(null);
+              if (newId) setSelectedSectionId(newId);
+              return;
+            }
             const newId = addSection(newSlug);
             if (newId) setSelectedSectionId(newId);
           }}

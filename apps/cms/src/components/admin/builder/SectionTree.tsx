@@ -23,6 +23,7 @@ interface SectionTreeProps {
   layout: LayoutBlock[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onSelectChild: (id: string) => void;
   onReorder: (oldIndex: number, newIndex: number) => void;
   onToggleDisabled: (id: string) => void;
   onDuplicate: (id: string) => void;
@@ -34,6 +35,7 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
   layout,
   selectedId,
   onSelect,
+  onSelectChild,
   onReorder,
   onToggleDisabled,
   onDuplicate,
@@ -74,7 +76,7 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
           className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
         >
           <Plus size={16} />
-          <span>Tambah Seksi Baru</span>
+          <span>Tambah Seksi / Layout</span>
         </button>
       </div>
 
@@ -95,7 +97,9 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
                     key={blockId}
                     block={block}
                     isSelected={selectedId === blockId}
+                    selectedId={selectedId}
                     onSelect={() => onSelect(blockId)}
+                    onSelectChild={onSelectChild}
                     onToggleDisabled={(e) => {
                       e.stopPropagation();
                       onToggleDisabled(blockId);

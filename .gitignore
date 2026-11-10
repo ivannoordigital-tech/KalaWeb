@@ -13,6 +13,9 @@ apps/cms/public/media/
 # Wrangler local state (dev/build artifacts)
 .wrangler/
 
+# Generated CMS class scan (created by apps/web-kala prebuild)
+apps/web-kala/src/generated/
+
 # Environment files
 .env
 .env.local

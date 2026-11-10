@@ -19,17 +19,38 @@ import {
   UserCheck,
   LayoutTemplate,
   Layers,
+  Columns3,
+  Heading,
+  Type,
+  MousePointerClick,
+  MoveVertical,
+  Minus,
+  BadgeCheck,
+  PlayCircle,
+  MapPin,
+  Square,
+  Code2,
+  Award,
+  Map,
 } from 'lucide-react';
-import { builderRegistry, builderTemplates, type BuilderPageTemplate } from '../../../blocks/registry';
+import { builderRegistry, builderTemplates } from '../../../blocks/registry';
 
 interface AddSectionMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectBlock: (slug: string) => void;
   onSelectTemplate?: (blocks: Array<Record<string, any>>) => void;
+  /** `widgets` limits the catalog to blocks that can live inside a container. */
+  mode?: 'all' | 'widgets';
+  /** Optional allowlist of block slugs (used when adding to a column). */
+  allowedSlugs?: string[];
+  /** Custom heading shown in widget mode. */
+  title?: string;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
+  layout: 'Layout & Kolom',
+  widget: 'Widget Dasar',
   hero: 'Banner Utama (Hero)',
   offer: 'Penawaran & Paket Harga',
   proof: 'Bukti Kredibilitas & Kepercayaan',
@@ -37,18 +58,28 @@ const CATEGORY_LABELS: Record<string, string> = {
   cta: 'Ajakan Aksi (Call to Action)',
 };
 
+const CATEGORY_ORDER = ['layout', 'widget', 'hero', 'offer', 'proof', 'content', 'cta'];
+
 export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
   isOpen,
   onClose,
   onSelectBlock,
   onSelectTemplate,
+  mode = 'all',
+  allowedSlugs,
+  title,
 }) => {
   const [activeTab, setActiveTab] = useState<'blocks' | 'templates'>('blocks');
 
   if (!isOpen) return null;
 
-  const blocks = Object.values(builderRegistry);
-  const categories = ['hero', 'offer', 'proof', 'content', 'cta'];
+  const isWidgetMode = mode === 'widgets';
+  const blocks = Object.values(builderRegistry).filter((block) => {
+    if (isWidgetMode && block.category !== 'widget') return false;
+    if (allowedSlugs && !allowedSlugs.includes(block.slug)) return false;
+    return true;
+  });
+  const categories = CATEGORY_ORDER.filter((cat) => blocks.some((b) => b.category === cat));
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -81,6 +112,32 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
       case 'FileText':
       default:
         return <FileText size={18} className="text-slate-600" />;
+      case 'Columns3':
+        return <Columns3 size={18} className="text-teal-700" />;
+      case 'Heading':
+        return <Heading size={18} className="text-slate-700" />;
+      case 'Type':
+        return <Type size={18} className="text-slate-600" />;
+      case 'MousePointerClick':
+        return <MousePointerClick size={18} className="text-emerald-700" />;
+      case 'MoveVertical':
+        return <MoveVertical size={18} className="text-slate-500" />;
+      case 'Minus':
+        return <Minus size={18} className="text-slate-500" />;
+      case 'BadgeCheck':
+        return <BadgeCheck size={18} className="text-emerald-600" />;
+      case 'PlayCircle':
+        return <PlayCircle size={18} className="text-rose-500" />;
+      case 'MapPin':
+        return <MapPin size={18} className="text-orange-600" />;
+      case 'Square':
+        return <Square size={18} className="text-sky-600" />;
+      case 'Code2':
+        return <Code2 size={18} className="text-indigo-600" />;
+      case 'Award':
+        return <Award size={18} className="text-amber-600" />;
+      case 'Map':
+        return <Map size={18} className="text-orange-600" />;
     }
   };
 
@@ -90,9 +147,13 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div>
-            <h2 className="text-sm font-bold text-slate-900">Katalog Seksi & Template</h2>
+            <h2 className="text-sm font-bold text-slate-900">
+              {title || (isWidgetMode ? 'Tambah Widget' : 'Katalog Seksi & Template')}
+            </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Pilih komponen seksi individual atau terapkan template halaman siap pakai.
+              {isWidgetMode
+                ? 'Pilih widget dasar untuk mengisi kolom container.'
+                : 'Pilih komponen seksi individual atau terapkan template halaman siap pakai.'}
             </p>
           </div>
           <button
@@ -116,20 +177,24 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
             }`}
           >
             <Layers size={14} />
-            <span>Koleksi Blok ({blocks.length})</span>
+            <span>
+              {isWidgetMode ? 'Widget' : 'Koleksi Blok'} ({blocks.length})
+            </span>
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('templates')}
-            className={`py-2.5 px-3 text-xs font-bold border-b-2 flex items-center gap-2 transition-all ${
-              activeTab === 'templates'
-                ? 'border-teal-600 text-teal-800'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <LayoutTemplate size={14} />
-            <span>Template Halaman Siap Pakai ({builderTemplates.length})</span>
-          </button>
+          {!isWidgetMode && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('templates')}
+              className={`py-2.5 px-3 text-xs font-bold border-b-2 flex items-center gap-2 transition-all ${
+                activeTab === 'templates'
+                  ? 'border-teal-600 text-teal-800'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <LayoutTemplate size={14} />
+              <span>Template Halaman Siap Pakai ({builderTemplates.length})</span>
+            </button>
+          )}
         </div>
 
         {/* Body */}

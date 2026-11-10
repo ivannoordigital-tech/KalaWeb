@@ -47,6 +47,26 @@ export interface ValidationResult {
   warnings: string[];
 }
 
+/**
+ * Flatten top-level sections and container widgets into one list so
+ * validation rules (H1, CTA, alt text) apply at any depth.
+ */
+function flattenLayoutBlocks(blocks: any[]): any[] {
+  const out: any[] = [];
+  for (const block of blocks) {
+    if (!block || block.disabled) continue;
+    out.push(block);
+    if (block.blockType === 'container') {
+      for (const column of ['column1', 'column2', 'column3', 'column4']) {
+        if (Array.isArray(block[column])) {
+          out.push(...flattenLayoutBlocks(block[column]));
+        }
+      }
+    }
+  }
+  return out;
+}
+
 export function validatePageBuilderDoc(doc: any, isLandingPage = false): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -72,6 +92,14 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     if (!isLanding && RESERVED_PAGE_SLUGS.includes(slug)) {
       errors.push(`Slug "${slug}" adalah rute tetap sistem web dan tidak boleh digunakan untuk halaman kustom.`);
     }
+
+    // Homepage rules: slug "home" and pageType "home" must go together.
+    if (slug === 'home' && doc.pageType !== 'home') {
+      errors.push('Slug "home" hanya boleh dipakai jika Tujuan Halaman diatur ke "Beranda Utama".');
+    }
+    if (doc.pageType === 'home' && slug !== 'home') {
+      errors.push('Halaman dengan tipe "Beranda Utama" wajib memakai slug "home".');
+    }
   }
 
   // 2. Ref Code Validation (for Landing Pages / Ads Campaign)
@@ -87,10 +115,12 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
   // 3. Layout Blocks Validation
   const allLayoutBlocks = Array.isArray(doc.layout) ? doc.layout : [];
   const layout = allLayoutBlocks.filter((b: any) => !b.disabled);
+  // Include widgets nested inside containers so SEO/CTA checks work at any depth.
+  const flattenedLayout = flattenLayoutBlocks(allLayoutBlocks);
 
   if (layout.length > 0) {
     // Check HeroBlock
-    const heroBlocks = layout.filter((b: any) => b.blockType === 'hero');
+    const heroBlocks = flattenedLayout.filter((b: any) => b.blockType === 'hero');
     if (heroBlocks.length > 1) {
       errors.push(`Halaman hanya boleh memiliki maksimal satu Hero Block (H1). Terdeteksi ${heroBlocks.length} Hero Block.`);
     } else if (isCanvas && heroBlocks.length === 0 && !doc.headline) {
@@ -106,12 +136,24 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
       }
     }
 
+    // SEO: only one H1 per page (Hero block or Heading widget).
+    const h1Widgets = flattenedLayout.filter(
+      (b: any) => b.blockType === 'heading' && b.level === 'h1',
+    );
+    const totalH1 = heroBlocks.length + h1Widgets.length;
+    if (totalH1 > 1) {
+      errors.push(
+        `Halaman hanya boleh memiliki satu H1. Terdeteksi ${totalH1} H1 (Hero + Widget Judul level H1).`,
+      );
+    }
+
     // Check WhatsApp CTA presence for landing pages
-    const hasCtaBlock = layout.some((b: any) =>
+    const hasCtaBlock = flattenedLayout.some((b: any) =>
       b.blockType === 'hero' ||
       b.blockType === 'pricing' ||
       b.blockType === 'cta' ||
-      b.blockType === 'solutions'
+      b.blockType === 'solutions' ||
+      b.blockType === 'button'
     );
     const hasBuiltInCta = doc.showWhatsAppCta !== false;
 
@@ -121,8 +163,8 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
 
     // Check FAQ & Testimonials presence (warning for landing pages)
     if (isLanding) {
-      const hasFaq = layout.some((b: any) => b.blockType === 'faq');
-      const hasTestimonials = layout.some((b: any) => b.blockType === 'testimonials');
+      const hasFaq = flattenedLayout.some((b: any) => b.blockType === 'faq');
+      const hasTestimonials = flattenedLayout.some((b: any) => b.blockType === 'testimonials');
       if (!hasFaq) {
         warnings.push('Halaman belum memiliki FAQ Accordion untuk menjawab keraguan calon Bunda.');
       }
@@ -132,8 +174,8 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     }
 
     // Check circular template references and image alt texts
-    for (let i = 0; i < layout.length; i++) {
-      const block = layout[i];
+    for (let i = 0; i < flattenedLayout.length; i++) {
+      const block = flattenedLayout[i];
 
       // Check TemplateRef recursion
       if (block.blockType === 'templateRef') {
@@ -162,10 +204,16 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
       if (block.blockType === 'hero' && block.image && !block.imageAlt) {
         errors.push('Gambar pada Hero Block wajib memiliki Alt Text deskriptif.');
       }
+      if (block.blockType === 'image' && block.image && !block.alt) {
+        errors.push('Widget Gambar wajib memiliki Alt Text deskriptif untuk aksesibilitas & SEO.');
+      }
+      if (block.blockType === 'card' && block.image && !block.alt) {
+        errors.push('Foto pada Widget Kartu wajib memiliki Alt Text deskriptif.');
+      }
     }
 
     // Check forbidden health claims in all block texts
-    const stringifiedBlocks = JSON.stringify(layout).toLowerCase();
+    const stringifiedBlocks = JSON.stringify(flattenedLayout).toLowerCase();
     for (const forbidden of DEFAULT_FORBIDDEN_HEALTH_WORDS) {
       if (stringifiedBlocks.includes(forbidden.toLowerCase())) {
         warnings.push(`Terdeteksi klaim medis berisiko: kata "${forbidden}" ditemukan pada konten halaman. Harap gunakan bahasa pendampingan kebidanan sesuai regulasi nakes.`);

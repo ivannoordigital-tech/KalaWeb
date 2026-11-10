@@ -6,8 +6,19 @@ import ValueProps from '../components/ValueProps.astro';
 import Testimonials from '../components/Testimonials.astro';
 import CoverageArea from '../components/CoverageArea.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
-import { fetchSiteSettings, fetchPayloadFAQs } from '../lib/payload';
+import BlockRenderer from '../components/blocks/BlockRenderer.astro';
+import { fetchSiteSettings, fetchPayloadFAQs, fetchHomepage } from '../lib/payload';
 import { siteConfig } from '../config/site';
+
+const homepage = await fetchHomepage();
+const homepageBlocks: any[] = Array.isArray(homepage?.layout) ? homepage.layout : [];
+const useCmsHomepage = homepageBlocks.length > 0;
+const homepageSeo = (homepage as any)?.seo;
+const homepageTitle = homepageSeo?.metaTitle || homepage?.title || 'Baby Spa Homecare Surabaya & Sidoarjo';
+const homepageDescription =
+  homepageSeo?.metaDescription ||
+  homepage?.description ||
+  'Baby massage, pijat newborn, dan pijat nifas homecare di Surabaya & Sidoarjo oleh bidan profesional. Perawatan nyaman untuk Bunda dan si kecil langsung di rumah.';
 
 const cmsSettings = await fetchSiteSettings();
 const siteSettings = {
@@ -131,10 +142,16 @@ const promotion = {
 ---
 
 <BaseLayout
-  title="Baby Spa Homecare Surabaya & Sidoarjo"
-  description="Baby massage, pijat newborn, dan pijat nifas homecare di Surabaya & Sidoarjo oleh bidan profesional. Perawatan nyaman untuk Bunda dan si kecil langsung di rumah."
+  title={homepageTitle}
+  description={homepageDescription}
   schemaType="home"
 >
+  {useCmsHomepage ? (
+    homepageBlocks.map((block) => (
+      <BlockRenderer block={block} siteSettings={siteSettings} />
+    ))
+  ) : (
+    <>
   <Hero siteSettings={siteSettings} />
 
   <section id="keluhan" class="py-16 md:py-24 bg-[#FFD9C4]/50">
@@ -361,6 +378,8 @@ const promotion = {
       </div>
     </div>
   </section>
+    </>
+  )}
 </BaseLayout>
 
 <style>
