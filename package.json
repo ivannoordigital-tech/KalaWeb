@@ -16,6 +16,7 @@
     "audit:seo": "node scripts/audit-seo.mjs",
     "test:role": "npm run test:role --workspace=cms-kala",
     "test:validation": "npm run test:validation --workspace=cms-kala",
+    "test:builder-catalog": "npm run test:builder-catalog --workspace=cms-kala",
     "test:contract": "node apps/automation/test/contract.test.mjs",
     "test:articles": "node scripts/verify-articles.mjs",
     "test:landing": "node scripts/verify-landing-pages.mjs",

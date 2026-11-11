@@ -58,6 +58,8 @@ export interface BuilderBlockMeta {
   icon: string;
   category: BuilderCategory;
   description: string;
+  /** Kata kunci tambahan untuk pencarian katalog (sinonim bahasa admin). */
+  keywords?: string[];
   defaults: Record<string, unknown>;
   fields: BuilderFieldMeta[];
   innerBlocks?: BuilderInnerBlocks;
@@ -82,10 +84,11 @@ const spacingOptions = [
 export const builderRegistry: Record<string, BuilderBlockMeta> = {
   section: {
     slug: 'section',
-    label: 'Seksi & Kolom (Container)',
+    label: 'Baris Berkolom (2–4 konten sejajar)',
     icon: 'LayoutGrid',
     category: 'layout',
-    description: 'Wadah 1–4 kolom untuk menyusun judul, gambar, tombol, dan blok lain berdampingan.',
+    description: 'Tempatkan teks, gambar, atau tombol berdampingan dalam 2–4 kolom.',
+    keywords: ['kolom', 'container', 'grid', 'berdampingan', 'layout', 'baris', 'sejajar', '2 kolom', '3 kolom', '4 kolom'],
     defaults: {
       blockType: 'section',
       label: 'Seksi Baru',

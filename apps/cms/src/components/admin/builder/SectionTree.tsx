@@ -75,7 +75,7 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
           className="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
         >
           <Plus size={16} />
-          <span>Tambah Seksi Baru</span>
+          <span>Tambah Bagian</span>
         </button>
       </div>
 
@@ -83,8 +83,8 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {layout.length === 0 ? (
           <div className="text-center py-12 px-4 text-slate-400">
-            <p className="text-xs">Belum ada seksi di halaman ini.</p>
-            <p className="text-[11px] mt-1">Klik tombol di atas untuk menambahkan seksi.</p>
+            <p className="text-xs">Belum ada bagian di halaman ini.</p>
+            <p className="text-[11px] mt-1">Klik tombol di atas untuk menambahkan bagian.</p>
           </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

@@ -292,8 +292,11 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         {/* Status indicator & Refresh */}
         <div className="flex items-center gap-2">
           {hasUnsavedChanges ? (
-            <span className="text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
-              Pratinjau = versi tersimpan
+            <span
+              className="text-[11px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-medium"
+              title="Pratinjau menampilkan versi yang sudah tersimpan. Klik Simpan Draf untuk memperbarui pratinjau."
+            >
+              Pratinjau masih versi tersimpan — klik Simpan Draf
             </span>
           ) : lastRefreshTime ? (
             <span className="text-[11px] text-slate-600 font-mono hidden sm:inline">
@@ -306,8 +309,8 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             onClick={fetchToken}
             disabled={isLoading || !docId}
             className="p-1.5 text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-40 cursor-pointer"
-            title="Muat Ulang Pratinjau"
-            aria-label="Muat ulang pratinjau"
+            title="Muat ulang pratinjau dari versi tersimpan"
+            aria-label="Muat ulang pratinjau dari versi tersimpan"
           >
             <RotateCw size={14} className={isLoading ? 'animate-spin' : ''} />
           </button>

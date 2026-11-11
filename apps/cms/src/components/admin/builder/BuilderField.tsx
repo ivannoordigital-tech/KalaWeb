@@ -14,6 +14,9 @@ import {
   Save,
   Rocket,
   Loader2,
+  HelpCircle,
+  Eye,
+  PenLine,
 } from 'lucide-react';
 import { SectionTree } from './SectionTree';
 import { SectionSettings } from './SectionSettings';
@@ -31,8 +34,13 @@ export const BuilderField: React.FC = () => {
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const portalRef = useRef<HTMLDivElement>(null);
   const confirmDialogRef = useRef<HTMLDivElement>(null);
+  const publishDialogRef = useRef<HTMLDivElement>(null);
+  const helpDialogRef = useRef<HTMLDivElement>(null);
 
   const { dispatchFields, setModified } = useForm();
   const docInfo = useDocumentInfo();
@@ -47,8 +55,10 @@ export const BuilderField: React.FC = () => {
     canPublish,
   } = useBuilderSave();
 
-  useFocusTrap(portalRef, isOpen && !showCloseConfirm && !isAddMenuOpen);
+  useFocusTrap(portalRef, isOpen && !showCloseConfirm && !showPublishConfirm && !showHelp && !isAddMenuOpen);
   useFocusTrap(confirmDialogRef, showCloseConfirm);
+  useFocusTrap(publishDialogRef, showPublishConfirm);
+  useFocusTrap(helpDialogRef, showHelp);
 
   // Read current layout from Payload Form State
   const rawLayout = useFormFields(([fields]) => fields?.layout?.value);
@@ -144,6 +154,10 @@ export const BuilderField: React.FC = () => {
       } else if (e.key === 'Escape') {
         if (isAddMenuOpen) {
           setIsAddMenuOpen(false);
+        } else if (showPublishConfirm) {
+          setShowPublishConfirm(false);
+        } else if (showHelp) {
+          setShowHelp(false);
         } else if (showCloseConfirm) {
           setShowCloseConfirm(false);
         } else if (selectedSectionId) {
@@ -162,6 +176,8 @@ export const BuilderField: React.FC = () => {
     isOpen,
     isAddMenuOpen,
     showCloseConfirm,
+    showPublishConfirm,
+    showHelp,
     selectedSectionId,
     canUndo,
     canRedo,
@@ -205,11 +221,11 @@ export const BuilderField: React.FC = () => {
               className="text-xs bg-teal-100 text-teal-800 font-semibold px-2 py-0.5 rounded-full"
               style={{ fontSize: '0.75rem', backgroundColor: '#ccfbf1', color: '#115e59', padding: '0.15rem 0.5rem', borderRadius: '9999px', fontWeight: 600 }}
             >
-              {layout.length} Seksi Tersusun
+              {layout.length} Bagian Tersusun
             </span>
           </div>
           <p className="text-xs text-slate-600 mt-1 max-w-xl" style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.35rem' }}>
-            Susun halaman secara visual: drag-and-drop urutan seksi, ubah teks & gambar, serta lihat pratinjau live instan tanpa reload browser.
+            Susun halaman secara visual: geser urutan bagian, ubah teks &amp; gambar, lalu lihat pratinjau sebelum menerbitkan.
           </p>
         </div>
 
@@ -327,6 +343,19 @@ export const BuilderField: React.FC = () => {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
+              onClick={() => setShowHelp(true)}
+              title="Panduan singkat builder"
+              aria-label="Buka panduan singkat builder"
+              className="flex items-center gap-1 p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded transition-colors cursor-pointer"
+            >
+              <HelpCircle size={16} />
+              <span className="hidden lg:inline text-[11px] font-semibold">Panduan</span>
+            </button>
+
+            <div className="h-4 w-px bg-slate-700 mx-1" aria-hidden="true" />
+
+            <button
+              type="button"
               onClick={() => canUndo && undo(layout)}
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
@@ -354,8 +383,8 @@ export const BuilderField: React.FC = () => {
                 onClick={() => void save('draft')}
                 disabled={isSaving}
                 className="flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-60 text-slate-100 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
-                aria-label="Simpan draf"
-                title="Simpan Draf (Ctrl+S)"
+                aria-label="Simpan draf (tidak tayang)"
+                title="Simpan Draf (Ctrl+S) — tidak tayang di website"
               >
                 {isSaving && saveIntent === 'draft' ? (
                   <Loader2 size={15} className="animate-spin" />
@@ -367,22 +396,28 @@ export const BuilderField: React.FC = () => {
             )}
 
             {canPublish && (
-              <button
-                type="button"
-                onClick={() => void save('publish')}
-                disabled={isSaving}
-                className="flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer"
-                aria-label={docInfo?.hasPublishedDoc ? 'Terbitkan perubahan' : 'Terbitkan'}
-              >
-                {isSaving && saveIntent === 'publish' ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Rocket size={15} />
-                )}
-                <span className="hidden sm:inline">
-                  {docInfo?.hasPublishedDoc ? 'Terbitkan Perubahan' : 'Terbitkan'}
+              <>
+                <span className="hidden xl:inline text-[10px] text-slate-400 whitespace-nowrap" aria-hidden="true">
+                  Terbitkan = langsung tayang
                 </span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPublishConfirm(true)}
+                  disabled={isSaving}
+                  className="flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 bg-teal-600 hover:bg-teal-500 disabled:opacity-60 text-white rounded-lg text-xs font-bold transition-colors shadow-sm cursor-pointer"
+                  aria-label={docInfo?.hasPublishedDoc ? 'Terbitkan perubahan' : 'Terbitkan'}
+                  title="Terbitkan — halaman langsung tampil di website"
+                >
+                  {isSaving && saveIntent === 'publish' ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <Rocket size={15} />
+                  )}
+                  <span className="hidden sm:inline">
+                    {docInfo?.hasPublishedDoc ? 'Terbitkan Perubahan' : 'Terbitkan'}
+                  </span>
+                </button>
+              </>
             )}
 
             <div className="h-4 w-px bg-slate-700 mx-1" aria-hidden="true" />
@@ -398,6 +433,42 @@ export const BuilderField: React.FC = () => {
             </button>
           </div>
         </header>
+
+        {/* Mobile/tablet view switcher — editor dan pratinjau tidak muat berdampingan */}
+        <div
+          className="md:hidden flex items-center gap-1 bg-slate-800 border-b border-slate-700 p-1.5 shrink-0"
+          role="tablist"
+          aria-label="Tampilan builder"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileView === 'editor'}
+            onClick={() => setMobileView('editor')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-bold transition-colors ${
+              mobileView === 'editor'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <PenLine size={13} />
+            Editor
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mobileView === 'preview'}
+            onClick={() => setMobileView('preview')}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-bold transition-colors ${
+              mobileView === 'preview'
+                ? 'bg-white text-slate-900 shadow-sm'
+                : 'text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <Eye size={13} />
+            Pratinjau
+          </button>
+        </div>
 
         {saveError && (
           <div role="alert" className="shrink-0 bg-red-950 border-b border-red-800 px-4 py-2 text-xs text-red-200">
@@ -419,7 +490,7 @@ export const BuilderField: React.FC = () => {
         {/* Main 2-Column Split Workspace */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Sidebar (360px on desktop) */}
-          <aside className="w-full md:w-[360px] bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-hidden shadow-sm">
+          <aside className={`w-full md:w-[360px] bg-white border-r border-slate-200 flex-col shrink-0 overflow-hidden shadow-sm ${mobileView === 'editor' ? 'flex' : 'hidden'} md:flex`}>
             {selectedBlock ? (
               <BuilderErrorBoundary
                 compact
@@ -464,7 +535,7 @@ export const BuilderField: React.FC = () => {
           </aside>
 
           {/* Right Canvas (Live Preview Frame) */}
-          <main className="flex-1 overflow-hidden hidden md:block">
+          <main className={`flex-1 overflow-hidden ${mobileView === 'preview' ? 'block' : 'hidden'} md:block`}>
             <BuilderErrorBoundary
               resetKey={`${docInfo?.id || 'new'}:${slug}`}
               title="Pratinjau gagal dimuat"
@@ -499,6 +570,138 @@ export const BuilderField: React.FC = () => {
             if (firstId) setSelectedSectionId(firstId);
           }}
         />
+
+        {/* Publish Confirmation Modal */}
+        {showPublishConfirm && (
+          <div
+            className="absolute inset-0 z-[100000] flex items-center justify-center bg-slate-950/70 p-4"
+            role="presentation"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowPublishConfirm(false);
+            }}
+          >
+            <div
+              ref={publishDialogRef}
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="kala-publish-title"
+              aria-describedby="kala-publish-desc"
+              className="w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl"
+            >
+              <h2 id="kala-publish-title" className="text-base font-bold text-slate-900 m-0">
+                Terbitkan halaman?
+              </h2>
+              <p id="kala-publish-desc" className="mt-2 text-xs leading-relaxed text-slate-600">
+                Halaman <strong>{title}</strong> akan <strong>langsung tampil di website</strong>{' '}
+                setelah diterbitkan.
+                {modified ? ' Perubahan yang belum disimpan akan ikut disimpan.' : ''}
+              </p>
+
+              <div className="mt-4 flex flex-col gap-2">
+                <button
+                  type="button"
+                  autoFocus
+                  disabled={isSaving}
+                  onClick={async () => {
+                    const ok = await save('publish');
+                    if (ok) setShowPublishConfirm(false);
+                  }}
+                  className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white hover:bg-teal-800 disabled:opacity-60 cursor-pointer transition-all"
+                >
+                  {isSaving && saveIntent === 'publish' ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Rocket size={14} />
+                  )}
+                  {isSaving && saveIntent === 'publish' ? 'Menerbitkan…' : 'Ya, terbitkan sekarang'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowPublishConfirm(false)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                >
+                  Batal
+                </button>
+              </div>
+              <p className="mt-2 text-[10px] text-slate-500 text-center">
+                Ingin cek dulu? Klik Batal, lalu <em>Simpan Draf</em> untuk melihat pratinjau.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Help / Quick Guide Modal */}
+        {showHelp && (
+          <div
+            className="absolute inset-0 z-[100000] flex items-center justify-center bg-slate-950/70 p-4"
+            role="presentation"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowHelp(false);
+            }}
+          >
+            <div
+              ref={helpDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="kala-help-title"
+              className="w-full max-w-md rounded-xl bg-white p-5 shadow-2xl max-h-[85vh] overflow-y-auto"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 id="kala-help-title" className="text-base font-bold text-slate-900 m-0">
+                    Panduan singkat
+                  </h2>
+                  <p className="mt-1 text-[11px] text-slate-500">
+                    Enam langkah menyusun halaman tanpa bantuan teknis.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowHelp(false)}
+                  aria-label="Tutup panduan"
+                  className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <ol className="mt-4 space-y-3 text-xs text-slate-700">
+                {[
+                  ['Pilih bagian', 'Klik salah satu bagian di panel kiri untuk mengedit isinya.'],
+                  ['Tambah bagian', 'Klik “Tambah Bagian”, lalu pilih komponen dari katalog.'],
+                  ['Buat kolom', 'Pilih “Baris Berkolom (2–4 konten sejajar)” untuk menaruh konten berdampingan.'],
+                  ['Isi kolom', 'Di tiap kolom, klik Teks, Gambar, atau Tombol. Untuk mengedit, klik nama blok di dalam kolom.'],
+                  ['Simpan & lihat pratinjau', 'Klik “Simpan Draf” agar pratinjau diperbarui. Draf belum tayang di website.'],
+                  ['Terbitkan', 'Jika sudah yakin, klik “Terbitkan”. Halaman langsung tampil di website.'],
+                ].map(([stepTitle, stepDesc], index) => (
+                  <li key={stepTitle} className="flex gap-2.5">
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold flex items-center justify-center">
+                      {index + 1}
+                    </span>
+                    <span>
+                      <strong className="block text-slate-900">{stepTitle}</strong>
+                      <span className="text-slate-600 leading-snug">{stepDesc}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-5 rounded-lg bg-slate-50 border border-slate-200 p-3 text-[11px] text-slate-600 leading-relaxed">
+                <strong className="text-slate-800">Tips:</strong> preview hanya diperbarui setelah
+                draf disimpan. Gunakan tombol Undo (Ctrl+Z) jika salah menambah atau menghapus bagian.
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowHelp(false)}
+                className="mt-4 w-full rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white hover:bg-teal-800 cursor-pointer transition-all"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Close Confirmation Modal */}
         {showCloseConfirm && (

@@ -11,6 +11,10 @@ import {
   ChevronRight,
   Columns3,
   Settings2,
+  Pencil,
+  Type,
+  MousePointerClick,
+  X,
 } from 'lucide-react';
 import {
   builderRegistry,
@@ -34,7 +38,15 @@ interface SectionSettingsProps {
   onAddInnerItem: (path: string, defaults?: Record<string, any>) => void;
   onRemoveInnerItem: (path: string, index: number) => void;
   onUpdateInnerItem: (path: string, index: number, fields: Record<string, any>) => void;
+  /** Diisi saat mengedit blok yang berada di dalam kolom sebuah bagian. */
+  nestedContext?: { sectionLabel: string; columnNumber: number };
 }
+
+const QUICK_COLUMN_BLOCKS: Array<{ slug: string; label: string; icon: React.ReactNode }> = [
+  { slug: 'heading', label: 'Teks', icon: <Type size={13} /> },
+  { slug: 'image', label: 'Gambar', icon: <ImageIcon size={13} /> },
+  { slug: 'button', label: 'Tombol', icon: <MousePointerClick size={13} /> },
+];
 
 const DEVICES: Array<{ id: 'mobile' | 'tablet' | 'desktop'; label: string }> = [
   { id: 'mobile', label: 'Ponsel' },
@@ -180,27 +192,50 @@ const RichTextArea: React.FC<{
 const AddNestedBlock: React.FC<{
   meta: BuilderBlockMeta;
   onAdd: (slug: string) => void;
-}> = ({ meta, onAdd }) => {
+  onClose?: () => void;
+}> = ({ meta, onAdd, onClose }) => {
   const available = meta.columns?.blockSlugs || [];
   const [slug, setSlug] = useState(available[0] || '');
 
   return (
-    <div className="flex items-center gap-1.5">
-      <select value={slug} onChange={(event) => setSlug(event.target.value)} className={inputClass}>
-        {available.map((item) => (
-          <option key={item} value={item}>
-            {builderRegistry[item]?.label || item}
-          </option>
-        ))}
-      </select>
-      <button
-        type="button"
-        onClick={() => slug && onAdd(slug)}
-        className="shrink-0 flex items-center gap-1 py-1.5 px-2.5 bg-teal-700 hover:bg-teal-800 text-white rounded text-[11px] font-bold transition-colors"
-      >
-        <Plus size={12} />
-        Tambah
-      </button>
+    <div className="rounded-lg border border-slate-200 bg-white p-2 space-y-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+          Pilih komponen lain
+        </span>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup daftar komponen"
+            className="p-0.5 text-slate-400 hover:text-slate-700 rounded transition-colors"
+          >
+            <X size={12} />
+          </button>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <select
+          value={slug}
+          onChange={(event) => setSlug(event.target.value)}
+          className={inputClass}
+          aria-label="Pilih komponen untuk kolom"
+        >
+          {available.map((item) => (
+            <option key={item} value={item}>
+              {builderRegistry[item]?.label || item}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => slug && onAdd(slug)}
+          className="shrink-0 flex items-center gap-1 py-1.5 px-2.5 bg-teal-700 hover:bg-teal-800 text-white rounded text-[11px] font-bold transition-colors"
+        >
+          <Plus size={12} />
+          Tambah
+        </button>
+      </div>
     </div>
   );
 };
@@ -212,6 +247,7 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
   onAddInnerItem,
   onRemoveInnerItem,
   onUpdateInnerItem,
+  nestedContext,
 }) => {
   const [activeMediaTarget, setActiveMediaTarget] = useState<{
     fieldName: string;
@@ -220,6 +256,7 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
     innerIndex?: number;
   } | null>(null);
   const [nestedSelection, setNestedSelection] = useState<{ column: number; index: number } | null>(null);
+  const [expandedColumn, setExpandedColumn] = useState<Record<number, boolean>>({});
 
   const meta = builderRegistry[block.blockType];
   const label = meta?.label || block.blockType;
@@ -269,6 +306,7 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
                 list.map((item, i) => (i === index ? { ...item, ...fields } : item)),
               )
             }
+            nestedContext={{ sectionLabel: label, columnNumber: nestedSelection.column + 1 }}
           />
         </>
       );
@@ -550,22 +588,41 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
   return (
     <div className="flex flex-col h-full bg-slate-50">
       {/* Header & Breadcrumb */}
-      <div className="p-3 bg-white border-b border-slate-200 flex items-center justify-between">
+      <div className="p-3 bg-white border-b border-slate-200 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors min-w-0"
         >
-          <ArrowLeft size={16} />
-          <span>Kembali</span>
+          <ArrowLeft size={16} className="shrink-0" />
+          <span className="truncate">
+            {nestedContext ? `Kembali ke ${nestedContext.sectionLabel}` : 'Kembali ke daftar bagian'}
+          </span>
         </button>
-        <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-          {block.blockType}
-        </span>
+        {nestedContext ? (
+          <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+            Di dalam kolom
+          </span>
+        ) : (
+          <span className="shrink-0 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+            {block.blockType}
+          </span>
+        )}
       </div>
 
       <div className="p-3 bg-white border-b border-slate-200">
-        <h2 className="font-bold text-sm text-slate-900">{label}</h2>
+        {nestedContext && (
+          <p className="flex items-center flex-wrap gap-0.5 text-[10px] text-slate-500 mb-1">
+            <span>Halaman</span>
+            <ChevronRight size={10} aria-hidden="true" />
+            <span>{nestedContext.sectionLabel}</span>
+            <ChevronRight size={10} aria-hidden="true" />
+            <span>Kolom {nestedContext.columnNumber}</span>
+            <ChevronRight size={10} aria-hidden="true" />
+            <strong className="text-slate-700">{label}</strong>
+          </p>
+        )}
+        <h2 className="font-bold text-sm text-slate-900">Mengedit: {label}</h2>
         {meta?.description && (
           <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">{meta.description}</p>
         )}
@@ -577,7 +634,7 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
         {meta?.fields && meta.fields.length > 0 && (
           <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-3">
             <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Pengaturan Seksi
+              {nestedContext ? 'Pengaturan Konten' : 'Pengaturan Bagian'}
             </h3>
             {meta.fields.map((f) => (
               <div key={f.name} className="space-y-1">
@@ -599,109 +656,191 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
         {/* Columns editor (depth 1) */}
         {columnsMeta && (
           <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Columns3 size={14} />
-                {columnsMeta.label} ({columns.length})
-              </h3>
+            <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-2">
+              <div>
+                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Columns3 size={14} />
+                  {columnsMeta.label} ({columns.length})
+                </h3>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  Atur lebar dan isi tiap kolom. Konten akan tampil berdampingan di layar lebar.
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={addColumn}
                 disabled={columns.length >= columnsMeta.maxColumns}
-                className="flex items-center gap-1 text-[11px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 disabled:opacity-40 px-2.5 py-1 rounded transition-colors"
+                title={
+                  columns.length >= columnsMeta.maxColumns
+                    ? `Maksimal ${columnsMeta.maxColumns} kolom`
+                    : 'Tambah kolom'
+                }
+                className="shrink-0 flex items-center gap-1 text-[11px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 disabled:opacity-40 px-2.5 py-1 rounded transition-colors"
               >
                 <Plus size={13} />
                 <span>Tambah Kolom</span>
               </button>
             </div>
 
-            {columns.map((column, columnIndex) => (
-              <div
-                key={columnIndex}
-                className="rounded-lg border border-slate-200 bg-slate-50/60 p-2.5 space-y-2"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold text-slate-700">
-                    Kolom {columnIndex + 1}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <select
-                      value={column.width || 'full'}
-                      onChange={(event) => updateColumnWidth(columnIndex, event.target.value)}
-                      className="text-[11px] p-1 rounded border border-slate-300 bg-white"
-                    >
-                      {columnsMeta.widthOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={() => removeColumn(columnIndex)}
-                      disabled={columns.length <= 1}
-                      className="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20 transition-colors"
-                      title="Hapus kolom"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                </div>
+            {columns.map((column, columnIndex) => {
+              const columnContent: any[] = column.content || [];
+              const isExpanded = expandedColumn[columnIndex] === true;
 
-                <div className="space-y-1.5">
-                  {(column.content || []).length === 0 && (
-                    <p className="text-[11px] text-slate-400 italic py-1">Kolom masih kosong.</p>
-                  )}
-                  {(column.content || []).map((nested: any, blockIndex: number) => (
-                    <div
-                      key={nested.id || blockIndex}
-                      className="flex items-center justify-between gap-2 bg-white border border-slate-200 rounded px-2 py-1.5 hover:border-teal-400 transition-colors"
-                    >
+              return (
+                <div
+                  key={columnIndex}
+                  className="rounded-lg border border-slate-200 bg-slate-50/60 p-2.5 space-y-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold text-slate-700">
+                      Kolom {columnIndex + 1}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <select
+                        value={column.width || 'full'}
+                        onChange={(event) => updateColumnWidth(columnIndex, event.target.value)}
+                        className="text-[11px] p-1 rounded border border-slate-300 bg-white"
+                        aria-label={`Lebar kolom ${columnIndex + 1}`}
+                        title="Lebar kolom"
+                      >
+                        {columnsMeta.widthOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
                       <button
                         type="button"
-                        onClick={() => setNestedSelection({ column: columnIndex, index: blockIndex })}
-                        className="flex items-center gap-1.5 min-w-0 flex-1 text-left"
+                        onClick={() => removeColumn(columnIndex)}
+                        disabled={columns.length <= 1}
+                        className="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-20 transition-colors"
+                        title="Hapus kolom"
+                        aria-label={`Hapus kolom ${columnIndex + 1}`}
                       >
-                        <span className="text-[11px] font-semibold text-slate-800 truncate">
-                          {builderRegistry[nested.blockType]?.label || nested.blockType}
-                        </span>
-                        <ChevronRight size={12} className="text-slate-400 shrink-0" />
+                        <Trash2 size={13} />
                       </button>
-                      <div className="flex items-center gap-0.5 shrink-0">
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    {columnContent.length === 0 && !isExpanded && (
+                      <div className="rounded-lg border border-dashed border-teal-300 bg-teal-50/50 p-3 text-center space-y-2">
+                        <p className="text-[11px] font-semibold text-teal-900">
+                          Kolom ini belum ada isinya.
+                        </p>
+                        <p className="text-[10px] text-teal-800/80">
+                          Mulai dengan menambahkan:
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-1.5">
+                          {QUICK_COLUMN_BLOCKS.map((quick) => (
+                            <button
+                              key={quick.slug}
+                              type="button"
+                              onClick={() => addBlockToColumn(columnIndex, quick.slug)}
+                              className="flex items-center gap-1 py-1.5 px-2.5 bg-white border border-teal-300 hover:border-teal-500 hover:bg-teal-50 text-teal-800 rounded-md text-[11px] font-bold transition-colors"
+                            >
+                              {quick.icon}
+                              {quick.label}
+                            </button>
+                          ))}
+                        </div>
                         <button
                           type="button"
-                          onClick={() => moveNestedBlock(columnIndex, blockIndex, -1)}
-                          disabled={blockIndex === 0}
-                          className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
-                          title="Geser ke atas"
+                          onClick={() =>
+                            setExpandedColumn((prev) => ({ ...prev, [columnIndex]: true }))
+                          }
+                          className="text-[10px] font-semibold text-teal-700 hover:text-teal-900 underline"
                         >
-                          <ChevronUp size={12} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveNestedBlock(columnIndex, blockIndex, 1)}
-                          disabled={blockIndex === (column.content || []).length - 1}
-                          className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
-                          title="Geser ke bawah"
-                        >
-                          <ChevronDown size={12} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeNestedBlock(columnIndex, blockIndex)}
-                          className="p-1 text-slate-400 hover:text-rose-600"
-                          title="Hapus blok"
-                        >
-                          <Trash2 size={12} />
+                          Lihat semua komponen
                         </button>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
 
-                <AddNestedBlock meta={meta!} onAdd={(slug) => addBlockToColumn(columnIndex, slug)} />
-              </div>
-            ))}
+                    {columnContent.map((nested: any, blockIndex: number) => (
+                      <div
+                        key={nested.id || blockIndex}
+                        className="flex items-center justify-between gap-2 bg-white border border-slate-200 rounded px-2 py-1.5 hover:border-teal-400 transition-colors"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setNestedSelection({ column: columnIndex, index: blockIndex })}
+                          className="flex items-center gap-1.5 min-w-0 flex-1 text-left"
+                          title="Klik untuk edit"
+                        >
+                          <Pencil size={11} className="text-slate-400 shrink-0" aria-hidden="true" />
+                          <span className="min-w-0">
+                            <span className="block text-[11px] font-semibold text-slate-800 truncate">
+                              {builderRegistry[nested.blockType]?.label || nested.blockType}
+                            </span>
+                            <span className="block text-[9px] text-slate-400">
+                              Klik untuk edit
+                            </span>
+                          </span>
+                          <ChevronRight size={12} className="text-slate-400 shrink-0" />
+                        </button>
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => moveNestedBlock(columnIndex, blockIndex, -1)}
+                            disabled={blockIndex === 0}
+                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
+                            title="Geser ke atas"
+                            aria-label="Geser blok ke atas"
+                          >
+                            <ChevronUp size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveNestedBlock(columnIndex, blockIndex, 1)}
+                            disabled={blockIndex === columnContent.length - 1}
+                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
+                            title="Geser ke bawah"
+                            aria-label="Geser blok ke bawah"
+                          >
+                            <ChevronDown size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeNestedBlock(columnIndex, blockIndex)}
+                            className="p-1 text-slate-400 hover:text-rose-600"
+                            title="Hapus blok"
+                            aria-label="Hapus blok dari kolom"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {columnContent.length > 0 && !isExpanded && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpandedColumn((prev) => ({ ...prev, [columnIndex]: true }))
+                      }
+                      className="w-full flex items-center justify-center gap-1 py-1.5 border border-dashed border-slate-300 hover:border-teal-500 hover:bg-teal-50/40 text-slate-600 hover:text-teal-800 rounded text-[11px] font-semibold transition-colors"
+                    >
+                      <Plus size={12} />
+                      Tambah isi kolom
+                    </button>
+                  )}
+
+                  {isExpanded && (
+                    <AddNestedBlock
+                      meta={meta!}
+                      onAdd={(slug) => {
+                        addBlockToColumn(columnIndex, slug);
+                        setExpandedColumn((prev) => ({ ...prev, [columnIndex]: false }));
+                      }}
+                      onClose={() =>
+                        setExpandedColumn((prev) => ({ ...prev, [columnIndex]: false }))
+                      }
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
