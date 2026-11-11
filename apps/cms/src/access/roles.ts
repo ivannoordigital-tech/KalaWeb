@@ -25,6 +25,18 @@ export function getUserRole(user?: any): UserRole | null {
   return user.role as UserRole;
 }
 
+/**
+ * Peran yang boleh melihat fitur teknis di CMS (HTML kustom, canonical, no-index).
+ * Peran lain (marketing, author, midwife_coordinator) memakai tampilan sederhana.
+ */
+export const TECHNICAL_ROLES: UserRole[] = ['superadmin', 'operator', 'seo', 'automation'];
+
+export function isTechnicalRole(userOrRole?: any): boolean {
+  const role =
+    typeof userOrRole === 'string' ? (userOrRole as UserRole) : getUserRole(userOrRole);
+  return role ? TECHNICAL_ROLES.includes(role) : false;
+}
+
 export const isSuperAdmin: Access = ({ req: { user } }: AccessArgs) => {
   return getUserRole(user) === 'superadmin';
 };

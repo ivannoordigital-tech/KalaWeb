@@ -2,6 +2,23 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
   ArrowLeft,
   Plus,
   Trash2,
@@ -15,6 +32,8 @@ import {
   Type,
   MousePointerClick,
   X,
+  GripVertical,
+  ShieldAlert,
 } from 'lucide-react';
 import {
   builderRegistry,
@@ -40,6 +59,11 @@ interface SectionSettingsProps {
   onUpdateInnerItem: (path: string, index: number, fields: Record<string, any>) => void;
   /** Diisi saat mengedit blok yang berada di dalam kolom sebuah bagian. */
   nestedContext?: { sectionLabel: string; columnNumber: number };
+  /** Peran teknis boleh mengedit HTML kustom. */
+  canUseAdvanced?: boolean;
+  /** Seleksi blok nested yang dikendalikan dari sidebar (opsional). */
+  activeNestedSelection?: { column: number; index: number } | null;
+  onNestedSelectionChange?: (selection: { column: number; index: number } | null) => void;
 }
 
 const QUICK_COLUMN_BLOCKS: Array<{ slug: string; label: string; icon: React.ReactNode }> = [
@@ -240,6 +264,109 @@ const AddNestedBlock: React.FC<{
   );
 };
 
+const ColumnDropArea: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`space-y-1.5 rounded-md transition-shadow ${
+        isOver ? 'ring-2 ring-teal-400 ring-offset-1' : ''
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
+
+const NestedBlockRow: React.FC<{
+  id: string;
+  label: string;
+  isSelected: boolean;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onEdit: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onRemove: () => void;
+}> = ({ id, label, isSelected, canMoveUp, canMoveDown, onEdit, onMoveUp, onMoveDown, onRemove }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.4 : 1,
+      }}
+      className={`flex items-center justify-between gap-1.5 bg-white border rounded px-2 py-1.5 transition-colors ${
+        isSelected ? 'border-teal-500 ring-1 ring-teal-400' : 'border-slate-200 hover:border-teal-400'
+      }`}
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        onClick={(event) => event.stopPropagation()}
+        className="text-slate-300 hover:text-slate-600 cursor-grab active:cursor-grabbing p-0.5 rounded"
+        title="Geser blok"
+        aria-label="Geser blok"
+      >
+        <GripVertical size={12} />
+      </button>
+
+      <button
+        type="button"
+        onClick={onEdit}
+        className="flex items-center gap-1.5 min-w-0 flex-1 text-left"
+        title="Klik untuk edit"
+      >
+        <Pencil size={11} className="text-slate-400 shrink-0" aria-hidden="true" />
+        <span className="min-w-0">
+          <span className="block text-[11px] font-semibold text-slate-800 truncate">{label}</span>
+          <span className="block text-[9px] text-slate-400">Klik untuk edit</span>
+        </span>
+        <ChevronRight size={12} className="text-slate-400 shrink-0" />
+      </button>
+
+      <div className="flex items-center gap-0.5 shrink-0">
+        <button
+          type="button"
+          onClick={onMoveUp}
+          disabled={!canMoveUp}
+          className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
+          title="Geser ke atas"
+          aria-label="Geser blok ke atas"
+        >
+          <ChevronUp size={12} />
+        </button>
+        <button
+          type="button"
+          onClick={onMoveDown}
+          disabled={!canMoveDown}
+          className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
+          title="Geser ke bawah"
+          aria-label="Geser blok ke bawah"
+        >
+          <ChevronDown size={12} />
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="p-1 text-slate-400 hover:text-rose-600"
+          title="Hapus blok"
+          aria-label="Hapus blok dari kolom"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const nestedRowId = (block: any, columnIndex: number, blockIndex: number): string =>
+  block?.id ? String(block.id) : `nested-${columnIndex}-${blockIndex}`;
+
 export const SectionSettings: React.FC<SectionSettingsProps> = ({
   block,
   onBack,
@@ -248,6 +375,9 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
   onRemoveInnerItem,
   onUpdateInnerItem,
   nestedContext,
+  canUseAdvanced = true,
+  activeNestedSelection,
+  onNestedSelectionChange,
 }) => {
   const [activeMediaTarget, setActiveMediaTarget] = useState<{
     fieldName: string;
@@ -255,8 +385,21 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
     innerPath?: string;
     innerIndex?: number;
   } | null>(null);
-  const [nestedSelection, setNestedSelection] = useState<{ column: number; index: number } | null>(null);
+  const [internalNestedSelection, setInternalNestedSelection] = useState<{
+    column: number;
+    index: number;
+  } | null>(null);
+  const nestedSelection =
+    activeNestedSelection !== undefined ? activeNestedSelection : internalNestedSelection;
+  const setNestedSelection = (selection: { column: number; index: number } | null) => {
+    onNestedSelectionChange?.(selection);
+    if (activeNestedSelection === undefined) setInternalNestedSelection(selection);
+  };
   const [expandedColumn, setExpandedColumn] = useState<Record<number, boolean>>({});
+  const nestedSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const meta = builderRegistry[block.blockType];
   const label = meta?.label || block.blockType;
@@ -358,6 +501,12 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
   };
 
   const removeNestedBlock = (columnIndex: number, blockIndex: number) => {
+    if (
+      nestedSelection?.column === columnIndex &&
+      nestedSelection?.index === blockIndex
+    ) {
+      setNestedSelection(null);
+    }
     setColumns(
       columns.map((column, i) =>
         i !== columnIndex
@@ -379,6 +528,53 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
         return { ...column, content };
       }),
     );
+  };
+
+  const findNestedBlock = (rowId: string) => {
+    for (let columnIndex = 0; columnIndex < columns.length; columnIndex += 1) {
+      const content: any[] = columns[columnIndex].content || [];
+      for (let blockIndex = 0; blockIndex < content.length; blockIndex += 1) {
+        if (nestedRowId(content[blockIndex], columnIndex, blockIndex) === rowId) {
+          return { columnIndex, blockIndex };
+        }
+      }
+    }
+    return null;
+  };
+
+  const handleNestedDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = String(active.id);
+    const overId = String(over.id);
+    const source = findNestedBlock(activeId);
+    if (!source) return;
+
+    let targetColumn: number;
+    let targetIndex: number;
+
+    if (overId.startsWith('column-')) {
+      targetColumn = Number(overId.slice('column-'.length));
+      targetIndex = (columns[targetColumn]?.content || []).length;
+    } else {
+      const target = findNestedBlock(overId);
+      if (!target) return;
+      targetColumn = target.columnIndex;
+      targetIndex = target.blockIndex;
+    }
+
+    if (!columns[targetColumn]) return;
+    if (source.columnIndex === targetColumn && source.blockIndex === targetIndex) return;
+
+    const next = columns.map((column) => ({
+      ...column,
+      content: [...(column.content || [])],
+    }));
+    const [moved] = next[source.columnIndex].content.splice(source.blockIndex, 1);
+    if (!moved) return;
+    next[targetColumn].content.splice(targetIndex, 0, moved);
+    setColumns(next);
   };
 
   // ---- Generic field renderer ----
@@ -630,6 +826,16 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
 
       {/* Settings Form Body */}
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {block.blockType === 'html' && !canUseAdvanced && (
+          <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-[11px] leading-relaxed text-amber-900">
+            <ShieldAlert size={15} className="shrink-0 mt-0.5" aria-hidden="true" />
+            <p>
+              <strong>Komponen teknis.</strong> HTML kustom hanya untuk tim teknis. Perubahan di
+              sini bisa merusak tampilan halaman — minta bantuan operator jika perlu.
+            </p>
+          </div>
+        )}
+
         {/* Simple Section Fields */}
         {meta?.fields && meta.fields.length > 0 && (
           <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-3">
@@ -682,7 +888,12 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
               </button>
             </div>
 
-            {columns.map((column, columnIndex) => {
+            <DndContext
+              sensors={nestedSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleNestedDragEnd}
+            >
+              {columns.map((column, columnIndex) => {
               const columnContent: any[] = column.content || [];
               const isExpanded = expandedColumn[columnIndex] === true;
 
@@ -722,96 +933,70 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    {columnContent.length === 0 && !isExpanded && (
-                      <div className="rounded-lg border border-dashed border-teal-300 bg-teal-50/50 p-3 text-center space-y-2">
-                        <p className="text-[11px] font-semibold text-teal-900">
-                          Kolom ini belum ada isinya.
-                        </p>
-                        <p className="text-[10px] text-teal-800/80">
-                          Mulai dengan menambahkan:
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-1.5">
-                          {QUICK_COLUMN_BLOCKS.map((quick) => (
-                            <button
-                              key={quick.slug}
-                              type="button"
-                              onClick={() => addBlockToColumn(columnIndex, quick.slug)}
-                              className="flex items-center gap-1 py-1.5 px-2.5 bg-white border border-teal-300 hover:border-teal-500 hover:bg-teal-50 text-teal-800 rounded-md text-[11px] font-bold transition-colors"
-                            >
-                              {quick.icon}
-                              {quick.label}
-                            </button>
-                          ))}
+                  <ColumnDropArea id={`column-${columnIndex}`}>
+                    <SortableContext
+                      items={columnContent.map((nested, blockIndex) =>
+                        nestedRowId(nested, columnIndex, blockIndex),
+                      )}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {columnContent.length === 0 && !isExpanded && (
+                        <div className="rounded-lg border border-dashed border-teal-300 bg-teal-50/50 p-3 text-center space-y-2">
+                          <p className="text-[11px] font-semibold text-teal-900">
+                            Kolom ini belum ada isinya.
+                          </p>
+                          <p className="text-[10px] text-teal-800/80">
+                            Mulai dengan menambahkan:
+                          </p>
+                          <div className="flex flex-wrap justify-center gap-1.5">
+                            {QUICK_COLUMN_BLOCKS.map((quick) => (
+                              <button
+                                key={quick.slug}
+                                type="button"
+                                onClick={() => addBlockToColumn(columnIndex, quick.slug)}
+                                className="flex items-center gap-1 py-1.5 px-2.5 bg-white border border-teal-300 hover:border-teal-500 hover:bg-teal-50 text-teal-800 rounded-md text-[11px] font-bold transition-colors"
+                              >
+                                {quick.icon}
+                                {quick.label}
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedColumn((prev) => ({ ...prev, [columnIndex]: true }))
+                            }
+                            className="text-[10px] font-semibold text-teal-700 hover:text-teal-900 underline"
+                          >
+                            Lihat semua komponen
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedColumn((prev) => ({ ...prev, [columnIndex]: true }))
-                          }
-                          className="text-[10px] font-semibold text-teal-700 hover:text-teal-900 underline"
-                        >
-                          Lihat semua komponen
-                        </button>
-                      </div>
-                    )}
+                      )}
 
-                    {columnContent.map((nested: any, blockIndex: number) => (
-                      <div
-                        key={nested.id || blockIndex}
-                        className="flex items-center justify-between gap-2 bg-white border border-slate-200 rounded px-2 py-1.5 hover:border-teal-400 transition-colors"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => setNestedSelection({ column: columnIndex, index: blockIndex })}
-                          className="flex items-center gap-1.5 min-w-0 flex-1 text-left"
-                          title="Klik untuk edit"
-                        >
-                          <Pencil size={11} className="text-slate-400 shrink-0" aria-hidden="true" />
-                          <span className="min-w-0">
-                            <span className="block text-[11px] font-semibold text-slate-800 truncate">
-                              {builderRegistry[nested.blockType]?.label || nested.blockType}
-                            </span>
-                            <span className="block text-[9px] text-slate-400">
-                              Klik untuk edit
-                            </span>
-                          </span>
-                          <ChevronRight size={12} className="text-slate-400 shrink-0" />
-                        </button>
-                        <div className="flex items-center gap-0.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => moveNestedBlock(columnIndex, blockIndex, -1)}
-                            disabled={blockIndex === 0}
-                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
-                            title="Geser ke atas"
-                            aria-label="Geser blok ke atas"
-                          >
-                            <ChevronUp size={12} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveNestedBlock(columnIndex, blockIndex, 1)}
-                            disabled={blockIndex === columnContent.length - 1}
-                            className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20"
-                            title="Geser ke bawah"
-                            aria-label="Geser blok ke bawah"
-                          >
-                            <ChevronDown size={12} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeNestedBlock(columnIndex, blockIndex)}
-                            className="p-1 text-slate-400 hover:text-rose-600"
-                            title="Hapus blok"
-                            aria-label="Hapus blok dari kolom"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      {columnContent.map((nested: any, blockIndex: number) => {
+                        const rowId = nestedRowId(nested, columnIndex, blockIndex);
+                        return (
+                          <NestedBlockRow
+                            key={rowId}
+                            id={rowId}
+                            label={builderRegistry[nested.blockType]?.label || nested.blockType}
+                            isSelected={
+                              nestedSelection?.column === columnIndex &&
+                              nestedSelection?.index === blockIndex
+                            }
+                            canMoveUp={blockIndex > 0}
+                            canMoveDown={blockIndex < columnContent.length - 1}
+                            onEdit={() =>
+                              setNestedSelection({ column: columnIndex, index: blockIndex })
+                            }
+                            onMoveUp={() => moveNestedBlock(columnIndex, blockIndex, -1)}
+                            onMoveDown={() => moveNestedBlock(columnIndex, blockIndex, 1)}
+                            onRemove={() => removeNestedBlock(columnIndex, blockIndex)}
+                          />
+                        );
+                      })}
+                    </SortableContext>
+                  </ColumnDropArea>
 
                   {columnContent.length > 0 && !isExpanded && (
                     <button
@@ -841,6 +1026,7 @@ export const SectionSettings: React.FC<SectionSettingsProps> = ({
                 </div>
               );
             })}
+            </DndContext>
           </div>
         )}
 

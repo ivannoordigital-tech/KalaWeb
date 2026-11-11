@@ -11,6 +11,7 @@ import {
   getPopularBlocks,
   normalizeCatalogText,
 } from '../components/admin/builder/catalog-utils';
+import { isTechnicalRole } from '../access/roles';
 
 let passed = 0;
 function test(name: string, fn: () => void) {
@@ -80,6 +81,18 @@ test('bagian "Sering dipakai" berisi komponen populer dan valid', () => {
 
 test('batas jumlah komponen populer dihormati', () => {
   assert.equal(getPopularBlocks(blocks, 3).length, 3);
+});
+
+test('peran teknis dan non-teknis dipetakan dengan benar', () => {
+  assert.equal(isTechnicalRole('superadmin'), true);
+  assert.equal(isTechnicalRole('operator'), true);
+  assert.equal(isTechnicalRole('seo'), true);
+  assert.equal(isTechnicalRole('automation'), true);
+  assert.equal(isTechnicalRole('marketing'), false);
+  assert.equal(isTechnicalRole('author'), false);
+  assert.equal(isTechnicalRole('midwife_coordinator'), false);
+  assert.equal(isTechnicalRole(undefined), false);
+  assert.equal(isTechnicalRole({ role: 'operator' }), true);
 });
 
 console.log(`\n✅ Semua ${passed} test katalog builder lulus.`);

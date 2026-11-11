@@ -48,6 +48,8 @@ Tidak perlu mengerti HTML, kode, atau istilah developer.
    - **Tombol** — untuk tombol aksi.
    - **Lihat semua komponen** — untuk pilihan lain (video, statistik, formulir, dll.).
 6. Untuk mengedit isi kolom: klik nama blok di dalam kolom (ada tulisan **“Klik untuk edit”**).
+7. Blok di dalam kolom juga muncul di **panel kiri** saat bagian dibuka (klik tanda panah pada bagian). Klik langsung nama bloknya untuk mengedit tanpa membuka bagian dua kali.
+8. Untuk memindahkan blok: geser ikon titik-titik di samping nama blok, atau gunakan tombol panah atas/bawah.
 
 > Di layar HP, kolom otomatis ditumpuk ke bawah. Cek lewat pratinjau **Mobile**.
 
@@ -105,6 +107,17 @@ Tidak perlu mengerti HTML, kode, atau istilah developer.
 | **Komponen** | Jenis isi yang bisa ditambahkan (teks, gambar, tombol, dll.). |
 | **Draf** | Versi kerja yang belum tayang. |
 | **Terbitkan** | Membuat halaman tampil di website. |
+
+---
+
+## Fitur teknis
+
+Beberapa fitur hanya terlihat untuk tim teknis (superadmin, operator, SEO, automation):
+
+- Komponen **HTML Kustom** di katalog.
+- Field **Canonical URL** dan **Pembaruan Substantif** di tab Optimasi SEO.
+
+Jika Bunda membutuhkan salah satunya, minta bantuan tim teknis. Fitur lain tetap bisa dipakai seperti biasa.
 
 ---
 

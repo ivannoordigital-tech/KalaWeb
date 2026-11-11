@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -15,7 +15,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Plus } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { SortableSection } from './SortableSection';
 import { builderRegistry } from '../../../blocks/registry';
 import type { LayoutBlock } from './useBuilderLayout';
@@ -29,6 +29,8 @@ interface SectionTreeProps {
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
   onOpenAddMenu: () => void;
+  nestedSelection?: { sectionId: string; column: number; index: number } | null;
+  onSelectNested?: (sectionId: string, column: number, index: number) => void;
 }
 
 export const SectionTree: React.FC<SectionTreeProps> = ({
@@ -40,7 +42,17 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
   onDuplicate,
   onDelete,
   onOpenAddMenu,
+  nestedSelection,
+  onSelectNested,
 }) => {
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  // Bagian yang dipilih otomatis dibuka agar isi kolomnya terlihat.
+  useEffect(() => {
+    if (!selectedId) return;
+    setExpandedSections((prev) => (prev[selectedId] ? prev : { ...prev, [selectedId]: true }));
+  }, [selectedId]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -91,12 +103,27 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
             <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
               {layout.map((block) => {
                 const blockId = block.id || block.blockType;
+                const columns =
+                  block.blockType === 'section' && Array.isArray(block.columns)
+                    ? (block.columns as any[])
+                    : [];
+                const hasNested = columns.length > 0;
+                const isExpanded = expandedSections[blockId] === true;
+
                 return (
                   <SortableSection
                     key={blockId}
                     block={block}
                     isSelected={selectedId === blockId}
                     onSelect={() => onSelect(blockId)}
+                    hasNested={hasNested}
+                    isExpanded={isExpanded}
+                    onToggleExpand={() =>
+                      setExpandedSections((prev) => ({
+                        ...prev,
+                        [blockId]: !prev[blockId],
+                      }))
+                    }
                     onToggleDisabled={(e) => {
                       e.stopPropagation();
                       onToggleDisabled(blockId);
@@ -107,12 +134,54 @@ export const SectionTree: React.FC<SectionTreeProps> = ({
                     }}
                     onDelete={(e) => {
                       e.stopPropagation();
-                      const label = builderRegistry[block.blockType]?.label || 'seksi ini';
+                      const label = builderRegistry[block.blockType]?.label || 'bagian ini';
                       if (confirm(`Hapus ${label}?`)) {
                         onDelete(blockId);
                       }
                     }}
-                  />
+                  >
+                    {columns.map((column, columnIndex) => {
+                      const content: any[] = Array.isArray(column.content) ? column.content : [];
+                      return (
+                        <div key={columnIndex}>
+                          <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 px-1 py-0.5">
+                            Kolom {columnIndex + 1}
+                          </p>
+                          {content.length === 0 ? (
+                            <p className="text-[10px] italic text-slate-400 px-1">Kosong</p>
+                          ) : (
+                            content.map((nested, nestedIndex) => {
+                              const isActive =
+                                nestedSelection?.sectionId === blockId &&
+                                nestedSelection.column === columnIndex &&
+                                nestedSelection.index === nestedIndex;
+                              return (
+                                <button
+                                  key={nested.id || `${columnIndex}-${nestedIndex}`}
+                                  type="button"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    onSelectNested?.(blockId, columnIndex, nestedIndex);
+                                  }}
+                                  title="Edit isi kolom"
+                                  className={`w-full flex items-center gap-1.5 px-1.5 py-1 rounded text-left text-[11px] transition-colors ${
+                                    isActive
+                                      ? 'bg-teal-100 text-teal-900 font-semibold'
+                                      : 'text-slate-600 hover:bg-slate-100'
+                                  }`}
+                                >
+                                  <Pencil size={10} className="shrink-0 text-slate-400" aria-hidden="true" />
+                                  <span className="truncate">
+                                    {builderRegistry[nested.blockType]?.label || nested.blockType}
+                                  </span>
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      );
+                    })}
+                  </SortableSection>
                 );
               })}
             </SortableContext>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useForm, useFormFields, useDocumentInfo, useFormModified } from '@payloadcms/ui';
+import { useForm, useFormFields, useDocumentInfo, useFormModified, useAuth } from '@payloadcms/ui';
 import {
   Undo2,
   Redo2,
@@ -28,6 +28,27 @@ import { useBuilderSave } from './useBuilderSave';
 import { BuilderValidationBanner } from './BuilderValidationBanner';
 import { useFocusTrap } from './useFocusTrap';
 import { BuilderErrorBoundary } from './BuilderErrorBoundary';
+import { isTechnicalRole } from '../../../access/roles';
+
+const ONBOARDING_KEY = 'kala-builder-onboarding-v1';
+
+const ONBOARDING_STEPS = [
+  {
+    title: 'Ini daftar bagian halaman',
+    description:
+      'Setiap kotak di panel kiri adalah satu bagian halaman. Urutannya bisa digeser dengan ikon titik-titik.',
+  },
+  {
+    title: 'Klik bagian untuk mengedit',
+    description:
+      'Bagian berkolom punya tanda panah untuk membuka isi kolom. Klik teks/gambar di dalamnya untuk mengedit.',
+  },
+  {
+    title: 'Simpan Draf dulu, Terbitkan jika siap',
+    description:
+      'Simpan Draf tidak menayangkan halaman. Terbitkan akan langsung menampilkan halaman di website.',
+  },
+];
 
 export const BuilderField: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,10 +58,17 @@ export const BuilderField: React.FC = () => {
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
+  const [selectedNested, setSelectedNested] = useState<{ column: number; index: number } | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const portalRef = useRef<HTMLDivElement>(null);
   const confirmDialogRef = useRef<HTMLDivElement>(null);
   const publishDialogRef = useRef<HTMLDivElement>(null);
   const helpDialogRef = useRef<HTMLDivElement>(null);
+  const onboardingDialogRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useAuth();
+  const canUseAdvanced = isTechnicalRole((user as any)?.role);
 
   const { dispatchFields, setModified } = useForm();
   const docInfo = useDocumentInfo();
@@ -55,10 +83,36 @@ export const BuilderField: React.FC = () => {
     canPublish,
   } = useBuilderSave();
 
-  useFocusTrap(portalRef, isOpen && !showCloseConfirm && !showPublishConfirm && !showHelp && !isAddMenuOpen);
+  useFocusTrap(
+    portalRef,
+    isOpen && !showCloseConfirm && !showPublishConfirm && !showHelp && !showOnboarding && !isAddMenuOpen,
+  );
   useFocusTrap(confirmDialogRef, showCloseConfirm);
   useFocusTrap(publishDialogRef, showPublishConfirm);
   useFocusTrap(helpDialogRef, showHelp);
+  useFocusTrap(onboardingDialogRef, showOnboarding);
+
+  // Tampilkan panduan 3 langkah sekali per browser.
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      if (window.localStorage.getItem(ONBOARDING_KEY) !== '1') {
+        setOnboardingStep(0);
+        setShowOnboarding(true);
+      }
+    } catch {
+      // localStorage bisa diblokir; abaikan dan jangan tampilkan onboarding.
+    }
+  }, [isOpen]);
+
+  const dismissOnboarding = useCallback(() => {
+    setShowOnboarding(false);
+    try {
+      window.localStorage.setItem(ONBOARDING_KEY, '1');
+    } catch {
+      // abaikan
+    }
+  }, []);
 
   // Read current layout from Payload Form State
   const rawLayout = useFormFields(([fields]) => fields?.layout?.value);
@@ -158,6 +212,8 @@ export const BuilderField: React.FC = () => {
           setShowPublishConfirm(false);
         } else if (showHelp) {
           setShowHelp(false);
+        } else if (showOnboarding) {
+          dismissOnboarding();
         } else if (showCloseConfirm) {
           setShowCloseConfirm(false);
         } else if (selectedSectionId) {
@@ -178,6 +234,7 @@ export const BuilderField: React.FC = () => {
     showCloseConfirm,
     showPublishConfirm,
     showHelp,
+    showOnboarding,
     selectedSectionId,
     canUndo,
     canRedo,
@@ -188,6 +245,7 @@ export const BuilderField: React.FC = () => {
     canSave,
     save,
     modified,
+    dismissOnboarding,
   ]);
 
   const collectionSlug = (docInfo?.collectionSlug as 'landing-pages' | 'pages') || 'landing-pages';
@@ -501,7 +559,10 @@ export const BuilderField: React.FC = () => {
               >
                 <SectionSettings
                   block={selectedBlock}
-                  onBack={() => setSelectedSectionId(null)}
+                  onBack={() => {
+                    setSelectedSectionId(null);
+                    setSelectedNested(null);
+                  }}
                   onUpdate={(updates, structural) => selectedBlock.id && updateSection(selectedBlock.id, updates, structural)}
                   onAddInnerItem={(path, defaults) =>
                     selectedBlock.id && addInnerItem(selectedBlock.id, path, defaults)
@@ -512,24 +573,45 @@ export const BuilderField: React.FC = () => {
                   onUpdateInnerItem={(path, idx, fields) =>
                     selectedBlock.id && updateInnerItem(selectedBlock.id, path, idx, fields)
                   }
+                  canUseAdvanced={canUseAdvanced}
+                  activeNestedSelection={selectedNested}
+                  onNestedSelectionChange={setSelectedNested}
                 />
               </BuilderErrorBoundary>
             ) : (
               <SectionTree
                 layout={layout}
                 selectedId={selectedSectionId}
-                onSelect={(id) => setSelectedSectionId(id)}
+                onSelect={(id) => {
+                  setSelectedSectionId(id);
+                  setSelectedNested(null);
+                }}
                 onReorder={reorderSections}
                 onToggleDisabled={toggleDisabled}
                 onDuplicate={(id) => {
                   const newId = duplicateSection(id);
-                  if (newId) setSelectedSectionId(newId);
+                  if (newId) {
+                    setSelectedSectionId(newId);
+                    setSelectedNested(null);
+                  }
                 }}
                 onDelete={(id) => {
                   removeSection(id);
-                  if (selectedSectionId === id) setSelectedSectionId(null);
+                  if (selectedSectionId === id) {
+                    setSelectedSectionId(null);
+                    setSelectedNested(null);
+                  }
                 }}
                 onOpenAddMenu={() => setIsAddMenuOpen(true)}
+                nestedSelection={
+                  selectedNested && selectedSectionId
+                    ? { sectionId: selectedSectionId, ...selectedNested }
+                    : null
+                }
+                onSelectNested={(sectionId, column, index) => {
+                  setSelectedSectionId(sectionId);
+                  setSelectedNested({ column, index });
+                }}
               />
             )}
           </aside>
@@ -547,7 +629,10 @@ export const BuilderField: React.FC = () => {
                 slug={slug}
                 hasUnsavedChanges={modified}
                 selectedSectionId={selectedSectionId}
-                onSelectFromIframe={(sectionId) => setSelectedSectionId(sectionId)}
+                onSelectFromIframe={(sectionId) => {
+                  setSelectedSectionId(sectionId);
+                  setSelectedNested(null);
+                }}
                 lastSaved={lastUpdateTime}
                 onSaveDraft={() => save('draft')}
                 isSavingDraft={isSaving && saveIntent === 'draft'}
@@ -569,7 +654,88 @@ export const BuilderField: React.FC = () => {
             const firstId = applyTemplate(templateBlocks, 'append');
             if (firstId) setSelectedSectionId(firstId);
           }}
+          canUseAdvanced={canUseAdvanced}
         />
+
+        {/* First-run onboarding */}
+        {showOnboarding && (
+          <div className="absolute inset-0 z-[100001] flex items-center justify-center bg-slate-950/70 p-4">
+            <div
+              ref={onboardingDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="kala-onboarding-title"
+              aria-describedby="kala-onboarding-desc"
+              className="w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700">
+                  Panduan {onboardingStep + 1} dari {ONBOARDING_STEPS.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={dismissOnboarding}
+                  aria-label="Tutup panduan"
+                  className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <h2 id="kala-onboarding-title" className="mt-3 text-base font-bold text-slate-900 m-0">
+                {ONBOARDING_STEPS[onboardingStep].title}
+              </h2>
+              <p id="kala-onboarding-desc" className="mt-2 text-xs leading-relaxed text-slate-600">
+                {ONBOARDING_STEPS[onboardingStep].description}
+              </p>
+
+              <div className="mt-4 flex items-center gap-1.5" aria-hidden="true">
+                {ONBOARDING_STEPS.map((step, index) => (
+                  <span
+                    key={step.title}
+                    className={`h-1.5 rounded-full transition-all ${
+                      index === onboardingStep ? 'w-6 bg-teal-600' : 'w-1.5 bg-slate-300'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                {onboardingStep > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setOnboardingStep((step) => Math.max(0, step - 1))}
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  >
+                    Kembali
+                  </button>
+                )}
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => {
+                    if (onboardingStep < ONBOARDING_STEPS.length - 1) {
+                      setOnboardingStep((step) => step + 1);
+                    } else {
+                      dismissOnboarding();
+                    }
+                  }}
+                  className="flex-1 rounded-lg bg-teal-700 px-4 py-2 text-xs font-bold text-white hover:bg-teal-800 cursor-pointer transition-all"
+                >
+                  {onboardingStep < ONBOARDING_STEPS.length - 1 ? 'Lanjut' : 'Mulai menyusun'}
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={dismissOnboarding}
+                className="mt-2 w-full text-[10px] text-slate-500 hover:text-slate-700 underline"
+              >
+                Jangan tampilkan lagi
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Publish Confirmation Modal */}
         {showPublishConfirm && (

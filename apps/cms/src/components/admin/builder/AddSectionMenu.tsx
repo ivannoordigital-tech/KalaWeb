@@ -51,6 +51,8 @@ interface AddSectionMenuProps {
   onClose: () => void;
   onSelectBlock: (slug: string) => void;
   onSelectTemplate?: (blocks: Array<Record<string, any>>) => void;
+  /** Peran teknis boleh melihat komponen HTML kustom. */
+  canUseAdvanced?: boolean;
 }
 
 export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
@@ -58,6 +60,7 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
   onClose,
   onSelectBlock,
   onSelectTemplate,
+  canUseAdvanced = true,
 }) => {
   const [activeTab, setActiveTab] = useState<'blocks' | 'templates'>('blocks');
   const [query, setQuery] = useState('');
@@ -89,7 +92,13 @@ export const AddSectionMenu: React.FC<AddSectionMenuProps> = ({
     }
   }, [isOpen]);
 
-  const blocks = useMemo(() => getCatalogBlocks(), []);
+  const blocks = useMemo(
+    () =>
+      getCatalogBlocks().filter(
+        (block) => canUseAdvanced || block.slug !== 'html',
+      ),
+    [canUseAdvanced],
+  );
   const categories = ['layout', 'hero', 'offer', 'proof', 'content', 'media', 'conversion', 'promo', 'cta'];
   const popularBlocks = useMemo(() => getPopularBlocks(blocks), [blocks]);
   const filteredBlocks = useMemo(() => filterCatalogBlocks(blocks, query), [blocks, query]);

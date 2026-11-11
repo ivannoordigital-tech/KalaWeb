@@ -1,5 +1,6 @@
 import type { Field } from 'payload'
 import { SEO_THRESHOLDS } from '../lib/seo-engine/constants'
+import { isTechnicalRole } from '../access/roles'
 
 export interface SeoFieldOptions {
   titleSourceField?: string
@@ -99,6 +100,7 @@ export function buildSeoFields(options: SeoFieldOptions = {}): Field {
         admin: {
           description: 'Biarkan kosong untuk URL otomatis halaman ini. Isi hanya jika konten halaman ini menduplikasi halaman lain.',
           placeholder: 'https://kalababyspa.com/...',
+          condition: (_data: any, _siblingData: any, { user }: any) => isTechnicalRole(user),
         },
       },
       {
@@ -117,6 +119,7 @@ export function buildSeoFields(options: SeoFieldOptions = {}): Field {
         label: 'Tandai sebagai Pembaruan Substantif',
         admin: {
           description: 'Centang jika pembaruan ini mengubah fakta medis/harga penting agar tanggal lastmod diperbarui untuk Google.',
+          condition: (_data: any, _siblingData: any, { user }: any) => isTechnicalRole(user),
         },
       },
     ],
