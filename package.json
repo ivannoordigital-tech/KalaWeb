@@ -21,6 +21,7 @@
     "test:articles": "node scripts/verify-articles.mjs",
     "test:landing": "node scripts/verify-landing-pages.mjs",
     "test:media": "node scripts/verify-media-health.mjs",
+    "test:admin-domain": "node scripts/verify-admin-domain.mjs",
     "test:integration": "npm run test:integration --workspace=cms-kala",
     "import:articles": "cross-env NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/import-articles.ts",
     "import:articles:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/import-articles.ts",

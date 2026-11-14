@@ -176,6 +176,11 @@ Bot WA memanggil CMS via internal Docker URL:
      - `https://admin.kalababyspa.com/admin` (Portal Admin CMS)
      - `https://admin.kalababyspa.com/api/deploy-status` (Wajib Header `Authorization: users API-Key <API_KEY>`)
    - Integrasikan alert langsung ke WhatsApp/Telegram PIC.
+5. **Routing CMS di Caddy:**
+   - `admin.kalababyspa.com` dilayani Caddy dari `/opt/wa-clinic-bot/Caddyfile` dengan target `kala-cms-app:3000`.
+   - **Jangan hapus blok `admin.kalababyspa.com`** saat merapikan Caddyfile. Jika blok hilang, Cloudflare menampilkan **525 SSL Handshake Failed**.
+   - Setelah mengubah Caddyfile, **restart** container Caddy (`docker restart wa-clinic-bot-caddy-1`). `caddy reload` saja tidak cukup karena bind-mount file bisa masih memakai inode lama.
+   - Verifikasi cepat: `npm run test:admin-domain` (harus 200/redirect, bukan 525).
 
 ---
 
