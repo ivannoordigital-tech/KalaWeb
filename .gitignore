@@ -24,6 +24,10 @@ pnpm-debug.log*
 # Cache
 .cache/
 *.cache
+.wrangler/
+**/.wrangler/
+src/generated/
+**/src/generated/
 
 # OS metadata
 .DS_Store

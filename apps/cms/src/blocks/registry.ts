@@ -2106,4 +2106,224 @@ export const builderTemplates: BuilderPageTemplate[] = [
       },
     ],
   },
+  {
+    id: 'landing-kala-ads',
+    title: 'Landing Page Ads Kala (Promo Treatment)',
+    badge: 'Iklan',
+    description:
+      'Struktur landing page iklan konversi tinggi: hero, statistik, keluhan, manfaat, promo banner, layanan unggulan, alur langkah, testimoni, garansi, closing CTA, dan floating WhatsApp desktop.',
+    blocks: [
+      {
+        blockType: 'hero',
+        badge: '✨ Dipercaya 1000+ Orang Tua di Surabaya & Sidoarjo',
+        headline: 'Si Kecil Lebih Tenang, Tidur Lebih Nyenyak, Tumbuh Lebih Optimal',
+        subheadline:
+          'Layanan pijat & perawatan profesional untuk bayi, anak, dan ibu nifas. Membantu stimulasi tumbuh kembang, mengurangi kolik, dan mempercepat pemulihan pasca melahirkan. Ditangani bidan bersertifikat, home visit available.',
+        price: 'Mulai Rp60.000',
+        originalPrice: 'Rp120.000',
+        duration: '45 Menit',
+        ctaText: 'Booking Gratis Konsultasi',
+        ctaMessage: 'Halo Bidan Kala, saya ingin reservasi treatment pertama untuk si kecil',
+        align: 'center',
+        bgStyle: 'gradient',
+      },
+      {
+        blockType: 'stats',
+        title: 'Dipercaya Ribuan Orang Tua',
+        subtitle: 'Kenyamanan homecare terbaik langsung di kediaman Anda di Surabaya & Sidoarjo',
+        columns: '3',
+        background: 'white',
+        items: [
+          { value: '1.000+', label: 'Bayi sudah dilayani', icon: '👶' },
+          { value: '4.9★', label: 'Rating kepuasan orang tua', icon: '⭐' },
+          { value: '5 Thn', label: 'Pengalaman dedikasi homecare', icon: '🩺' },
+        ],
+      },
+      {
+        blockType: 'painPoints',
+        title: 'Kekhawatiran yang Sering Dirasakan Orang Tua Baru',
+        subtitle: 'Bunda tidak perlu menghadapinya sendirian, kami hadir mendampingi.',
+        columns: '3',
+        background: 'cream',
+        points: [
+          {
+            icon: '😭',
+            title: 'Bayi Sering Rewel & Susah Tidur',
+            description:
+              'Si kecil menangis terus tanpa sebab jelas, tengah malam pun sulit tidur. Mama & Papa kelelahan dan khawatir.',
+          },
+          {
+            icon: '🤷‍♀️',
+            title: 'Bingung Cara Stimulasi yang Benar',
+            description:
+              'Banyak informasi di internet, tapi mana yang tepat untuk usia si kecil? Khawatir salah langkah menghambat perkembangan.',
+          },
+          {
+            icon: '😣',
+            title: 'Kolik & Perut Kembung',
+            description:
+              'Bayi menangis keras sambil menarik kaki ke perut. Melihatnya tidak nyaman membuat sedih, namun bingung harus berbuat apa.',
+          },
+        ],
+      },
+      {
+        blockType: 'solutions',
+        anchorId: 'manfaat',
+        variant: 'benefits',
+        badge: 'Solusi untuk Si Kecil',
+        title: 'Apa yang Berubah Setelah Baby Massage?',
+        subtitle:
+          'Massage bukan sekadar pijat biasa. Ini adalah terapi holistik yang didukung riset untuk mendukung tumbuh kembang optimal bayi Anda.',
+        items: [
+          {
+            icon: '😴',
+            title: 'Tidur Lebih Nyenyak & Teratur',
+            description:
+              'Pijat bayi merangsang kenyamanan dan relaksasi alami — si kecil tidur lebih lelap dan tenang setelah sesi perawatan.',
+          },
+          {
+            icon: '🌱',
+            title: 'Stimulasi Motorik & Sensorik',
+            description:
+              'Pijat dengan teknik anatomi tepat membantu perkembangan otot, koordinasi, dan rasa percaya diri si kecil sejak dini.',
+          },
+          {
+            icon: '💆',
+            title: 'Meredakan Kolik & Kembung',
+            description:
+              'Teknik pijat perut khusus (ILU) membantu melancarkan pencernaan bayi dan meredakan ketidaknyamanan gas secara alami.',
+          },
+          {
+            icon: '❤️',
+            title: 'Perkuat Bonding Mama & Bayi',
+            description:
+              'Sentuhan terapeutik penuh kehangatan meningkatkan rasa aman dan kedekatan emosional antara Bunda dan si kecil.',
+          },
+        ],
+        highlightQuote: {
+          quote:
+            'Setelah massage rutin bersama bidan Kala, si kecil yang tadinya sering kembung jadi jauh lebih tenang dan tidurnya lelap!',
+          author: 'Bunda Risa, Mama dari Baby Keenan (2 bulan)',
+        },
+      },
+      {
+        blockType: 'promoBanner',
+        badge: 'Penawaran Terbatas',
+        title: 'Promo Treatment Pertama Si Kecil',
+        description: 'Durasi 45 menit · Baby Massage + Baby Gym · Konsultasi tumbuh kembang gratis.',
+        price: 'Rp60.000',
+        originalPrice: 'Rp120.000',
+        discountBadge: 'Hemat 50%',
+        note: 'Promo berlaku khusus reservasi pertama di Surabaya & Sidoarjo.',
+        capacityNote: 'Kuota harian terbatas agar pelayanan tetap higienis dan maksimal.',
+        serviceName: 'Paket Treatment Pertama: Baby Massage & Gym',
+        buttonText: 'Ambil Promo Sekarang',
+        refCode: 'KALA-LP-ADS-PROMO',
+        message: 'Halo Bidan Kala, saya ingin konsultasi dan ambil Promo Treatment Pertama Rp60.000',
+      },
+      {
+        blockType: 'featuredServices',
+        anchorId: 'layanan',
+        badge: 'Treatment Lengkap',
+        title: 'Pilihan Layanan Terfavorit',
+        subtitle:
+          'Layanan profesional homecare oleh bidan resmi bersertifikasi langsung ke rumah Anda.',
+        catalogTitle: 'Mencari Layanan Lain? Tersedia Menu Lengkap',
+        catalogDescription:
+          'Mulai dari tindik telinga bayi steril, terapi uap (nebulizer saline), infrared moksa, pijat lahap makan anak, hingga perawatan laktasi ibu.',
+        catalogCtaText: 'Tanya Layanan Lengkap via WhatsApp',
+        catalogCtaMessage: 'Halo Bidan Kala, boleh tanya info layanan lengkap homecare Kala?',
+        catalogRefCode: 'KALA-LP-ADS-SERVICES',
+      },
+      {
+        blockType: 'steps',
+        anchorId: 'langkah-booking',
+        title: 'Mudah & Nyaman dari Rumah',
+        subtitle: 'Alur praktis tanpa perlu keluar rumah dan tanpa antre.',
+        steps: [
+          {
+            num: '1',
+            title: 'Konsultasi Gratis',
+            description:
+              'Ceritakan kondisi & kebutuhan si kecil. Bidan kami rekomendasikan paket paling tepat untuk usianya.',
+          },
+          {
+            num: '2',
+            title: 'Pilih Jadwal',
+            description:
+              'Booking via WhatsApp, pilih hari & jam yang sesuai. Tersedia 7 hari seminggu, termasuk weekend.',
+          },
+          {
+            num: '3',
+            title: 'Bidan Datang ke Rumah',
+            description:
+              'Bidan bersertifikat hadir tepat waktu dengan membawa semua perlengkapan higienis steril.',
+          },
+          {
+            num: '4',
+            title: 'Pantau Perkembangan',
+            description:
+              'Bidan memberikan edukasi & panduan lanjutan agar Bunda bisa melanjutkan stimulasi mandiri di rumah.',
+          },
+        ],
+      },
+      {
+        blockType: 'testimonials',
+        anchorId: 'testimoni',
+        title: 'Kata Mereka yang Sudah Merasakan Manfaatnya',
+        subtitle:
+          'Cerita nyata dari orang tua di Surabaya dan Sidoarjo yang memilih kenyamanan homecare bersama bidan profesional kami.',
+        items: [
+          {
+            quote:
+              'Saya sangat bersyukur, setelah sesi pertama baby massage, putri saya yang 2 bulan langsung tidur lebih nyenyak dan tidak rewel lagi. Benar-benar perubahan luar biasa untuk keluarga kami.',
+            author: 'Bunda Maharani',
+            role: 'Mama Baby Zahra (2 bulan)',
+            area: 'Surabaya',
+          },
+          {
+            quote:
+              'Anak saya kolik parah sampai 3 bulan. Setelah baby massage teratur, koliknya berkurang drastis. Bidan terapisnya sangat sabar, telaten, dan profesional.',
+            author: 'Papa Dimas',
+            role: 'Ayah Baby Raffa (3 bulan)',
+            area: 'Sidoarjo',
+          },
+          {
+            quote:
+              'Yang bikin saya repeat order terus adalah edukasi perkembangan yang diberikan setiap sesi. Saya jadi paham milestone apa yang perlu distimulasi untuk si kecil.',
+            author: 'Bunda Clarisa',
+            role: 'Mama Baby Elora (5 bulan)',
+            area: 'Surabaya',
+          },
+        ],
+      },
+      {
+        blockType: 'guarantee',
+        badge: '🛡️ Komitmen Kualitas Kala',
+        title: 'Puas 100% atau Sesi Pengganti Gratis',
+        description:
+          'Kami percaya pada kualitas dedikasi dan standar kebidanan kami. Jika setelah sesi pertama Anda merasa kurang puas dengan hasilnya, kami sediakan sesi evaluasi pengganti gratis. Kepercayaan Anda adalah prioritas kami.',
+        note: '*Sesi evaluasi pengganti berlaku untuk kunjungan pertama dengan konfirmasi dalam 24 jam.',
+      },
+      {
+        blockType: 'cta',
+        badge: 'Awal Terbaik untuk Buah Hati',
+        headline: 'Berikan Si Kecil Awal Terbaik dalam Hidupnya',
+        description:
+          'Konsultasi gratis via WhatsApp sekarang. Tim bidan kami siap membantu Anda memilih paket yang paling tepat untuk si kecil.',
+        buttonText: 'Chat WhatsApp Sekarang',
+        buttonMessage: 'Halo Bidan Kala, saya mau konsultasi reservasi paket perawatan untuk si kecil',
+        footnote: 'Balas cepat dalam hitungan menit pada jam operasional · Konsultasi awal tanpa biaya',
+      },
+      {
+        blockType: 'html',
+        label: 'Floating WhatsApp Desktop (Ads Tracking)',
+        html: '<a href="https://app.kalababyspa.online/cta?divisi=iklan-utama" class="hidden md:flex fixed bottom-6 right-6 z-50 items-center gap-2.5 rounded-full bg-[#0E733D] px-5 py-3 text-sm font-bold text-white shadow-2xl hover:bg-[#0b5c31] transition-all hover:scale-105" data-capi-event="Contact" data-ref-code="KALA-LP-ADS-FLOATING">💬 Chat WhatsApp</a>',
+        allowScripts: false,
+        maxWidth: 'full',
+        padding: 'none',
+        background: 'transparent',
+      },
+    ],
+  },
 ];

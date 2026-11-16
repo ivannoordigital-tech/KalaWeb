@@ -29,6 +29,9 @@
     "seed:homepage": "npm run seed:homepage --workspace=cms-kala",
     "seed:homepage:dry": "cross-env DRY_RUN=true npm run seed:homepage --workspace=cms-kala",
     "seed:homepage:force": "npm run seed:homepage:force --workspace=cms-kala",
+    "seed:landing-ads": "npm run seed:landing-ads --workspace=cms-kala",
+    "seed:landing-ads:dry": "npm run seed:landing-ads:dry --workspace=cms-kala",
+    "seed:landing-ads:force": "npm run seed:landing-ads:force --workspace=cms-kala",
     "migrate:landing:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/migrate-landing-pages.ts",
     "preview": "npm run preview --workspace=web-kala"
   }
