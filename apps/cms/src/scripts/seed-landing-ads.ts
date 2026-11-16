@@ -110,7 +110,7 @@ async function main() {
     pageLayout: 'canvas' as const,
     editorMode: 'builder' as const,
     refCode,
-    variant: 'A',
+    variant: 'A' as const,
     activePixels: ['meta'] as ('meta' | 'google' | 'tiktok')[],
     description:
       'Promo treatment pertama pijat bayi & perawatan nifas homecare di Surabaya & Sidoarjo. Ditangani bidan bersertifikat Kemenkes RI.',
