@@ -169,6 +169,8 @@ contained = kombinasi lainnya
 
 **Dampak:** marketing bisa mengganti background section menjadi peach/cream tanpa memunculkan padding container; tidak ada perubahan data atau schema.
 
+**Verifikasi live (setelah deploy):** 375×812 dan 1440×900 tanpa overflow, floating WA mobile `none`, 0 iframe, 9 CTA, font Fredoka/Nunito; `npm run check:landing-css` tetap sinkron. Tidak ada perubahan visual karena Page 11 belum memakai background non-transparan — perilaku baru berlaku saat admin memilih warna.
+
 ---
 
 ## 7. Catatan operasional
