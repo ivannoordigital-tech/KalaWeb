@@ -3,7 +3,7 @@
 **Tanggal:** 20 November 2026
 **Ruang lingkup:** Page ID 11 (`promo-treatment`) + PageTemplate ID 1
 **Referensi rencana:** `docs/rencana-perbaikan-landing-ads-2026-11-20.md`
-**Commit:** `759e801` (fix(cms): dukung publish landing berbasis blok HTML + guard CTA mobile)
+**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS)
 
 ---
 
@@ -99,6 +99,7 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 - 8 CTA memakai `ref` unik; 1 CTA tambahan berasal dari `MobileStickyBar` (`KALA-MOB-BAR`).
 - Guard CSS sempat salah tempel di luar `</style>` pada publish pertama; sudah diperbaiki dan diverifikasi ulang (marker berada di dalam `<style>`).
 - Banner consent dinaikkan ke `z-[70]` agar tombol "Saya Mengerti & Setuju" tidak tertutup floating WhatsApp di desktop.
+- Verifikasi `elementFromPoint` pada tombol consent: desktop dan mobile sama-sama mengembalikan `#acceptConsentBtn` sebagai elemen teratas (banner z-index 70 > float 60).
 
 ---
 
