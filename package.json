@@ -25,6 +25,9 @@
     "test:html-safety": "npm run test:html-safety --workspace=cms-kala",
     "check:landing-css": "node scripts/check-landing-css.mjs",
     "check:landing-links": "node scripts/check-landing-links.mjs",
+    "serve:dist": "node scripts/serve-dist.mjs",
+    "test:smoke": "playwright test",
+    "backup:landing": "node scripts/backup-landing-page.mjs",
     "test:media": "node scripts/verify-media-health.mjs",
     "test:admin-domain": "node scripts/verify-admin-domain.mjs",
     "test:integration": "npm run test:integration --workspace=cms-kala",
@@ -39,5 +42,8 @@
     "seed:landing-ads:force": "npm run seed:landing-ads:force --workspace=cms-kala",
     "migrate:landing:dry": "cross-env DRY_RUN=true NODE_OPTIONS=--no-deprecation tsx --env-file=apps/cms/.env apps/cms/src/scripts/migrate-landing-pages.ts",
     "preview": "npm run preview --workspace=web-kala"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
   }
 }

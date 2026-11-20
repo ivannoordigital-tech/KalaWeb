@@ -1,0 +1,50 @@
+name: Landing Smoke Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web-kala/**'
+      - 'apps/cms/src/blocks/**'
+      - 'tests/e2e/**'
+      - 'playwright.config.ts'
+      - 'scripts/serve-dist.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - 'apps/web-kala/**'
+      - 'apps/cms/src/blocks/**'
+      - 'tests/e2e/**'
+      - 'playwright.config.ts'
+      - 'scripts/serve-dist.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build web
+        run: npm run build --workspace=web-kala
+        env:
+          # Build memakai CMS production; jangan fallback diam-diam.
+          ALLOW_FALLBACK: 'false'
+      - name: Playwright smoke test
+        run: npx playwright test
+        env:
+          PW_CHANNEL: chrome
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-trace
+          path: test-results/
+          retention-days: 7

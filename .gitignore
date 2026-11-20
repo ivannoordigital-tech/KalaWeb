@@ -35,3 +35,10 @@ landing-page-sections/preview-full.html
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+
+# Backup harian landing (timestamp ISO) - jangan commit
+backups/pages/*T*.json
+backups/page-templates/*T*.json
+# Playwright artifacts
+test-results/
+playwright-report/
