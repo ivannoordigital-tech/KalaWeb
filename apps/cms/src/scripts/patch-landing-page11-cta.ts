@@ -38,6 +38,19 @@ ${CSS_MARKER}
 #booking,#layanan{scroll-margin-top:96px}
 `
 
+function applyCssPatch(html: string) {
+  // Hapus patch lama (termasuk yang sebelumnya salah tempel di luar </style>).
+  let base = html.split(CSS_PATCH).join('')
+  base = base.split(CSS_PATCH.trim()).join('')
+
+  const closeIndex = base.lastIndexOf('</style>')
+  const next = closeIndex >= 0
+    ? `${base.slice(0, closeIndex)}${CSS_PATCH}${base.slice(closeIndex)}`
+    : `${base}<style>${CSS_PATCH}</style>`
+
+  return { html: next, changed: next !== html }
+}
+
 const CTA_PATTERN = /<a\b[^>]*href="https:\/\/app\.kalababyspa\.online\/cta\?divisi=iklan-utama"[^>]*>/g
 
 function decorateAnchors(html: string, refCode: string) {
@@ -103,11 +116,14 @@ async function main() {
   const report: string[] = []
   let totalAnchors = 0
 
-  if (layout[0]?.blockType === 'html' && !String(layout[0].html).includes(CSS_MARKER)) {
-    layout[0].html = `${layout[0].html}${CSS_PATCH}`
-    report.push('CSS block: guard mobile + scroll-margin ditambahkan')
-  } else {
-    report.push('CSS block: guard sudah ada, dilewati')
+  if (layout[0]?.blockType === 'html') {
+    const cssResult = applyCssPatch(String(layout[0].html))
+    if (cssResult.changed) {
+      layout[0].html = cssResult.html
+      report.push('CSS block: guard mobile + scroll-margin ditambahkan di dalam <style>')
+    } else {
+      report.push('CSS block: guard sudah benar, dilewati')
+    }
   }
 
   for (const [indexRaw, refCode] of Object.entries(REF_BY_BLOCK)) {

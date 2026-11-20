@@ -84,7 +84,21 @@ Verifikasi di dokumen published:
 | Font | Fredoka / Nunito |
 | CTA tracked | 8 |
 | Template 1 | 11 blok, guard + 8 ref |
-| URL publik | diverifikasi setelah build Cloudflare |
+| URL publik | `https://kalababyspa.com/sales/promo-treatment/` → **HTTP 200** |
+
+Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-slash. Gunakan URL final di dashboard iklan agar tidak ada hop tambahan.
+
+### 3.1 Verifikasi live (headless Chrome)
+
+| Viewport | Overflow horizontal | Floating WA | Sticky bar | iframe | Font H1 |
+|---|---|---|---|---|---|
+| 375×812 | tidak | `display:none` | muncul setelah scroll | 0 | Fredoka |
+| 1440×900 | tidak | `display:flex` | tidak tampil | 0 | Fredoka |
+
+- Floating WA dan sticky bar **tidak overlap** di mobile.
+- 8 CTA memakai `ref` unik; 1 CTA tambahan berasal dari `MobileStickyBar` (`KALA-MOB-BAR`).
+- Guard CSS sempat salah tempel di luar `</style>` pada publish pertama; sudah diperbaiki dan diverifikasi ulang (marker berada di dalam `<style>`).
+- Banner consent dinaikkan ke `z-[70]` agar tombol "Saya Mengerti & Setuju" tidak tertutup floating WhatsApp di desktop.
 
 ---
 

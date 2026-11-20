@@ -11,6 +11,8 @@ Folder ini menyimpan salinan JSON dokumen CMS untuk pemulihan cepat jika konten 
 | 2026-11-20 | PageTemplate ID 1 `template-landing-ads-10-sections` | `page-templates/template-1-landing-ads-2026-11-20.json` |
 | 2026-11-20 | HTML preview draft (baseline) | `render/promo-treatment-preview-2026-11-20.html` |
 | 2026-11-20 | Hasil patch CTA (sebelum publish) | `render/pages-11-after-cta-patch-*.json` |
+| 2026-11-20 | Screenshot live 375px | `render/live-mobile-375-2026-11-20.png` |
+| 2026-11-20 | Screenshot live 1440px | `render/live-desktop-1440-2026-11-20.png` |
 
 ## Cara membuat backup baru
 
