@@ -114,7 +114,38 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 
 ---
 
-## 5. Catatan operasional
+## 5. Fase 2 — Satu sumber kebenaran CSS
+
+### 5.1 Perubahan
+
+1. **Blok CSS CMS menjadi satu-satunya sumber styling.** Impor `landing-page.css` dihapus dari:
+   - `apps/web-kala/src/pages/sales/[slug].astro`
+   - `apps/web-kala/src/pages/editor-view/sales/[slug].astro`
+2. File lama dipindahkan ke `docs/assets/landing-page.reference.css` sebagai arsip desain.
+3. Selector CSS di CMS di-scope ke `.kala-html-raw`:
+   - `body` → `.kala-html-raw`
+   - `section`, `p`, `img`, `a`, `h1–h4`, `footer` → turunan `.kala-html-raw`
+   - `:root` dan `html` tetap global (token warna dan smooth scroll)
+   - 119 rule, **0 selector lolos scope**
+4. Snapshot CSS aktif disimpan di `docs/assets/landing-page.cms-snapshot.css`.
+5. Script baru:
+   - `scripts/scope-landing-css.mjs` — transformasi CSS global → scoped.
+   - `scripts/check-landing-css.mjs` (`npm run check:landing-css`) — deteksi drift antara CMS dan snapshot.
+
+### 5.2 Verifikasi
+
+| Cek | Hasil |
+|---|---|
+| Build lokal `npm run build --workspace=web-kala` | lulus |
+| Page 11 di build lokal (375 & 1440) | identik dengan live: tanpa overflow, font Fredoka/Nunito, 0 iframe, 9 CTA |
+| Halaman legacy `/sales/bayi-kolik` | tidak rusak; jarak section kembali ke padding Tailwind (menghapus efek samping `section{padding:76px 0}` global) |
+| `npm run check:landing-css` | sinkron |
+
+Catatan: halaman legacy memang berubah sedikit (lebih rapat) karena efek bocor CSS global dihapus. Ini mengembalikan tampilan ke padding native Tailwind, bukan regresi.
+
+---
+
+## 6. Catatan operasional
 
 Deploy CMS (manual, jika diperlukan):
 

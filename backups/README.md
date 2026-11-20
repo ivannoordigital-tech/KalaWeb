@@ -13,6 +13,9 @@ Folder ini menyimpan salinan JSON dokumen CMS untuk pemulihan cepat jika konten 
 | 2026-11-20 | Hasil patch CTA (sebelum publish) | `render/pages-11-after-cta-patch-*.json` |
 | 2026-11-20 | Screenshot live 375px | `render/live-mobile-375-2026-11-20.png` |
 | 2026-11-20 | Screenshot live 1440px | `render/live-desktop-1440-2026-11-20.png` |
+| 2026-11-20 | Screenshot build lokal Page 11 (375/1440) | `render/local-build-promo-*.png` |
+| 2026-11-20 | Halaman legacy sebelum/sesudah scoping CSS | `render/legacy-before-mobile-375.png`, `render/legacy-after-mobile-375.png` |
+| 2026-11-20 | Snapshot CSS CMS (scoped) | `../docs/assets/landing-page.cms-snapshot.css` |
 | 2026-11-20 | Screenshot consent desktop (setelah fix z-index) | `render/live-consent-desktop-1440-2026-11-20.png` |
 | 2026-11-20 | Screenshot consent mobile (setelah fix z-index) | `render/live-consent-mobile-375-2026-11-20.png` |
 

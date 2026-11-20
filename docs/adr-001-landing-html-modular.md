@@ -45,8 +45,8 @@ Kebutuhan utama:
 - [x] Backup JSON Page 11 dan PageTemplate 1 (20 Nov 2026).
 - [x] Validator publish mengenali H1/CTA di blok HTML.
 - [x] Guard floating WhatsApp mobile + atribusi CTA per section.
-- [ ] Hapus impor `landing-page.css` dari route sales (Fase 2).
-- [ ] Scope selector CSS ke `.kala-html-raw` (Fase 2).
+- [x] Hapus impor `landing-page.css` dari route sales (Fase 2).
+- [x] Scope selector CSS ke `.kala-html-raw` (Fase 2).
 - [ ] Role gate untuk `allowScripts` + sanitasi saat simpan (Fase 4).
 
 ## Referensi

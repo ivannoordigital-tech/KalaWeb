@@ -7,7 +7,6 @@ import MobileStickyBar from '../../../components/MobileStickyBar.astro';
 import { siteConfig } from '../../../config/site';
 import { fetchPreviewDraftByToken, PreviewAuthError } from '../../../lib/preview';
 import '../../../styles/global.css';
-import '../../../styles/landing-page.css';
 
 const { slug } = Astro.params;
 const token = Astro.url.searchParams.get('token');

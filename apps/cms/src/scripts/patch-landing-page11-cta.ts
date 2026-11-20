@@ -11,7 +11,7 @@
  *   APPLY=true npm run patch:landing-cta # simpan sebagai draft
  *   PUBLISH=true npm run patch:landing-cta # simpan + publish (memicu deploy)
  */
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
 
@@ -116,7 +116,10 @@ async function main() {
   const report: string[] = []
   let totalAnchors = 0
 
-  if (layout[0]?.blockType === 'html') {
+  if (process.env.CSS_FILE && layout[0]?.blockType === 'html') {
+    layout[0].html = readFileSync(process.env.CSS_FILE, 'utf8')
+    report.push(`CSS block: diganti dari ${process.env.CSS_FILE}`)
+  } else if (layout[0]?.blockType === 'html') {
     const cssResult = applyCssPatch(String(layout[0].html))
     if (cssResult.changed) {
       layout[0].html = cssResult.html

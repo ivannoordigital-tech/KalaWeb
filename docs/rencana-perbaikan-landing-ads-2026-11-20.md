@@ -14,7 +14,7 @@
 |---|---|---|
 | 0 — Backup & keputusan | **Selesai** | Backup JSON + baseline render, ADR-001 (CMS sebagai sumber CSS) |
 | 1 — Konversi & UX | **Selesai** | Validator publish, guard float mobile, 8 CTA ter-track, CMS dideploy, Page 11 dipublish |
-| 2 — Satu sumber CSS | Belum | Sesuai keputusan: blok CMS kanonik, impor repo dihapus |
+| 2 — Satu sumber CSS | **Selesai** | Blok CMS kanonik, selector di-scope ke `.kala-html-raw`, impor repo dihapus |
 | 3 — Layout mode | Belum | |
 | 4 — Hardening | Belum | |
 | 5 — Listener iframe | Belum | |

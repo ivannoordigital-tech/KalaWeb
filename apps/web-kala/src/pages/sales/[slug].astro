@@ -8,7 +8,6 @@ import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
 import { siteConfig } from '../../config/site';
 import { fetchPayloadLandingPages, fetchPayloadPages, type PayloadLandingPage } from '../../lib/payload';
 import '../../styles/global.css';
-import '../../styles/landing-page.css';
 
 export async function getStaticPaths() {
   const [cmsCampaigns, cmsPages] = await Promise.all([
