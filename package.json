@@ -20,6 +20,7 @@
     "test:contract": "node apps/automation/test/contract.test.mjs",
     "test:articles": "node scripts/verify-articles.mjs",
     "test:landing": "node scripts/verify-landing-pages.mjs",
+    "test:htmlblock-layout": "tsx apps/web-kala/src/lib/htmlBlockLayout.test.ts",
     "check:landing-css": "node scripts/check-landing-css.mjs",
     "test:media": "node scripts/verify-media-health.mjs",
     "test:admin-domain": "node scripts/verify-admin-domain.mjs",

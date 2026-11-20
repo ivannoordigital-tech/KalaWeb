@@ -15,7 +15,7 @@
 | 0 — Backup & keputusan | **Selesai** | Backup JSON + baseline render, ADR-001 (CMS sebagai sumber CSS) |
 | 1 — Konversi & UX | **Selesai** | Validator publish, guard float mobile, 8 CTA ter-track, CMS dideploy, Page 11 dipublish |
 | 2 — Satu sumber CSS | **Selesai** | Blok CMS kanonik, selector di-scope ke `.kala-html-raw`, impor repo dihapus |
-| 3 — Layout mode | Belum | |
+| 3 — Layout mode | **Selesai** | Kontrak raw eksplisit dari `maxWidth` + `padding`; background aman; tanpa migration |
 | 4 — Hardening | Belum | |
 | 5 — Listener iframe | Belum | |
 | 6 — Aset/SEO | Belum | |
@@ -171,28 +171,28 @@ Tambahkan script `scripts/check-landing-css.mjs` yang membandingkan hash CSS di 
 
 ## 5. Fase 3 — Layout Mode Eksplisit (P1, ±1 hari)
 
+**Status:** Selesai (20 November 2026) — tanpa field/kolom baru.
+
 **Masalah:** `isRawLayout` menuntut `maxWidth: full` + `padding: none` + `background: transparent`. Marketing yang mengganti background ke `peach` akan memunculkan `px-4 sm:px-6` dan merusak full-bleed.
 
-**Langkah:**
-1. Tambah field `layoutMode` (`raw` | `contained`, default `contained`) di:
-   - `apps/cms/src/blocks/HtmlBlock.ts`
-   - `apps/cms/src/blocks/registry.ts` (defaults)
-   - tipe `Props` di `apps/web-kala/src/components/blocks/HtmlBlock.astro`
-2. Ubah logika:
-   ```ts
-   const isRawLayout = block.layoutMode === 'raw'
-     || (block.layoutMode == null && block.padding === 'none'
-         && block.maxWidth === 'full'
-         && (!block.background || block.background === 'transparent'));
-   ```
-   Fallback terakhir menjaga 11 blok existing tetap bekerja tanpa migrasi data.
-3. Pada mode raw, terapkan class background di wrapper tanpa padding horizontal:
-   ```astro
-   <div class={`kala-html-raw w-full ${backgroundClasses[block.background || 'transparent']}`} set:html={sanitized} />
-   ```
-4. Opsional: script backfill `layoutMode: 'raw'` untuk 11 blok page 11 dan template 1.
+**Keputusan:** Menambah kolom `layoutMode` memerlukan migration Postgres karena adapter memakai `push: false`. Untuk menghindari risiko schema di production, kontrak raw dibuat eksplisit dari field yang sudah ada:
 
-**Acceptance:** matriks uji (raw/contained × background transparan/peach/cream × padding none/normal) menghasilkan lebar penuh atau contained sesuai pilihan, tanpa padding tak terduga.
+```
+raw       = maxWidth: 'full' + padding: 'none'
+contained = kombinasi lainnya
+```
+
+Background tidak lagi menjadi syarat. Warna background pada mode raw diterapkan lewat inline style di wrapper, sehingga tidak tertimpa aturan `.kala-html-raw { background: var(--bg) }`.
+
+**Implementasi:**
+
+1. `apps/web-kala/src/lib/htmlBlockLayout.ts` — `resolvesToRawLayout()` dan `rawBackgroundStyle()`.
+2. `HtmlBlock.astro` memakai helper tersebut; wrapper raw mendapat `style` background bila dipilih.
+3. Deskripsi field `maxWidth`, `padding`, dan `background` di CMS diperbarui agar admin tahu kontraknya.
+4. Test: `npm run test:htmlblock-layout` → **13/13 lulus**, termasuk kasus `full + none + peach = raw`.
+5. Verifikasi markup nyata lewat fixture build: raw peach menghasilkan `<div class="kala-html-raw w-full" style="background:#FFEFE5">`; contained cream tetap memakai `<section class="py-10 md:py-14 bg-[#FFF9F4]">`.
+
+**Acceptance:** matriks uji (raw/contained × background transparan/peach/cream × padding none/normal) menghasilkan lebar penuh atau contained sesuai pilihan, tanpa padding tak terduga. **Terpenuhi.**
 
 ---
 

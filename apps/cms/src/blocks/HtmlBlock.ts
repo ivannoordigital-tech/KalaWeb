@@ -46,7 +46,10 @@ export const HtmlBlock: Block = {
           type: 'select',
           defaultValue: 'normal',
           label: 'Lebar Maksimal',
-          admin: { width: '50%' },
+          admin: {
+            width: '50%',
+            description: 'Pilih "Penuh Layar" + "Tanpa Jarak" untuk mode full-bleed tanpa container.',
+          },
           options: [
             { label: 'Sempit (768px)', value: 'narrow' },
             { label: 'Normal (1152px)', value: 'normal' },
@@ -59,7 +62,10 @@ export const HtmlBlock: Block = {
           type: 'select',
           defaultValue: 'normal',
           label: 'Jarak Atas-Bawah',
-          admin: { width: '50%' },
+          admin: {
+            width: '50%',
+            description: 'Pilih "Tanpa Jarak" + lebar "Penuh Layar" untuk mode full-bleed.',
+          },
           options: [
             { label: 'Tanpa Jarak', value: 'none' },
             { label: 'Rapat', value: 'compact' },
@@ -74,6 +80,9 @@ export const HtmlBlock: Block = {
       type: 'select',
       defaultValue: 'transparent',
       label: 'Latar Belakang',
+      admin: {
+        description: 'Warna tetap diterapkan pada mode full-bleed (Penuh Layar + Tanpa Jarak).',
+      },
       options: [
         { label: 'Transparan', value: 'transparent' },
         { label: 'Putih', value: 'white' },

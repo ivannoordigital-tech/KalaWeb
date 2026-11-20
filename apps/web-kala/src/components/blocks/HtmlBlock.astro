@@ -1,5 +1,6 @@
 ---
 import sanitizeHtml from 'sanitize-html';
+import { rawBackgroundStyle, resolvesToRawLayout } from '../../lib/htmlBlockLayout';
 
 interface Props {
   block: {
@@ -149,7 +150,8 @@ const backgroundClasses: Record<string, string> = {
   peach: 'bg-[#FFEFE5]',
 };
 
-const isRawLayout = (block.padding === 'none') && (block.maxWidth === 'full') && (!block.background || block.background === 'transparent');
+const isRawLayout = resolvesToRawLayout(block);
+const rawBgStyle = rawBackgroundStyle(block.background);
 ---
 
 {(sanitized || sandboxDocument) && (
@@ -162,13 +164,13 @@ const isRawLayout = (block.padding === 'none') && (block.maxWidth === 'full') &&
         data-kala-html-frame
         data-frame-id={frameId}
         class="block w-full border-0"
-        style="height: 200px; overflow: hidden;"
+        style={`height: 200px; overflow: hidden;${rawBgStyle ? ` ${rawBgStyle};` : ''}`}
         scrolling="no"
         loading="lazy"
         referrerpolicy="no-referrer"
       ></iframe>
     ) : (
-      <div class="kala-html-raw w-full" set:html={sanitized} />
+      <div class="kala-html-raw w-full" style={rawBgStyle} set:html={sanitized} />
     )
   ) : (
     <section class={`${paddingClasses[block.padding || 'normal'] || ''} ${backgroundClasses[block.background || 'transparent'] || ''}`}>

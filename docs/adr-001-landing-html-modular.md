@@ -47,6 +47,7 @@ Kebutuhan utama:
 - [x] Guard floating WhatsApp mobile + atribusi CTA per section.
 - [x] Hapus impor `landing-page.css` dari route sales (Fase 2).
 - [x] Scope selector CSS ke `.kala-html-raw` (Fase 2).
+- [x] Kontrak raw eksplisit (`full + none`) dan background aman di mode raw (Fase 3).
 - [ ] Role gate untuk `allowScripts` + sanitasi saat simpan (Fase 4).
 
 ## Referensi

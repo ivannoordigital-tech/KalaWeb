@@ -103,14 +103,12 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 
 ---
 
-## 4. Pekerjaan tersisa (Fase 2–7)
+## 4. Pekerjaan tersisa (Fase 4-7)
 
-1. **Fase 2:** hapus impor `landing-page.css` dari route sales; scope selector ke `.kala-html-raw`.
-2. **Fase 3:** field `layoutMode` eksplisit.
-3. **Fase 4:** role gate `allowScripts`, sanitasi saat simpan, CSP per path.
-4. **Fase 5:** perbaikan listener iframe.
-5. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
-6. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
+1. **Fase 4:** role gate `allowScripts`, sanitasi saat simpan, CSP per path.
+2. **Fase 5:** perbaikan listener iframe.
+3. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
+4. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
 
 ---
 
@@ -148,7 +146,32 @@ Catatan: halaman legacy memang berubah sedikit (lebih rapat) karena efek bocor C
 
 ---
 
-## 6. Catatan operasional
+## 6. Fase 3 — Layout mode eksplisit (tanpa migration)
+
+**Keputusan:** tidak menambah kolom `layoutMode` karena adapter Postgres memakai `push: false`; kolom baru memerlukan migration production. Kontrak raw dibuat eksplisit dari kombinasi field yang sudah ada:
+
+```
+raw       = maxWidth: 'full' + padding: 'none'
+contained = kombinasi lainnya
+```
+
+**Perubahan:**
+
+1. Helper baru `apps/web-kala/src/lib/htmlBlockLayout.ts`:
+   - `resolvesToRawLayout(block)` — mengabaikan `background`.
+   - `rawBackgroundStyle(background)` — menghasilkan `background:#...` untuk mode raw.
+2. `HtmlBlock.astro` memakai helper; wrapper raw mendapat inline style background.
+3. Deskripsi field `maxWidth`, `padding`, dan `background` di CMS diperbarui.
+4. Test baru `npm run test:htmlblock-layout` — **13/13 lulus**.
+5. Verifikasi markup lewat fixture build:
+   - raw peach → `<div class="kala-html-raw w-full" style="background:#FFEFE5">`
+   - contained cream → `<section class="py-10 md:py-14 bg-[#FFF9F4]">`
+
+**Dampak:** marketing bisa mengganti background section menjadi peach/cream tanpa memunculkan padding container; tidak ada perubahan data atau schema.
+
+---
+
+## 7. Catatan operasional
 
 Deploy CMS (manual, jika diperlukan):
 

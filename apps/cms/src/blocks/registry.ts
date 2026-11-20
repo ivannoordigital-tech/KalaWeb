@@ -1560,6 +1560,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         name: 'maxWidth',
         label: 'Lebar Maksimal',
         type: 'select',
+        description: 'Pilih "Penuh Layar" + "Tanpa Jarak" untuk mode full-bleed tanpa container.',
         options: [
           { label: 'Sempit (768px)', value: 'narrow' },
           { label: 'Normal (1152px)', value: 'normal' },
@@ -1571,6 +1572,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         name: 'padding',
         label: 'Jarak Atas-Bawah',
         type: 'select',
+        description: 'Pilih "Tanpa Jarak" + lebar "Penuh Layar" untuk mode full-bleed.',
         options: [
           { label: 'Tanpa Jarak', value: 'none' },
           { label: 'Rapat', value: 'compact' },
@@ -1582,6 +1584,7 @@ export const builderRegistry: Record<string, BuilderBlockMeta> = {
         name: 'background',
         label: 'Latar Belakang',
         type: 'select',
+        description: 'Warna tetap diterapkan pada mode full-bleed (Penuh Layar + Tanpa Jarak).',
         options: [
           { label: 'Transparan', value: 'transparent' },
           { label: 'Putih', value: 'white' },
