@@ -8,6 +8,23 @@
 
 ---
 
+## 0. Status eksekusi
+
+| Fase | Status | Catatan |
+|---|---|---|
+| 0 — Backup & keputusan | **Selesai** | Backup JSON + baseline render, ADR-001 (CMS sebagai sumber CSS) |
+| 1 — Konversi & UX | **Selesai** | Validator publish, guard float mobile, 8 CTA ter-track, CMS dideploy, Page 11 dipublish |
+| 2 — Satu sumber CSS | Belum | Sesuai keputusan: blok CMS kanonik, impor repo dihapus |
+| 3 — Layout mode | Belum | |
+| 4 — Hardening | Belum | |
+| 5 — Listener iframe | Belum | |
+| 6 — Aset/SEO | Belum | |
+| 7 — Guardrail & docs | Sebagian | Pedoman admin + progress log sudah diperbarui |
+
+Detail eksekusi: `docs/progress-landing-ads-2026-11-20.md`.
+
+---
+
 ## 1. Ringkasan
 
 Pekerjaan 20 November berhasil membuat halaman modular dan tampil sesuai desain. Namun audit menemukan empat hal yang harus diselesaikan sebelum halaman dianggap production-ready:

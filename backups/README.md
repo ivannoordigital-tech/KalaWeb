@@ -7,6 +7,7 @@ Folder ini menyimpan salinan JSON dokumen CMS untuk pemulihan cepat jika konten 
 | Tanggal | Dokumen | File |
 |---|---|---|
 | 2026-11-20 | Page ID 11 `promo-treatment` | `pages/page-11-promo-treatment-2026-11-20.json` |
+| 2026-11-20 | Page ID 11 versi **published** (setelah patch CTA) | `pages/page-11-promo-treatment-2026-11-20-published.json` |
 | 2026-11-20 | PageTemplate ID 1 `template-landing-ads-10-sections` | `page-templates/template-1-landing-ads-2026-11-20.json` |
 | 2026-11-20 | HTML preview draft (baseline) | `render/promo-treatment-preview-2026-11-20.html` |
 | 2026-11-20 | Hasil patch CTA (sebelum publish) | `render/pages-11-after-cta-patch-*.json` |
