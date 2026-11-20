@@ -71,3 +71,48 @@ Untuk membandingkan performa 2 copywriting atau tawaran:
 4. Ubah variabel yang diuji (misal: judul headline atau paket harga).
 5. Pada dashboard iklan Meta/Google, bagi budget 50:50 ke URL `/sales/bayi-kolik-a` dan `/sales/bayi-kolik-b`.
 6. Evaluasi performa berdasarkan jumlah chat WhatsApp yang masuk dengan kode ref masing-masing.
+
+---
+
+## 5. Halaman Landing Modular Berbasis Blok HTML
+
+Sebagian landing page (contoh: `promo-treatment`) disusun dari blok **HTML Kustom**, bukan blok native. Aturan khusus:
+
+### 5.1 Simpan Draf vs Publish
+
+| Aksi | Yang terjadi |
+|---|---|
+| **Simpan Draf** | Perubahan hanya tampil di **Pratinjau Draft** (`/editor-view/sales/{slug}?token=...`). Halaman publik belum berubah. |
+| **Publish** | CMS memicu build Cloudflare otomatis (debounce 60 detik). Perubahan tampil di publik setelah build selesai (±2–5 menit). |
+| **Unpublish** | Halaman publik dihapus pada build berikutnya (404). |
+
+Jangan menganggap "Simpan Draf" sudah mengubah halaman publik.
+
+### 5.2 Sumber CSS
+
+- Styling terpusat di blok **`🎨 [CSS Global] Styling, Warna & Font`** (blok pertama).
+- Ubah token warna di bagian `:root`; seluruh section mengikuti.
+- Jangan menambahkan `@import` atau `url()` ke domain eksternal tanpa persetujuan teknis.
+- File `landing-page.css` di repo hanyalah arsip; perubahan CSS dilakukan di CMS.
+
+### 5.3 CTA dan tracking
+
+- Setiap CTA wajib memiliki kelas `kala-wa-btn` dan `data-ref-code` unik per section, contoh:
+  `KALA-LP-ADS-HERO`, `KALA-LP-ADS-PROMO`, `KALA-LP-ADS-SERVICES`, `KALA-LP-ADS-FINAL`, `KALA-LP-ADS-FLOATING`.
+- Tanpa kelas tersebut, klik tidak tercatat di dataLayer, Meta, TikTok, maupun Clarity.
+- Tombol melayang WhatsApp hanya tampil di desktop. Di mobile, gunakan sticky bar bawah agar tidak bertumpuk.
+
+### 5.4 Keamanan
+
+- Biarkan opsi **"Jalankan JavaScript di dalam sandbox"** tidak dicentang untuk section tampilan.
+- Centang hanya untuk widget yang benar-benar membutuhkan JavaScript (kalkulator, form pihak ketiga). Script berjalan di iframe terisolasi tanpa akses cookie/DOM induk.
+- `<script>`, `<iframe>`, `<form>`, event handler, dan `javascript:` otomatis dibuang pada mode non-sandbox.
+- Role yang boleh mengaktifkan sandbox: admin/operator teknis.
+
+### 5.5 Checklist khusus halaman HTML
+
+- [ ] Ada tepat satu `<h1>` di salah satu blok section.
+- [ ] Ada minimal satu tautan CTA WhatsApp (`wa.me`, `api.whatsapp.com`, atau `/cta`).
+- [ ] Semua gambar memiliki `alt`, `width`, dan `height`.
+- [ ] Floating WhatsApp tidak diaktifkan untuk mobile.
+- [ ] Preview draft diuji di 375px, 768px, dan 1440px sebelum publish.

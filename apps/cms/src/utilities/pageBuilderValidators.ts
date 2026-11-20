@@ -241,6 +241,18 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
   if (layout.length > 0) {
     const flatLayout = flattenLayout(layout);
 
+    // Blok HTML kustom bisa menjadi satu-satunya konten halaman (mis. landing page
+    // modular berbasis beberapa HtmlBlock). Deteksi H1 dan CTA WhatsApp di dalamnya
+    // agar validasi tidak memaksa penggunaan blok native.
+    const htmlBlocks = flatLayout.filter(
+      (b: any) => b.blockType === 'html' && typeof b.html === 'string'
+    );
+    const combinedHtml = htmlBlocks.map((b: any) => String(b.html)).join('\n');
+    const htmlHasH1 = /<h1\b[^>]*>/i.test(combinedHtml);
+    const htmlHasWhatsAppCta =
+      /(?:wa\.me|api\.whatsapp\.com|whatsapp:\/\/)/i.test(combinedHtml) ||
+      /kalababyspa\.(?:com|online)\/(?:cta|reservasi)[^"'\s>]*/i.test(combinedHtml);
+
     // Check HeroBlock
     const heroBlocks = flatLayout.filter((b: any) => b.blockType === 'hero');
     if (heroBlocks.length > 1) {
@@ -249,7 +261,7 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
         'MULTIPLE_HERO_BLOCKS',
         `Halaman hanya boleh memiliki maksimal satu Hero Block (H1). Terdeteksi ${heroBlocks.length} Hero Block.`
       );
-    } else if (isCanvas && heroBlocks.length === 0 && !doc.headline) {
+    } else if (isCanvas && heroBlocks.length === 0 && !doc.headline && !htmlHasH1) {
       addError(
         'layout',
         'MISSING_HERO_BLOCK',
@@ -272,17 +284,17 @@ export function validatePageBuilderDoc(doc: any, isLandingPage = false): Validat
     );
     const hasBuiltInCta = doc.showWhatsAppCta !== false;
 
-    if (isLanding && !hasCtaBlock) {
+    if (isLanding && !hasCtaBlock && !htmlHasWhatsAppCta) {
       addError(
         'layout',
         'MISSING_WHATSAPP_CTA',
-        'Halaman kampanye iklan (landing page) wajib memiliki minimal satu blok CTA WhatsApp nyata (blok CallToAction, Paket Harga, atau Hero dengan tombol CTA).'
+        'Halaman kampanye iklan (landing page) wajib memiliki minimal satu blok CTA WhatsApp nyata (blok CallToAction, Paket Harga, Hero dengan tombol CTA, atau tautan WhatsApp/CTA di blok HTML).'
       );
-    } else if (isCanvas && !isLanding && !hasCtaBlock && !hasBuiltInCta) {
+    } else if (isCanvas && !isLanding && !hasCtaBlock && !hasBuiltInCta && !htmlHasWhatsAppCta) {
       addError(
         'layout',
         'MISSING_WHATSAPP_CTA',
-        'Halaman kanvas wajib memiliki minimal satu tombol CTA WhatsApp nyata (blok CallToAction, Paket Harga, atau Hero dengan tombol CTA).'
+        'Halaman kanvas wajib memiliki minimal satu tombol CTA WhatsApp nyata (blok CallToAction, Paket Harga, Hero dengan tombol CTA, atau tautan WhatsApp/CTA di blok HTML).'
       );
     }
 

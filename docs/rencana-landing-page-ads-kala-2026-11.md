@@ -1,5 +1,7 @@
 # Rencana Implementasi Landing Page Ads Kala (Native-First Hybrid)
 
+> **SUPERSEDED (20 November 2026):** Keputusan native-first pada dokumen ini digantikan oleh pendekatan **11 blok HTML modular + blok CSS global di CMS**. Lihat `docs/adr-001-landing-html-modular.md` dan `docs/rencana-perbaikan-landing-ads-2026-11-20.md`. Dokumen ini disimpan sebagai catatan sejarah keputusan.
+
 **Tanggal:** 16 November 2026  
 **Status:** Draft — menunggu approval dan penentuan slug  
 **Referensi audit:** `landing-page-sections/`, `apps/cms/src/blocks/`, `apps/web-kala/src/pages/sales/[slug].astro`, `apps/cms/src/utilities/pageBuilderValidators.ts`
