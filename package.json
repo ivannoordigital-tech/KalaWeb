@@ -24,6 +24,7 @@
     "test:htmlblock-layout": "tsx apps/web-kala/src/lib/htmlBlockLayout.test.ts",
     "test:html-safety": "npm run test:html-safety --workspace=cms-kala",
     "check:landing-css": "node scripts/check-landing-css.mjs",
+    "check:landing-links": "node scripts/check-landing-links.mjs",
     "test:media": "node scripts/verify-media-health.mjs",
     "test:admin-domain": "node scripts/verify-admin-domain.mjs",
     "test:integration": "npm run test:integration --workspace=cms-kala",

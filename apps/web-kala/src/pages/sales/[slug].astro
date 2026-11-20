@@ -366,6 +366,45 @@ const analyticsConfig = {
 };
 const gtmId = import.meta.env.PUBLIC_GTM_ID || 'GTM-XXXXXXX';
 const metaDescription = campaign.subheadline || `${campaign.title} - Layanan perawatan dan pijat bayi homecare profesional oleh bidan bersertifikat di Surabaya dan Sidoarjo.`;
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'HealthAndBeautyBusiness',
+      '@id': `${siteConfig.url}/#business`,
+      name: siteConfig.name,
+      legalName: siteConfig.legalName,
+      url: siteConfig.url,
+      image: `${siteConfig.url}/images/logo-kala.webp`,
+      logo: `${siteConfig.url}/images/logo-kala.webp`,
+      telephone: `+${siteConfig.whatsappNumber}`,
+      priceRange: siteConfig.priceRange,
+      areaServed: ['Surabaya', 'Sidoarjo'],
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: siteConfig.geo.latitude,
+        longitude: siteConfig.geo.longitude,
+      },
+      openingHours: 'Mo-Su 08:00-17:00',
+      sameAs: [siteConfig.instagramUrl],
+    },
+    {
+      '@type': 'Service',
+      '@id': `${siteConfig.url}/#baby-spa-homecare`,
+      name: 'Baby Spa & Homecare',
+      serviceType: 'Baby massage, newborn care, kids massage, postpartum care',
+      provider: { '@id': `${siteConfig.url}/#business` },
+      areaServed: ['Surabaya', 'Sidoarjo'],
+      offers: {
+        '@type': 'Offer',
+        price: siteConfig.promotion.numericPrice,
+        priceCurrency: 'IDR',
+        availability: 'https://schema.org/InStock',
+      },
+    },
+  ],
+};
 ---
 
 <!DOCTYPE html>
@@ -376,6 +415,7 @@ const metaDescription = campaign.subheadline || `${campaign.title} - Layanan per
     <meta name="robots" content="noindex, nofollow" />
     <title>{campaign.title}</title>
     <meta name="description" content={metaDescription} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <link rel="canonical" href={`https://kalababyspa.com/sales/${campaign.slug}`} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
