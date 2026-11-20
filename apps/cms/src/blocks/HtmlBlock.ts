@@ -28,6 +28,10 @@ export const HtmlBlock: Block = {
       type: 'code',
       required: true,
       label: 'Kode HTML',
+      access: {
+        update: ({ req, siblingData }: any) =>
+          !siblingData?.allowScripts || canToggleScripts({ req }),
+      },
       admin: {
         language: 'html',
         description:

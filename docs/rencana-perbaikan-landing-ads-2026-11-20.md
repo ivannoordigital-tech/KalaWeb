@@ -16,7 +16,7 @@
 | 1 — Konversi & UX | **Selesai** | Validator publish, guard float mobile, 8 CTA ter-track, CMS dideploy, Page 11 dipublish |
 | 2 — Satu sumber CSS | **Selesai** | Blok CMS kanonik, selector di-scope ke `.kala-html-raw`, impor repo dihapus |
 | 3 — Layout mode | **Selesai** | Kontrak raw eksplisit dari `maxWidth` + `padding`; background aman; tanpa migration |
-| 4 — Hardening | Belum | |
+| 4 — Hardening | **Selesai** | Validasi save (tolak script/CSS asing), role gate sandbox, CSP preview eksplisit |
 | 5 — Listener iframe | Belum | |
 | 6 — Aset/SEO | Belum | |
 | 7 — Guardrail & docs | Sebagian | Pedoman admin + progress log sudah diperbarui |
@@ -197,6 +197,19 @@ Background tidak lagi menjadi syarat. Warna background pada mode raw diterapkan 
 ---
 
 ## 6. Fase 4 — Hardening Keamanan (P1, ±1,5 hari)
+
+**Status:** Selesai (20 November 2026).
+
+**Implementasi final (menggantikan detail rencana di bawah):**
+
+1. **Validasi saat simpan, bukan menulis ulang HTML.** `apps/cms/src/utilities/validateHtmlBlock.ts` menolak `<script>`, `<iframe>`, `<object>`, `<embed>`, `<form>`, event handler, `javascript:`, `@import`, dan `url()` ke host asing (termasuk di atribut `style`). HTML yang aman tidak diubah, sehingga komentar/format admin tetap utuh.
+2. Hook `beforeChange` dipasang di `Pages`, `LandingPages`, dan `PageTemplates`. Blok `allowScripts: true` dikecualikan karena berjalan di iframe sandbox.
+3. Field `allowScripts` hanya dapat diubah `superadmin`/`operator`; field `html` pada blok sandbox juga read-only untuk role lain.
+4. CSP untuk route SSR `editor-view` diset lewat `Astro.response.headers` (karena `_headers` Cloudflare tidak berlaku untuk Functions). `frame-ancestors` hanya mengizinkan self + admin preview.
+5. `_headers` produksi tidak lagi mengizinkan `http://localhost:3005` sebagai frame ancestor.
+6. Bug lama `behavior:` juga menghapus `scroll-behavior:` diperbaiki dengan lookbehind.
+
+**Test:** `npm run test:html-safety` 15/15, `npm run test:validation-html` 10/10, `tsc --noEmit` lulus, PATCH berisi `<script>` dan CSS host asing ditolak HTTP 400 oleh server.
 
 ### 6.1 Batasi eksekusi & role
 

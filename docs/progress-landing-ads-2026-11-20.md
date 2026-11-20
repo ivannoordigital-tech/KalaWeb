@@ -103,12 +103,11 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 
 ---
 
-## 4. Pekerjaan tersisa (Fase 4-7)
+## 4. Pekerjaan tersisa (Fase 5-7)
 
-1. **Fase 4:** role gate `allowScripts`, sanitasi saat simpan, CSP per path.
-2. **Fase 5:** perbaikan listener iframe.
-3. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
-4. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
+1. **Fase 5:** perbaikan listener iframe.
+2. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
+3. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
 
 ---
 
@@ -173,7 +172,53 @@ contained = kombinasi lainnya
 
 ---
 
-## 7. Catatan operasional
+## 7. Fase 4 — Hardening keamanan
+
+**Pendekatan:** validasi saat simpan (menolak), bukan menulis ulang HTML. Dengan begitu konten aman tidak berubah dan admin mendapat pesan error yang jelas.
+
+### 7.1 Validasi blok HTML
+
+`apps/cms/src/utilities/validateHtmlBlock.ts` menolak pada `beforeChange`:
+
+- `<script>`, `<iframe>`, `<object>`, `<embed>`, `<form>`
+- event handler (`onclick`, dll) dan URL `javascript:`
+- `@import` di CSS
+- `url()` ke host di luar allowlist (`cdn.scalev.id`, `kalababyspa.com`, `fonts.googleapis.com`, `fonts.gstatic.com`, `data:`, relatif)
+
+Hook dipasang di `Pages`, `LandingPages`, dan `PageTemplates`. Blok `allowScripts: true` dilewati karena berjalan di iframe sandbox.
+
+### 7.2 Role gate
+
+- `allowScripts` hanya dapat diubah `superadmin`/`operator`.
+- Field `html` pada blok sandbox menjadi read-only untuk role lain, sehingga script yang sudah ada tidak bisa disisipi konten baru oleh editor non-teknis.
+
+### 7.3 CSP
+
+- Route SSR `editor-view/sales/*` menyetel CSP sendiri via `Astro.response.headers` dengan `frame-ancestors 'self' https://admin.kalababyspa.com http://localhost:3005`.
+- CSP global `_headers` tidak lagi mengizinkan `localhost:3005` sebagai frame ancestor.
+- Alasan: `_headers` Cloudflare tidak berlaku untuk route Functions/SSR, sehingga header harus diset dari route.
+
+### 7.4 Bug yang ikut diperbaiki
+
+Regex lama `behavior:` juga memotong `scroll-behavior:`, sehingga `html{scroll-behavior:smooth}` menjadi `html{scroll-smooth}`. Regex diganti dengan lookbehind dan smooth scroll kembali aktif.
+
+### 7.5 Verifikasi
+
+| Cek | Hasil |
+|---|---|
+| `npm run test:html-safety` | 15/15 lulus |
+| `npm run test:validation-html` | 10/10 lulus |
+| `tsc --noEmit` CMS | lulus |
+| PATCH template dengan `<script>` | **HTTP 400** |
+| PATCH template dengan `url(https://evil.example)` | **HTTP 400** |
+| Preview draft dengan CSP baru | render normal, 0 console error, Fredoka, 9 ref CTA, 0 iframe |
+| Live Page 11 | tanpa overflow, float mobile `none`, 9 CTA, `scroll-behavior` aktif |
+
+Catatan: `<style>` tetap diizinkan karena merupakan fitur utama landing page. Yang dibatasi adalah script/form/iframe dan URL CSS eksternal.
+
+---
+
+## 8. Catatan operasional
 
 Deploy CMS (manual, jika diperlukan):
 

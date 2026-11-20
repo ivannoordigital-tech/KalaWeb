@@ -39,6 +39,11 @@ ${CSS_MARKER}
 `
 
 function applyCssPatch(html: string) {
+  // Jika guard scoped sudah ada, jangan tambahkan guard global lagi.
+  if (/\.kala-html-raw\s+\.float-wa\s*\{\s*display\s*:\s*none/i.test(html)) {
+    return { html, changed: false }
+  }
+
   // Hapus patch lama (termasuk yang sebelumnya salah tempel di luar </style>).
   let base = html.split(CSS_PATCH).join('')
   base = base.split(CSS_PATCH.trim()).join('')
