@@ -6,6 +6,7 @@ import { pageSeoAdapter, calculateSeoScore } from '../lib/seo-engine'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
 import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
+import { validatePageLayoutHtml } from '../utilities/validateHtmlBlock'
 import { formatSlug } from '../utilities/formatSlug'
 
 const RESERVED_SLUGS = [
@@ -98,6 +99,8 @@ export const Pages: CollectionConfig = {
     ],
     beforeChange: [
       async ({ data, req, originalDoc }) => {
+        validatePageLayoutHtml(data)
+
         // DAT-008: Cegah overwrite antar editor (Optimistic Lock)
         if (originalDoc?.updatedAt && (data as any)?._expectedUpdatedAt) {
           const originalTime = new Date(originalDoc.updatedAt).getTime()

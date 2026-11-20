@@ -9,6 +9,25 @@ import { fetchPreviewDraftByToken, PreviewAuthError } from '../../../lib/preview
 import '../../../styles/global.css';
 
 const { slug } = Astro.params;
+
+// Route ini adalah SSR (prerender = false), sehingga _headers Cloudflare tidak
+// berlaku. Set CSP sendiri agar preview tetap bisa di-iframe oleh admin, tetapi
+// tidak oleh origin lain.
+const previewCsp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.google-analytics.com https://*.clarity.ms https://connect.facebook.net https://*.facebook.net https://static.cloudflareinsights.com https://analytics.tiktok.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com data:",
+  "img-src 'self' data: https: blob:",
+  "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.clarity.ms https://*.bing.com https://connect.facebook.net https://*.facebook.com https://www.facebook.com https://static.cloudflareinsights.com https://*.cloudflareinsights.com https://analytics.tiktok.com https://*.cloud.run https://*.on.aws https://admin.kalababyspa.com",
+  "frame-src 'self' https://www.googletagmanager.com https://*.facebook.com https://www.facebook.com",
+  "frame-ancestors 'self' https://admin.kalababyspa.com http://localhost:3005",
+  "base-uri 'self'",
+  "object-src 'none'",
+].join('; ');
+
+Astro.response.headers.set('Content-Security-Policy', previewCsp);
+
 const token = Astro.url.searchParams.get('token');
 
 // Security Check: Token is mandatory

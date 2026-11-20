@@ -1,5 +1,11 @@
 import type { Block } from 'payload'
+import { getUserRole } from '../access/roles'
 import { blockSettingsFields } from './commonBlockFields'
+
+const canToggleScripts = ({ req }: { req: { user?: any } }) => {
+  const role = getUserRole(req.user)
+  return role === 'superadmin' || role === 'operator'
+}
 
 export const HtmlBlock: Block = {
   slug: 'html',
@@ -33,6 +39,10 @@ export const HtmlBlock: Block = {
       type: 'checkbox',
       defaultValue: false,
       label: 'Jalankan JavaScript di dalam sandbox (Advanced)',
+      access: {
+        create: canToggleScripts,
+        update: canToggleScripts,
+      },
       admin: {
         description:
           'Jika dicentang, HTML dirender di dalam iframe sandbox: script boleh berjalan, tetapi tidak bisa mengakses DOM halaman induk, cookie, localStorage, atau mengarahkan ulang halaman. Hanya aktifkan untuk kode yang Anda percaya.',

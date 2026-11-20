@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
+import { validatePageLayoutHtml } from '../utilities/validateHtmlBlock'
 
 export const PageTemplates: CollectionConfig = {
   slug: 'page-templates',
@@ -23,6 +24,14 @@ export const PageTemplates: CollectionConfig = {
     create: canManagePagesAndLPs,
     update: canManagePagesAndLPs,
     delete: canManagePagesAndLPs,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        validatePageLayoutHtml(data)
+        return data
+      },
+    ],
   },
   fields: [
     {

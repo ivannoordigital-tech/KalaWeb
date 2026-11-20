@@ -91,11 +91,12 @@ const sanitized = !allowScripts && raw
   ? sanitizeHtml(raw, {
       allowedTags: [
         'style',
+        '!--',
         'div', 'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
         'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'ul', 'ol', 'li', 'dl', 'dt', 'dd',
         'a', 'strong', 'b', 'em', 'i', 'u', 's', 'small', 'mark',
-        'br', 'hr', 'blockquote', 'pre', 'code',
+        'br', 'hr', 'blockquote', 'cite', 'pre', 'code',
         'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'colgroup', 'col',
         'img', 'figure', 'figcaption', 'picture', 'source',
         'video', 'audio',
@@ -127,7 +128,7 @@ const sanitized = !allowScripts && raw
       .replace(/@import[^;]+;/gi, '')
       .replace(/expression\s*\(/gi, '')
       .replace(/javascript\s*:/gi, '')
-      .replace(/behavior\s*:/gi, '')
+      .replace(/(?<![\w-])behavior\s*:/gi, '')
       .replace(/-moz-binding\s*:/gi, '')
   : '';
 

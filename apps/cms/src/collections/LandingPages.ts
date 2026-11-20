@@ -6,6 +6,7 @@ import { landingPageSeoAdapter, calculateSeoScore } from '../lib/seo-engine'
 import { canManagePagesAndLPs, getUserRole } from '../access/roles'
 import { allBlocks } from '../blocks'
 import { validatePageBuilderDoc } from '../utilities/pageBuilderValidators'
+import { validatePageLayoutHtml } from '../utilities/validateHtmlBlock'
 
 export const LandingPages: CollectionConfig = {
   slug: 'landing-pages',
@@ -63,6 +64,8 @@ export const LandingPages: CollectionConfig = {
     ],
     beforeChange: [
       async ({ data, req }) => {
+        validatePageLayoutHtml(data)
+
         // Auto-generate standard refCode if empty
         if (!data.refCode && data.slug) {
           const cleanSlug = String(data.slug).toUpperCase().replace(/[^A-Z0-9]/g, '-');
