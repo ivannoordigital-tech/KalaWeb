@@ -322,10 +322,16 @@ npm run backup:landing
 
 Menulis JSON Page 11 + Template 1 ke `backups/pages/` dan `backups/page-templates/`, menampilkan jumlah blok + hash SHA-256, dan menyimpan maksimal 30 file per jenis.
 
+Di VPS yang tidak memiliki Node.js di host, gunakan wrapper Docker:
+
+```bash
+cd /opt/kalaweb && bash scripts/backup-landing-docker.sh
+```
+
 Cron produksi (contoh):
 
 ```cron
-0 3 * * * cd /opt/kalaweb && npm run backup:landing >> /var/log/kala-landing-backup.log 2>&1
+0 3 * * * cd /opt/kalaweb && bash scripts/backup-landing-docker.sh >> backups/landing-backup.log 2>&1
 ```
 
 File bertimestamp ISO di-ignore dari git agar repo tidak membengkak.

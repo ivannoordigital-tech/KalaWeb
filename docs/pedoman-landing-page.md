@@ -119,7 +119,7 @@ Jangan menganggap "Simpan Draf" sudah mengubah halaman publik.
 
 ### 5.6 Backup & smoke test
 
-- Backup konten: `npm run backup:landing` (Page 11 + Template 1, pruning 30 file). Cron produksi ada di `docs/runbook-teknis.md`.
+- Backup konten: `npm run backup:landing` (lokal) atau `bash scripts/backup-landing-docker.sh` (VPS tanpa Node.js). Script menyimpan Page 11 + Template 1 dengan pruning 30 file.
 - Sebelum publish perubahan besar:
 
 ```bash
