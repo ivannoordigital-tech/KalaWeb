@@ -1,9 +1,9 @@
-# Progres Perbaikan Landing Page Ads — Fase 0, 1 & 2
+# Progres Perbaikan Landing Page Ads — Fase 0–4
 
 **Tanggal:** 20 November 2026
 **Ruang lingkup:** Page ID 11 (`promo-treatment`) + PageTemplate ID 1
 **Referensi rencana:** `docs/rencana-perbaikan-landing-ads-2026-11-20.md`
-**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global)
+**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global), `1083c1a` (hardening simpan + CSP), `fc4c270` (batasi edit sandbox + guard patch)
 
 ---
 
