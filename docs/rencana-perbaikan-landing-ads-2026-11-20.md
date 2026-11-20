@@ -18,7 +18,7 @@
 | 3 — Layout mode | **Selesai** | Kontrak raw eksplisit dari `maxWidth` + `padding`; background aman; tanpa migration |
 | 4 — Hardening | **Selesai** | Validasi save (tolak script/CSS asing), role gate sandbox, CSP preview eksplisit |
 | 5 - Listener iframe | **Selesai** | Listener singleton, query frame saat pesan masuk, cek origin/source, uji fixture browser |
-| 6 — Aset/SEO | Belum | |
+| 6 - Aset/SEO | **Selesai** | Dimensi gambar, JSON-LD, disclaimer, link/CTA checker |
 | 7 — Guardrail & docs | Sebagian | Pedoman admin + progress log sudah diperbarui |
 
 Detail eksekusi: `docs/progress-landing-ads-2026-11-20.md`.
@@ -259,7 +259,18 @@ Sudah diuji: `url(https://evil.example/track.gif)` lolos sanitizer. CSS tidak bi
 
 ---
 
-## 8. Fase 6 — Aset, SEO, Kepatuhan (P2, ±1 hari)
+## 8. Fase 6 - Aset, SEO, Kepatuhan (P2, ±1 hari)
+
+**Status:** Selesai (20 November 2026).
+
+**Implementasi:**
+
+1. **Gambar:** 8 gambar CDN diberi `width`/`height` intrinsik + `decoding="async"`; hero logo mendapat `fetchpriority="high"`. `srcset` tidak diterapkan karena CDN Scalev tidak menyediakan varian ukuran — migrasi ke Media CMS/R2 dengan varian menjadi rekomendasi lanjutan.
+2. **Struktur data:** JSON-LD `@graph` berisi `HealthAndBeautyBusiness` (nama, telepon, area, geo, jam buka, Instagram) dan `Service` (baby spa/homecare + offer). `AggregateRating`/`Review` sengaja tidak dipasang karena belum terverifikasi.
+3. **Kepatuhan:** S&K promo ditambahkan di kotak promo; disclaimer hasil testimoni di section testimoni; disclaimer kesehatan di closing CTA (layanan komplementer, bukan pengganti dokter).
+4. **Link checker:** `npm run check:landing-links` memeriksa anchor internal, halaman internal, CTA `/cta`, dan kelengkapan `data-ref-code`.
+
+**Acceptance:** tidak ada link mati, gambar punya dimensi, schema valid, disclaimer tampil. **Terpenuhi** (8 link, 2 anchor, 9 CTA tracked, 0 gagal).
 
 1. **Gambar:** tambahkan `width`/`height` (atau `aspect-ratio`) dan `srcset`/`sizes` untuk 8 gambar `cdn.scalev.id`; pertimbangkan migrasi ke Media CMS sendiri. Hero logo: `fetchpriority="high"`.
 2. **Struktur data:** tambahkan JSON-LD `LocalBusiness` + `Service`; `Review`/`AggregateRating` hanya jika testimoni benar-benar terverifikasi.

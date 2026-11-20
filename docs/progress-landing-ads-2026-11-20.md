@@ -1,9 +1,9 @@
-# Progres Perbaikan Landing Page Ads — Fase 0–5
+# Progres Perbaikan Landing Page Ads — Fase 0–6
 
 **Tanggal:** 20 November 2026
 **Ruang lingkup:** Page ID 11 (`promo-treatment`) + PageTemplate ID 1
 **Referensi rencana:** `docs/rencana-perbaikan-landing-ads-2026-11-20.md`
-**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global), `1083c1a` (hardening simpan + CSP), `fc4c270` (batasi edit sandbox + guard patch), `26c8238` (listener iframe)
+**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global), `1083c1a` (hardening simpan + CSP), `fc4c270` (batasi edit sandbox + guard patch), `26c8238` (listener iframe), `f263ab2` (gambar + JSON-LD + disclaimer)
 
 ---
 
@@ -103,10 +103,9 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 
 ---
 
-## 4. Pekerjaan tersisa (Fase 6-7)
+## 4. Pekerjaan tersisa (Fase 7)
 
-1. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
-2. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
+1. **Fase 7:** Playwright smoke test, backup harian, dokumentasi final.
 
 ---
 
@@ -243,7 +242,52 @@ Fixture dihapus setelah verifikasi; build produksi tidak memuat halaman uji.
 
 ---
 
-## 9. Catatan operasional
+## 9. Fase 6 — Aset, SEO, kepatuhan
+
+### 9.1 Gambar
+
+- 8 gambar `cdn.scalev.id` diberi `width`/`height` intrinsik (640×431, 640×503, 640×443, 640×391, 640×417, 640×410, 640×438, 640×385) + `decoding="async"`.
+- Hero logo `/images/logo-kala.webp` diberi `fetchpriority="high"` dan `decoding="async"`.
+- `srcset` belum diterapkan: CDN Scalev tidak menyediakan varian ukuran. Rekomendasi lanjutan: migrasi ke Media CMS/R2 dengan varian 480/960px.
+
+### 9.2 JSON-LD
+
+`@graph` berisi `HealthAndBeautyBusiness` + `Service`:
+
+- nama, legal name, URL, logo, telepon, price range
+- areaServed Surabaya & Sidoarjo, geo, jam buka, Instagram
+- Service baby spa/homecare + `Offer` mulai Rp60.000
+- `AggregateRating`/`Review` tidak dipasang karena belum terverifikasi
+
+### 9.3 Kepatuhan
+
+- **S&K promo** ditambahkan di kotak promo: reservasi pertama, tidak digabung promo lain, kuota harian terbatas.
+- **Disclaimer testimoni**: "Testimoni dari orang tua klien Kala. Hasil dapat berbeda pada setiap anak."
+- **Disclaimer kesehatan** di closing CTA: layanan komplementer, bukan pengganti pemeriksaan/pengobatan dokter; hentikan sesi dan konsultasikan bila ada tanda bahaya.
+- Kebijakan privasi sudah tertaut dari banner consent.
+
+### 9.4 Link checker
+
+`npm run check:landing-links` memeriksa:
+
+- anchor internal (`#booking`, `#layanan`)
+- halaman internal (`/kebijakan-privasi`)
+- CTA `app.kalababyspa.online/cta`
+- kelengkapan `kala-wa-btn` + `data-ref-code`
+
+Hasil build lokal: **8 link, 2 anchor valid, 9 CTA tracked, 5 ref unik, 0 gagal**.
+
+### 9.5 Verifikasi live
+
+- JSON-LD terdeteksi di HTML live: `@graph` berisi `HealthAndBeautyBusiness` + `Service`, tanpa `aggregateRating`.
+- 8 gambar memiliki `width="640"` + `height` intrinsik; hero logo `fetchpriority="high"`.
+- S&K promo, disclaimer testimoni, dan disclaimer kesehatan tampil di HTML live.
+- `npm run check:landing-links` terhadap live: **0 gagal**.
+- Audit 375/1440: tanpa overflow, float mobile `none`, 0 iframe, 9 CTA, font Fredoka.
+
+---
+
+## 10. Catatan operasional
 
 Deploy CMS (manual, jika diperlukan):
 
