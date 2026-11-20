@@ -28,6 +28,8 @@ pnpm-debug.log*
 **/.wrangler/
 src/generated/
 **/src/generated/
+scratch/
+landing-page-sections/preview-full.html
 
 # OS metadata
 .DS_Store
