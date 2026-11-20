@@ -1,9 +1,9 @@
-# Progres Perbaikan Landing Page Ads — Fase 0 & 1
+# Progres Perbaikan Landing Page Ads — Fase 0, 1 & 2
 
 **Tanggal:** 20 November 2026
 **Ruang lingkup:** Page ID 11 (`promo-treatment`) + PageTemplate ID 1
 **Referensi rencana:** `docs/rencana-perbaikan-landing-ads-2026-11-20.md`
-**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS)
+**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global)
 
 ---
 
@@ -140,6 +140,9 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 | Page 11 di build lokal (375 & 1440) | identik dengan live: tanpa overflow, font Fredoka/Nunito, 0 iframe, 9 CTA |
 | Halaman legacy `/sales/bayi-kolik` | tidak rusak; jarak section kembali ke padding Tailwind (menghapus efek samping `section{padding:76px 0}` global) |
 | `npm run check:landing-css` | sinkron |
+| Live setelah deploy (commit `199e1c0`) | Page 11 375/1440 identik, tanpa overflow, float mobile `none`, 0 iframe, 9 CTA |
+| Bundle CSS live | landing CSS global tidak lagi dimuat (hanya 1 stylesheet, bukan 2) |
+| Legacy live setelah deploy | sama dengan build lokal; header, kartu, CTA, consent tetap utuh |
 
 Catatan: halaman legacy memang berubah sedikit (lebih rapat) karena efek bocor CSS global dihapus. Ini mengembalikan tampilan ke padding native Tailwind, bukan regresi.
 
