@@ -59,6 +59,9 @@ function buildSandboxDocument(html: string): string {
   } else {
     window.setInterval(sendHeight, 500);
   }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(sendHeight).catch(function () {});
+  }
   sendHeight();
 })();
 `;
@@ -198,22 +201,40 @@ const rawBgStyle = rawBackgroundStyle(block.background);
 )}
 
 <script>
+  type KalaHeightMessage = { type?: string; id?: string; height?: number };
+
   function initKalaHtmlFrames() {
-    const frames = Array.from(document.querySelectorAll<HTMLIFrameElement>('[data-kala-html-frame]'));
-    if (frames.length === 0) return;
+    const kalaWindow = window as Window & { __kalaHtmlFrameListener?: boolean };
+    if (kalaWindow.__kalaHtmlFrameListener) return;
+    kalaWindow.__kalaHtmlFrameListener = true;
 
-    window.addEventListener('message', (event) => {
-      const data = event.data;
-      if (!data || data.type !== 'kala-html-height') return;
+    window.addEventListener(
+      'message',
+      (event: MessageEvent<KalaHeightMessage>) => {
+        const data = event.data;
+        if (!data || data.type !== 'kala-html-height') return;
 
-      const frame = frames.find((item) => item.contentWindow === event.source);
-      if (!frame) return;
+        // iframe sandbox tanpa allow-same-origin memiliki opaque origin "null".
+        if (event.origin !== 'null') return;
 
-      const height = Number(data.height);
-      if (Number.isFinite(height) && height > 0) {
-        frame.style.height = `${Math.ceil(height)}px`;
-      }
-    });
+        const frameId = typeof data.id === 'string' ? data.id : '';
+        if (!frameId) return;
+
+        const frame = Array.from(
+          document.querySelectorAll<HTMLIFrameElement>('[data-kala-html-frame]')
+        ).find((item) => item.dataset.frameId === frameId);
+        if (!frame || event.source !== frame.contentWindow) return;
+
+        const height = Number(data.height);
+        if (!Number.isFinite(height) || height <= 0) return;
+
+        const nextHeight = `${Math.ceil(height)}px`;
+        if (frame.style.height !== nextHeight) {
+          frame.style.height = nextHeight;
+        }
+      },
+      { passive: true }
+    );
   }
 
   initKalaHtmlFrames();

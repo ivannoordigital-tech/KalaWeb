@@ -103,11 +103,10 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 
 ---
 
-## 4. Pekerjaan tersisa (Fase 5-7)
+## 4. Pekerjaan tersisa (Fase 6-7)
 
-1. **Fase 5:** perbaikan listener iframe.
-2. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
-3. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
+1. **Fase 6:** dimensi gambar, JSON-LD, disclaimer, link check.
+2. **Fase 7:** Playwright smoke test, backup harian, dokumentasi.
 
 ---
 
@@ -218,7 +217,33 @@ Catatan: `<style>` tetap diizinkan karena merupakan fitur utama landing page. Ya
 
 ---
 
-## 8. Catatan operasional
+## 8. Fase 5 — Listener iframe
+
+**Masalah:** listener `message` ditambahkan ulang setiap `astro:page-load`, daftar frame disimpan saat init (frame baru tidak terdeteksi), dan tidak ada validasi origin/source.
+
+**Perbaikan:**
+
+1. Guard `window.__kalaHtmlFrameListener` memastikan listener hanya dipasang sekali.
+2. Frame dicari saat pesan diterima berdasarkan `data-frame-id`, bukan dari snapshot.
+3. Validasi `event.origin === 'null'` (opaque origin iframe sandbox) dan `event.source === frame.contentWindow`.
+4. Tinggi hanya diubah jika nilainya berbeda.
+5. Tinggi dikirim ulang setelah `document.fonts.ready` agar font web tidak memotong konten.
+
+**Verifikasi fixture browser:**
+
+| Skenario | Hasil |
+|---|---|
+| Iframe statis 620px | tinggi 620px (sebelumnya 200px) |
+| Iframe statis 320px | tinggi 320px |
+| Iframe dinamis ditambahkan setelah load | tinggi 450px |
+| Iframe non-sandbox (origin bukan `null`) | tetap 200px, diabaikan |
+| `astro:page-load` dipicu 5× | tinggi stabil, 0 console error |
+
+Fixture dihapus setelah verifikasi; build produksi tidak memuat halaman uji.
+
+---
+
+## 9. Catatan operasional
 
 Deploy CMS (manual, jika diperlukan):
 

@@ -17,7 +17,7 @@
 | 2 — Satu sumber CSS | **Selesai** | Blok CMS kanonik, selector di-scope ke `.kala-html-raw`, impor repo dihapus |
 | 3 — Layout mode | **Selesai** | Kontrak raw eksplisit dari `maxWidth` + `padding`; background aman; tanpa migration |
 | 4 — Hardening | **Selesai** | Validasi save (tolak script/CSS asing), role gate sandbox, CSP preview eksplisit |
-| 5 — Listener iframe | Belum | |
+| 5 - Listener iframe | **Selesai** | Listener singleton, query frame saat pesan masuk, cek origin/source, uji fixture browser |
 | 6 — Aset/SEO | Belum | |
 | 7 — Guardrail & docs | Sebagian | Pedoman admin + progress log sudah diperbarui |
 
@@ -239,7 +239,9 @@ Sudah diuji: `url(https://evil.example/track.gif)` lolos sanitizer. CSS tidak bi
 
 ---
 
-## 7. Fase 5 — Perbaikan Listener Iframe (P2, ±0,5 hari)
+## 7. Fase 5 - Perbaikan Listener Iframe (P2, ±0,5 hari)
+
+**Status:** Selesai (20 November 2026). Diuji dengan fixture browser: 2 iframe sandbox statis, 1 iframe dinamis, dan 1 iframe non-sandbox (harus diabaikan).
 
 **File:** `apps/web-kala/src/components/blocks/HtmlBlock.astro`
 
