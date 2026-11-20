@@ -19,7 +19,7 @@
 | 4 — Hardening | **Selesai** | Validasi save (tolak script/CSS asing), role gate sandbox, CSP preview eksplisit |
 | 5 - Listener iframe | **Selesai** | Listener singleton, query frame saat pesan masuk, cek origin/source, uji fixture browser |
 | 6 - Aset/SEO | **Selesai** | Dimensi gambar, JSON-LD, disclaimer, link/CTA checker |
-| 7 — Guardrail & docs | Sebagian | Pedoman admin + progress log sudah diperbarui |
+| 7 - Guardrail & docs | **Selesai** | Playwright 4/4, backup harian, workflow CI, dokumentasi final |
 
 Detail eksekusi: `docs/progress-landing-ads-2026-11-20.md`.
 
@@ -282,7 +282,23 @@ Sudah diuji: `url(https://evil.example/track.gif)` lolos sanitizer. CSS tidak bi
 
 ---
 
-## 9. Fase 7 — Guardrail, Backup, Dokumentasi (P2, ±1 hari)
+## 9. Fase 7 - Guardrail, Backup, Dokumentasi (P2, ±1 hari)
+
+**Status:** Selesai (20 November 2026).
+
+**Implementasi:**
+
+1. **Playwright smoke test** (`tests/e2e/landing-ads.spec.ts`) — 4 test:
+   - desktop 1440: layout, font, CTA tracking, schema, disclaimer
+   - tablet 768: tanpa overflow
+   - mobile 375: float WA tersembunyi, sticky bar muncul setelah scroll
+   - legacy `/sales/bayi-kolik`: tanpa overflow
+2. **Static server** `scripts/serve-dist.mjs` karena `astro preview` tidak mendukung adapter Cloudflare.
+3. **Backup harian** `npm run backup:landing`: JSON Page 11 + Template 1, pruning 30 file, hash SHA-256 di log.
+4. **CI** `.github/workflows/landing-smoke.yml`: build web + Playwright (Chrome bawaan runner) + artifact trace saat gagal.
+5. Dokumentasi admin, runbook, dan progress diperbarui.
+
+**Hasil:** `npm run test:smoke` → **4 passed**; `npm run backup:landing` → 2 file backup dibuat (blok 11).
 
 ### 9.1 Smoke test Playwright
 

@@ -136,6 +136,25 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
 4. Klik tombol **Manage Deployment** > **Rollback to this deployment**.
 5. Situs langsung aktif kembali dalam hitungan detik.
 
+### 4.3 Backup & Smoke Test Landing Page
+- **Backup harian** Page 11 + Template 1:
+  ```bash
+  cd /opt/kalaweb && npm run backup:landing
+  ```
+  File JSON ditulis ke `backups/pages/` dan `backups/page-templates/`; maksimal 30 file per jenis. Cron yang disarankan:
+  ```cron
+  0 3 * * * cd /opt/kalaweb && npm run backup:landing >> /var/log/kala-landing-backup.log 2>&1
+  ```
+- **Restore** konten: ambil file JSON terbaru, lalu PATCH `layout` ke CMS (lihat `backups/README.md`) atau pulihkan versi dokumen dari Payload.
+- **Smoke test** sebelum/sesudah rilis:
+  ```bash
+  npm run build --workspace=web-kala
+  npm run test:smoke
+  ```
+  Test memakai Chrome terpasang (`channel: chrome`), tanpa download browser.
+- **Pemeriksaan tambahan:** `npm run check:landing-css` (drift CSS CMS) dan `npm run check:landing-links` (link/CTA).
+- **CI:** `.github/workflows/landing-smoke.yml` menjalankan build + smoke test otomatis.
+
 ---
 
 ## 5. Integrasi Database Bersama (PostgreSQL VPS ↔ WA Clinic Bot)

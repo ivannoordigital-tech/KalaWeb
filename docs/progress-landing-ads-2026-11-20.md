@@ -1,9 +1,9 @@
-# Progres Perbaikan Landing Page Ads — Fase 0–6
+# Progres Perbaikan Landing Page Ads — Fase 0–7
 
 **Tanggal:** 20 November 2026
 **Ruang lingkup:** Page ID 11 (`promo-treatment`) + PageTemplate ID 1
 **Referensi rencana:** `docs/rencana-perbaikan-landing-ads-2026-11-20.md`
-**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global), `1083c1a` (hardening simpan + CSP), `fc4c270` (batasi edit sandbox + guard patch), `26c8238` (listener iframe), `f263ab2` (gambar + JSON-LD + disclaimer)
+**Commit:** `759e801` (validator + patch CTA), `90df638` (dokumentasi), `1a56121` (consent z-index + perbaikan sisip CSS), `199e1c0` (scoping CSS + hapus impor global), `1083c1a` (hardening simpan + CSP), `fc4c270` (batasi edit sandbox + guard patch), `26c8238` (listener iframe), `f263ab2` (gambar + JSON-LD + disclaimer), `0b247c9` (smoke test + backup harian)
 
 ---
 
@@ -103,9 +103,14 @@ Catatan: URL tanpa trailing slash mengembalikan **307** ke versi ber-trailing-sl
 
 ---
 
-## 4. Pekerjaan tersisa (Fase 7)
+## 4. Status akhir
 
-1. **Fase 7:** Playwright smoke test, backup harian, dokumentasi final.
+Seluruh fase 0–7 selesai. Yang tersisa hanya operasional rutin:
+
+- backup harian via cron,
+- smoke test otomatis di CI setiap perubahan,
+- review CSS/JS sebelum publish,
+- migrasi gambar ke Media CMS/R2 bila ingin `srcset`.
 
 ---
 
@@ -287,7 +292,62 @@ Hasil build lokal: **8 link, 2 anchor valid, 9 CTA tracked, 5 ref unik, 0 gagal*
 
 ---
 
-## 10. Catatan operasional
+## 10. Fase 7 — Guardrail & dokumentasi
+
+### 10.1 Playwright smoke test
+
+`tests/e2e/landing-ads.spec.ts` — 4 test:
+
+| Test | Cakupan |
+|---|---|
+| Desktop 1440 | tanpa overflow, 0 iframe, Fredoka/Nunito, float tampil, sticky bar hidden, 9 CTA ber-ref, 8 gambar berdimensi, JSON-LD valid, disclaimer |
+| Tablet 768 | tanpa overflow, float tampil, sticky bar hidden |
+| Mobile 375 | tanpa overflow, float `none`, sticky bar muncul setelah scroll, float tidak punya bounding box |
+| Legacy `/sales/bayi-kolik` | halaman tetap tampil tanpa overflow |
+
+Menjalankan:
+
+```bash
+npm run build --workspace=web-kala
+npm run test:smoke
+```
+
+Hasil: **4 passed (11,7 detik)**. Test memakai Chrome yang terpasang (`channel: chrome`), tanpa download browser.
+
+### 10.2 Backup harian
+
+```bash
+npm run backup:landing
+```
+
+Menulis JSON Page 11 + Template 1 ke `backups/pages/` dan `backups/page-templates/`, menampilkan jumlah blok + hash SHA-256, dan menyimpan maksimal 30 file per jenis.
+
+Cron produksi (contoh):
+
+```cron
+0 3 * * * cd /opt/kalaweb && npm run backup:landing >> /var/log/kala-landing-backup.log 2>&1
+```
+
+File bertimestamp ISO di-ignore dari git agar repo tidak membengkak.
+
+### 10.3 CI
+
+`.github/workflows/landing-smoke.yml`:
+
+- trigger pada push/PR yang menyentuh web, blok CMS, test, atau script
+- `npm ci` → build web → Playwright (Chrome runner)
+- upload `test-results/` saat gagal
+- run pertama setelah commit `0b247c9`: **success** (build + smoke test)
+
+### 10.4 Dokumentasi
+
+- `docs/pedoman-landing-page.md` — alur simpan/publish, CSS CMS, CTA tracking, keamanan, backup.
+- `docs/runbook-teknis.md` — prosedur backup/restore/smoke test landing.
+- `docs/progress-landing-ads-2026-11-20.md` — catatan eksekusi lengkap.
+
+---
+
+## 11. Catatan operasional
 
 Deploy CMS (manual, jika diperlukan):
 

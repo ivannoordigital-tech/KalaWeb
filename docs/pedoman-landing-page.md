@@ -116,3 +116,18 @@ Jangan menganggap "Simpan Draf" sudah mengubah halaman publik.
 - [ ] Semua gambar memiliki `alt`, `width`, dan `height`.
 - [ ] Floating WhatsApp tidak diaktifkan untuk mobile.
 - [ ] Preview draft diuji di 375px, 768px, dan 1440px sebelum publish.
+
+### 5.6 Backup & smoke test
+
+- Backup konten: `npm run backup:landing` (Page 11 + Template 1, pruning 30 file). Cron produksi ada di `docs/runbook-teknis.md`.
+- Sebelum publish perubahan besar:
+
+```bash
+npm run build --workspace=web-kala
+npm run test:smoke
+npm run check:landing-css
+npm run check:landing-links
+```
+
+- `test:smoke` memakai Chrome yang terpasang dan menguji 375/768/1440, CTA tracking, JSON-LD, serta disclaimer.
+- CI `.github/workflows/landing-smoke.yml` menjalankan build + smoke test pada perubahan web/blok.
