@@ -334,6 +334,8 @@ Cron produksi (contoh):
 0 3 * * * cd /opt/kalaweb && bash scripts/backup-landing-docker.sh >> backups/landing-backup.log 2>&1
 ```
 
+Cron sudah terpasang di VPS per 20 November 2026 dan sudah diuji manual (2 file, blok 11).
+
 File bertimestamp ISO di-ignore dari git agar repo tidak membengkak.
 
 ### 10.3 CI

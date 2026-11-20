@@ -149,6 +149,7 @@ Lakukan rotasi minimal setiap 6 bulan atau saat pergantian tim teknis:
   ```cron
   0 3 * * * cd /opt/kalaweb && bash scripts/backup-landing-docker.sh >> backups/landing-backup.log 2>&1
   ```
+  Cron ini sudah terpasang di `klinik-server-baru` (20 November 2026).
 - **Restore** konten: ambil file JSON terbaru, lalu PATCH `layout` ke CMS (lihat `backups/README.md`) atau pulihkan versi dokumen dari Payload.
 - **Smoke test** sebelum/sesudah rilis:
   ```bash
